@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Brutal Truth Life Coaching | Honest Life Coach in Yeovil, Somerset UK | Online & In-Person Sessions</title>
+    <meta name="description" content="Brutal honesty life coaching in Yeovil, Somerset, UK. No-BS guidance via phone, Skype, Teams, or face-to-face. Worldwide clients welcome—ditch excuses, build real change.">
+    <meta name="keywords" content="life coaching Yeovil, brutal honesty coach UK, online life coach, Somerset life coaching, no-nonsense personal development">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://richietaylor.net/">
+    
+    <!-- Open Graph for Social Sharing -->
+    <meta property="og:title" content="The Brutal Truth Life Coaching - Yeovil, UK">
+    <meta property="og:description" content="Your No-BS Guide to Real Change. Face your truths with a direct coach—local in Somerset or global online.">
+    <meta property="og:image" content="banner.jpg"> <!-- Update this to your hosted banner image URL for social previews -->
+    <meta property="og:url" content="https://richietaylor.net/">
+    <meta property="og:type" content="website">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="The Brutal Truth Life Coaching - Yeovil, UK">
+    <meta name="twitter:description" content="Stop the excuses. Get brutally honest coaching for real progress—Yeovil-based, worldwide reach.">
+    <meta name="twitter:image" content="banner.jpg"> <!-- Update this to your hosted banner image URL for social previews -->
+    
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #000;
+            color: #fff;
+            padding: 1rem 0;
+            text-align: center;
+        }
+        nav {
+            background-color: #111; /* Darker gray to distinguish from header black */
+            padding: 0.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 2px solid #ff6b35; /* Orange underline for visibility pop */
+        }
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+        nav li {
+            margin: 0 1rem;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* Subtle shadow for extra contrast */
+        }
+        nav a:hover {
+            color: #ff6b35; /* Attention-grabbing orange hover */
+        }
+        .hero {
+            background-image: url('banner.jpg'); /* Your uploaded image as banner - save it as 'banner.jpg' in the same folder as index.html */
+            background-size: cover;
+            background-position: center;
+            color: #fff;
+            text-align: center;
+            padding: 6rem 2rem;
+            position: relative;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5); /* Overlay for readability - adjust opacity if needed for your image */
+        }
+        .hero > * {
+            position: relative;
+            z-index: 1;
+        }
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7); /* Makes it pop */
+            animation: fadeInUp 1s ease-out;
+        }
+        .hero p {
+            font-size: 1.3rem;
+            max-width: 800px;
+            margin: 0 auto;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        section {
+            padding: 3rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .about, .services, .contact {
+            background-color: #fff;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1); /* Deeper shadow for depth */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .about:hover, .services:hover, .contact:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15); /* Hover lift for engagement */
+        }
+        h2 {
+            color: #000;
+            border-bottom: 2px solid #ff6b35; /* Orange accent for grab */
+            padding-bottom: 0.5rem;
+            padding-top: 1rem; /* Added top padding to prevent overlap with section padding */
+            margin-top: 0;
+            font-size: 2rem;
+        }
+        .about img {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 50%;
+            display: block;
+            margin: 0 auto 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            animation: fadeIn 1.5s ease-out;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+        li {
+            background: linear-gradient(135deg, #f9f9f9, #e9e9e9);
+            margin: 0;
+            padding: 1.5rem;
+            border-left: 4px solid #ff6b35;
+            border-radius: 0 8px 8px 0;
+            transition: background 0.3s ease;
+            display: flex;
+            align-items: flex-start; /* Changed to flex-start for better text alignment if multi-line */
+            gap: 1rem; /* Added gap for spacing between image and text */
+        }
+        li:hover {
+            background: linear-gradient(135deg, #ff6b35, #ff8c5a);
+            color: #fff;
+        }
+        li img {
+            width: 50px;
+            height: 50px;
+            margin-right: 0; /* Removed since gap handles it */
+            border-radius: 50%;
+            flex-shrink: 0; /* Prevents image from shrinking */
+        }
+        li strong {
+            color: inherit;
+            display: block; /* Makes strong a block for better separation from description */
+            margin-bottom: 0.25rem;
+        }
+        li::after { /* Ensures the colon has space */
+            content: ": ";
+            font-weight: normal;
+        }
+        .contact a {
+            color: #ff6b35;
+            font-weight: bold;
+            text-decoration: none;
+            border-bottom: 1px solid #ff6b35;
+            transition: color 0.3s ease;
+        }
+        .contact a:hover {
+            color: #e55a2b;
+            border-bottom-color: #e55a2b;
+        }
+        .contact a[href^="https://wa.me/"] {
+            border-bottom-style: dotted; /* Dotted underline for WhatsApp to indicate clickability */
+        }
+        form {
+            display: grid;
+            gap: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        input, textarea, button {
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: 1px solid #333;
+            border-radius: 4px;
+            transition: border-color 0.3s ease;
+        }
+        input:focus, textarea:focus {
+            border-color: #ff6b35;
+            outline: none;
+        }
+        button {
+            background-color: #ff6b35; /* Orange CTA for attention */
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            border: none;
+            transition: background 0.3s ease;
+        }
+        button:hover {
+            background-color: #e55a2b;
+        }
+        footer {
+            background-color: #000;
+            color: #fff;
+            text-align: center;
+            padding: 1rem 0;
+        }
+        footer a {
+            color: #ff6b35;
+        }
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            .hero p {
+                font-size: 1.1rem;
+            }
+            nav ul {
+                flex-direction: column;
+            }
+            nav li {
+                margin: 0.5rem 0;
+            }
+            ul {
+                grid-template-columns: 1fr;
+            }
+            li {
+                justify-content: flex-start;
+                flex-direction: column; /* Stack on mobile for better readability */
+                align-items: flex-start;
+                text-align: left;
+            }
+            li img {
+                align-self: flex-start;
+            }
+            li strong {
+                margin-bottom: 0.5rem;
+            }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>The Brutal Truth Life Coaching</h1>
+        <p>Your No-BS Guide to Real Change</p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <section id="home" class="hero">
+        <h1>Stop Wasting Time on Feel-Good Lies</h1>
+        <p>Life coaching with brutal honesty. I'm here to call out your excuses, dismantle your delusions, and push you toward actual progress. No sugarcoating, no endless affirmations—just raw, actionable truth. Based in Yeovil, Somerset, but I work with clients worldwide via phone, Skype, Teams, or in-person if you're local.</p>
+    </section>
+
+    <section id="about" class="about">
+        <img src="profile.jpg" alt="Profile photo of Richie Taylor, The Brutal Truth Life Coach in Yeovil UK"> <!-- Your uploaded image as profile - save it as 'profile.jpg' in the same folder as index.html -->
+        <h2>About Me</h2>
+        <p>I'm Richie Taylor, a life coach who's been through the grinder and come out sharper. Based in Yeovil, UK, I've helped dozens of people—from stuck professionals to lost dreamers—face their realities head-on. My style? Direct. If you're avoiding the hard stuff, we'll fix that first. I believe real growth comes from uncomfortable truths, not motivational posters.</p>
+        <p>Whether you're in Somerset or across the globe, I'm equipped to deliver results without the fluff. Let's cut through the noise and get you moving.</p>
+    </section>
+
+    <section id="services" class="services">
+        <h2>Services</h2>
+        <p>I offer flexible, no-nonsense coaching tailored to your needs. Sessions are 60 minutes, focused on breaking barriers and building momentum.</p>
+        <ul>
+            <li><img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=50&q=80" alt="Phone icon for remote coaching"><strong>Phone Coaching</strong> Direct, distraction-free calls from anywhere. Ideal for busy schedules.</li>
+            <li><img src="https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=50&q=80" alt="Video call icon for Skype/Teams sessions"><strong>Skype/Teams Video</strong> Face-to-face vibe without the travel. Screen-sharing for goal-tracking if needed.</li>
+            <li><img src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?ixlib=rb-4.0.3&auto=format&fit=crop&w=50&q=80" alt="Handshake icon for in-person coaching"><strong>Face-to-Face</strong> In-person sessions in Yeovil, Somerset. For those who thrive on real-world intensity.</li>
+        </ul>
+        <p>Packages start at £90/hour. Group sessions and intensives available for deeper dives. Contact me to discuss what fits your reality.</p>
+    </section>
+
+    <section id="contact" class="contact">
+        <h2>Get Started—Or Keep Stalling</h2>
+        <p>Ready for the truth? Email me at <a href="mailto:lifecoaching@richietaylor.net">lifecoaching@richietaylor.net</a>. I'll respond within 24 hours with a no-obligation chat to see if we're a fit. WhatsApp: <a href="https://wa.me/447817976703">07817 976703</a></p>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 The Brutal Truth Life Coaching. Yeovil, Somerset, UK. All rights reserved. | <a href="#privacy">Privacy Policy</a></p>
+    </footer>
+
+    <script>
+        // Smooth scrolling for nav links with offset to account for sticky header/nav
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const headerOffset = 120; // Adjust this value based on your header + nav height (e.g., 1rem padding + nav padding + border)
+                    const elementPosition = target.getBoundingClientRect().top + window.pageYOffset;
+                    const offsetPosition = elementPosition - headerOffset;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
