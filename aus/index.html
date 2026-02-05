@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Full Trip Itinerary: UK → Queensland → Sydney → UK (May–June 2026)</title>
+  <title>Full Trip Itinerary 2026 – UK to Queensland & Sydney</title>
   <style>
     body {
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: Arial, sans-serif;
       margin: 20px;
-      line-height: 1.5;
-      background-color: #f9f9f9;
+      background: #f8f9fa;
       color: #333;
+      line-height: 1.5;
     }
     h1 {
       text-align: center;
@@ -19,9 +19,9 @@
     table {
       width: 100%;
       border-collapse: collapse;
+      background: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       margin: 20px 0;
-      background-color: white;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     th, td {
       border: 1px solid #ddd;
@@ -30,23 +30,24 @@
       vertical-align: top;
     }
     th {
-      background-color: #34495e;
+      background: #34495e;
       color: white;
       position: sticky;
       top: 0;
       z-index: 10;
     }
-    tr:nth-child(even) {
-      background-color: #f2f2f2;
-    }
-    tr:hover {
-      background-color: #e8f4f8;
+    tr:nth-child(even) { background: #f2f2f2; }
+    tr:hover { background: #e8f4f8; }
+    .total-row {
+      font-weight: bold;
+      background: #d4edda;
+      color: #155724;
     }
     .notes {
       max-width: 900px;
       margin: 20px auto;
       padding: 15px;
-      background-color: #fff;
+      background: white;
       border-left: 4px solid #3498db;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
@@ -56,15 +57,22 @@
       tr { border: 1px solid #ccc; margin-bottom: 15px; }
       td { border: none; border-bottom: 1px solid #eee; position: relative; padding-left: 50%; }
       td:before {
-        position: absolute; top: 6px; left: 6px; width: 45%; padding-right: 10px; white-space: nowrap;
-        content: attr(data-label); font-weight: bold; color: #34495e;
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        content: attr(data-label);
+        font-weight: bold;
+        color: #34495e;
       }
     }
   </style>
 </head>
 <body>
 
-<h1>Complete Trip Itinerary<br>Manchester → Queensland Coast → Sydney → Manchester<br>May 7 – June 2, 2026</h1>
+<h1>Complete Trip Itinerary 2026<br>Manchester → Queensland → Sydney → Manchester<br>May 7 – June 2</h1>
 
 <table>
   <thead>
@@ -74,310 +82,330 @@
       <th>Location</th>
       <th>Activities / Notes</th>
       <th>Accommodation</th>
-      <th>Transport / Flight Details</th>
+      <th>Transport / Flight</th>
       <th>Est. Cost (GBP, per person)</th>
-      <th>Bar Recommendations</th>
-      <th>Eat Recommendations</th>
+      <th>Cumulative (GBP)</th>
+      <th>Bars</th>
+      <th>Eat</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td data-label="Date">May 7–8, 2026</td>
-      <td data-label="Day">Thu–Fri</td>
-      <td data-label="Location">Manchester → Dubai → Melbourne</td>
-      <td data-label="Activities">Depart MAN 21:20 (Qantas QF8020 op. Emirates). Overnight flight. Arrive DXB 07:30 (May 8), connect 2h35, depart DXB 10:05 (QF8406 op. Emirates), arrive MEL 05:30 (May 9 local).</td>
-      <td data-label="Accommodation">In-flight</td>
-      <td data-label="Transport">QF8020 (MAN–DXB, 7h10) → QF8406 (DXB–MEL, 13h25)</td>
-      <td data-label="Est. Cost">Included in ticket</td>
-      <td data-label="Bars">N/A (in-flight)</td>
-      <td data-label="Eat">In-flight meals</td>
+      <td>May 7–8</td>
+      <td>Thu–Fri</td>
+      <td>Manchester → Dubai → Melbourne</td>
+      <td>Outbound long-haul (part of £1,400 international package)</td>
+      <td>In-flight</td>
+      <td>QF8020 → QF8406 (Emirates codeshare)</td>
+      <td>£600 (flight share)</td>
+      <td>£600</td>
+      <td>N/A</td>
+      <td>In-flight</td>
     </tr>
     <tr>
-      <td data-label="Date">May 9, 2026</td>
-      <td data-label="Day">Sat</td>
-      <td data-label="Location">Melbourne → Proserpine (PPP) → Airlie Beach</td>
-      <td data-label="Activities">Connect MEL 2h10 → Jetstar QF5832 dep 07:40, arr PPP 10:35. Jet lag recovery: Shuttle to Airlie Beach, settle, light beach/lagoon walk if energy allows.</td>
-      <td data-label="Accommodation">Magnums Queen Cabin (early check-in if available)</td>
-      <td data-label="Transport">QF5832 (MEL–PPP, 2h55) + airport shuttle (~30–45 min)</td>
-      <td data-label="Est. Cost">£75–110 pp (shuttle + light meals)</td>
-      <td data-label="Bars">Northerlies Beach Bar or Anchor Bar (if up for sunset)</td>
-      <td data-label="Eat">Light: Fish D’vine or picnic from Woolies</td>
+      <td>May 9</td>
+      <td>Sat</td>
+      <td>Melbourne → Proserpine → Airlie</td>
+      <td>Jetstar domestic leg (part of £1,400) + shuttle. Jet lag recovery.</td>
+      <td>Magnums Queen Cabin</td>
+      <td>QF5832 + shuttle</td>
+      <td>£275–310 (£200 flight share + land)</td>
+      <td>£875–910</td>
+      <td>Northerlies or Anchor</td>
+      <td>Fish D’vine or picnic</td>
     </tr>
     <tr>
-      <td data-label="Date">May 10, 2026</td>
-      <td data-label="Day">Sun</td>
-      <td data-label="Location">Whitsundays (Airlie Beach)</td>
-      <td data-label="Activities">Chilled day: Cannonvale Beach or Airlie Lagoon swim, relax, beach walk, sunset drinks.</td>
-      <td data-label="Accommodation">Magnums Queen Cabin</td>
-      <td data-label="Transport">Local walk/bus</td>
-      <td data-label="Est. Cost">£75–110 pp</td>
-      <td data-label="Bars">Northerlies or Anchor Bar</td>
-      <td data-label="Eat">Fish D’vine (seafood) or Mr Bones (pizza/burgers); picnic option</td>
+      <td>May 10</td>
+      <td>Sun</td>
+      <td>Whitsundays (Airlie Beach)</td>
+      <td>Chilled beach/lagoon day</td>
+      <td>Magnums Queen Cabin</td>
+      <td>Local walk/bus</td>
+      <td>£75–110</td>
+      <td>£950–1,020</td>
+      <td>Northerlies or Anchor</td>
+      <td>Fish D’vine or Mr Bones</td>
     </tr>
     <tr>
-      <td data-label="Date">May 11, 2026</td>
-      <td data-label="Day">Mon</td>
-      <td data-label="Location">Whitsundays (Airlie/Outer Reef)</td>
-      <td data-label="Activities">Snorkeling tour (fringing reefs, gear incl.). Optional jetski or pickleball afternoon.</td>
-      <td data-label="Accommodation">Magnums Queen Cabin</td>
-      <td data-label="Transport">Walk/shuttle to marina</td>
-      <td data-label="Est. Cost">£100–175 pp</td>
-      <td data-label="Bars">Northerlies (happy hour) or Magnum's (live music)</td>
-      <td data-label="Eat">The Shack (Thai) or Sol Restaurant (tacos)</td>
+      <td>May 11</td>
+      <td>Mon</td>
+      <td>Whitsundays (Reef)</td>
+      <td>Snorkeling tour + optional extras</td>
+      <td>Magnums Queen Cabin</td>
+      <td>Marina shuttle</td>
+      <td>£100–175</td>
+      <td>£1,050–1,195</td>
+      <td>Northerlies / Magnum's</td>
+      <td>The Shack or Sol</td>
     </tr>
     <tr>
-      <td data-label="Date">May 12, 2026</td>
-      <td data-label="Day">Tue</td>
-      <td data-label="Location">Proserpine → Townsville → Magnetic Island (Nelly Bay)</td>
-      <td data-label="Activities">Scenic train north. Ferry to Nelly Bay. Check-in. Afternoon hike: Sphinx Lookout. Pool/garden relax.</td>
-      <td data-label="Accommodation">Vintage Coral Green (One-Bedroom House, 2 nights)</td>
-      <td data-label="Transport">Spirit of Queensland PPP→TSV (~07:16–10:25) + SeaLink ferry</td>
-      <td data-label="Est. Cost">£100–150 pp</td>
-      <td data-label="Bars">Peppers Blue on Blue rooftop or local brewery</td>
-      <td data-label="Eat">Nelly Bay cafés or Peppers deck dining</td>
+      <td>May 12</td>
+      <td>Tue</td>
+      <td>Proserpine → Magnetic Island</td>
+      <td>Train + ferry + hike</td>
+      <td>Vintage Coral Green</td>
+      <td>Spirit of Queensland + SeaLink</td>
+      <td>£100–150</td>
+      <td>£1,150–1,345</td>
+      <td>Peppers rooftop</td>
+      <td>Nelly Bay cafés</td>
     </tr>
     <tr>
-      <td data-label="Date">May 13, 2026</td>
-      <td data-label="Day">Wed</td>
-      <td data-label="Location">Magnetic Island (Nelly Bay)</td>
-      <td data-label="Activities">Morning Discovery Tour (snorkel + SUP). Afternoon: pool/beach, optional Horseshoe Bay or wallabies at Geoffrey Bay.</td>
-      <td data-label="Accommodation">Vintage Coral Green</td>
-      <td data-label="Transport">Walk to tour; optional bus</td>
-      <td data-label="Est. Cost">£125–175 pp</td>
-      <td data-label="Bars">Magnetic Island Brewery or beachside sundowners</td>
-      <td data-label="Eat">Peppers deck or Nelly Bay fresh fish</td>
+      <td>May 13</td>
+      <td>Wed</td>
+      <td>Magnetic Island</td>
+      <td>Discovery snorkel/SUP tour</td>
+      <td>Vintage Coral Green</td>
+      <td>Walk/bus</td>
+      <td>£125–175</td>
+      <td>£1,275–1,520</td>
+      <td>Magnetic Brewery</td>
+      <td>Peppers or fresh fish</td>
     </tr>
     <tr>
-      <td data-label="Date">May 14, 2026</td>
-      <td data-label="Day">Thu</td>
-      <td data-label="Location">Magnetic Island → Mission Beach</td>
-      <td data-label="Activities">Early ferry to Townsville. Train to Tully. Transfer to motel. Beach relax + Licuala rainforest walk (cassowary spotting).</td>
-      <td data-label="Accommodation">Rainforest Motel (Double Room with Patio, 2 nights)</td>
-      <td data-label="Transport">SeaLink ferry + train TSV→TLY + taxi/shuttle</td>
-      <td data-label="Est. Cost">£125–175 pp</td>
-      <td data-label="Bars">Mission Beach Tavern or Seabean Café</td>
-      <td data-label="Eat">Noori Thai or The Treehouse (fusion/seafood)</td>
+      <td>May 14</td>
+      <td>Thu</td>
+      <td>Mag. Isl. → Mission Beach</td>
+      <td>Ferry/train + Licuala walk</td>
+      <td>Rainforest Motel</td>
+      <td>Ferry + train + shuttle</td>
+      <td>£125–175</td>
+      <td>£1,400–1,695</td>
+      <td>Mission Beach Tavern</td>
+      <td>Noori Thai / Treehouse</td>
     </tr>
     <tr>
-      <td data-label="Date">May 15, 2026</td>
-      <td data-label="Day">Fri</td>
-      <td data-label="Location">Mission Beach</td>
-      <td data-label="Activities">Reef & Island Tour (Beaver Reef snorkel + Dunk Island). Evening beach sunset, pool relax.</td>
-      <td data-label="Accommodation">Rainforest Motel</td>
-      <td data-label="Transport">Walk to pickup; tour includes drop-off</td>
-      <td data-label="Est. Cost">£150–200 pp</td>
-      <td data-label="Bars">Mission Beach Tavern (casual pub)</td>
-      <td data-label="Eat">Castaways Resort or local cafés (tropical/seafood)</td>
+      <td>May 15</td>
+      <td>Fri</td>
+      <td>Mission Beach</td>
+      <td>Reef & Dunk Island tour</td>
+      <td>Rainforest Motel</td>
+      <td>Tour pickup</td>
+      <td>£150–200</td>
+      <td>£1,550–1,895</td>
+      <td>Mission Beach Tavern</td>
+      <td>Castaways / local</td>
     </tr>
     <tr>
-      <td data-label="Date">May 16, 2026</td>
-      <td data-label="Day">Sat</td>
-      <td data-label="Location">Mission Beach → Cairns (via Tully rafting)</td>
-      <td data-label="Activities">Morning free. Transfer/train to Cairns area. Full-day Tully River rafting (grade 3–4). Evening relax.</td>
-      <td data-label="Accommodation">Cairns Plaza (~£50–70 pp)</td>
-      <td data-label="Transport">Taxi/shuttle + Spirit of Queensland train + rafting bus pickup</td>
-      <td data-label="Est. Cost">£140–185 pp</td>
-      <td data-label="Bars">Hemingway’s Brewery or The Pier Bar</td>
-      <td data-label="Eat">Prawn Star or Ochre Restaurant (bush tucker)</td>
+      <td>May 16</td>
+      <td>Sat</td>
+      <td>Mission Beach → Cairns</td>
+      <td>Tully rafting full-day</td>
+      <td>Cairns Plaza</td>
+      <td>Train + rafting bus</td>
+      <td>£140–185</td>
+      <td>£1,690–2,080</td>
+      <td>Hemingway’s / Pier Bar</td>
+      <td>Prawn Star / Ochre</td>
     </tr>
     <tr>
-      <td data-label="Date">May 17, 2026</td>
-      <td data-label="Day">Sun</td>
-      <td data-label="Location">Cairns</td>
-      <td data-label="Activities">Silverswift 3-reef Great Barrier Reef tour (snorkel/dive, lunch incl.).</td>
-      <td data-label="Accommodation">Cairns Plaza</td>
-      <td data-label="Transport">Bus/walk to terminal</td>
-      <td data-label="Est. Cost">£175–285 pp</td>
-      <td data-label="Bars">+ Three Wolves (speakeasy)</td>
-      <td data-label="Eat">+ Ganbaranba (ramen)</td>
+      <td>May 17</td>
+      <td>Sun</td>
+      <td>Cairns</td>
+      <td>Silverswift 3-reef tour</td>
+      <td>Cairns Plaza</td>
+      <td>Terminal bus</td>
+      <td>£175–285</td>
+      <td>£1,865–2,365</td>
+      <td>Three Wolves</td>
+      <td>Ganbaranba ramen</td>
     </tr>
     <tr>
-      <td data-label="Date">May 18, 2026</td>
-      <td data-label="Day">Mon</td>
-      <td data-label="Location">Cairns</td>
-      <td data-label="Activities">Kuranda Scenic Railway & Skyrail (rainforest views).</td>
-      <td data-label="Accommodation">Cairns Plaza</td>
-      <td data-label="Transport">Bus to station</td>
-      <td data-label="Est. Cost">£111–221 pp</td>
-      <td data-label="Bars">+ The Conservatory Bar (wine/tapas)</td>
-      <td data-label="Eat">+ Ollie's Italian (pasta/steak)</td>
+      <td>May 18</td>
+      <td>Mon</td>
+      <td>Cairns</td>
+      <td>Kuranda Railway + Skyrail</td>
+      <td>Cairns Plaza</td>
+      <td>Station bus</td>
+      <td>£111–221</td>
+      <td>£1,976–2,586</td>
+      <td>Conservatory Bar</td>
+      <td>Ollie's Italian</td>
     </tr>
     <tr>
-      <td data-label="Date">May 19, 2026</td>
-      <td data-label="Day">Tue</td>
-      <td data-label="Location">Cairns</td>
-      <td data-label="Activities">Green Island day trip (turtle snorkel, glass bottom boat, walks).</td>
-      <td data-label="Accommodation">Cairns Plaza</td>
-      <td data-label="Transport">Bus/walk to ferry terminal</td>
-      <td data-label="Est. Cost">£115–220 pp</td>
-      <td data-label="Bars">As above</td>
-      <td data-label="Eat">As above</td>
+      <td>May 19</td>
+      <td>Tue</td>
+      <td>Cairns</td>
+      <td>Green Island day trip</td>
+      <td>Cairns Plaza</td>
+      <td>Ferry terminal</td>
+      <td>£115–220</td>
+      <td>£2,091–2,806</td>
+      <td>As above</td>
+      <td>As above</td>
     </tr>
     <tr>
-      <td data-label="Date">May 20, 2026</td>
-      <td data-label="Day">Wed</td>
-      <td data-label="Location">Cairns → Port Douglas</td>
-      <td data-label="Activities">Bus to Port Douglas. Four Mile Beach relax or optional jet ski.</td>
-      <td data-label="Accommodation">Mantra PortSea (~£55–80 pp/night)</td>
-      <td data-label="Transport">Bus (~1h)</td>
-      <td data-label="Est. Cost">£125–225 pp</td>
-      <td data-label="Bars">Iron Bar, Watergate, Jimmy Rum's</td>
-      <td data-label="Eat">Salsa Bar & Grill, Hi Tide, Pasta e Vino</td>
+      <td>May 20</td>
+      <td>Wed</td>
+      <td>Cairns → Port Douglas</td>
+      <td>Bus + Four Mile Beach</td>
+      <td>Mantra PortSea</td>
+      <td>Bus (~1h)</td>
+      <td>£125–225</td>
+      <td>£2,216–3,031</td>
+      <td>Iron Bar / Watergate</td>
+      <td>Salsa / Hi Tide</td>
     </tr>
     <tr>
-      <td data-label="Date">May 21, 2026</td>
-      <td data-label="Day">Thu</td>
-      <td data-label="Location">Port Douglas</td>
-      <td data-label="Activities">Daintree/Cape Trib tour (rainforest walks, beach).</td>
-      <td data-label="Accommodation">Mantra PortSea</td>
-      <td data-label="Transport">Bus/tour transport</td>
-      <td data-label="Est. Cost">£150–235 pp</td>
-      <td data-label="Bars">+ Barbados (rooftop)</td>
-      <td data-label="Eat">+ Zinc (Australian)</td>
+      <td>May 21</td>
+      <td>Thu</td>
+      <td>Port Douglas</td>
+      <td>Daintree/Cape Trib tour</td>
+      <td>Mantra PortSea</td>
+      <td>Bus/tour</td>
+      <td>£150–235</td>
+      <td>£2,366–3,266</td>
+      <td>Barbados rooftop</td>
+      <td>Zinc</td>
     </tr>
     <tr>
-      <td data-label="Date">May 22, 2026</td>
-      <td data-label="Day">Fri</td>
-      <td data-label="Location">Port Douglas</td>
-      <td data-label="Activities">Wildlife Habitat + Hartley's Crocodile Adventures.</td>
-      <td data-label="Accommodation">Mantra PortSea</td>
-      <td data-label="Transport">Bus</td>
-      <td data-label="Est. Cost">£108–160 pp</td>
-      <td data-label="Bars">+ Jungle Fowl</td>
-      <td data-label="Eat">+ Seabean (tapas)</td>
+      <td>May 22</td>
+      <td>Fri</td>
+      <td>Port Douglas</td>
+      <td>Wildlife Habitat + Hartley's</td>
+      <td>Mantra PortSea</td>
+      <td>Bus</td>
+      <td>£108–160</td>
+      <td>£2,474–3,426</td>
+      <td>Jungle Fowl</td>
+      <td>Seabean tapas</td>
     </tr>
     <tr>
-      <td data-label="Date">May 23, 2026</td>
-      <td data-label="Day">Sat</td>
-      <td data-label="Location">Port Douglas</td>
-      <td data-label="Activities">Mossman Gorge extended (Dreamtime Walk, swimming holes) + beach relax.</td>
-      <td data-label="Accommodation">Mantra PortSea</td>
-      <td data-label="Transport">Bus/drive</td>
-      <td data-label="Est. Cost">£115–145 pp</td>
-      <td data-label="Bars">As above</td>
-      <td data-label="Eat">As above</td>
+      <td>May 23</td>
+      <td>Sat</td>
+      <td>Port Douglas</td>
+      <td>Mossman Gorge + beach</td>
+      <td>Mantra PortSea</td>
+      <td>Bus/drive</td>
+      <td>£115–145</td>
+      <td>£2,589–3,571</td>
+      <td>As above</td>
+      <td>As above</td>
     </tr>
     <tr>
-      <td data-label="Date">May 24, 2026</td>
-      <td data-label="Day">Sun</td>
-      <td data-label="Location">Port Douglas</td>
-      <td data-label="Activities">Low Isles full-day snorkeling & sailing (lagoon, beach, lunch/gear incl.).</td>
-      <td data-label="Accommodation">Mantra PortSea</td>
-      <td data-label="Transport">Walk/bus to marina</td>
-      <td data-label="Est. Cost">£230–260 pp</td>
-      <td data-label="Bars">As above</td>
-      <td data-label="Eat">As above</td>
+      <td>May 24</td>
+      <td>Sun</td>
+      <td>Port Douglas</td>
+      <td>Low Isles snorkel/sailing</td>
+      <td>Mantra PortSea</td>
+      <td>Marina</td>
+      <td>£230–260</td>
+      <td>£2,819–3,831</td>
+      <td>As above</td>
+      <td>As above</td>
     </tr>
     <tr>
-      <td data-label="Date">May 25, 2026</td>
-      <td data-label="Day">Mon</td>
-      <td data-label="Location">Port Douglas</td>
-      <td data-label="Activities">Self-planned: Flagstaff Hill walk (views), Four Mile Beach relaxation.</td>
-      <td data-label="Accommodation">Mantra PortSea</td>
-      <td data-label="Transport">Bus/walk</td>
-      <td data-label="Est. Cost">£65–90 pp</td>
-      <td data-label="Bars">As above</td>
-      <td data-label="Eat">As above</td>
+      <td>May 25</td>
+      <td>Mon</td>
+      <td>Port Douglas</td>
+      <td>Flagstaff Hill + beach</td>
+      <td>Mantra PortSea</td>
+      <td>Bus/walk</td>
+      <td>£65–90</td>
+      <td>£2,884–3,921</td>
+      <td>As above</td>
+      <td>As above</td>
     </tr>
     <tr>
-      <td data-label="Date">May 26, 2026</td>
-      <td data-label="Day">Tue</td>
-      <td data-label="Location">Port Douglas</td>
-      <td data-label="Activities">Light day: Beach/pool downtime, marina stroll, optional sunset sail or spa.</td>
-      <td data-label="Accommodation">Mantra PortSea</td>
-      <td data-label="Transport">Walk/bus</td>
-      <td data-label="Est. Cost">£65–285 pp</td>
-      <td data-label="Bars">As above</td>
-      <td data-label="Eat">As above</td>
+      <td>May 26</td>
+      <td>Tue</td>
+      <td>Port Douglas</td>
+      <td>Beach/pool downtime</td>
+      <td>Mantra PortSea</td>
+      <td>Walk/bus</td>
+      <td>£65–285</td>
+      <td>£2,949–4,206</td>
+      <td>As above</td>
+      <td>As above</td>
     </tr>
     <tr>
-      <td data-label="Date">May 27, 2026</td>
-      <td data-label="Day">Wed</td>
-      <td data-label="Location">Port Douglas → Sydney</td>
-      <td data-label="Activities">Morning bus to Cairns airport. Flight to Sydney. Afternoon/evening settle with brother, light explore (Circular Quay / Vivid if on).</td>
-      <td data-label="Accommodation">Staying with brother (family home)</td>
-      <td data-label="Transport">Bus to CNS airport + flight CNS→SYD (~2.5–3h)</td>
-      <td data-label="Est. Cost">£100–220 pp</td>
-      <td data-label="Bars">The Glenmore (Rocks) or Opera Bar</td>
-      <td data-label="Eat">Sydney Fish Market or casual pub grub</td>
+      <td>May 27</td>
+      <td>Wed</td>
+      <td>Port Douglas → Sydney</td>
+      <td>Flight to SYD + settle with brother</td>
+      <td>Staying with brother (£0)</td>
+      <td>Bus + CNS→SYD (£120 pp)</td>
+      <td>£220–340</td>
+      <td>£3,169–4,546</td>
+      <td>Glenmore / Opera Bar</td>
+      <td>Fish Market / pub</td>
     </tr>
     <tr>
-      <td data-label="Date">May 28, 2026</td>
-      <td data-label="Day">Thu</td>
-      <td data-label="Location">Sydney</td>
-      <td data-label="Activities">Sydney Opera House tour/walk, Harbour Bridge views, The Rocks wander. Family dinner.</td>
-      <td data-label="Accommodation">Staying with brother</td>
-      <td data-label="Transport">Opal card (trains/ferries/buses ~£10–20 pp/day)</td>
-      <td data-label="Est. Cost">£50–150 pp</td>
-      <td data-label="Bars">Coogee Pavilion or Glenmore</td>
-      <td data-label="Eat">Opera Bar or Chinatown eats</td>
+      <td>May 28</td>
+      <td>Thu</td>
+      <td>Sydney</td>
+      <td>Opera House / Harbour / Rocks</td>
+      <td>Staying with brother (£0)</td>
+      <td>Opal card</td>
+      <td>£50–150</td>
+      <td>£3,219–4,696</td>
+      <td>Coogee Pavilion</td>
+      <td>Opera Bar / Chinatown</td>
     </tr>
     <tr>
-      <td data-label="Date">May 29, 2026</td>
-      <td data-label="Day">Fri</td>
-      <td data-label="Location">Sydney</td>
-      <td data-label="Activities">Bondi Beach + Coastal Walk to Bronte. Optional surf lesson. Evening family time.</td>
-      <td data-label="Accommodation">Staying with brother</td>
-      <td data-label="Transport">Bus/train</td>
-      <td data-label="Est. Cost">£40–120 pp</td>
-      <td data-label="Bars">Icebergs Dining Room bar or local pubs</td>
-      <td data-label="Eat">Bondi cafes (fish & chips) or home-cooked</td>
+      <td>May 29</td>
+      <td>Fri</td>
+      <td>Sydney</td>
+      <td>Bondi + Coastal Walk</td>
+      <td>Staying with brother (£0)</td>
+      <td>Bus/train</td>
+      <td>£40–120</td>
+      <td>£3,259–4,816</td>
+      <td>Icebergs bar</td>
+      <td>Bondi cafes</td>
     </tr>
     <tr>
-      <td data-label="Date">May 30, 2026</td>
-      <td data-label="Day">Sat</td>
-      <td data-label="Location">Sydney</td>
-      <td data-label="Activities">Ferry to Manly Beach (scenic ride). Beach relax, walks. Possible Vivid lights evening.</td>
-      <td data-label="Accommodation">Staying with brother</td>
-      <td data-label="Transport">Ferry (~£8 pp return)</td>
-      <td data-label="Est. Cost">£40–100 pp</td>
-      <td data-label="Bars">4 Pines Brewing (Manly) or harbour bars</td>
-      <td data-label="Eat">Manly Wharf seafood or casual</td>
+      <td>May 30</td>
+      <td>Sat</td>
+      <td>Sydney</td>
+      <td>Manly ferry + beach</td>
+      <td>Staying with brother (£0)</td>
+      <td>Ferry</td>
+      <td>£40–100</td>
+      <td>£3,299–4,916</td>
+      <td>4 Pines Manly</td>
+      <td>Manly Wharf</td>
     </tr>
     <tr>
-      <td data-label="Date">May 31, 2026</td>
-      <td data-label="Day">Sun</td>
-      <td data-label="Location">Sydney</td>
-      <td data-label="Activities">Royal Botanic Garden stroll, Art Gallery of NSW (free), or Taronga Zoo ferry. Relaxed family day.</td>
-      <td data-label="Accommodation">Staying with brother</td>
-      <td data-label="Transport">Ferry/bus</td>
-      <td data-label="Est. Cost">£30–100 pp</td>
-      <td data-label="Bars">As above</td>
-      <td data-label="Eat">Picnic in gardens or local cafes</td>
+      <td>May 31</td>
+      <td>Sun</td>
+      <td>Sydney</td>
+      <td>Botanic Garden / Gallery / Zoo option</td>
+      <td>Staying with brother (£0)</td>
+      <td>Ferry/bus</td>
+      <td>£30–100</td>
+      <td>£3,329–5,016</td>
+      <td>As above</td>
+      <td>Picnic / local</td>
     </tr>
     <tr>
-      <td data-label="Date">June 1, 2026</td>
-      <td data-label="Day">Mon</td>
-      <td data-label="Location">Sydney → Singapore → Manchester</td>
-      <td data-label="Activities">Morning free/family time. Depart SYD 15:00 (SQ222). Long SIN layover (~4h50). Overnight flight SQ302 dep 02:10 (June 2).</td>
-      <td data-label="Accommodation">In-flight</td>
-      <td data-label="Transport">Train/bus to SYD airport + SQ222 (SYD–SIN, 8h20) → SQ302 (SIN–MAN, 14h05)</td>
-      <td data-label="Est. Cost">Included in ticket + ~£30–50 (meals/transport)</td>
-      <td data-label="Bars">N/A (in-flight / SIN lounge if access)</td>
-      <td data-label="Eat">In-flight meals / SIN airport food</td>
+      <td>June 1</td>
+      <td>Mon</td>
+      <td>Sydney → Manchester</td>
+      <td>Return long-haul (part of £1,400 package)</td>
+      <td>In-flight</td>
+      <td>SQ222 → SQ302</td>
+      <td>£600 (flight share)</td>
+      <td>£3,929–5,616</td>
+      <td>N/A</td>
+      <td>In-flight / SIN</td>
     </tr>
-    <tr>
-      <td data-label="Date">June 2, 2026</td>
-      <td data-label="Day">Tue</td>
-      <td data-label="Location">Manchester</td>
-      <td data-label="Activities">Arrive MAN 09:15. Trip ends. Welcome home!</td>
-      <td data-label="Accommodation">N/A</td>
-      <td data-label="Transport">N/A</td>
-      <td data-label="Est. Cost">N/A</td>
-      <td data-label="Bars">N/A</td>
-      <td data-label="Eat">N/A</td>
+    <tr class="total-row">
+      <td colspan="6">Grand Total (per person – land + all flights)</td>
+      <td>£3,929 – £5,616</td>
+      <td>£3,929 – £5,616</td>
+      <td colspan="2">Includes: land activities/accom/transport/meals buffer + £1,400 international flights (split) + £120 CNS→SYD</td>
     </tr>
   </tbody>
 </table>
 
 <div class="notes">
-  <h2>Quick Trip Notes (as of February 2026)</h2>
+  <h2>Notes</h2>
   <ul>
-    <li><strong>Total duration:</strong> May 7 departure → June 2 arrival (~27 days away).</li>
-    <li><strong>Costs:</strong> Approximate per person (GBP), shoulder season estimates. Accommodation in Sydney = staying with brother (no cost). Flights/tours book early for best rates.</li>
-    <li><strong>Weather:</strong> Queensland May = warm/dry (~24–29°C). Sydney late May/early June = cool/mild (~18–22°C days, 10–14°C nights) — pack layers.</li>
-    <li><strong>Recommendations:</strong> Reef-safe sunscreen, hat, insect repellent (rainforest). Opal card for Sydney public transport. Check Vivid Sydney dates (light festival) closer to travel.</li>
-    <li><strong>Flights:</strong> Outbound Qantas/Emirates/Jetstar codeshare. Return Singapore Airlines (premium, reliable). Schedules based on provided details — confirm closer to date.</li>
+    <li>International flights (£1,400 pp total) split roughly: £600 outbound long-haul, £200 MEL–PPP domestic, £600 return long-haul.</li>
+    <li>Cairns → Sydney flight (£120 pp) added to May 27.</li>
+    <li>Costs are approximate (shoulder season 2026) — actuals depend on bookings, exchange rates, options.</li>
+    <li>Excludes: travel insurance, visas/ETA, heavy extras, souvenirs.</li>
   </ul>
 </div>
 
