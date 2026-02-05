@@ -1,331 +1,385 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Brutal Truth Life Coaching | Honest Life Coach in Yeovil, Somerset UK | Online & In-Person Sessions</title>
-    <meta name="description" content="Brutal honesty life coaching in Yeovil, Somerset, UK. No-BS guidance via phone, Skype, Teams, or face-to-face. Worldwide clients welcome—ditch excuses, build real change.">
-    <meta name="keywords" content="life coaching Yeovil, brutal honesty coach UK, online life coach, Somerset life coaching, no-nonsense personal development">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://richietaylor.net/">
-    
-    <!-- Open Graph for Social Sharing -->
-    <meta property="og:title" content="The Brutal Truth Life Coaching - Yeovil, UK">
-    <meta property="og:description" content="Your No-BS Guide to Real Change. Face your truths with a direct coach—local in Somerset or global online.">
-    <meta property="og:image" content="banner.jpg"> <!-- Update this to your hosted banner image URL for social previews -->
-    <meta property="og:url" content="https://richietaylor.net/">
-    <meta property="og:type" content="website">
-    
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="The Brutal Truth Life Coaching - Yeovil, UK">
-    <meta name="twitter:description" content="Stop the excuses. Get brutally honest coaching for real progress—Yeovil-based, worldwide reach.">
-    <meta name="twitter:image" content="banner.jpg"> <!-- Update this to your hosted banner image URL for social previews -->
-    
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            line-height: 1.6;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-        header {
-            background-color: #000;
-            color: #fff;
-            padding: 1rem 0;
-            text-align: center;
-        }
-        nav {
-            background-color: #111; /* Darker gray to distinguish from header black */
-            padding: 0.5rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            border-bottom: 2px solid #ff6b35; /* Orange underline for visibility pop */
-        }
-        nav ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-        }
-        nav li {
-            margin: 0 1rem;
-        }
-        nav a {
-            color: #fff;
-            text-decoration: none;
-            font-weight: bold;
-            transition: color 0.3s ease;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* Subtle shadow for extra contrast */
-        }
-        nav a:hover {
-            color: #ff6b35; /* Attention-grabbing orange hover */
-        }
-        .hero {
-            background-image: url('banner.jpg'); /* Your uploaded image as banner - save it as 'banner.jpg' in the same folder as index.html */
-            background-size: cover;
-            background-position: center;
-            color: #fff;
-            text-align: center;
-            padding: 6rem 2rem;
-            position: relative;
-        }
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5); /* Overlay for readability - adjust opacity if needed for your image */
-        }
-        .hero > * {
-            position: relative;
-            z-index: 1;
-        }
-        .hero h1 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.7); /* Makes it pop */
-            animation: fadeInUp 1s ease-out;
-        }
-        .hero p {
-            font-size: 1.3rem;
-            max-width: 800px;
-            margin: 0 auto;
-            animation: fadeInUp 1s ease-out 0.2s both;
-        }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        section {
-            padding: 3rem 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .about, .services, .contact {
-            background-color: #fff;
-            margin-bottom: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1); /* Deeper shadow for depth */
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .about:hover, .services:hover, .contact:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.15); /* Hover lift for engagement */
-        }
-        h2 {
-            color: #000;
-            border-bottom: 2px solid #ff6b35; /* Orange accent for grab */
-            padding-bottom: 0.5rem;
-            padding-top: 1rem; /* Added top padding to prevent overlap with section padding */
-            margin-top: 0;
-            font-size: 2rem;
-        }
-        .about img {
-            width: 100%;
-            max-width: 300px;
-            border-radius: 50%;
-            display: block;
-            margin: 0 auto 1rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            animation: fadeIn 1.5s ease-out;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1rem;
-        }
-        li {
-            background: linear-gradient(135deg, #f9f9f9, #e9e9e9);
-            margin: 0;
-            padding: 1.5rem;
-            border-left: 4px solid #ff6b35;
-            border-radius: 0 8px 8px 0;
-            transition: background 0.3s ease;
-            display: flex;
-            align-items: flex-start; /* Changed to flex-start for better text alignment if multi-line */
-            gap: 1rem; /* Added gap for spacing between image and text */
-        }
-        li:hover {
-            background: linear-gradient(135deg, #ff6b35, #ff8c5a);
-            color: #fff;
-        }
-        li img {
-            width: 50px;
-            height: 50px;
-            margin-right: 0; /* Removed since gap handles it */
-            border-radius: 50%;
-            flex-shrink: 0; /* Prevents image from shrinking */
-        }
-        li strong {
-            color: inherit;
-            display: block; /* Makes strong a block for better separation from description */
-            margin-bottom: 0.25rem;
-        }
-        li::after { /* Ensures the colon has space */
-            content: ": ";
-            font-weight: normal;
-        }
-        .contact a {
-            color: #ff6b35;
-            font-weight: bold;
-            text-decoration: none;
-            border-bottom: 1px solid #ff6b35;
-            transition: color 0.3s ease;
-        }
-        .contact a:hover {
-            color: #e55a2b;
-            border-bottom-color: #e55a2b;
-        }
-        .contact a[href^="https://wa.me/"] {
-            border-bottom-style: dotted; /* Dotted underline for WhatsApp to indicate clickability */
-        }
-        form {
-            display: grid;
-            gap: 1rem;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        input, textarea, button {
-            padding: 0.75rem;
-            font-size: 1rem;
-            border: 1px solid #333;
-            border-radius: 4px;
-            transition: border-color 0.3s ease;
-        }
-        input:focus, textarea:focus {
-            border-color: #ff6b35;
-            outline: none;
-        }
-        button {
-            background-color: #ff6b35; /* Orange CTA for attention */
-            color: #fff;
-            cursor: pointer;
-            font-weight: bold;
-            border: none;
-            transition: background 0.3s ease;
-        }
-        button:hover {
-            background-color: #e55a2b;
-        }
-        footer {
-            background-color: #000;
-            color: #fff;
-            text-align: center;
-            padding: 1rem 0;
-        }
-        footer a {
-            color: #ff6b35;
-        }
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.2rem;
-            }
-            .hero p {
-                font-size: 1.1rem;
-            }
-            nav ul {
-                flex-direction: column;
-            }
-            nav li {
-                margin: 0.5rem 0;
-            }
-            ul {
-                grid-template-columns: 1fr;
-            }
-            li {
-                justify-content: flex-start;
-                flex-direction: column; /* Stack on mobile for better readability */
-                align-items: flex-start;
-                text-align: left;
-            }
-            li img {
-                align-self: flex-start;
-            }
-            li strong {
-                margin-bottom: 0.5rem;
-            }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Full Trip Itinerary: UK → Queensland → Sydney → UK (May–June 2026)</title>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 20px;
+      line-height: 1.5;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      background-color: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background-color: #34495e;
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+    tr:hover {
+      background-color: #e8f4f8;
+    }
+    .notes {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 15px;
+      background-color: #fff;
+      border-left: 4px solid #3498db;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    @media (max-width: 1200px) {
+      table, thead, tbody, th, td, tr { display: block; }
+      thead tr { position: absolute; top: -9999px; left: -9999px; }
+      tr { border: 1px solid #ccc; margin-bottom: 15px; }
+      td { border: none; border-bottom: 1px solid #eee; position: relative; padding-left: 50%; }
+      td:before {
+        position: absolute; top: 6px; left: 6px; width: 45%; padding-right: 10px; white-space: nowrap;
+        content: attr(data-label); font-weight: bold; color: #34495e;
+      }
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <h1>The Brutal Truth Life Coaching</h1>
-        <p>Your No-BS Guide to Real Change</p>
-    </header>
 
-    <nav>
-        <ul>
-            <li><a href="#home">Home</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#services">Services</a></li>
-            <li><a href="#contact">Contact</a></li>
-        </ul>
-    </nav>
+<h1>Complete Trip Itinerary<br>Manchester → Queensland Coast → Sydney → Manchester<br>May 7 – June 2, 2026</h1>
 
-    <section id="home" class="hero">
-        <h1>Stop Wasting Time on Feel-Good Lies</h1>
-        <p>Life coaching with brutal honesty. I'm here to call out your excuses, dismantle your delusions, and push you toward actual progress. No sugarcoating, no endless affirmations—just raw, actionable truth. Based in Yeovil, Somerset, but I work with clients worldwide via phone, Skype, Teams, or in-person if you're local and prefer in person.</p>
-    </section>
+<table>
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Day</th>
+      <th>Location</th>
+      <th>Activities / Notes</th>
+      <th>Accommodation</th>
+      <th>Transport / Flight Details</th>
+      <th>Est. Cost (GBP, per person)</th>
+      <th>Bar Recommendations</th>
+      <th>Eat Recommendations</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td data-label="Date">May 7–8, 2026</td>
+      <td data-label="Day">Thu–Fri</td>
+      <td data-label="Location">Manchester → Dubai → Melbourne</td>
+      <td data-label="Activities">Depart MAN 21:20 (Qantas QF8020 op. Emirates). Overnight flight. Arrive DXB 07:30 (May 8), connect 2h35, depart DXB 10:05 (QF8406 op. Emirates), arrive MEL 05:30 (May 9 local).</td>
+      <td data-label="Accommodation">In-flight</td>
+      <td data-label="Transport">QF8020 (MAN–DXB, 7h10) → QF8406 (DXB–MEL, 13h25)</td>
+      <td data-label="Est. Cost">Included in ticket</td>
+      <td data-label="Bars">N/A (in-flight)</td>
+      <td data-label="Eat">In-flight meals</td>
+    </tr>
+    <tr>
+      <td data-label="Date">May 9, 2026</td>
+      <td data-label="Day">Sat</td>
+      <td data-label="Location">Melbourne → Proserpine (PPP) → Airlie Beach</td>
+      <td data-label="Activities">Connect MEL 2h10 → Jetstar QF5832 dep 07:40, arr PPP 10:35. Jet lag recovery: Shuttle to Airlie Beach, settle, light beach/lagoon walk if energy allows.</td>
+      <td data-label="Accommodation">Magnums Queen Cabin (early check-in if available)</td>
+      <td data-label="Transport">QF5832 (MEL–PPP, 2h55) + airport shuttle (~30–45 min)</td>
+      <td data-label="Est. Cost">£75–110 pp (shuttle + light meals)</td>
+      <td data-label="Bars">Northerlies Beach Bar or Anchor Bar (if up for sunset)</td>
+      <td data-label="Eat">Light: Fish D’vine or picnic from Woolies</td>
+    </tr>
+    <tr>
+      <td data-label="Date">May 10, 2026</td>
+      <td data-label="Day">Sun</td>
+      <td data-label="Location">Whitsundays (Airlie Beach)</td>
+      <td data-label="Activities">Chilled day: Cannonvale Beach or Airlie Lagoon swim, relax, beach walk, sunset drinks.</td>
+      <td data-label="Accommodation">Magnums Queen Cabin</td>
+      <td data-label="Transport">Local walk/bus</td>
+      <td data-label="Est. Cost">£75–110 pp</td>
+      <td data-label="Bars">Northerlies or Anchor Bar</td>
+      <td data-label="Eat">Fish D’vine (seafood) or Mr Bones (pizza/burgers); picnic option</td>
+    </tr>
+    <tr>
+      <td data-label="Date">May 11, 2026</td>
+      <td data-label="Day">Mon</td>
+      <td data-label="Location">Whitsundays (Airlie/Outer Reef)</td>
+      <td data-label="Activities">Snorkeling tour (fringing reefs, gear incl.). Optional jetski or pickleball afternoon.</td>
+      <td data-label="Accommodation">Magnums Queen Cabin</td>
+      <td data-label="Transport">Walk/shuttle to marina</td>
+      <td data-label="Est. Cost">£100–175 pp</td>
+      <td data-label="Bars">Northerlies (happy hour) or Magnum's (live music)</td>
+      <td data-label="Eat">The Shack (Thai) or Sol Restaurant (tacos)</td>
+    </tr>
+    <tr>
+      <td data-label="Date">May 12, 2026</td>
+      <td data-label="Day">Tue</td>
+      <td data-label="Location">Proserpine → Townsville → Magnetic Island (Nelly Bay)</td>
+      <td data-label="Activities">Scenic train north. Ferry to Nelly Bay. Check-in. Afternoon hike: Sphinx Lookout. Pool/garden relax.</td>
+      <td data-label="Accommodation">Vintage Coral Green (One-Bedroom House, 2 nights)</td>
+      <td data-label="Transport">Spirit of Queensland PPP→TSV (~07:16–10:25) + SeaLink ferry</td>
+      <td data-label="Est. Cost">£100–150 pp</td>
+      <td data-label="Bars">Peppers Blue on Blue rooftop or local brewery</td>
+      <td data-label="Eat">Nelly Bay cafés or Peppers deck dining</td>
+    </tr>
+    <tr>
+      <td data-label="Date">May 13, 2026</td>
+      <td data-label="Day">Wed</td>
+      <td data-label="Location">Magnetic Island (Nelly Bay)</td>
+      <td data-label="Activities">Morning Discovery Tour (snorkel + SUP). Afternoon: pool/beach, optional Horseshoe Bay or wallabies at Geoffrey Bay.</td>
+      <td data-label="Accommodation">Vintage Coral Green</td>
+      <td data-label="Transport">Walk to tour; optional bus</td>
+      <td data-label="Est. Cost">£125–175 pp</td>
+      <td data-label="Bars">Magnetic Island Brewery or beachside sundowners</td>
+      <td data-label="Eat">Peppers deck or Nelly Bay fresh fish</td>
+    </tr>
+    <tr>
+      <td data-label="Date">May 14, 2026</td>
+      <td data-label="Day">Thu</td>
+      <td data-label="Location">Magnetic Island → Mission Beach</td>
+      <td data-label="Activities">Early ferry to Townsville. Train to Tully. Transfer to motel. Beach relax + Licuala rainforest walk (cassowary spotting).</td>
+      <td data-label="Accommodation">Rainforest Motel (Double Room with Patio, 2 nights)</td>
+      <td data-label="Transport">SeaLink ferry + train TSV→TLY + taxi/shuttle</td>
+      <td data-label="Est. Cost">£125–175 pp</td>
+      <td data-label="Bars">Mission Beach Tavern or Seabean Café</td>
+      <td data-label="Eat">Noori Thai or The Treehouse (fusion/seafood)</td>
+    </tr>
+    <tr>
+      <td data-label="Date">May 15, 2026</td>
+      <td data-label="Day">Fri</td>
+      <td data-label="Location">Mission Beach</td>
+      <td data-label="Activities">Reef & Island Tour (Beaver Reef snorkel + Dunk Island). Evening beach sunset, pool relax.</td>
+      <td data-label="Accommodation">Rainforest Motel</td>
+      <td data-label="Transport">Walk to pickup; tour includes drop-off</td>
+      <td data-label="Est. Cost">£150–200 pp</td>
+      <td data-label="Bars">Mission Beach Tavern (casual pub)</td>
+      <td data-label="Eat">Castaways Resort or local cafés (tropical/seafood)</td>
+    </tr>
+    <tr>
+      <td data-label="Date">May 16, 2026</td>
+      <td data-label="Day">Sat</td>
+      <td data-label="Location">Mission Beach → Cairns (via Tully rafting)</td>
+      <td data-label="Activities">Morning free. Transfer/train to Cairns area. Full-day Tully River rafting (grade 3–4). Evening relax.</td>
+      <td data-label="Accommodation">Cairns Plaza (~£50–70 pp)</td>
+      <td data-label="Transport">Taxi/shuttle + Spirit of Queensland train + rafting bus pickup</td>
+      <td data-label="Est. Cost">£140–185 pp</td>
+      <td data-label="Bars">Hemingway’s Brewery or The Pier Bar</td>
+      <td data-label="Eat">Prawn Star or Ochre Restaurant (bush tucker)</td>
+    </tr>
+    <tr>
+      <td data-label="Date">May 17, 2026</td>
+      <td data-label="Day">Sun</td>
+      <td data-label="Location">Cairns</td>
+      <td data-label="Activities">Silverswift 3-reef Great Barrier Reef tour (snorkel/dive, lunch incl.).</td>
+      <td data-label="Accommodation">Cairns Plaza</td>
+      <td data-label="Transport">Bus/walk to terminal</td>
+      <td data-label="Est. Cost">£175–285 pp</td>
+      <td data-label="Bars">+ Three Wolves (speakeasy)</td>
+      <td data-label="Eat">+ Ganbaranba (ramen)</td>
+    </tr>
+    <tr>
+      <td data-label="Date">May 18, 2026</td>
+      <td data-label="Day">Mon</td>
+      <td data-label="Location">Cairns</td>
+      <td data-label="Activities">Kuranda Scenic Railway & Skyrail (rainforest views).</td>
+      <td data-label="Accommodation">Cairns Plaza</td>
+      <td data-label="Transport">Bus to station</td>
+      <td data-label="Est. Cost">£111–221 pp</td>
+      <td data-label="Bars">+ The Conservatory Bar (wine/tapas)</td>
+      <td data-label="Eat">+ Ollie's Italian (pasta/steak)</td>
+    </tr>
+    <tr>
+      <td data-label="Date">May 19, 2026</td>
+      <td data-label="Day">Tue</td>
+      <td data-label="Location">Cairns</td>
+      <td data-label="Activities">Green Island day trip (turtle snorkel, glass bottom boat, walks).</td>
+      <td data-label="Accommodation">Cairns Plaza</td>
+      <td data-label="Transport">Bus/walk to ferry terminal</td>
+      <td data-label="Est. Cost">£115–220 pp</td>
+      <td data-label="Bars">As above</td>
+      <td data-label="Eat">As above</td>
+    </tr>
+    <tr>
+      <td data-label="Date">May 20, 2026</td>
+      <td data-label="Day">Wed</td>
+      <td data-label="Location">Cairns → Port Douglas</td>
+      <td data-label="Activities">Bus to Port Douglas. Four Mile Beach relax or optional jet ski.</td>
+      <td data-label="Accommodation">Mantra PortSea (~£55–80 pp/night)</td>
+      <td data-label="Transport">Bus (~1h)</td>
+      <td data-label="Est. Cost">£125–225 pp</td>
+      <td data-label="Bars">Iron Bar, Watergate, Jimmy Rum's</td>
+      <td data-label="Eat">Salsa Bar & Grill, Hi Tide, Pasta e Vino</td>
+    </tr>
+    <tr>
+      <td data-label="Date">May 21, 2026</td>
+      <td data-label="Day">Thu</td>
+      <td data-label="Location">Port Douglas</td>
+      <td data-label="Activities">Daintree/Cape Trib tour (rainforest walks, beach).</td>
+      <td data-label="Accommodation">Mantra PortSea</td>
+      <td data-label="Transport">Bus/tour transport</td>
+      <td data-label="Est. Cost">£150–235 pp</td>
+      <td data-label="Bars">+ Barbados (rooftop)</td>
+      <td data-label="Eat">+ Zinc (Australian)</td>
+    </tr>
+    <tr>
+      <td data-label="Date">May 22, 2026</td>
+      <td data-label="Day">Fri</td>
+      <td data-label="Location">Port Douglas</td>
+      <td data-label="Activities">Wildlife Habitat + Hartley's Crocodile Adventures.</td>
+      <td data-label="Accommodation">Mantra PortSea</td>
+      <td data-label="Transport">Bus</td>
+      <td data-label="Est. Cost">£108–160 pp</td>
+      <td data-label="Bars">+ Jungle Fowl</td>
+      <td data-label="Eat">+ Seabean (tapas)</td>
+    </tr>
+    <tr>
+      <td data-label="Date">May 23, 2026</td>
+      <td data-label="Day">Sat</td>
+      <td data-label="Location">Port Douglas</td>
+      <td data-label="Activities">Mossman Gorge extended (Dreamtime Walk, swimming holes) + beach relax.</td>
+      <td data-label="Accommodation">Mantra PortSea</td>
+      <td data-label="Transport">Bus/drive</td>
+      <td data-label="Est. Cost">£115–145 pp</td>
+      <td data-label="Bars">As above</td>
+      <td data-label="Eat">As above</td>
+    </tr>
+    <tr>
+      <td data-label="Date">May 24, 2026</td>
+      <td data-label="Day">Sun</td>
+      <td data-label="Location">Port Douglas</td>
+      <td data-label="Activities">Low Isles full-day snorkeling & sailing (lagoon, beach, lunch/gear incl.).</td>
+      <td data-label="Accommodation">Mantra PortSea</td>
+      <td data-label="Transport">Walk/bus to marina</td>
+      <td data-label="Est. Cost">£230–260 pp</td>
+      <td data-label="Bars">As above</td>
+      <td data-label="Eat">As above</td>
+    </tr>
+    <tr>
+      <td data-label="Date">May 25, 2026</td>
+      <td data-label="Day">Mon</td>
+      <td data-label="Location">Port Douglas</td>
+      <td data-label="Activities">Self-planned: Flagstaff Hill walk (views), Four Mile Beach relaxation.</td>
+      <td data-label="Accommodation">Mantra PortSea</td>
+      <td data-label="Transport">Bus/walk</td>
+      <td data-label="Est. Cost">£65–90 pp</td>
+      <td data-label="Bars">As above</td>
+      <td data-label="Eat">As above</td>
+    </tr>
+    <tr>
+      <td data-label="Date">May 26, 2026</td>
+      <td data-label="Day">Tue</td>
+      <td data-label="Location">Port Douglas</td>
+      <td data-label="Activities">Light day: Beach/pool downtime, marina stroll, optional sunset sail or spa.</td>
+      <td data-label="Accommodation">Mantra PortSea</td>
+      <td data-label="Transport">Walk/bus</td>
+      <td data-label="Est. Cost">£65–285 pp</td>
+      <td data-label="Bars">As above</td>
+      <td data-label="Eat">As above</td>
+    </tr>
+    <tr>
+      <td data-label="Date">May 27, 2026</td>
+      <td data-label="Day">Wed</td>
+      <td data-label="Location">Port Douglas → Sydney</td>
+      <td data-label="Activities">Morning bus to Cairns airport. Flight to Sydney. Afternoon/evening settle with brother, light explore (Circular Quay / Vivid if on).</td>
+      <td data-label="Accommodation">Staying with brother (family home)</td>
+      <td data-label="Transport">Bus to CNS airport + flight CNS→SYD (~2.5–3h)</td>
+      <td data-label="Est. Cost">£100–220 pp</td>
+      <td data-label="Bars">The Glenmore (Rocks) or Opera Bar</td>
+      <td data-label="Eat">Sydney Fish Market or casual pub grub</td>
+    </tr>
+    <tr>
+      <td data-label="Date">May 28, 2026</td>
+      <td data-label="Day">Thu</td>
+      <td data-label="Location">Sydney</td>
+      <td data-label="Activities">Sydney Opera House tour/walk, Harbour Bridge views, The Rocks wander. Family dinner.</td>
+      <td data-label="Accommodation">Staying with brother</td>
+      <td data-label="Transport">Opal card (trains/ferries/buses ~£10–20 pp/day)</td>
+      <td data-label="Est. Cost">£50–150 pp</td>
+      <td data-label="Bars">Coogee Pavilion or Glenmore</td>
+      <td data-label="Eat">Opera Bar or Chinatown eats</td>
+    </tr>
+    <tr>
+      <td data-label="Date">May 29, 2026</td>
+      <td data-label="Day">Fri</td>
+      <td data-label="Location">Sydney</td>
+      <td data-label="Activities">Bondi Beach + Coastal Walk to Bronte. Optional surf lesson. Evening family time.</td>
+      <td data-label="Accommodation">Staying with brother</td>
+      <td data-label="Transport">Bus/train</td>
+      <td data-label="Est. Cost">£40–120 pp</td>
+      <td data-label="Bars">Icebergs Dining Room bar or local pubs</td>
+      <td data-label="Eat">Bondi cafes (fish & chips) or home-cooked</td>
+    </tr>
+    <tr>
+      <td data-label="Date">May 30, 2026</td>
+      <td data-label="Day">Sat</td>
+      <td data-label="Location">Sydney</td>
+      <td data-label="Activities">Ferry to Manly Beach (scenic ride). Beach relax, walks. Possible Vivid lights evening.</td>
+      <td data-label="Accommodation">Staying with brother</td>
+      <td data-label="Transport">Ferry (~£8 pp return)</td>
+      <td data-label="Est. Cost">£40–100 pp</td>
+      <td data-label="Bars">4 Pines Brewing (Manly) or harbour bars</td>
+      <td data-label="Eat">Manly Wharf seafood or casual</td>
+    </tr>
+    <tr>
+      <td data-label="Date">May 31, 2026</td>
+      <td data-label="Day">Sun</td>
+      <td data-label="Location">Sydney</td>
+      <td data-label="Activities">Royal Botanic Garden stroll, Art Gallery of NSW (free), or Taronga Zoo ferry. Relaxed family day.</td>
+      <td data-label="Accommodation">Staying with brother</td>
+      <td data-label="Transport">Ferry/bus</td>
+      <td data-label="Est. Cost">£30–100 pp</td>
+      <td data-label="Bars">As above</td>
+      <td data-label="Eat">Picnic in gardens or local cafes</td>
+    </tr>
+    <tr>
+      <td data-label="Date">June 1, 2026</td>
+      <td data-label="Day">Mon</td>
+      <td data-label="Location">Sydney → Singapore → Manchester</td>
+      <td data-label="Activities">Morning free/family time. Depart SYD 15:00 (SQ222). Long SIN layover (~4h50). Overnight flight SQ302 dep 02:10 (June 2).</td>
+      <td data-label="Accommodation">In-flight</td>
+      <td data-label="Transport">Train/bus to SYD airport + SQ222 (SYD–SIN, 8h20) → SQ302 (SIN–MAN, 14h05)</td>
+      <td data-label="Est. Cost">Included in ticket + ~£30–50 (meals/transport)</td>
+      <td data-label="Bars">N/A (in-flight / SIN lounge if access)</td>
+      <td data-label="Eat">In-flight meals / SIN airport food</td>
+    </tr>
+    <tr>
+      <td data-label="Date">June 2, 2026</td>
+      <td data-label="Day">Tue</td>
+      <td data-label="Location">Manchester</td>
+      <td data-label="Activities">Arrive MAN 09:15. Trip ends. Welcome home!</td>
+      <td data-label="Accommodation">N/A</td>
+      <td data-label="Transport">N/A</td>
+      <td data-label="Est. Cost">N/A</td>
+      <td data-label="Bars">N/A</td>
+      <td data-label="Eat">N/A</td>
+    </tr>
+  </tbody>
+</table>
 
-    <section id="about" class="about">
-        <img src="profile.jpg" alt="Profile photo of Richie Taylor, The Brutal Truth Life Coach in Yeovil UK"> <!-- Your uploaded image as profile - save it as 'profile.jpg' in the same folder as index.html -->
-        <h2>About Me</h2>
-        <p>I'm Richie Taylor, a life coach who's been through the grinder and come out sharper. Based in Yeovil, UK, I've helped dozens of people—from stuck professionals to lost dreamers—face their realities head-on. My style? Direct. If you're avoiding the hard stuff, we'll fix that first. I believe real growth comes from uncomfortable truths, not motivational posters.</p>
-        <p>Whether you're in Somerset or across the globe, I'm equipped to deliver results without the fluff. Let's cut through the noise and get you moving.</p>
-    </section>
+<div class="notes">
+  <h2>Quick Trip Notes (as of February 2026)</h2>
+  <ul>
+    <li><strong>Total duration:</strong> May 7 departure → June 2 arrival (~27 days away).</li>
+    <li><strong>Costs:</strong> Approximate per person (GBP), shoulder season estimates. Accommodation in Sydney = staying with brother (no cost). Flights/tours book early for best rates.</li>
+    <li><strong>Weather:</strong> Queensland May = warm/dry (~24–29°C). Sydney late May/early June = cool/mild (~18–22°C days, 10–14°C nights) — pack layers.</li>
+    <li><strong>Recommendations:</strong> Reef-safe sunscreen, hat, insect repellent (rainforest). Opal card for Sydney public transport. Check Vivid Sydney dates (light festival) closer to travel.</li>
+    <li><strong>Flights:</strong> Outbound Qantas/Emirates/Jetstar codeshare. Return Singapore Airlines (premium, reliable). Schedules based on provided details — confirm closer to date.</li>
+  </ul>
+</div>
 
-    <section id="services" class="services">
-        <h2>Services</h2>
-        <p>I offer flexible, no-nonsense coaching tailored to your needs. Sessions are 60 minutes, focused on breaking barriers and building momentum.</p>
-        <ul>
-            <li><img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=50&q=80" alt="Phone icon for remote coaching"><strong>Phone Coaching</strong> Direct, distraction-free calls from anywhere. Ideal for busy schedules.</li>
-            <li><img src="https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=50&q=80" alt="Video call icon for Skype/Teams sessions"><strong>Skype/Teams Video</strong> Face-to-face vibe without the travel. Screen-sharing for goal-tracking if needed.</li>
-            <li><img src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?ixlib=rb-4.0.3&auto=format&fit=crop&w=50&q=80" alt="Handshake icon for in-person coaching"><strong>Face-to-Face</strong> In-person sessions in Yeovil, Somerset. For those who thrive on real-world intensity.</li>
-        </ul>
-        <p>Packages start at £90/hour. Group sessions and intensives available for deeper dives. Contact me to discuss what fits your reality.</p>
-    </section>
-
-    <section id="contact" class="contact">
-        <h2>Get Started—Or Keep Stalling</h2>
-        <p>Ready for the truth? Email me at <a href="mailto:lifecoaching@richietaylor.net">lifecoaching@richietaylor.net</a>. I'll respond within 24 hours with a no-obligation chat to see if we're a fit. WhatsApp: <a href="https://wa.me/447817976703">07817 976703</a></p>
-    </section>
-
-    <footer>
-        <p>&copy; 2025 The Brutal Truth Life Coaching. Yeovil, Somerset, UK. All rights reserved. | <a href="#privacy">Privacy Policy</a></p>
-    </footer>
-
-    <script>
-        // Smooth scrolling for nav links with offset to account for sticky header/nav
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    const headerOffset = 120; // Adjust this value based on your header + nav height (e.g., 1rem padding + nav padding + border)
-                    const elementPosition = target.getBoundingClientRect().top + window.pageYOffset;
-                    const offsetPosition = elementPosition - headerOffset;
-
-                    window.scrollTo({
-                        top: offsetPosition,
-                        behavior: 'smooth'
-                    });
-                }
-            });
-        });
-    </script>
 </body>
-
 </html>
