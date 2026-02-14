@@ -3,29 +3,36 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Full Trip Itinerary 2026 – UK to Queensland & Sydney</title>
+  <title>Australia Trip 2026 – Full Itinerary</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background: #f8f9fa;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      background: #f9f9f9;
       color: #333;
-      line-height: 1.5;
     }
     h1 {
       text-align: center;
       color: #2c3e50;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #7f8c8d;
+      margin-bottom: 30px;
     }
     table {
       width: 100%;
       border-collapse: collapse;
+      margin-bottom: 40px;
       background: white;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      margin: 20px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     th, td {
       border: 1px solid #ddd;
-      padding: 10px;
+      padding: 12px;
       text-align: left;
       vertical-align: top;
     }
@@ -36,43 +43,64 @@
       top: 0;
       z-index: 10;
     }
-    tr:nth-child(even) { background: #f2f2f2; }
-    tr:hover { background: #e8f4f8; }
-    .total-row {
+    tr:nth-child(even) {
+      background: #f8f9fa;
+    }
+    tr:hover {
+      background: #e8f4f8;
+    }
+    .date-group {
+      background: #ecf0f1;
       font-weight: bold;
-      background: #d4edda;
-      color: #155724;
     }
-    .notes {
-      max-width: 900px;
-      margin: 20px auto;
-      padding: 15px;
-      background: white;
-      border-left: 4px solid #3498db;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    .details {
+      font-size: 0.95em;
+      color: #555;
     }
-    @media (max-width: 1200px) {
-      table, thead, tbody, th, td, tr { display: block; }
-      thead tr { position: absolute; top: -9999px; left: -9999px; }
-      tr { border: 1px solid #ccc; margin-bottom: 15px; }
-      td { border: none; border-bottom: 1px solid #eee; position: relative; padding-left: 50%; }
+    @media (max-width: 900px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+      thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+      }
+      tr {
+        border: 1px solid #ccc;
+        margin-bottom: 15px;
+      }
+      td {
+        border: none;
+        border-bottom: 1px solid #eee;
+        position: relative;
+        padding-left: 50%;
+      }
       td:before {
         position: absolute;
-        top: 6px;
-        left: 6px;
+        top: 12px;
+        left: 12px;
         width: 45%;
         padding-right: 10px;
         white-space: nowrap;
-        content: attr(data-label);
         font-weight: bold;
-        color: #34495e;
       }
+      td:nth-of-type(1):before { content: "Date"; }
+      td:nth-of-type(2):before { content: "Day"; }
+      td:nth-of-type(3):before { content: "Location"; }
+      td:nth-of-type(4):before { content: "Activities"; }
+      td:nth-of-type(5):before { content: "Accommodation"; }
+      td:nth-of-type(6):before { content: "Transport"; }
+      td:nth-of-type(7):before { content: "Est. Cost"; }
+      td:nth-of-type(8):before { content: "Eat"; }
+      td:nth-of-type(9):before { content: "Details"; }
     }
   </style>
 </head>
 <body>
 
-<h1>Complete Trip Itinerary 2026<br>Manchester → Queensland → Sydney → Manchester<br>May 7 – June 2</h1>
+<h1>Australia Trip 2026 – Full Itinerary</h1>
+<p class="subtitle">March 15 – May 27, 2026 | Consolidated daily overview – all segments merged</p>
 
 <table>
   <thead>
@@ -80,334 +108,83 @@
       <th>Date</th>
       <th>Day</th>
       <th>Location</th>
-      <th>Activities / Notes</th>
+      <th>Activities</th>
       <th>Accommodation</th>
-      <th>Transport / Flight</th>
-      <th>Est. Cost (GBP, per person)</th>
-      <th>Cumulative (GBP)</th>
-      <th>Bars</th>
-      <th>Eat</th>
+      <th>Transport</th>
+      <th>Est. Cost (GBP)</th>
+      <th>Eat Recommendations</th>
+      <th>Details</th>
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <td>May 7–8</td>
-      <td>Thu–Fri</td>
-      <td>Manchester → Dubai → Melbourne</td>
-      <td>Outbound long-haul (part of £1,400 international package)</td>
-      <td>In-flight</td>
-      <td>QF8020 → QF8406 (Emirates codeshare)</td>
-      <td>£600 (flight share)</td>
-      <td>£600</td>
-      <td>N/A</td>
-      <td>In-flight</td>
-    </tr>
-    <tr>
-      <td>May 9</td>
-      <td>Sat</td>
-      <td>Melbourne → Proserpine → Airlie</td>
-      <td>Jetstar domestic leg (part of £1,400) + shuttle. Jet lag recovery.</td>
-      <td>Magnums Queen Cabin</td>
-      <td>QF5832 + shuttle</td>
-      <td>£275–310 (£200 flight share + land)</td>
-      <td>£875–910</td>
-      <td>Northerlies or Anchor</td>
-      <td>Fish D’vine or picnic</td>
-    </tr>
-    <tr>
-      <td>May 10</td>
-      <td>Sun</td>
-      <td>Whitsundays (Airlie Beach)</td>
-      <td>Chilled beach/lagoon day</td>
-      <td>Magnums Queen Cabin</td>
-      <td>Local walk/bus</td>
-      <td>£75–110</td>
-      <td>£950–1,020</td>
-      <td>Northerlies or Anchor</td>
-      <td>Fish D’vine or Mr Bones</td>
-    </tr>
-    <tr>
-      <td>May 11</td>
-      <td>Mon</td>
-      <td>Whitsundays (Reef)</td>
-      <td>Snorkeling tour + optional extras</td>
-      <td>Magnums Queen Cabin</td>
-      <td>Marina shuttle</td>
-      <td>£100–175</td>
-      <td>£1,050–1,195</td>
-      <td>Northerlies / Magnum's</td>
-      <td>The Shack or Sol</td>
-    </tr>
-    <tr>
-      <td>May 12</td>
-      <td>Tue</td>
-      <td>Proserpine → Magnetic Island</td>
-      <td>Train + ferry + hike</td>
-      <td>Vintage Coral Green</td>
-      <td>Spirit of Queensland + SeaLink</td>
-      <td>£100–150</td>
-      <td>£1,150–1,345</td>
-      <td>Peppers rooftop</td>
-      <td>Nelly Bay cafés</td>
-    </tr>
-    <tr>
-      <td>May 13</td>
-      <td>Wed</td>
-      <td>Magnetic Island</td>
-      <td>Discovery snorkel/SUP tour</td>
-      <td>Vintage Coral Green</td>
-      <td>Walk/bus</td>
-      <td>£125–175</td>
-      <td>£1,275–1,520</td>
-      <td>Magnetic Brewery</td>
-      <td>Peppers or fresh fish</td>
-    </tr>
-    <tr>
-      <td>May 14</td>
-      <td>Thu</td>
-      <td>Mag. Isl. → Mission Beach</td>
-      <td>Ferry/train + Licuala walk</td>
-      <td>Rainforest Motel</td>
-      <td>Ferry + train + shuttle</td>
-      <td>£125–175</td>
-      <td>£1,400–1,695</td>
-      <td>Mission Beach Tavern</td>
-      <td>Noori Thai / Treehouse</td>
-    </tr>
-    <tr>
-      <td>May 15</td>
-      <td>Fri</td>
-      <td>Mission Beach</td>
-      <td>Reef & Dunk Island tour</td>
-      <td>Rainforest Motel</td>
-      <td>Tour pickup</td>
-      <td>£150–200</td>
-      <td>£1,550–1,895</td>
-      <td>Mission Beach Tavern</td>
-      <td>Castaways / local</td>
-    </tr>
-    <tr>
-      <td>May 16</td>
-      <td>Sat</td>
-      <td>Mission Beach → Cairns</td>
-      <td>Tully rafting full-day</td>
-      <td>Cairns Plaza</td>
-      <td>Train + rafting bus</td>
-      <td>£140–185</td>
-      <td>£1,690–2,080</td>
-      <td>Hemingway’s / Pier Bar</td>
-      <td>Prawn Star / Ochre</td>
-    </tr>
-    <tr>
-      <td>May 17</td>
-      <td>Sun</td>
-      <td>Cairns</td>
-      <td>Silverswift 3-reef tour</td>
-      <td>Cairns Plaza</td>
-      <td>Terminal bus</td>
-      <td>£175–285</td>
-      <td>£1,865–2,365</td>
-      <td>Three Wolves</td>
-      <td>Ganbaranba ramen</td>
-    </tr>
-    <tr>
-      <td>May 18</td>
-      <td>Mon</td>
-      <td>Cairns</td>
-      <td>Kuranda Railway + Skyrail</td>
-      <td>Cairns Plaza</td>
-      <td>Station bus</td>
-      <td>£111–221</td>
-      <td>£1,976–2,586</td>
-      <td>Conservatory Bar</td>
-      <td>Ollie's Italian</td>
-    </tr>
-    <tr>
-      <td>May 19</td>
-      <td>Tue</td>
-      <td>Cairns</td>
-      <td>Green Island day trip</td>
-      <td>Cairns Plaza</td>
-      <td>Ferry terminal</td>
-      <td>£115–220</td>
-      <td>£2,091–2,806</td>
-      <td>As above</td>
-      <td>As above</td>
-    </tr>
-    <tr>
-      <td>May 20</td>
-      <td>Wed</td>
-      <td>Cairns → Port Douglas</td>
-      <td>Bus + Four Mile Beach</td>
-      <td>Mantra PortSea</td>
-      <td>Bus (~1h)</td>
-      <td>£125–225</td>
-      <td>£2,216–3,031</td>
-      <td>Iron Bar / Watergate</td>
-      <td>Salsa / Hi Tide</td>
-    </tr>
-    <tr>
-      <td>May 21</td>
-      <td>Thu</td>
-      <td>Port Douglas</td>
-      <td>Daintree/Cape Trib tour</td>
-      <td>Mantra PortSea</td>
-      <td>Bus/tour</td>
-      <td>£150–235</td>
-      <td>£2,366–3,266</td>
-      <td>Barbados rooftop</td>
-      <td>Zinc</td>
-    </tr>
-    <tr>
-      <td>May 22</td>
-      <td>Fri</td>
-      <td>Port Douglas</td>
-      <td>Wildlife Habitat + Hartley's</td>
-      <td>Mantra PortSea</td>
-      <td>Bus</td>
-      <td>£108–160</td>
-      <td>£2,474–3,426</td>
-      <td>Jungle Fowl</td>
-      <td>Seabean tapas</td>
-    </tr>
-    <tr>
-      <td>May 23</td>
-      <td>Sat</td>
-      <td>Port Douglas</td>
-      <td>Mossman Gorge + beach</td>
-      <td>Mantra PortSea</td>
-      <td>Bus/drive</td>
-      <td>£115–145</td>
-      <td>£2,589–3,571</td>
-      <td>As above</td>
-      <td>As above</td>
-    </tr>
-    <tr>
-      <td>May 24</td>
-      <td>Sun</td>
-      <td>Port Douglas</td>
-      <td>Low Isles snorkel/sailing</td>
-      <td>Mantra PortSea</td>
-      <td>Marina</td>
-      <td>£230–260</td>
-      <td>£2,819–3,831</td>
-      <td>As above</td>
-      <td>As above</td>
-    </tr>
-    <tr>
-      <td>May 25</td>
-      <td>Mon</td>
-      <td>Port Douglas</td>
-      <td>Flagstaff Hill + beach</td>
-      <td>Mantra PortSea</td>
-      <td>Bus/walk</td>
-      <td>£65–90</td>
-      <td>£2,884–3,921</td>
-      <td>As above</td>
-      <td>As above</td>
-    </tr>
-    <tr>
-      <td>May 26</td>
-      <td>Tue</td>
-      <td>Port Douglas</td>
-      <td>Beach/pool downtime</td>
-      <td>Mantra PortSea</td>
-      <td>Walk/bus</td>
-      <td>£65–285</td>
-      <td>£2,949–4,206</td>
-      <td>As above</td>
-      <td>As above</td>
-    </tr>
-    <tr>
-      <td>May 27</td>
-      <td>Wed</td>
-      <td>Port Douglas → Sydney</td>
-      <td>Flight to SYD + settle with brother</td>
-      <td>Staying with brother (£0)</td>
-      <td>Bus + CNS→SYD (£120 pp)</td>
-      <td>£220–340</td>
-      <td>£3,169–4,546</td>
-      <td>Glenmore / Opera Bar</td>
-      <td>Fish Market / pub</td>
-    </tr>
-    <tr>
-      <td>May 28</td>
-      <td>Thu</td>
-      <td>Sydney</td>
-      <td>Opera House / Harbour / Rocks</td>
-      <td>Staying with brother (£0)</td>
-      <td>Opal card</td>
-      <td>£50–150</td>
-      <td>£3,219–4,696</td>
-      <td>Coogee Pavilion</td>
-      <td>Opera Bar / Chinatown</td>
-    </tr>
-    <tr>
-      <td>May 29</td>
-      <td>Fri</td>
-      <td>Sydney</td>
-      <td>Bondi + Coastal Walk</td>
-      <td>Staying with brother (£0)</td>
-      <td>Bus/train</td>
-      <td>£40–120</td>
-      <td>£3,259–4,816</td>
-      <td>Icebergs bar</td>
-      <td>Bondi cafes</td>
-    </tr>
-    <tr>
-      <td>May 30</td>
-      <td>Sat</td>
-      <td>Sydney</td>
-      <td>Manly ferry + beach</td>
-      <td>Staying with brother (£0)</td>
-      <td>Ferry</td>
-      <td>£40–100</td>
-      <td>£3,299–4,916</td>
-      <td>4 Pines Manly</td>
-      <td>Manly Wharf</td>
-    </tr>
-    <tr>
-      <td>May 31</td>
-      <td>Sun</td>
-      <td>Sydney</td>
-      <td>Botanic Garden / Gallery / Zoo option</td>
-      <td>Staying with brother (£0)</td>
-      <td>Ferry/bus</td>
-      <td>£30–100</td>
-      <td>£3,329–5,016</td>
-      <td>As above</td>
-      <td>Picnic / local</td>
-    </tr>
-    <tr>
-      <td>June 1</td>
-      <td>Mon</td>
-      <td>Sydney → Manchester</td>
-      <td>Return long-haul (part of £1,400 package)</td>
-      <td>In-flight</td>
-      <td>SQ222 → SQ302</td>
-      <td>£600 (flight share)</td>
-      <td>£3,929–5,616</td>
-      <td>N/A</td>
-      <td>In-flight / SIN</td>
-    </tr>
-    <tr class="total-row">
-      <td colspan="6">Grand Total (per person – land + all flights)</td>
-      <td>£3,929 – £5,616</td>
-      <td>£3,929 – £5,616</td>
-      <td colspan="2">Includes: land activities/accom/transport/meals buffer + £1,400 international flights (split) + £120 CNS→SYD</td>
-    </tr>
+    <tr class="date-group"><td colspan="9">International Arrival & Sydney / Blue Mountains</td></tr>
+    <tr><td>Mar 15</td><td>Sun</td><td>Travel (UK → Singapore)</td><td>Depart LHR → SIN (SQ321 ~22:00)</td><td>In-flight</td><td>Flight</td><td>Included in ~£700 total</td><td>In-flight meals</td><td class="details">Long-haul; rest/sleep for jet lag</td></tr>
+    <tr><td>Mar 16</td><td>Mon</td><td>Travel (SIN → Sydney)</td><td>Layover SIN + SIN → SYD (SQ221 overnight)</td><td>In-flight</td><td>Flight</td><td>Included</td><td>In-flight meals</td><td class="details">~2h layover; lounge if eligible</td></tr>
+    <tr><td>Mar 17–23</td><td>Tue–Mon</td><td>Sydney</td><td>Family stay: Opera House, Bondi-Coogee, Botanic Gardens, Manly ferry, The Rocks</td><td>Free (family)</td><td>Airport shuttle (~£10 Mar 17)</td><td>110–150</td><td>Family (~£15–20/day); Bills (~£15)</td><td class="details">Relaxed family time; Manly ferry ~£8–10 return</td></tr>
+    <tr><td>Mar 24</td><td>Tue</td><td>Blue Mountains (Katoomba)</td><td>Train to Katoomba, Three Sisters/Echo Point walks</td><td>Free (family)</td><td>Train (~£5–10)</td><td>25–40</td><td>Family; picnic/cafes (~£15–20)</td><td class="details">Opal card for transport</td></tr>
+    <tr><td>Mar 25</td><td>Wed</td><td>Blue Mountains</td><td>Giant Stairway hike, Scenic World (~£30)</td><td>Free (family)</td><td>Local bus (~£5)</td><td>40–60</td><td>Family; Katoomba cafes (~£20)</td><td class="details">Scenic World: unlimited rides</td></tr>
+    <tr><td>Mar 26</td><td>Thu</td><td>Blue Mountains → Sydney</td><td>Wentworth Falls hike, train back</td><td>Free (family)</td><td>Train (~£5–10)</td><td>25–40</td><td>Family (~£15–20)</td><td class="details">Track can be slippery after rain</td></tr>
+    <tr><td>Mar 27</td><td>Fri</td><td>Sydney → Melbourne</td><td>QF423 SYD-MEL 08:30→10:05, Federation Square</td><td>Free (Paul & Carla’s)</td><td>Flight + shuttle (~£70–90)</td><td>85–110</td><td>Family breakfast (~£15–20)</td><td class="details">Early flight; airport security time</td></tr>
+
+    <tr class="date-group"><td colspan="9">Melbourne → Tasmania Loop</td></tr>
+    <tr><td>Mar 28</td><td>Sat</td><td>Melbourne → Hobart</td><td>QF1295 MEL-HBA 16:55→18:15, waterfront</td><td>Travelodge Hobart (~£75)</td><td>Flight + shuttle (~£86)</td><td>86</td><td>N/A</td><td class="details">Zip Auto car pickup (~5 min shuttle); drive to stay ~20–25 min</td></tr>
+    <tr><td>Mar 29</td><td>Sun</td><td>Hobart → Bruny Island → Hobart</td><td>Day trip: Neck lookout, Adventure Bay, wildlife/food trail</td><td>Bay Hotel Apartments</td><td>Drive + ferry</td><td>~100–200</td><td>Food trail (cheese/oysters)</td><td class="details">SeaLink ferry frequent; day tour option</td></tr>
+    <tr><td>Mar 30</td><td>Mon</td><td>Hobart → Port Arthur</td><td>Tasman Peninsula kayak tour → Port Arthur</td><td>Fox & Hounds Hotel</td><td>Drive</td><td>~150–250</td><td>N/A</td><td class="details">Kayak tour confirmed #316492102</td></tr>
+    <tr><td>Mar 31</td><td>Tue</td><td>Port Arthur → Coles Bay</td><td>Port Arthur site → Wineglass Bay hike</td><td>BIG4 Iluka Freycinet</td><td>Drive</td><td>~120–200</td><td>N/A</td><td class="details">Lookout 1–2 hr return; full loop 3–4 hr</td></tr>
+    <tr><td>Apr 1</td><td>Wed</td><td>Coles Bay → Binalong Bay</td><td>Bay of Fires beaches/walks</td><td>Georges Bay Apartments</td><td>Drive</td><td>~100–180</td><td>N/A</td><td class="details">The Gardens / Swimcart good for photos</td></tr>
+    <tr><td>Apr 2</td><td>Thu</td><td>Binalong Bay → Launceston</td><td>Cataract Gorge, Hollybank segway/zipline, pickleball</td><td>Peppers Silo (rec)</td><td>Drive</td><td>~150–250</td><td>N/A</td><td class="details">Segway/Zipline confirmed; pickleball 6–8 PM</td></tr>
+    <tr><td>Apr 3</td><td>Fri</td><td>Launceston → Cradle Mountain</td><td>Mersey rafting, short walks/wildlife</td><td>Cradle Mountain Hotel/Lodge</td><td>Drive</td><td>~150–300</td><td>N/A</td><td class="details">Rafting Aardvark; Enchanted Walk evening option</td></tr>
+    <tr><td>Apr 4</td><td>Sat</td><td>Cradle Mountain → Strahan</td><td>Summit hike → drive</td><td>Strahan Wilderness Lodge</td><td>Drive</td><td>~120–200</td><td>N/A</td><td class="details">Summit 8–10 hr steep; alt Dove Lake if poor weather</td></tr>
+    <tr><td>Apr 5</td><td>Sun</td><td>Strahan</td><td>Gordon River cruise</td><td>Strahan Wilderness Lodge</td><td>Local</td><td>~150–250</td><td>N/A</td><td class="details">Cruise #847133; Upper Deck Window</td></tr>
+    <tr><td>Apr 6</td><td>Mon</td><td>Strahan → Lake St Clair</td><td>West Coast Wilderness Railway → lake walk</td><td>Lake St Clair Lodge</td><td>Drive</td><td>~100–180</td><td>N/A</td><td class="details">"Rack & Gorge" ~10:30 AM dep</td></tr>
+    <tr><td>Apr 7</td><td>Tue</td><td>Lake St Clair → Mt Field</td><td>Russell Falls, Tall Trees, Lady Barron Falls</td><td>Mt Field cabins</td><td>Drive</td><td>~80–150</td><td>N/A</td><td class="details">Easy tracks; cassowary rare</td></tr>
+    <tr><td>Apr 8</td><td>Wed</td><td>Mt Field → Hobart → Coolangatta</td><td>Free day Hobart (MONA/Mt Wellington), JQ695 HBA → OOL evening flight</td><td>Coolangatta Sands Hotel (~£62 total)</td><td>Drive + flight + taxi (~£80–180 total)</td><td>80–180 (total)</td><td>Hotel bar or nearby</td><td>Hotel pub grub or fish & chips takeaway</td></tr>
+
+    <tr class="date-group"><td colspan="9">Gold Coast → Coastal Drive → Sunshine Coast</td></tr>
+    <tr><td>Apr 9</td><td>Thu</td><td>Coolangatta → Family</td><td>Checkout, transfer to brother's place, beach unwind</td><td>Free (brother/family stay)</td><td>Family car / short transfer</td><td>15–30</td><td>N/A</td><td>Family welcome meal or takeaway pizza</td></tr>
+    <tr><td>Apr 10–15</td><td>Fri–Wed</td><td>Gold Coast</td><td>Family stay: beaches, Currumbin Wildlife, Burleigh Heads, Tamborine optional, theme park/park</td><td>Free (family)</td><td>Free (family car)</td><td>15–100 per day</td><td>Local pubs / home</td><td>Beachside pubs, family meals, seafood/pasta</td></tr>
+    <tr><td>Apr 16</td><td>Thu</td><td>Gold Coast → Byron Bay</td><td>Pick up hire car OOL, drive to Byron (~1h), Cape Byron Lighthouse walk, Main Beach</td><td>Crystalbrook Byron</td><td>Hire car from OOL</td><td>180</td><td>N/A</td><td>Light Years (Asian fusion)</td></tr>
+    <tr><td>Apr 17</td><td>Fri</td><td>Brunswick Heads</td><td>Drive south (~20 min), Nature Reserve hike, coastal walk/beach swim</td><td>The Brunswick</td><td>Hire car</td><td>160</td><td>N/A</td><td>Hotel Brunswick (pub fare, river views)</td></tr>
+    <tr><td>Apr 18</td><td>Sat</td><td>Kingscliff Beach</td><td>Drive south (~20 min), Kingscliff swim/coastal walk, Cudgen Creek kayak/paddleboard</td><td>Mantra on Salt Beach Kingscliff</td><td>Hire car</td><td>200</td><td>N/A</td><td>Marine Parade Kitchen (seafood/local)</td></tr>
+    <tr><td>Apr 19</td><td>Sun</td><td>Fingal Head & Murwillumbah</td><td>Drive south (~10 min), Fingal Head Lighthouse walk, Murwillumbah riverside trails, optional Uki hike</td><td>Gallery Motel</td><td>Hire car</td><td>150</td><td>N/A</td><td>Tweed River House (riverside bistro)</td></tr>
+    <tr><td>Apr 20</td><td>Mon</td><td>Springbrook NP</td><td>Drive north (~55 min), Purling Brook Falls intro hike, evening Natural Bridge glow worms</td><td>Springbrook Mountain Hotel</td><td>Hire car</td><td>140</td><td>N/A</td><td>The Fudge Shop cafe (comfort food/views)</td></tr>
+    <tr><td>Apr 21</td><td>Tue</td><td>Springbrook NP</td><td>Full Purling Brook circuit, Natural Bridge glow worms, scenic drives</td><td>Springbrook Mountain Hotel</td><td>Hire car</td><td>170</td><td>N/A</td><td>The Fudge Shop cafe</td></tr>
+    <tr><td>Apr 22</td><td>Wed</td><td>Burleigh Heads</td><td>Drive (~30 min), Burleigh Heads NP hike, Currumbin Wildlife, Currumbin Beach</td><td>Burleigh Beach Hotel</td><td>Hire car</td><td>180</td><td>N/A</td><td>Justin Lane (shared plates)</td></tr>
+    <tr><td>Apr 23</td><td>Thu</td><td>Gold Coast → Noosa</td><td>Drop hire car OOL, shuttle bus to Noosa (~2–3h), Noosa NP coastal walk</td><td>Noosa Boathouse Retreat</td><td>Hire car drop + bus (~£40)</td><td>200</td><td>N/A</td><td>Bistro C (French-Australian fusion)</td></tr>
+
+    <tr class="date-group"><td colspan="9">Sunshine Coast → Noosa → K'gari → Brisbane → Whitsundays</td></tr>
+    <tr><td>Apr 24–25</td><td>Fri–Sat</td><td>Buderim</td><td>Self-planned with Elle: Forest Park, markets, free activities</td><td>Free (Elle’s)</td><td>Free (with Elle)</td><td>20–30</td><td>Foote Sanctuary picnic / Thai Mango</td><td class="details">Coords: -26.6848, 153.0585</td></tr>
+    <tr><td>Apr 26</td><td>Sun</td><td>Buderim → Noosa</td><td>Daytime with Elle, drive to Noosa, Hastings St, beach sunset</td><td>Villa Noosa Hotel</td><td>Drive with Elle</td><td>75–100</td><td>Bistro C / Season Restaurant</td><td class="details">AUD 150.30 confirmed; phone +61 7 5430 5555</td></tr>
+    <tr><td>Apr 27–29</td><td>Mon–Wed</td><td>Noosa → K'gari</td><td>Drop Bear 3D 4WD: Lakes, Champagne Pools, Maheno, return Apr 29 ~5–6 PM</td><td>Beachfront Eco Retreat</td><td>Pick-up / ferry / 4WD</td><td>360–400+</td><td>All meals included</td><td class="details">AUD 727 paid; upgrade auto-charge 7 days before</td></tr>
+    <tr><td>Apr 29</td><td>Wed</td><td>K'gari → Noosa</td><td>Arrive ~5–6 PM, check-in Noosa Lakes, marina dinner</td><td>Noosa Lakes Resort</td><td>None (taxi if needed)</td><td>Included</td><td>Marina cafes</td><td class="details">AUD 518.85 confirmed; phone +61 7 5447 1400</td></tr>
+    <tr><td>Apr 30</td><td>Thu</td><td>Noosa/Everglades</td><td>Kanu Kapers kayak tour, afternoon relax</td><td>Noosa Lakes Resort</td><td>Transfer booked</td><td>100–130</td><td>Bistro C / Season</td><td class="details">AUD 196.56 paid; pickup 7:50 AM confirmed Jan 18, 2026</td></tr>
+    <tr><td>May 1</td><td>Fri</td><td>Noosa</td><td>Noosa NP Coastal Track, beach/Hastings St/Laguna sunset</td><td>Noosa Lakes Resort</td><td>Walk/taxi</td><td>90–120</td><td>Bistro C / Season</td><td class="details">Customizable track; koala spotting possible</td></tr>
+    <tr><td>May 2</td><td>Sat</td><td>Noosa → Brisbane</td><td>Pickleball at The Olive, Greyhound bus to Brisbane (~18:00 arr)</td><td>South Bank hotel</td><td>Taxi + Greyhound</td><td>150–300</td><td>South Bank riverside</td><td class="details">Book pickleball npc.pickleplanner.com; Greyhound ~£15–30</td></tr>
+    <tr><td>May 3</td><td>Sun</td><td>Brisbane</td><td>South Bank/Streets Beach, CityCat, Mt Coot-tha lookout</td><td>Same</td><td>Local</td><td>100–200</td><td>South Bank riverside</td><td class="details">CityCat scenic ferry</td></tr>
+    <tr><td>May 4</td><td>Mon</td><td>Brisbane → Airlie Beach</td><td>VA1117 BNE → PPP 12:45→14:35, shuttle to Airlie, lagoon/Honeyeater hike</td><td>Magnums</td><td>Flight + shuttle</td><td>140–300</td><td>Fish D’vine</td><td class="details">AUD 163.60 paid</td></tr>
+
+    <tr class="date-group"><td colspan="9">Whitsundays & Magnetic Island</td></tr>
+    <tr><td>May 5–7</td><td>Tue–Thu</td><td>Whitsundays</td><td>Power Play 2D2N sailing: Whitehaven, reefs, SUP, jacuzzi</td><td>Onboard</td><td>Walk to marina</td><td>380–480</td><td>Meals included</td><td class="details">BYO drinks OK (no glass)</td></tr>
+    <tr><td>May 7–11</td><td>Thu–Mon</td><td>Airlie Beach</td><td>Post-cruise, sunset cruise, Emily arrival/jetski, Ocean Rafting, SeaLink outer reef</td><td>Paradise Court</td><td>Walk/bus/scooter</td><td>150–300 per day</td><td>The Shack / Magnums / self-cater</td><td class="details">Paradise Court ~£85–120/night</td></tr>
+    <tr><td>May 12</td><td>Tue</td><td>Proserpine → Magnetic Island</td><td>Train to Townsville + ferry, Forts Walk koalas</td><td>Vintage Coral Green</td><td>Train + ferry</td><td>120–190</td><td>Nelly Bay cafés / Peppers</td><td class="details">Forts Walk trail map: parks.des.qld.gov.au/…</td></tr>
+
+    <tr class="date-group"><td colspan="9">Magnetic Island → Mission Beach → Cairns</td></tr>
+    <tr><td>May 13</td><td>Wed</td><td>Magnetic Island</td><td>Discovery snorkel/SUP tour, Geoffrey Bay wallabies dusk</td><td>Vintage Coral Green</td><td>Walk/bus</td><td>250–350</td><td>Peppers deck / Nelly Bay</td><td class="details">Wallabies best ~4:30–6:30 PM dusk</td></tr>
+    <tr><td>May 14</td><td>Thu</td><td>Magnetic → Mission Beach</td><td>Ferry/train, beach, Licuala Fan Palm Walk</td><td>Rainforest Motel</td><td>Ferry + train + taxi</td><td>250–350</td><td>Noori Thai / Treehouse</td><td class="details">Cassowary spotting possible</td></tr>
+    <tr><td>May 15</td><td>Fri</td><td>Mission Beach</td><td>Beaver Reef/Dunk Island snorkel tour</td><td>Rainforest Motel</td><td>Walk to pickup</td><td>300–400</td><td>Castaways Resort / local cafés</td><td class="details">AUD 199 × 2 ~£200 tour</td></tr>
+    <tr><td>May 16</td><td>Sat</td><td>Mission Beach → Cairns</td><td>Tully River rafting → Cairns arrival, Esplanade lagoon/markets</td><td>Cairns Plaza</td><td>Rafting pickup/drop</td><td>300–450</td><td>Esplanade food stalls / Thaidy</td><td class="details">Grade 3–4 rapids; AUD 245 × 2 ~£250</td></tr>
+
+    <tr class="date-group"><td colspan="9">Cairns → Port Douglas → Sydney Departure</td></tr>
+    <tr><td>May 17–19</td><td>Sun–Tue</td><td>Cairns</td><td>Silverswift reef, Kuranda/Skyrail, Green Island turtles</td><td>Cairns Plaza</td><td>Bus/walk</td><td>115–265 per day</td><td>Prawn Star / Ochre / Ganbaranba / Ollie's</td><td class="details">Reef tours weather-dependent; book early</td></tr>
+    <tr><td>May 20</td><td>Wed</td><td>Cairns → Port Douglas</td><td>Bus transfer, Four Mile Beach / optional jet ski</td><td>Mantra PortSea</td><td>Bus</td><td>140–245</td><td>Salsa Bar / Hi Tide / Pasta e Vino</td><td class="details">Bus ~1h; jet ski optional</td></tr>
+    <tr><td>May 21–26</td><td>Thu–Tue</td><td>Port Douglas</td><td>Daintree/Cape Trib, Wildlife Habitat/crocs, Mossman Gorge, Low Isles snorkel, Flagstaff/beach/sail/spa opt</td><td>Mantra PortSea</td><td>Bus/walk/drive</td><td>70–285 per day</td><td>Zinc / Seabean</td><td class="details">Low Isles ~£175–190; Mossman Dreamtime cultural</td></tr>
+    <tr><td>May 27</td><td>Wed</td><td>Port Douglas → Sydney</td><td>Bus to CNS + flight to SYD (departure)</td><td>N/A</td><td>Bus + flight</td><td>95–175</td><td>N/A</td><td class="details">CNS-SYD ~£75–140; book early</td></tr>
   </tbody>
 </table>
 
-<div class="notes">
-  <h2>Notes</h2>
-  <ul>
-    <li>International flights (£1,400 pp total) split roughly: £600 outbound long-haul, £200 MEL–PPP domestic, £600 return long-haul.</li>
-    <li>Cairns → Sydney flight (£120 pp) added to May 27.</li>
-    <li>Costs are approximate (shoulder season 2026) — actuals depend on bookings, exchange rates, options.</li>
-    <li>Excludes: travel insurance, visas/ETA, heavy extras, souvenirs.</li>
-  </ul>
-</div>
+<p style="text-align:center; margin-top:40px; color:#7f8c8d;">
+  Generated on February 14, 2026 | All bookings/tours should be reconfirmed closer to travel dates.
+</p>
 
 </body>
 </html>
