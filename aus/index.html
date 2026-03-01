@@ -8,7 +8,30 @@
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; margin: 0; padding: 20px; background: #f9f9f9; color: #333; }
     h1 { text-align: center; color: #2c3e50; margin-bottom: 10px; }
     .subtitle { text-align: center; color: #7f8c8d; margin-bottom: 10px; }
-    .header-box { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin: 0 auto 30px auto; max-width: 900px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    .overview-box {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 0 auto 30px auto;
+      max-width: 900px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .overview-box h3 { margin-top: 0; color: #34495e; }
+    .overview-list { list-style: none; padding-left: 0; }
+    .overview-list li {
+      margin-bottom: 12px;
+      padding-left: 20px;
+      position: relative;
+    }
+    .overview-list li strong { color: #2c3e50; }
+    .overview-list li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: #3498db;
+      font-weight: bold;
+    }
     .insurance-note { text-align: center; font-size: 0.95em; color: #555; margin-bottom: 30px; }
     table { width: 100%; border-collapse: collapse; margin-bottom: 40px; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     th, td { border: 1px solid #ddd; padding: 12px; text-align: left; vertical-align: top; }
@@ -17,10 +40,105 @@
     tr:hover { background: #e8f4f8; }
     .date-group { background: #ecf0f1; font-weight: bold; font-size: 1.1em; }
     .details { font-size: 0.95em; color: #555; }
-    @media (max-width: 900px) { table, thead, tbody, th, td, tr { display: block; } thead tr { position: absolute; top: -9999px; left: -9999px; } tr { border: 1px solid #ccc; margin-bottom: 15px; } td { border: none; border-bottom: 1px solid #eee; position: relative; padding-left: 50%; } td:before { position: absolute; top: 12px; left: 12px; width: 45%; padding-right: 10px; white-space: nowrap; font-weight: bold; } td:nth-of-type(1):before { content: "Date"; } td:nth-of-type(2):before { content: "Day"; } td:nth-of-type(3):before { content: "Location"; } td:nth-of-type(4):before { content: "Activities"; } td:nth-of-type(5):before { content: "Accommodation"; } td:nth-of-type(6):before { content: "Transport"; } td:nth-of-type(7):before { content: "Est. Cost"; } td:nth-of-type(8):before { content: "Eat"; } td:nth-of-type(9):before { content: "Details"; } }
+    @media (max-width: 900px) {
+      table, thead, tbody, th, td, tr { display: block; }
+      thead tr { position: absolute; top: -9999px; left: -9999px; }
+      tr { border: 1px solid #ccc; margin-bottom: 15px; }
+      td { border: none; border-bottom: 1px solid #eee; position: relative; padding-left: 50%; }
+      td:before { position: absolute; top: 12px; left: 12px; width: 45%; padding-right: 10px; white-space: nowrap; font-weight: bold; }
+      td:nth-of-type(1):before { content: "Date"; }
+      td:nth-of-type(2):before { content: "Day"; }
+      td:nth-of-type(3):before { content: "Location"; }
+      td:nth-of-type(4):before { content: "Activities"; }
+      td:nth-of-type(5):before { content: "Accommodation"; }
+      td:nth-of-type(6):before { content: "Transport"; }
+      td:nth-of-type(7):before { content: "Est. Cost"; }
+      td:nth-of-type(8):before { content: "Eat"; }
+      td:nth-of-type(9):before { content: "Details"; }
+    }
   </style>
 </head>
 <body>
+
+<h1>Australia Trip 2026 – Full Daily Itinerary</h1>
+<p class="subtitle">March 15 – June 1, 2026 | Every day listed individually – last updated March 1, 2026</p>
+
+<div class="overview-box">
+  <h3>Quick Daily Overview – At a Glance</h3>
+  <ul class="overview-list">
+    <li><strong>Mar 15 (Sun)</strong> – Travel: Depart London → Singapore → Sydney (overnight flights)</li>
+    <li><strong>Mar 16 (Mon)</strong> – Travel: Layover SIN → arrive Sydney early Mar 17</li>
+    <li><strong>Mar 17 (Tue)</strong> – Sydney: Arrive, settle in, Ku-ring-gai Chase Bobbin Head, optional pickleball</li>
+    <li><strong>Mar 18 (Wed)</strong> – Ku-ring-gai Chase: Solo West Head Lookout & walks, pickleball check</li>
+    <li><strong>Mar 19 (Thu)</strong> – Northern Beaches North: Solo Palm Beach & Barrenjoey Lighthouse, optional pickleball</li>
+    <li><strong>Mar 20 (Fri)</strong> – Northern Beaches East: Solo Shelly Beach snorkel & coastal path, pickleball check</li>
+    <li><strong>Mar 21 (Sat)</strong> – Northern Beaches/Manly: Beach walks, lagoon, snorkel (family may join)</li>
+    <li><strong>Mar 22 (Sun)</strong> – St Ives + Northern Beaches: Pickleball Warrimoo Oval + Mona Vale/Bilgola beach hop</li>
+    <li><strong>Mar 23 (Mon)</strong> – Sydney: Optional Royal National Park or local, Thornleigh pickleball, prep Blue Mountains</li>
+    <li><strong>Mar 24 (Tue)</strong> – Sydney/Blue Mountains: Train to Katoomba, Three Sisters & Echo Point walks</li>
+    <li><strong>Mar 25 (Wed)</strong> – Blue Mountains: Giant Stairway hike + Scenic World, optional advanced pickleball</li>
+    <li><strong>Mar 26 (Thu)</strong> – Blue Mountains/Sydney: Wentworth Falls hike, train back, afternoon relax</li>
+    <li><strong>Mar 27 (Fri)</strong> – Sydney → Melbourne: Flight SYD-MEL</li>
+
+    <li><strong>Mar 28 (Sat)</strong> – Arrival Hobart: Pick up car, late check-in Kingston Hotel</li>
+    <li><strong>Mar 29 (Sun)</strong> – Bruny Island & Eaglehawk Neck: Ferry, food trail, beaches, drive to Lufra Beachside</li>
+    <li><strong>Mar 30 (Mon)</strong> – Tasman Peninsula: Kayak tour Fortescue Bay, evening Port Arthur</li>
+    <li><strong>Mar 31 (Tue)</strong> – Port Arthur → Coles Bay: Historic site, Wineglass Bay hike/lookout</li>
+    <li><strong>Apr 1 (Wed)</strong> – Coles Bay → St Helens: Bicheno Blowhole, Bay of Fires beaches</li>
+    <li><strong>Apr 2 (Thu)</strong> – Launceston → Promised Land: Cataract Gorge, Segway + Zipline Hollybank, pickleball, late check-in AAA Granary</li>
+    <li><strong>Apr 3 (Fri)</strong> – Cradle Mountain day trip: Summit attempt or easier walks, return Promised Land</li>
+    <li><strong>Apr 4 (Sat)</strong> – Promised Land → Strahan: Drive via Zeehan, prep for Gordon cruise</li>
+    <li><strong>Apr 5 (Sun)</strong> – Strahan: Gordon River cruise (Sarah Island, rainforests)</li>
+    <li><strong>Apr 6 (Mon)</strong> – Strahan → Queenstown: Iron Blow, Horsetail Falls, Montezuma Falls walk</li>
+    <li><strong>Apr 7 (Tue)</strong> – Queenstown → Hobart: Nelson Falls, Mt Field NP (Russell Falls etc.), Martin Cash Motel</li>
+    <li><strong>Apr 8 (Wed)</strong> – Hobart → Gold Coast: MONA walk from motel, car drop, evening flight JQ695</li>
+
+    <li><strong>Apr 9–15</strong> – Gold Coast family stay: Beach days, Currumbin, Burleigh, Tamborine, wildlife</li>
+    <li><strong>Apr 16–23</strong> – Coastal drive: Byron Bay → Brunswick → Kingscliff → Fingal → Springbrook → Burleigh → Noosa</li>
+    <li><strong>Apr 24–26</strong> – Buderim → Noosa: Family time with Elle, Hastings St, coastal track</li>
+    <li><strong>Apr 27–29</strong> – K'gari (Fraser Island): Drop Bear 3-day 4WD tour (Lake McKenzie, Champagne Pools, Maheno)</li>
+    <li><strong>Apr 30–May 1</strong> – Noosa: Kanu Kapers kayak, Noosa NP coastal track</li>
+    <li><strong>May 2–3</strong> – Brisbane: Pickleball, South Bank, CityCat ferry</li>
+    <li><strong>May 4</strong> – Brisbane → Airlie Beach: Flight, lagoon, Honeyeater hike</li>
+
+    <li><strong>May 5–11</strong> – Whitsundays: Power Play liveaboard, Ocean Rafting, SeaLink reef, Paradise Court</li>
+    <li><strong>May 12–15</strong> – Magnetic Island → Mission Beach → Cairns: Forts Walk, snorkel/SUP, Beaver Reef, Tully rafting arrival</li>
+
+    <li><strong>May 16–19</strong> – Cairns: Tully rafting, Green Island, Kuranda+Hartley's, Silverswift + dives, Cairns Plaza</li>
+    <li><strong>May 20–23</strong> – Port Douglas: Four Mile Beach, Tony's Daintree/Mossman, Wildlife Habitat Swim with Salties, Silversonic dives, Mantra PortSea</li>
+    <li><strong>May 24–25</strong> – Port Douglas → Cairns: Light day + evening bus, Behana Canyoning, Cairns Plaza</li>
+
+    <li><strong>May 26 (Tue)</strong> – Arrival Sydney: Flight CNS-SYD, train to St Ives, Ku-ring-gai Wildflower Garden</li>
+    <li><strong>May 27 (Wed)</strong> – Eastern Suburbs: Bondi coastal walk, Watson's Bay/South Head, Vivid evening</li>
+    <li><strong>May 28 (Thu)</strong> – Blue Mountains overnight: Echo Point, Giant Stairway, Scenic World, Fairmont Leura</li>
+    <li><strong>May 29 (Fri)</strong> – Grand Pacific Drive: Sea Cliff Bridge, Wollongong, Kiama Blowhole, return St Ives</li>
+    <li><strong>May 30 (Sat)</strong> – Family fun: Luna Park/Taronga/Darling Harbour, group dinner, St Ives</li>
+    <li><strong>May 31 (Sun)</strong> – Family time + BridgeClimb Vivid Twilight: Darling Quarter/Botanic, climb 5pm, Grace Hotel CBD</li>
+    <li><strong>Jun 1 (Mon)</strong> – Departure: Light morning, airport transfer, 3pm flight</li>
+  </ul>
+</div>
+
+<p class="insurance-note">
+  Insurance: GTG/2026/746370 (Gold Cover) • £188.18 • Valid 15 Mar – 2 Jun 2026<br>
+  Medical & Repatriation: £10M • Cancellation: £2,000 • Baggage: £2,000 • Gadgets: £1,000<br>
+  Hazardous Cat C incl. • Excess: £75–£100 • Emergency: +44 (0)1444 465573
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Day</th>
+      <th>Location / Route</th>
+      <th>Activities</th>
+      <th>Accommodation</th>
+      <th>Transport</th>
+      <th>Est. Cost (GBP)</th>
+      <th>Eat Recommendations</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
 
 <h1>Australia Trip 2026 – Full Daily Itinerary</h1>
 <p class="subtitle">March 15 – June 1, 2026 | Every day listed individually – last updated March 1, 2026</p>
@@ -175,3 +293,4 @@
 
 </body>
 </html>
+
