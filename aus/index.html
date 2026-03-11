@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Australia Trip 2026 – Full Daily Itinerary</title>
-  <style>
+
+<style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       line-height: 1.6;
@@ -104,6 +105,57 @@
       font-size: 0.95em;
       color: #555;
     }
+
+    /* ── At a Glance ── */
+    .glance-segment {
+      margin-bottom: 20px;
+    }
+    .glance-segment:last-child {
+      margin-bottom: 0;
+    }
+    .glance-segment-header {
+      background: #34495e;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.95em;
+      letter-spacing: 0.03em;
+      padding: 8px 14px;
+      border-radius: 5px 5px 0 0;
+      text-transform: uppercase;
+    }
+    .glance-grid {
+      border: 1px solid #ddd;
+      border-top: none;
+      border-radius: 0 0 5px 5px;
+      overflow: hidden;
+    }
+    .glance-day {
+      display: flex;
+      align-items: baseline;
+      padding: 7px 14px;
+      border-bottom: 1px solid #eee;
+      gap: 14px;
+    }
+    .glance-day:last-child {
+      border-bottom: none;
+    }
+    .glance-day:nth-child(even) {
+      background: #f8f9fa;
+    }
+    .glance-date {
+      font-weight: 700;
+      color: #2c3e50;
+      min-width: 52px;
+      font-size: 0.88em;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+    .glance-desc {
+      font-size: 0.92em;
+      color: #444;
+      line-height: 1.45;
+    }
+
     @media (max-width: 900px) {
       table, thead, tbody, th, td, tr { display: block; }
       thead tr { position: absolute; top: -9999px; left: -9999px; }
@@ -128,56 +180,12 @@
       td:nth-of-type(8):before { content: "Eat"; }
       td:nth-of-type(9):before { content: "Details"; }
     }
-    /* ── At a Glance – rewritten ── */
-.glance-segment {
-  margin-bottom: 20px;
-}
-.glance-segment:last-child {
-  margin-bottom: 0;
-}
-.glance-segment-header {
-  background: #34495e;
-  color: #fff;
-  font-weight: 700;
-  font-size: 0.95em;
-  letter-spacing: 0.03em;
-  padding: 8px 14px;
-  border-radius: 5px 5px 0 0;
-  text-transform: uppercase;
-}
-.glance-grid {
-  border: 1px solid #ddd;
-  border-top: none;
-  border-radius: 0 0 5px 5px;
-  overflow: hidden;
-}
-.glance-day {
-  display: flex;
-  align-items: baseline;
-  padding: 7px 14px;
-  border-bottom: 1px solid #eee;
-  gap: 14px;
-}
-.glance-day:last-child {
-  border-bottom: none;
-}
-.glance-day:nth-child(even) {
-  background: #f8f9fa;
-}
-.glance-date {
-  font-weight: 700;
-  color: #2c3e50;
-  min-width: 52px;
-  font-size: 0.88em;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
-.glance-desc {
-  font-size: 0.92em;
-  color: #444;
-  line-height: 1.45;
-}
   </style>
+  
+  
+
+
+  
 </head>
 <body>
 
@@ -622,6 +630,7 @@ html<div class="overview-box">
 
 </body>
 </html>
+
 
 
 
