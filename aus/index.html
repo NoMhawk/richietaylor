@@ -128,6 +128,55 @@
       td:nth-of-type(8):before { content: "Eat"; }
       td:nth-of-type(9):before { content: "Details"; }
     }
+    /* ── At a Glance – rewritten ── */
+.glance-segment {
+  margin-bottom: 20px;
+}
+.glance-segment:last-child {
+  margin-bottom: 0;
+}
+.glance-segment-header {
+  background: #34495e;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95em;
+  letter-spacing: 0.03em;
+  padding: 8px 14px;
+  border-radius: 5px 5px 0 0;
+  text-transform: uppercase;
+}
+.glance-grid {
+  border: 1px solid #ddd;
+  border-top: none;
+  border-radius: 0 0 5px 5px;
+  overflow: hidden;
+}
+.glance-day {
+  display: flex;
+  align-items: baseline;
+  padding: 7px 14px;
+  border-bottom: 1px solid #eee;
+  gap: 14px;
+}
+.glance-day:last-child {
+  border-bottom: none;
+}
+.glance-day:nth-child(even) {
+  background: #f8f9fa;
+}
+.glance-date {
+  font-weight: 700;
+  color: #2c3e50;
+  min-width: 52px;
+  font-size: 0.88em;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.glance-desc {
+  font-size: 0.92em;
+  color: #444;
+  line-height: 1.45;
+}
   </style>
 </head>
 <body>
@@ -141,19 +190,145 @@
   Hazardous Activities: Category C included • Excess: £75–£100 typical • Emergency: +44 (0)1444 465573
 </p>
 
-<div class="overview-box">
-  <h3>Quick Trip Overview – At a Glance</h3>
-  <ul class="overview-list">
-    <li><strong>Mar 15–27</strong> – Sydney arrival & Blue Mountains: Flights, family stay St Ives, Northern Beaches solo days, pickleball, Royal NP option, Katoomba hikes, Scenic World, train to Melbourne</li>
-    <li><strong>Mar 28–Apr 8</strong> – Tasmania Loop: Hobart arrival & car pickup, Bruny Island, Tasman Peninsula kayak, Port Arthur, Wineglass Bay, Bay of Fires, Cradle Mountain attempt, Gordon River cruise, Queenstown mining, Mt Field NP, MONA walk, flight to Gold Coast</li>
-    <li><strong>Apr 9–16</strong> – Gold Coast family stay: Brother's place Coolangatta/Kirra/Greenmount/Burleigh/Tamborine, Currumbin Wildlife, Rainbow Bay/Snapper Rocks, theme park option, hire car pickup Apr 16 → Byron Bay arrival</li>
-    <li><strong>Apr 17–23</strong> – Byron Bay & hinterland: Sundive Julian Rocks, Behind The Bay tour (Killen Falls/Lake Ainsworth/Broken Head), Sea Kayak Tour, Cape Byron walk, surfing lesson, Greyhound bus to Brisbane Apr 22, onward to Sunshine Coast Apr 23</li>
-    <li><strong>Apr 24–May 4</strong> – Sunshine Coast → Noosa → K'gari → Brisbane → Airlie Beach: Buderim with Elle, Drop Bear 3-day Fraser Island tour, Noosa kayak & NP, Brisbane pickleball/South Bank, flight to Airlie</li>
-    <li><strong>May 5–12</strong> – Whitsundays & Magnetic Island: Power Play liveaboard, Ocean Rafting, SeaLink reef, Paradise Court, Forts Walk koalas</li>
-    <li><strong>May 12–16</strong> – Magnetic Island → Mission Beach → Cairns: Train + ferry to Nelly Bay, Discovery Tour snorkel/SUP + wallabies, ferry/train to Tully → Mission Beach, Reef & Island Tour (Beaver Reef/Dunk), Tully River rafting pickup → direct drop-off Cairns ~8–9pm, overnight Abbott Boutique Hotel</li>
-    <li><strong>May 17–25</strong> – Cairns & Port Douglas: Green Island, Kuranda + Skyrail + Hartley's, Silverswift 3-reef + dives, Crystal Cascades canyoning + Wildlife Habitat + bus to PD, relaxed day + Indigo sunset sail, Tony's Daintree/Mossman Gorge, ATV Buggy Tour, Silversonic dives, relaxed day + bus to CNS Airport + QF925 flight to SYD (18:20 dep, 21:15 arr, seats 17C/17B)</li>
-    <li><strong>May 26–Jun 1</strong> – Sydney extension & departure: Late arrival SYD ~21:15 May 25 → May 26 Bondi & Watson’s Bay coastal day, Blue Mountains overnight Fairmont Leura, Grand Pacific Drive Wollongong/Kiama, free recovery day St Ives/North Shore, kids' flexible day (Luna Park/Taronga/etc.), BridgeClimb Vivid Twilight 5:00pm + Grace Hotel, light morning + 3pm flight out Jun 1</li>
-  </ul>
+Here's a rewritten "At a Glance" section — a clean, day-by-day breakdown with segment dividers and a polished design:
+html<div class="overview-box">
+  <h3>🗺️ At a Glance – Daily Plan</h3>
+
+  <div class="glance-segment">
+    <div class="glance-segment-header">Sydney Arrival & Blue Mountains · Mar 15–27</div>
+    <div class="glance-grid">
+      <div class="glance-day"><span class="glance-date">Mar 15</span><span class="glance-desc">Depart London (SQ321 LHR→SIN, overnight)</span></div>
+      <div class="glance-day"><span class="glance-date">Mar 16</span><span class="glance-desc">Layover Singapore, then SIN→SYD overnight flight</span></div>
+      <div class="glance-day"><span class="glance-date">Mar 17</span><span class="glance-desc">Arrive Sydney 07:40 · Bobbin Head mangrove walk · optional pickleball evening</span></div>
+      <div class="glance-day"><span class="glance-date">Mar 18</span><span class="glance-desc">West Head Lookout · Pittwater views · solo nature day</span></div>
+      <div class="glance-day"><span class="glance-date">Mar 19</span><span class="glance-desc">Palm Beach · Barrenjoey Lighthouse walk · Avalon/Whale Beach swims</span></div>
+      <div class="glance-day"><span class="glance-date">Mar 20</span><span class="glance-desc">Shelly Beach snorkel (marine reserve) · Narrabeen Lagoon</span></div>
+      <div class="glance-day"><span class="glance-date">Mar 21</span><span class="glance-desc">Shelly Beach or Narrabeen/Collaroy coastal walks & snorkel</span></div>
+      <div class="glance-day"><span class="glance-date">Mar 22</span><span class="glance-desc">Pickleball at Warrimoo Oval · Mona Vale/Bilgola beach hop</span></div>
+      <div class="glance-day"><span class="glance-date">Mar 23</span><span class="glance-desc">Optional Royal National Park (clifftops, Garie/Wattamolla swim) · trip prep</span></div>
+      <div class="glance-day"><span class="glance-date">Mar 24</span><span class="glance-desc">Train to Katoomba · Three Sisters · Echo Point walks</span></div>
+      <div class="glance-day"><span class="glance-date">Mar 25</span><span class="glance-desc">Giant Stairway hike · Scenic World · optional evening pickleball</span></div>
+      <div class="glance-day"><span class="glance-date">Mar 26</span><span class="glance-desc">Wentworth Falls walk · train back to Sydney afternoon</span></div>
+      <div class="glance-day"><span class="glance-date">Mar 27</span><span class="glance-desc">Early flight QF423 Sydney → Melbourne (08:30)</span></div>
+    </div>
+  </div>
+
+  <div class="glance-segment">
+    <div class="glance-segment-header">Tasmania Loop · Mar 28–Apr 8</div>
+    <div class="glance-grid">
+      <div class="glance-day"><span class="glance-date">Mar 28</span><span class="glance-desc">Fly into Hobart · pick up hire car · check in Kingston</span></div>
+      <div class="glance-day"><span class="glance-date">Mar 29</span><span class="glance-desc">Bruny Island day (ferry, beaches, cheese/oyster trail) · drive to Eaglehawk Neck</span></div>
+      <div class="glance-day"><span class="glance-date">Mar 30</span><span class="glance-desc">Tasman Peninsula sea kayak tour (sea cliffs & caves) · drive to Port Arthur</span></div>
+      <div class="glance-day"><span class="glance-date">Mar 31</span><span class="glance-desc">Port Arthur historic site · drive to Coles Bay · Wineglass Bay lookout hike</span></div>
+      <div class="glance-day"><span class="glance-date">Apr 1</span><span class="glance-desc">Bay of Fires (lichen boulders, Swimcart Beach) · Bicheno Blowhole · St Helens</span></div>
+      <div class="glance-day"><span class="glance-date">Apr 2</span><span class="glance-desc">Launceston: Cataract Gorge · Hollybank Segway & Zipline tours · drive to Promised Land</span></div>
+      <div class="glance-day"><span class="glance-date">Apr 3</span><span class="glance-desc">Cradle Mountain attempt (weather dependent) · Dove Lake circuit option</span></div>
+      <div class="glance-day"><span class="glance-date">Apr 4</span><span class="glance-desc">Morning recovery · drive to Strahan · relax & prep for Gordon cruise</span></div>
+      <div class="glance-day"><span class="glance-date">Apr 5</span><span class="glance-desc">Gordon River cruise (6 hrs, Sarah Island & rainforests) · Ocean Beach sunset</span></div>
+      <div class="glance-day"><span class="glance-date">Apr 6</span><span class="glance-desc">Queenstown: Iron Blow lookout · Horsetail Falls · Montezuma Falls hike</span></div>
+      <div class="glance-day"><span class="glance-date">Apr 7</span><span class="glance-desc">Nelson Falls boardwalk · Mt Field NP (Russell & Lady Barron Falls) · drive to Hobart</span></div>
+      <div class="glance-day"><span class="glance-date">Apr 8</span><span class="glance-desc">Walk to MONA · car drop-off · fly Hobart → Gold Coast (JQ695, 19:15)</span></div>
+    </div>
+  </div>
+
+  <div class="glance-segment">
+    <div class="glance-segment-header">Gold Coast Family Stay · Apr 9–16</div>
+    <div class="glance-grid">
+      <div class="glance-day"><span class="glance-date">Apr 9</span><span class="glance-desc">Arrive Gold Coast · transfer to brother's · Kirra/Greenmount beach unwind</span></div>
+      <div class="glance-day"><span class="glance-date">Apr 10</span><span class="glance-desc">Currumbin Wildlife Sanctuary (koalas/feedings) or family beach day</span></div>
+      <div class="glance-day"><span class="glance-date">Apr 11</span><span class="glance-desc">Rainbow Bay & Snapper Rocks walk · casual family beach time</span></div>
+      <div class="glance-day"><span class="glance-date">Apr 12</span><span class="glance-desc">Theme park option (Sea World) or park picnic</span></div>
+      <div class="glance-day"><span class="glance-date">Apr 13</span><span class="glance-desc">Burleigh Heads coastal walk · coffee · Broadwater play areas</span></div>
+      <div class="glance-day"><span class="glance-date">Apr 14</span><span class="glance-desc">Tamborine Mountain hinterland · rainforest · optional Glow Worm Caves</span></div>
+      <div class="glance-day"><span class="glance-date">Apr 15</span><span class="glance-desc">Beach day or local wildlife show · relaxed wind-down</span></div>
+      <div class="glance-day"><span class="glance-date">Apr 16</span><span class="glance-desc">Pick up hire car at OOL · drive to Byron Bay · Cape Byron Lighthouse walk</span></div>
+    </div>
+  </div>
+
+  <div class="glance-segment">
+    <div class="glance-segment-header">Byron Bay & Hinterland · Apr 16–23</div>
+    <div class="glance-grid">
+      <div class="glance-day"><span class="glance-date">Apr 16</span><span class="glance-desc">Arrive Byron Bay · Glen Villa Resort check-in · Main/Clarkes Beach sunset</span></div>
+      <div class="glance-day"><span class="glance-date">Apr 17</span><span class="glance-desc">Sundive: ReActivate pool session + Julian Rocks scuba dive</span></div>
+      <div class="glance-day"><span class="glance-date">Apr 18</span><span class="glance-desc">Behind The Bay hinterland tour: Killen Falls · Lake Ainsworth SUP · Broken Head</span></div>
+      <div class="glance-day"><span class="glance-date">Apr 19</span><span class="glance-desc">Byron Bay Sea Kayak Tour (dolphins, turtles, lighthouse views)</span></div>
+      <div class="glance-day"><span class="glance-date">Apr 20</span><span class="glance-desc">Cape Byron Lighthouse coastal loop walk · swim at Wategos/The Pass</span></div>
+      <div class="glance-day"><span class="glance-date">Apr 21</span><span class="glance-desc">Surfing lesson at Clarkes Beach or The Pass</span></div>
+      <div class="glance-day"><span class="glance-date">Apr 22</span><span class="glance-desc">Check out · Greyhound bus to Brisbane · South Bank explore · pickleball</span></div>
+      <div class="glance-day"><span class="glance-date">Apr 23</span><span class="glance-desc">Brisbane morning · bus/train north to Sunshine Coast</span></div>
+    </div>
+  </div>
+
+  <div class="glance-segment">
+    <div class="glance-segment-header">Sunshine Coast → K'gari → Brisbane → Airlie Beach · Apr 24–May 4</div>
+    <div class="glance-grid">
+      <div class="glance-day"><span class="glance-date">Apr 24</span><span class="glance-desc">Buderim with Elle · Forest Park · local markets</span></div>
+      <div class="glance-day"><span class="glance-date">Apr 25</span><span class="glance-desc">Buderim with Elle · relaxed family time</span></div>
+      <div class="glance-day"><span class="glance-date">Apr 26</span><span class="glance-desc">Drive to Noosa · Hastings St stroll · beach sunset · Villa Noosa check-in</span></div>
+      <div class="glance-day"><span class="glance-date">Apr 27</span><span class="glance-desc">Drop Bear K'gari Day 1: Ferry · Lake McKenzie SUPs · rainforest · campfire</span></div>
+      <div class="glance-day"><span class="glance-date">Apr 28</span><span class="glance-desc">Drop Bear K'gari Day 2: Champagne Pools · Eli Creek · Maheno Shipwreck</span></div>
+      <div class="glance-day"><span class="glance-date">Apr 29</span><span class="glance-desc">Drop Bear K'gari Day 3: Lake Wabby · Pinnacles · return to Noosa ~5pm</span></div>
+      <div class="glance-day"><span class="glance-date">Apr 30</span><span class="glance-desc">Kanu Kapers Noosa Everglades kayak tour · afternoon relax</span></div>
+      <div class="glance-day"><span class="glance-date">May 1</span><span class="glance-desc">Noosa NP Coastal Track · beach · Hastings St · Laguna sunset</span></div>
+      <div class="glance-day"><span class="glance-date">May 2</span><span class="glance-desc">Pickleball at The Olive · Greyhound bus to Brisbane</span></div>
+      <div class="glance-day"><span class="glance-date">May 3</span><span class="glance-desc">Brisbane: South Bank/Streets Beach · CityCat ferry · Mt Coot-tha lookout</span></div>
+      <div class="glance-day"><span class="glance-date">May 4</span><span class="glance-desc">Fly Brisbane → Airlie Beach (VA1117) · lagoon swim · Honeyeater hike</span></div>
+    </div>
+  </div>
+
+  <div class="glance-segment">
+    <div class="glance-segment-header">Whitsundays · May 4–12</div>
+    <div class="glance-grid">
+      <div class="glance-day"><span class="glance-date">May 4</span><span class="glance-desc">Arrive Airlie · Magnums check-in · lagoon swim · Honeyeater Lookout walk</span></div>
+      <div class="glance-day"><span class="glance-date">May 5–7</span><span class="glance-desc">Power Play 2-night liveaboard: Whitehaven Beach · Hill Inlet · snorkel reefs · SUP · jacuzzi</span></div>
+      <div class="glance-day"><span class="glance-date">May 7</span><span class="glance-desc">Post-cruise recovery · Cannonvale Beach · Marina View Apartment check-in</span></div>
+      <div class="glance-day"><span class="glance-date">May 8</span><span class="glance-desc">Lagoon swim · optional sunset cruise · apartment pool relax</span></div>
+      <div class="glance-day"><span class="glance-date">May 9</span><span class="glance-desc">Meet Emily at airport · ferry to Hamilton Island · Catseye Beach · Hideaway Bay trail</span></div>
+      <div class="glance-day"><span class="glance-date">May 10</span><span class="glance-desc">Viper day tour: Outer GBR snorkel · Whitehaven Beach · Hill Inlet Lookout</span></div>
+      <div class="glance-day"><span class="glance-date">May 11</span><span class="glance-desc">Jetski Island Safari (Daydream & South Molle Islands) · optional SUP/kayak</span></div>
+      <div class="glance-day"><span class="glance-date">May 12</span><span class="glance-desc">Early RailBus → Spirit of Queensland train → Townsville ferry to Magnetic Island</span></div>
+    </div>
+  </div>
+
+  <div class="glance-segment">
+    <div class="glance-segment-header">Magnetic Island → Mission Beach → Cairns · May 12–16</div>
+    <div class="glance-grid">
+      <div class="glance-day"><span class="glance-date">May 12</span><span class="glance-desc">Arrive Magnetic Island · Forts Walk (koalas & views) · Vintage Coral Green check-in</span></div>
+      <div class="glance-day"><span class="glance-date">May 13</span><span class="glance-desc">Discovery Tour (snorkel & SUP) · Geoffrey Bay beach · dusk rock-wallabies</span></div>
+      <div class="glance-day"><span class="glance-date">May 14</span><span class="glance-desc">Ferry & train to Tully → Mission Beach · Licuala Fan Palm Walk (cassowary spotting)</span></div>
+      <div class="glance-day"><span class="glance-date">May 15</span><span class="glance-desc">Reef & Island Tour: Beaver Reef snorkel + Dunk Island · motel pool evening</span></div>
+      <div class="glance-day"><span class="glance-date">May 16</span><span class="glance-desc">Full-day Tully River rafting (Grade 3–4) · direct drop-off Cairns ~8–9pm</span></div>
+    </div>
+  </div>
+
+  <div class="glance-segment">
+    <div class="glance-segment-header">Cairns & Port Douglas · May 17–25</div>
+    <div class="glance-grid">
+      <div class="glance-day"><span class="glance-date">May 17</span><span class="glance-desc">Green Island day trip (snorkel, glass-bottom boat)</span></div>
+      <div class="glance-day"><span class="glance-date">May 18</span><span class="glance-desc">Kuranda village + Skyrail rainforest gondola + Hartley's Crocodile Adventures</span></div>
+      <div class="glance-day"><span class="glance-date">May 19</span><span class="glance-desc">Silverswift 3-reef GBR cruise: 3 cert dives (Rich) + 2 intro dives (Emily)</span></div>
+      <div class="glance-day"><span class="glance-date">May 20</span><span class="glance-desc">Crystal Cascades canyoning · bus to Port Douglas · Wildlife Habitat entry</span></div>
+      <div class="glance-day"><span class="glance-date">May 21</span><span class="glance-desc">Flagstaff Hill walk · Four Mile Beach · Indigo 2hr sunset sailing</span></div>
+      <div class="glance-day"><span class="glance-date">May 22</span><span class="glance-desc">Tony's Tropical Tours: Daintree Rainforest & Mossman Gorge full day</span></div>
+      <div class="glance-day"><span class="glance-date">May 23</span><span class="glance-desc">ATV Adventure Buggy offroad rainforest tour · afternoon relax</span></div>
+      <div class="glance-day"><span class="glance-date">May 24</span><span class="glance-desc">Silversonic Outer Reef cruise: Agincourt Reefs + 2–3 dives</span></div>
+      <div class="glance-day"><span class="glance-date">May 25</span><span class="glance-desc">Four Mile Beach morning · bus to Cairns Airport · QF925 → Sydney (18:20)</span></div>
+    </div>
+  </div>
+
+  <div class="glance-segment">
+    <div class="glance-segment-header">Sydney Extension & Departure · May 26–Jun 1</div>
+    <div class="glance-grid">
+      <div class="glance-day"><span class="glance-date">May 26</span><span class="glance-desc">Bondi to Coogee coastal walk · Watson's Bay · Gap lookout · Camp Cove swim</span></div>
+      <div class="glance-day"><span class="glance-date">May 27</span><span class="glance-desc">Blue Mountains: Echo Point · Giant Stairway · Scenic World · Fairmont Leura overnight</span></div>
+      <div class="glance-day"><span class="glance-date">May 28</span><span class="glance-desc">Grand Pacific Drive: Sea Cliff Bridge · Wollongong · Kiama Blowhole</span></div>
+      <div class="glance-day"><span class="glance-date">May 29</span><span class="glance-desc">Manly Beach · Shelly Beach · Freshwater · Curl Curl coastal walks</span></div>
+      <div class="glance-day"><span class="glance-date">May 30</span><span class="glance-desc">Kids' day: Luna Park / Taronga Zoo / Darling Harbour · family dinner</span></div>
+      <div class="glance-day"><span class="glance-date">May 31</span><span class="glance-desc">BridgeClimb Vivid Summit (5:05pm) · The Rocks dinner · Grace Hotel overnight</span></div>
+      <div class="glance-day"><span class="glance-date">Jun 1</span><span class="glance-desc">Hotel breakfast · transfer to airport · 3pm departure flight home ✈️</span></div>
+    </div>
+  </div>
+
 </div>
 
 <!-- ==================== SEGMENT 1 ==================== -->
@@ -447,6 +622,7 @@
 
 </body>
 </html>
+
 
 
 
