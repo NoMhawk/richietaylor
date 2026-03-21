@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Australia Trip 2026 – Full Daily Itinerary</title>
 
-<style>
+  <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       line-height: 1.6;
@@ -43,24 +43,40 @@
       margin-top: 0;
       color: #34495e;
     }
-    .overview-list {
-      list-style: none;
-      padding-left: 0;
-    }
-    .overview-list li {
+    .glance-day {
       margin-bottom: 10px;
-      padding-left: 20px;
-      position: relative;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
     }
-    .overview-list li strong {
-      color: #2c3e50;
-    }
-    .overview-list li::before {
-      content: "•";
-      position: absolute;
-      left: 0;
-      color: #3498db;
+    .glance-date {
       font-weight: bold;
+      color: #2c3e50;
+      margin-right: 12px;
+      min-width: 110px;
+      display: inline-block;
+    }
+    .glance-desc {
+      color: #555;
+    }
+    h4 {
+      color: #34495e;
+      margin: 40px 0 15px 0;
+      border-bottom: 1px solid #3498db;
+      padding-bottom: 8px;
+    }
+    .glance-daily {
+      margin: 20px 0 40px 0;
+    }
+    .glance-line {
+      margin-bottom: 10px;
+      padding: 6px 0 6px 15px;
+      border-left: 4px solid #3498db;
+      line-height: 1.4;
+    }
+    .glance-line strong {
+      color: #2c3e50;
+      min-width: 120px;
+      display: inline-block;
     }
     .segment {
       margin-bottom: 50px;
@@ -76,6 +92,7 @@
       border-collapse: collapse;
       background: white;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
     }
     th, td {
       border: 1px solid #ddd;
@@ -96,64 +113,9 @@
     tr:hover {
       background: #e8f4f8;
     }
-    .date-group {
-      background: #ecf0f1;
-      font-weight: bold;
-      font-size: 1.1em;
-    }
     .details {
       font-size: 0.95em;
       color: #555;
-    }
-
-    /* ── At a Glance ── */
-    .glance-segment {
-      margin-bottom: 20px;
-    }
-    .glance-segment:last-child {
-      margin-bottom: 0;
-    }
-    .glance-segment-header {
-      background: #34495e;
-      color: #fff;
-      font-weight: 700;
-      font-size: 0.95em;
-      letter-spacing: 0.03em;
-      padding: 8px 14px;
-      border-radius: 5px 5px 0 0;
-      text-transform: uppercase;
-    }
-    .glance-grid {
-      border: 1px solid #ddd;
-      border-top: none;
-      border-radius: 0 0 5px 5px;
-      overflow: hidden;
-    }
-    .glance-day {
-      display: flex;
-      align-items: baseline;
-      padding: 7px 14px;
-      border-bottom: 1px solid #eee;
-      gap: 14px;
-    }
-    .glance-day:last-child {
-      border-bottom: none;
-    }
-    .glance-day:nth-child(even) {
-      background: #f8f9fa;
-    }
-    .glance-date {
-      font-weight: 700;
-      color: #2c3e50;
-      min-width: 52px;
-      font-size: 0.88em;
-      white-space: nowrap;
-      font-variant-numeric: tabular-nums;
-    }
-    .glance-desc {
-      font-size: 0.92em;
-      color: #444;
-      line-height: 1.45;
     }
 
     @media (max-width: 900px) {
@@ -177,61 +139,31 @@
       td:nth-of-type(5):before { content: "Accommodation"; }
       td:nth-of-type(6):before { content: "Transport"; }
       td:nth-of-type(7):before { content: "Est. Cost"; }
-      td:nth-of-type(8):before { content: "Eat"; }
-      td:nth-of-type(9):before { content: "Details"; }
+      td:nth-of-type(8):before { content: "Bar"; }
+      td:nth-of-type(9):before { content: "Eat"; }
+      td:nth-of-type(10):before { content: "Notes"; }
     }
-
-  .overview-box {
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 20px;
-  margin: 0 auto 30px auto;
-  max-width: 900px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-.glance-day {
-  margin-bottom: 10px;
-  padding: 8px 0;
-  border-bottom: 1px solid #eee;
-}
-.glance-date {
-  font-weight: bold;
-  color: #2c3e50;
-  margin-right: 10px;
-  min-width: 100px;
-  display: inline-block;
-}
-.glance-desc {
-  color: #555;
-}
   </style>
-  
-  
-
-
-  
 </head>
 <body>
 
 <h1>Australia Trip 2026 – Full Daily Itinerary</h1>
 <p class="subtitle">March 15 – June 1, 2026 | Modular segments – last updated March 22, 2026</p>
 
-<!-- QUICK OVERVIEW – AT A GLANCE (short glance-day divs) -->
+<!-- QUICK OVERVIEW – AT A GLANCE -->
 <div class="overview-box">
   <h3>Quick Trip Overview – At a Glance</h3>
-  <div class="glance-day"><span class="glance-date">Mar 15–16</span><span class="glance-desc">Travel: London → Singapore layover → arrive Sydney Mar 17 \~07:40</span></div>
-  <div class="glance-day"><span class="glance-date">Mar 17–22</span><span class="glance-desc">Sydney (St Ives family base): Jetlag recovery, Ku-ring-gai Chase, Hunter Valley/Central/South Coast day trips, Northern Beaches, Bombies cousins meet, family time with Blaze & Harlow, optional pickleball</span></div>
-  <div class="glance-day"><span class="glance-date">Mar 23–26</span><span class="glance-desc">Blue Mountains: Katoomba/Leura, Echo Point/Three Sisters, Grand Canyon Walk, Wentworth Falls, Lincoln's Rock golden hour, advanced pickleball</span></div>
+  <div class="glance-day"><span class="glance-date">Mar 15–16</span><span class="glance-desc">Travel: London → Singapore layover → arrive Sydney Mar 17 ~07:40</span></div>
+  <div class="glance-day"><span class="glance-date">Mar 17–26</span><span class="glance-desc">Sydney & Blue Mountains: St Ives family base, day trips (Hunter Valley, Central Coast, South Coast), Northern Beaches, Bombies cousins meet, family time with Blaze & Harlow, optional pickleball, Blue Mountains (Katoomba/Leura, Echo Point, Grand Canyon Walk, Lincoln's Rock golden hour, pickleball)</span></div>
   <div class="glance-day"><span class="glance-date">Mar 27</span><span class="glance-desc">Sydney → Melbourne: Early flight QF423</span></div>
   <div class="glance-day"><span class="glance-date">Mar 28–Apr 8</span><span class="glance-desc">Tasmania Loop: Hobart arrival/car pickup, Bruny Island, Tasman kayak, Port Arthur, Wineglass Bay, Bay of Fires, Cradle Mountain, Gordon River cruise, Queenstown, Mt Field NP, MONA walk, flight to Gold Coast</span></div>
   <div class="glance-day"><span class="glance-date">Apr 9–16</span><span class="glance-desc">Gold Coast family stay: Brother's place (beaches/wildlife/Tamborine), Currumbin, theme park option, hire car pickup Apr 16 → Byron Bay arrival</span></div>
   <div class="glance-day"><span class="glance-date">Apr 17–23</span><span class="glance-desc">Byron Bay & hinterland: Sundive Julian Rocks, Behind The Bay tour, Sea Kayak Tour, Cape Byron walk, surfing lesson, Greyhound bus to Brisbane Apr 22, onward Sunshine Coast Apr 23</span></div>
   <div class="glance-day"><span class="glance-date">Apr 24–May 4</span><span class="glance-desc">Sunshine Coast → Noosa → K'gari → Brisbane → Airlie Beach: Buderim with Elle, Drop Bear Fraser Island tour, Noosa kayak & NP, Brisbane pickleball/South Bank, flight to Airlie</span></div>
   <div class="glance-day"><span class="glance-date">May 4–12</span><span class="glance-desc">Whitsundays & Airlie Beach: Magnums arrival, Power Play 2D2N liveaboard, Marina View Apartment, Emily arrival May 9 → Hamilton Island ferry day trip, Viper tour May 10, SeaLink outer reef May 11, early train/ferry to Magnetic Island May 12</span></div>
-  <div class="glance-day"><span class="glance-date">May 12–16</span><span class="glance-desc">Magnetic Island → Mission Beach → Cairns: Forts Walk, Discovery Tour snorkel/SUP + wallabies, ferry/train to Tully → Mission Beach, Reef & Island Tour (Beaver Reef/Dunk), Tully River rafting → Cairns drop-off \~8–9pm, overnight Abbott Boutique Hotel</span></div>
+  <div class="glance-day"><span class="glance-date">May 12–16</span><span class="glance-desc">Magnetic Island → Mission Beach → Cairns: Forts Walk, Discovery Tour snorkel/SUP + wallabies, ferry/train to Tully → Mission Beach, Reef & Island Tour (Beaver Reef/Dunk), Tully River rafting → Cairns drop-off ~8–9pm, overnight Abbott Boutique Hotel</span></div>
   <div class="glance-day"><span class="glance-date">May 16–25</span><span class="glance-desc">Cairns & Port Douglas: Green Island, Kuranda + Skyrail + Hartley's, Silverswift 3-reef + dives, Crystal Cascades canyoning + bus to PD + Wildlife Habitat, relaxed day + Indigo sunset sail, Tony's Daintree/Mossman Gorge, ATV Buggy Tour, Silversonic dives, relaxed day + bus to CNS Airport + QF925 flight to SYD (18:20 dep, 21:15 arr, seats 17C/17B)</span></div>
-  <div class="glance-day"><span class="glance-date">May 26–Jun 1</span><span class="glance-desc">Sydney extension & departure: Late arrival SYD \~21:15 May 25 → May 26 Bondi-Coogee walk + Watson’s Bay, Blue Mountains overnight Fairmont Leura, Grand Pacific Drive Wollongong/Kiama, Manly/Northern Beaches day, kids' flexible day, BridgeClimb Vivid Summit 5:05pm + Grace Hotel, light morning + 3pm flight out Jun 1</span></div>
+  <div class="glance-day"><span class="glance-date">May 26–Jun 1</span><span class="glance-desc">Sydney extension & departure: Late arrival SYD ~21:15 May 25 → May 26 Bondi-Coogee walk + Watson’s Bay, Blue Mountains overnight Fairmont Leura, Grand Pacific Drive Wollongong/Kiama, Manly/Northern Beaches day, kids' flexible day, BridgeClimb Vivid Summit 5:05pm + Grace Hotel, light morning + 3pm flight out Jun 1</span></div>
 </div>
 
 <p class="insurance-note">
@@ -240,13 +172,7 @@
   Hazardous Activities: Category C included • Excess: £75–£100 typical • Emergency: +44 (0)1444 465573
 </p>
 
-<!-- Then the full detailed segments start here (Segment 1, 2, etc.) -->
-
-
-  
-
-
-  <h3>🗺️ At a Glance – Daily Plan</h3>
+<h3>🗺️ At a Glance – Daily Plan</h3>
 
 <!-- ==================== International Arrival & Sydney / Blue Mountains ==================== -->
 <h4>International Arrival & Sydney / Blue Mountains – Mar 15 to Mar 27</h4>
@@ -367,7 +293,6 @@
   <div class="glance-line"><strong>May 30 (Sat)</strong> – Sydney: Kids' flexible day (Luna Park/Taronga/etc.), evening family meal</div>
   <div class="glance-line"><strong>May 31 (Sun)</strong> – Sydney CBD: Morning at brother's, train to Circular Quay, drop bags Grace Hotel, Opera House surrounds, BridgeClimb Vivid Summit 5:05pm, dinner The Rocks</div>
   <div class="glance-line"><strong>Jun 1 (Mon)</strong> – Sydney Airport: Light morning, airport transfer, 3pm flight departure</div>
-</div>
 </div>
 
 <!-- ==================== SEGMENT 1 ==================== -->
