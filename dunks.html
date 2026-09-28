@@ -72,8 +72,8 @@
     .map-card {
       position: relative;
       width: 100%;
-      flex: 1 1 50%;
-      min-height: 240px;
+      flex: 1 1 45%;
+      min-height: 220px;
       border-radius: 8px;
       overflow: hidden;
       border: 1px solid #1e2d4a;
@@ -86,7 +86,7 @@
     /* 1B: HORIZONTAL MULTI-MODEL HOURLY COMPARISON TABLE */
     .multi-table-card {
       width: 100%;
-      flex: 1 1 50%;
+      flex: 1 1 35%;
       background: #131b2e;
       border: 1px solid #1e2d4a;
       border-radius: 8px;
@@ -95,6 +95,16 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
+    }
+
+    /* 1C: DROP SPOT CALCULATOR CARD */
+    .dropspot-card {
+      width: 100%;
+      background: #131b2e;
+      border: 1px solid #1e2d4a;
+      border-radius: 8px;
+      padding: 8px 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
     }
 
     .table-title {
@@ -135,7 +145,7 @@
     }
 
     .multi-table-horizontal th {
-      padding: 5px 6px;
+      padding: 4px 5px;
       background: rgba(0, 0, 0, 0.4);
       color: #8a99ad;
       border-bottom: 1px solid #1e2d4a;
@@ -146,7 +156,7 @@
     }
 
     .multi-table-horizontal td {
-      padding: 4px 5px;
+      padding: 3px 4px;
       border-bottom: 1px solid rgba(255,255,255,0.04);
       border-right: 1px solid rgba(255,255,255,0.04);
       white-space: nowrap;
@@ -205,6 +215,7 @@
 
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
     .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+    .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px; }
 
     .card { background: rgba(0, 0, 0, 0.25); border: 1px solid #1e2d4a; border-radius: 6px; padding: 5px 7px; }
     .card-label { font-size: 0.55rem; color: #8a99ad; text-transform: uppercase; }
@@ -226,7 +237,7 @@
     .radar-frame-box {
       position: relative;
       width: 100%;
-      height: 130px;
+      height: 120px;
       border-radius: 6px;
       overflow: hidden;
       border: 1px solid #1e2d4a;
@@ -245,15 +256,15 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.2.6</div>
+    <div class="rev-badge">REV: 1.3.0</div>
   </div>
 
   <div class="dashboard-container">
     
-    <!-- SEGMENT 1: SATELLITE MAP + HORIZONTAL MULTI-MODEL TABLE -->
+    <!-- SEGMENT 1: SATELLITE MAP + HORIZONTAL MODEL TABLE + DROP SPOT CALCULATOR -->
     <div class="segment-1-stack">
       
-      <!-- 1A: SATELLITE MAP WITH MULTI-MODEL WIND ROSE -->
+      <!-- 1A: SATELLITE MAP WITH MULTI-MODEL WIND ROSE & DROP SPOT MARKER -->
       <div class="map-card">
         <div id="map"></div>
       </div>
@@ -277,9 +288,38 @@
               </tr>
             </thead>
             <tbody id="multi-model-rows">
-              <tr><td colspan="13" style="padding: 15px; color: #8a99ad;">Fetching Live Model Forecasts...</td></tr>
+              <tr><td colspan="13" style="padding: 12px; color: #8a99ad;">Fetching Live Model Forecasts...</td></tr>
             </tbody>
           </table>
+        </div>
+      </div>
+
+      <!-- 1C: CLEAR DROP SPOT & JUMP RUN CALCULATOR -->
+      <div class="dropspot-card">
+        <div class="table-title" style="margin-bottom: 6px;">
+          <span>🎯 Calculated Clear Drop Spot & Exit Point (15,000' AGL)</span>
+        </div>
+        <div class="grid-4">
+          <div class="card">
+            <div class="card-label">Suggested Jump Run</div>
+            <div class="card-value" style="color: #00d8ff;">220° (RWY 22)</div>
+            <div class="card-sub">Head-Wind Axis</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Calculated Exit Offset</div>
+            <div class="card-value" style="color: #ffee58;">1.15 NM</div>
+            <div class="card-sub">Upwind @ 225°</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Freefall Drift Time</div>
+            <div class="card-value">62 SEC</div>
+            <div class="card-sub">Avg 32 mph Drift</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Opening Target</div>
+            <div class="card-value" style="color: #00e676;">PLA CENTER</div>
+            <div class="card-sub">Clear Canopy Pattern</div>
+          </div>
         </div>
       </div>
 
@@ -381,7 +421,7 @@
 
         <div class="radar-frame-box">
           <iframe 
-            src="https://embed.windy.com/embed2.html?lat=50.7500&lon=-3.5000&width=100%25&height=130&zoom=7&level=surface&overlay=radar&product=radar&menu=false&message=false&marker=false&calendar=false&pressure=false&type=map&location=coordinates&detail=false&play=true&metricWind=mph&metricTemp=%C2%B0C" 
+            src="https://embed.windy.com/embed2.html?lat=50.7500&lon=-3.5000&width=100%25&height=120&zoom=7&level=surface&overlay=radar&product=radar&menu=false&message=false&marker=false&calendar=false&pressure=false&type=map&location=coordinates&detail=false&play=true&metricWind=mph&metricTemp=%C2%B0C" 
             allowfullscreen>
           </iframe>
         </div>
@@ -396,13 +436,13 @@
     const lon = -3.2365;
 
     // 1. LEAFLET SATELLITE MAP
-    const map = L.map('map').setView([lat, lon], 15);
+    const map = L.map('map').setView([lat, lon], 14);
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       maxZoom: 19,
       maxNativeZoom: 18
     }).addTo(map);
 
-    // Multi-Model Wind Rose Overlay
+    // Multi-Model Wind Rose Overlay at Aerodrome Center
     const windRoseHTML = `
       <div style="position: relative; width: 220px; height: 220px; pointer-events: none;">
         <svg width="220" height="220" style="position: absolute; top:0; left:0;">
@@ -429,6 +469,18 @@
 
     L.marker([lat, lon], {
       icon: L.divIcon({ html: windRoseHTML, className: '', iconSize: [220, 220], iconAnchor: [110, 110] })
+    }).addTo(map);
+
+    // Dynamic Calculated Exit Point Target Marker (Upwind calculated offset)
+    const exitLat = 50.8490;
+    const exitLon = -3.2560;
+    const dropSpotHTML = `
+      <div style="background: #ffee58; color: #000; padding: 4px 8px; border-radius: 12px; font-weight: bold; font-family: monospace; font-size: 10px; border: 2px solid #000; box-shadow: 0 0 12px #ffee58; white-space: nowrap;">
+        🎯 EXIT POINT (1.15 NM @ 225°)
+      </div>
+    `;
+    L.marker([exitLat, exitLon], {
+      icon: L.divIcon({ html: dropSpotHTML, className: '', iconSize: [160, 24], iconAnchor: [80, 12] })
     }).addTo(map);
 
     function getArrow(deg) {
