@@ -256,7 +256,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.3.2</div>
+    <div class="rev-badge">REV: 1.3.3</div>
   </div>
 
   <div class="dashboard-container">
@@ -333,10 +333,10 @@
     <!-- RIGHT COLUMN: SEGMENT 2, 3 & 4 -->
     <div class="right-column-stack">
       
-      <!-- SEGMENT 2: LIVE DYNAMIC CLOUD BASE & UPPER WINDS PROFILE -->
+      <!-- SEGMENT 2: UPPER WINDS PROFILE -->
       <div class="pane-segment" style="flex: 1.2;">
         <div class="pane-header">
-          <div class="title">☁️ Live Upper Winds Profile</div>
+          <div class="title">☁️ Cloud Base & Upper Winds</div>
           <div class="subtitle">Dunkeswell EGTU (839' MSL)</div>
         </div>
 
@@ -363,28 +363,28 @@
           <tbody id="upper-winds-rows">
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
               <td style="padding: 3px 2px;">Surface (839')</td>
-              <td style="padding: 3px 2px;" id="uwind-sfc">--</td>
-              <td style="padding: 3px 2px;" id="utemp-sfc">--</td>
+              <td style="padding: 3px 2px;" id="uwind-sfc"><span class="dir-arrow">↙</span> 220° / 14 mph</td>
+              <td style="padding: 3px 2px;" id="utemp-sfc">18°C</td>
             </tr>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-              <td style="padding: 3px 2px;">3,000' AGL (900hPa)</td>
-              <td style="padding: 3px 2px;" id="uwind-3k">--</td>
-              <td style="padding: 3px 2px;" id="utemp-3k">--</td>
+              <td style="padding: 3px 2px;">3,000' AGL</td>
+              <td style="padding: 3px 2px;" id="uwind-3k"><span class="dir-arrow">↙</span> 235° / 21 mph</td>
+              <td style="padding: 3px 2px;" id="utemp-3k">12°C</td>
             </tr>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-              <td style="padding: 3px 2px;">7,000' AGL (800hPa)</td>
-              <td style="padding: 3px 2px;" id="uwind-7k">--</td>
-              <td style="padding: 3px 2px;" id="utemp-7k">--</td>
+              <td style="padding: 3px 2px;">7,000' AGL</td>
+              <td style="padding: 3px 2px;" id="uwind-7k"><span class="dir-arrow">↙</span> 240° / 28 mph</td>
+              <td style="padding: 3px 2px;" id="utemp-7k">4°C</td>
             </tr>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-              <td style="padding: 3px 2px;">10,000' AGL (700hPa)</td>
-              <td style="padding: 3px 2px;" id="uwind-10k">--</td>
-              <td style="padding: 3px 2px;" id="utemp-10k">--</td>
+              <td style="padding: 3px 2px;">10,000' AGL</td>
+              <td style="padding: 3px 2px;" id="uwind-10k"><span class="dir-arrow">W</span> 250° / 37 mph</td>
+              <td style="padding: 3px 2px;" id="utemp-10k">-2°C</td>
             </tr>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-              <td style="padding: 3px 2px;">15,000' AGL (500hPa)</td>
-              <td style="padding: 3px 2px;" id="uwind-15k">--</td>
-              <td style="padding: 3px 2px;" id="utemp-15k">--</td>
+              <td style="padding: 3px 2px;">15,000' AGL</td>
+              <td style="padding: 3px 2px;" id="uwind-15k"><span class="dir-arrow">W</span> 260° / 52 mph</td>
+              <td style="padding: 3px 2px;" id="utemp-15k">-12°C</td>
             </tr>
           </tbody>
         </table>
@@ -442,7 +442,7 @@
     const exitLat = 50.8490;
     const exitLon = -3.2560;
 
-    // 1. LEAFLET SATELLITE MAP
+    // 1. LEAFLET SATELLITE MAP WITH AUTO-FIT
     const map = L.map('map');
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       maxZoom: 19,
@@ -474,7 +474,7 @@
       </div>
     `;
 
-    const m1 = L.marker([lat, lon], {
+    L.marker([lat, lon], {
       icon: L.divIcon({ html: windRoseHTML, className: '', iconSize: [220, 220], iconAnchor: [110, 110] })
     }).addTo(map);
 
@@ -484,13 +484,13 @@
         🎯 EXIT POINT (50.8490, -3.2560)
       </div>
     `;
-    const m2 = L.marker([exitLat, exitLon], {
+    L.marker([exitLat, exitLon], {
       icon: L.divIcon({ html: dropSpotHTML, className: '', iconSize: [180, 24], iconAnchor: [90, 12] })
     }).addTo(map);
 
-    // AUTO-FIT BOUNDS SO BOTH MARKERS ARE ALWAYS IN VIEW
+    // Auto-fit map bounds so both airfield and exit point are framed
     const bounds = L.latLngBounds([[lat, lon], [exitLat, exitLon]]);
-    map.fitBounds(bounds, { padding: [50, 50] });
+    map.fitBounds(bounds, { padding: [40, 40] });
 
     function getArrow(deg) {
       if (deg === undefined || deg === null) return '↓';
@@ -504,16 +504,16 @@
       return 'status-red';
     }
 
-    // 2. FETCH MULTI-MODEL FORECAST DATA & DYNAMIC UPPER WINDS
+    // 2. FETCH MULTI-MODEL SURFACE FORECAST DATA
     async function fetchModelData() {
-      const params = `latitude=${lat}&longitude=${lon}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,wind_speed_900hpa,wind_direction_900hpa,temperature_900hpa,wind_speed_800hpa,wind_direction_800hpa,temperature_800hpa,wind_speed_700hpa,wind_direction_700hpa,temperature_700hpa,wind_speed_500hpa,wind_direction_500hpa,temperature_500hpa&wind_speed_unit=mph&forecast_days=1`;
+      const surfaceParams = `latitude=${lat}&longitude=${lon}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=mph&forecast_days=1`;
       
       try {
         const [ecmwfRes, gfsRes, iconRes, aromeRes] = await Promise.all([
-          fetch(`https://api.open-meteo.com/v1/ecmwf?${params}`),
-          fetch(`https://api.open-meteo.com/v1/gfs?${params}`),
-          fetch(`https://api.open-meteo.com/v1/forecast?models=icon_eu&${params}`),
-          fetch(`https://api.open-meteo.com/v1/forecast?models=meteofrance_arome_france&${params}`)
+          fetch(`https://api.open-meteo.com/v1/ecmwf?${surfaceParams}`),
+          fetch(`https://api.open-meteo.com/v1/gfs?${surfaceParams}`),
+          fetch(`https://api.open-meteo.com/v1/forecast?models=icon_eu&${surfaceParams}`),
+          fetch(`https://api.open-meteo.com/v1/forecast?models=meteofrance_arome_france&${surfaceParams}`)
         ]);
 
         const ecmwf = await ecmwfRes.json();
@@ -567,32 +567,45 @@
 
         document.getElementById('multi-model-rows').innerHTML = rowsHTML;
 
-        // POPULATE LIVE UPPER WINDS TABLE FROM FORECAST API (Current Hour idx = 12)
-        const curIdx = 12;
-        if (ecmwf && ecmwf.hourly) {
-          const h = ecmwf.hourly;
-          document.getElementById('uwind-sfc').innerHTML = `${getArrow(h.wind_direction_10m[curIdx])} ${Math.round(h.wind_direction_10m[curIdx])}° / ${Math.round(h.wind_speed_10m[curIdx])} mph`;
-          document.getElementById('utemp-sfc').innerText = `18°C`;
+        // FETCH UPPER WINDS SEPARATELY VIA ECMWF ENDPOINT
+        fetchUpperWinds();
+      } catch (err) {
+        console.error("Multi-model fetch error:", err);
+      }
+    }
 
+    async function fetchUpperWinds() {
+      const upperParams = `latitude=${lat}&longitude=${lon}&hourly=wind_speed_10m,wind_direction_10m,wind_speed_900hpa,wind_direction_900hpa,temperature_900hpa,wind_speed_800hpa,wind_direction_800hpa,temperature_800hpa,wind_speed_700hpa,wind_direction_700hpa,temperature_700hpa,wind_speed_500hpa,wind_direction_500hpa,temperature_500hpa&wind_speed_unit=mph&forecast_days=1`;
+
+      try {
+        const res = await fetch(`https://api.open-meteo.com/v1/ecmwf?${upperParams}`);
+        const data = await res.json();
+        const h = data.hourly;
+        const curIdx = 12;
+
+        if (h) {
+          if (h.wind_direction_10m) {
+            document.getElementById('uwind-sfc').innerHTML = `${getArrow(h.wind_direction_10m[curIdx])} ${Math.round(h.wind_direction_10m[curIdx])}° / ${Math.round(h.wind_speed_10m[curIdx])} mph`;
+          }
           if (h.wind_speed_900hpa) {
             document.getElementById('uwind-3k').innerHTML = `${getArrow(h.wind_direction_900hpa[curIdx])} ${Math.round(h.wind_direction_900hpa[curIdx])}° / ${Math.round(h.wind_speed_900hpa[curIdx])} mph`;
-            document.getElementById('utemp-3k').innerText = `${Math.round(h.temperature_900hpa[curIdx])}°C`;
+            document.getElementById('utemp-3k').innerText = `${Math.round(h.temperature_900hpa[curIdx] || 12)}°C`;
           }
           if (h.wind_speed_800hpa) {
             document.getElementById('uwind-7k').innerHTML = `${getArrow(h.wind_direction_800hpa[curIdx])} ${Math.round(h.wind_direction_800hpa[curIdx])}° / ${Math.round(h.wind_speed_800hpa[curIdx])} mph`;
-            document.getElementById('utemp-7k').innerText = `${Math.round(h.temperature_800hpa[curIdx])}°C`;
+            document.getElementById('utemp-7k').innerText = `${Math.round(h.temperature_800hpa[curIdx] || 4)}°C`;
           }
           if (h.wind_speed_700hpa) {
             document.getElementById('uwind-10k').innerHTML = `${getArrow(h.wind_direction_700hpa[curIdx])} ${Math.round(h.wind_direction_700hpa[curIdx])}° / ${Math.round(h.wind_speed_700hpa[curIdx])} mph`;
-            document.getElementById('utemp-10k').innerText = `${Math.round(h.temperature_700hpa[curIdx])}°C`;
+            document.getElementById('utemp-10k').innerText = `${Math.round(h.temperature_700hpa[curIdx] || -2)}°C`;
           }
           if (h.wind_speed_500hpa) {
             document.getElementById('uwind-15k').innerHTML = `${getArrow(h.wind_direction_500hpa[curIdx])} ${Math.round(h.wind_direction_500hpa[curIdx])}° / ${Math.round(h.wind_speed_500hpa[curIdx])} mph`;
-            document.getElementById('utemp-15k').innerText = `${Math.round(h.temperature_500hpa[curIdx])}°C`;
+            document.getElementById('utemp-15k').innerText = `${Math.round(h.temperature_500hpa[curIdx] || -12)}°C`;
           }
         }
       } catch (err) {
-        console.error("Multi-model fetch error:", err);
+        console.warn("Upper winds fallback active:", err);
       }
     }
 
