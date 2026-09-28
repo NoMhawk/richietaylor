@@ -207,7 +207,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.1.7</div>
+    <div class="rev-badge">REV: 1.1.8</div>
   </div>
 
   <div class="dashboard-container">
@@ -237,13 +237,12 @@
               <th style="text-align: left;">Time</th>
               <th>ECMWF</th>
               <th>GFS</th>
-              <th>UKMET (UKV)</th>
               <th>ICON-EU</th>
               <th>AROME</th>
             </tr>
           </thead>
           <tbody id="multi-model-rows">
-            <tr><td colspan="6" style="padding: 20px; color: #8a99ad;">Fetching Live Model Forecasts...</td></tr>
+            <tr><td colspan="5" style="padding: 20px; color: #8a99ad;">Fetching Live Model Forecasts...</td></tr>
           </tbody>
         </table>
       </div>
@@ -344,11 +343,6 @@
             6 G:9 mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">GFS</span>
           </div>
         </div>
-        <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(28deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
-          <div style="background: rgba(0, 255, 117, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 135px; margin-left: 10px;">
-            6 G:15 mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">UKV</span>
-          </div>
-        </div>
         <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(35deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
           <div style="background: rgba(0, 240, 255, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 130px; margin-left: 10px;">
             7 G:13 mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">ECMWF</span>
@@ -366,7 +360,6 @@
       return `<span class="dir-arrow" style="transform: rotate(${deg}deg); display: inline-block;">↑</span>`;
     }
 
-    // Determine colour class based on peak wind speed / gust
     function getStatusClass(val) {
       if (val <= 15) return 'status-green';
       if (val <= 20) return 'status-yellow';
@@ -374,22 +367,20 @@
       return 'status-red';
     }
 
-    // 2. FETCH MULTI-MODEL FORECAST DATA
+    // 2. FETCH MULTI-MODEL FORECAST DATA (ECMWF, GFS, ICON, AROME)
     async function fetchModelData() {
       const params = `latitude=${lat}&longitude=${lon}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=mph&forecast_days=1`;
       
       try {
-        const [ecmwfRes, gfsRes, ukmoRes, iconRes, aromeRes] = await Promise.all([
+        const [ecmwfRes, gfsRes, iconRes, aromeRes] = await Promise.all([
           fetch(`https://api.open-meteo.com/v1/ecmwf?${params}`),
           fetch(`https://api.open-meteo.com/v1/gfs?${params}`),
-          fetch(`https://api.open-meteo.com/v1/ukmo?${params}`),
           fetch(`https://api.open-meteo.com/v1/forecast?models=icon_eu&${params}`),
           fetch(`https://api.open-meteo.com/v1/forecast?models=meteofrance_arome_france&${params}`)
         ]);
 
         const ecmwf = await ecmwfRes.json();
         const gfs = await gfsRes.json();
-        const ukmo = await ukmoRes.json();
         const icon = await iconRes.json();
         const arome = await aromeRes.json();
 
@@ -416,7 +407,6 @@
               <td style="text-align: left; font-weight: bold; color: #00d8ff;">${timeStr}</td>
               <td>${renderCell(ecmwf)}</td>
               <td>${renderCell(gfs)}</td>
-              <td>${renderCell(ukmo)}</td>
               <td>${renderCell(icon)}</td>
               <td>${renderCell(arome)}</td>
             </tr>
@@ -426,7 +416,7 @@
         document.getElementById('multi-model-rows').innerHTML = rowsHTML;
       } catch (err) {
         console.error("Multi-model fetch error:", err);
-        document.getElementById('multi-model-rows').innerHTML = `<tr><td colspan="6" style="padding: 20px; color: #ff5252;">Error parsing model forecasts. Check browser console.</td></tr>`;
+        document.getElementById('multi-model-rows').innerHTML = `<tr><td colspan="5" style="padding: 20px; color: #ff5252;">Error parsing model forecasts. Check browser console.</td></tr>`;
       }
     }
 
