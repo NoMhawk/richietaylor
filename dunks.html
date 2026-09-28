@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Skydive Southwest - Weather Dashboard Test</title>
+  <title>Skydive Southwest - Dunkeswell Operations Weather</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Leaflet & Windy Web API SDK -->
@@ -28,7 +28,7 @@
       margin: 0 auto;
     }
 
-    /* SEGMENT 1 CONTAINER */
+    /* SEGMENT 1: WINDY API MAP CONTAINER */
     #windy-container {
       position: relative;
       width: 100%;
@@ -75,10 +75,12 @@
       font-size: 0.75rem;
       font-weight: 600;
       margin-left: 4px;
+      transition: border-color 0.2s ease;
     }
+    .model-btn:hover { border-color: #0088ff; }
     .model-btn.active { background: #0088ff; border-color: #0088ff; }
 
-    /* SEGMENT 2 CONTAINER */
+    /* SEGMENT 2: CLOUD & UPPER WINDS CONTAINER */
     .pane-segment {
       background: #131b2e;
       border: 1px solid #1e2d4a;
