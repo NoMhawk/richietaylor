@@ -5,6 +5,10 @@
   <title>Skydive Southwest - Dunkeswell Weather</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -14,7 +18,6 @@
       padding: 16px;
     }
 
-    /* TOP REVISION BADGE HEADER */
     .top-header {
       display: flex;
       justify-content: space-between;
@@ -52,48 +55,34 @@
       margin: 0 auto;
     }
 
-    /* SEGMENT 1: SIDE-BY-SIDE OPTIONS GRID */
-    .segment-1-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .option-card {
-      background: #131b2e;
-      border: 1px solid #1e2d4a;
-      border-radius: 8px;
-      padding: 12px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .option-title {
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: #00d8ff;
-      text-transform: uppercase;
-      margin-bottom: 8px;
-      letter-spacing: 0.5px;
-    }
-
-    .frame-container {
+    /* SEGMENT 1: MAP WITH NATIVE MULTI-MODEL WIND ROSE */
+    .map-card {
+      position: relative;
       width: 100%;
-      height: 600px;
-      border-radius: 6px;
+      height: 650px;
+      border-radius: 8px;
       overflow: hidden;
       border: 1px solid #1e2d4a;
-      background: #0b0f19;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      background: #131b2e;
     }
 
-    iframe {
+    #map {
       width: 100%;
       height: 100%;
-      border: none;
     }
 
-    /* SEGMENT 2: CLOUD & UPPER WINDS CONTAINER */
+    /* WIND ROSE SVG OVERLAY STYLES */
+    .wind-rose-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    /* SEGMENT 2 STYLES */
     .pane-segment {
       background: #131b2e;
       border: 1px solid #1e2d4a;
@@ -133,42 +122,20 @@
 </head>
 <body>
 
-  <!-- PAGE HEADER & REVISION BADGE -->
+  <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.0.8</div>
+    <div class="rev-badge">REV: 1.0.9</div>
   </div>
 
   <div class="dashboard-container">
     
-    <!-- SEGMENT 1: OPTION A AND OPTION B SIDE-BY-SIDE -->
-    <div class="segment-1-grid">
-      
-      <!-- OPTION A: WINDY INTERACTIVE EMBED -->
-      <div class="option-card">
-        <div class="option-title">Option A: Windy Interactive Map</div>
-        <div class="frame-container">
-          <iframe 
-            src="https://embed.windy.com/embed2.html?lat=50.8600&lon=-3.2378&detailLat=50.8600&detailLon=-3.2378&width=100%25&height=600&zoom=11&level=surface&overlay=wind&product=ecmwf&menu=true&message=true&marker=true&calendar=now&pressure=true&type=map&location=coordinates&detail=true&metricWind=kt&metricTemp=%C2%B0C" 
-            allowfullscreen>
-          </iframe>
-        </div>
-      </div>
-
-      <!-- OPTION B: VENTUSKY MULTI-MODEL WIND MAP & TIMELINE -->
-      <div class="option-card">
-        <div class="option-title">Option B: Ventusky Multi-Model Wind Engine</div>
-        <div class="frame-container">
-          <iframe 
-            src="https://www.ventusky.com/?p=50.86;-3.24;11&l=wind-10m&m=icon&units=kn" 
-            allowfullscreen>
-          </iframe>
-        </div>
-      </div>
-
+    <!-- SEGMENT 1: MAP WITH DUNKESWELL MULTI-MODEL WIND ROSE -->
+    <div class="map-card">
+      <div id="map"></div>
     </div>
 
-    <!-- SEGMENT 2: CLOUD BASE & UPPER WINDS PROFILE -->
+    <!-- SEGMENT 2: CLOUD & UPPER WINDS PROFILE -->
     <div class="pane-segment">
       <div class="pane-header">
         <div class="title">☁️ Cloud Base & Upper Winds</div>
@@ -233,6 +200,66 @@
     </div>
 
   </div>
+
+  <script>
+    // Initialize dark map view centered on Dunkeswell
+    const lat = 50.8600;
+    const lon = -3.2378;
+    const map = L.map('map').setView([lat, lon], 11);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; OpenStreetMap &copy; CARTO',
+      maxZoom: 18
+    }).addTo(map);
+
+    // Multi-Model Wind Rose HTML Marker (ECMWF, GFS, UKV, AROME, ICON-EU)
+    const windRoseHTML = `
+      <div style="position: relative; width: 220px; height: 220px; pointer-events: none;">
+        <!-- Radius Circle -->
+        <svg width="220" height="220" style="position: absolute; top:0; left:0;">
+          <circle cx="110" cy="110" r="80" stroke="#ffffff" stroke-opacity="0.3" stroke-width="1.5" fill="none" />
+          <circle cx="110" cy="110" r="6" fill="#ffffff" stroke="#000" stroke-width="2"/>
+        </svg>
+
+        <!-- AROME-HD Vector -->
+        <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(12deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
+          <div style="background: #a3ffb4; color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 130px; margin-left: 10px;">
+            6 G:13 <span style="background:#333; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">AROME-HD</span>
+          </div>
+        </div>
+
+        <!-- GFS Vector -->
+        <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(22deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
+          <div style="background: #c2ffd2; color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 110px; margin-left: 10px;">
+            5 G:8 <span style="background:#333; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">GFS</span>
+          </div>
+        </div>
+
+        <!-- UKV Vector -->
+        <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(28deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
+          <div style="background: #00ff75; color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 125px; margin-left: 10px;">
+            5 G:13 <span style="background:#333; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">UKV</span>
+          </div>
+        </div>
+
+        <!-- ECMWF Vector -->
+        <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(35deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
+          <div style="background: #00f0ff; color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 120px; margin-left: 10px;">
+            6 G:11 <span style="background:#333; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">ECMWF</span>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const windRoseIcon = L.divIcon({
+      html: windRoseHTML,
+      className: '',
+      iconSize: [220, 220],
+      iconAnchor: [110, 110]
+    });
+
+    L.marker([lat, lon], { icon: windRoseIcon }).addTo(map);
+  </script>
 
 </body>
 </html>
