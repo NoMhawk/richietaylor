@@ -11,25 +11,30 @@
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
+    
+    html, body {
+      width: 100%;
+      height: 100vh;
+      overflow: hidden; /* Prevents page scrolling */
       background: #0b0f19;
       color: #f0f4f8;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      padding: 16px;
+      padding: 12px 16px;
     }
 
     .top-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      max-width: 1400px;
-      margin: 0 auto 16px auto;
-      padding-bottom: 8px;
+      max-width: 100%;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
       border-bottom: 1px solid #1e2d4a;
+      height: 32px;
     }
 
     .site-title {
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 700;
       color: #00d8ff;
       text-transform: uppercase;
@@ -41,31 +46,34 @@
       color: #fff;
       font-weight: 800;
       font-family: monospace;
-      padding: 4px 10px;
+      padding: 3px 8px;
       border-radius: 4px;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       box-shadow: 0 0 10px rgba(0, 136, 255, 0.4);
     }
 
+    /* WIDESCREEN DASHBOARD CONTAINER */
     .dashboard-container {
       display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 16px;
-      max-width: 1400px;
-      margin: 0 auto;
+      grid-template-columns: 1.8fr 1fr;
+      gap: 12px;
+      width: 100%;
+      height: calc(100vh - 60px); /* Fits exact viewport height */
     }
 
     .segment-1-stack {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 10px;
+      height: 100%;
     }
 
     /* 1A: SATELLITE MAP */
     .map-card {
       position: relative;
       width: 100%;
-      height: 480px;
+      flex: 1 1 50%;
+      min-height: 260px;
       border-radius: 8px;
       overflow: hidden;
       border: 1px solid #1e2d4a;
@@ -78,20 +86,23 @@
     /* 1B: MULTI-MODEL HOURLY COMPARISON TABLE CARD */
     .multi-table-card {
       width: 100%;
+      flex: 1 1 50%;
       background: #131b2e;
       border: 1px solid #1e2d4a;
       border-radius: 8px;
-      padding: 16px;
+      padding: 10px 12px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-      overflow-x: auto;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
 
     .table-title {
-      font-size: 0.85rem;
+      font-size: 0.75rem;
       font-weight: 700;
       color: #00d8ff;
       text-transform: uppercase;
-      margin-bottom: 12px;
+      margin-bottom: 6px;
       letter-spacing: 0.5px;
       display: flex;
       justify-content: space-between;
@@ -100,57 +111,54 @@
 
     .legend-bar {
       display: flex;
-      gap: 10px;
-      font-size: 0.65rem;
+      gap: 8px;
+      font-size: 0.6rem;
       color: #8a99ad;
       font-family: monospace;
     }
 
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
+    .legend-item { display: flex; align-items: center; gap: 3px; }
+    .legend-box { width: 8px; height: 8px; border-radius: 2px; }
 
-    .legend-box {
-      width: 10px;
-      height: 10px;
-      border-radius: 2px;
+    .table-wrapper {
+      flex: 1;
+      overflow-y: auto;
     }
 
     .multi-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.78rem;
+      font-size: 0.72rem;
       font-family: monospace;
       text-align: center;
     }
 
     .multi-table th {
-      padding: 8px;
-      background: rgba(0, 0, 0, 0.3);
+      padding: 4px 6px;
+      background: rgba(0, 0, 0, 0.4);
       color: #8a99ad;
       border-bottom: 1px solid #1e2d4a;
       text-transform: uppercase;
-      font-size: 0.7rem;
+      font-size: 0.65rem;
+      position: sticky;
+      top: 0;
+      z-index: 2;
     }
 
     .multi-table td {
-      padding: 6px;
+      padding: 3px 4px;
       border-bottom: 1px solid rgba(255,255,255,0.04);
     }
 
-    .multi-table tr:hover {
-      background: rgba(0, 216, 255, 0.05);
-    }
+    .multi-table tr:hover { background: rgba(0, 216, 255, 0.05); }
 
     /* COLOUR-CODED CELL BADGES */
     .wind-badge {
       display: inline-block;
-      padding: 3px 8px;
+      padding: 2px 4px;
       border-radius: 4px;
       font-weight: bold;
-      width: 90%;
+      width: 95%;
     }
 
     .status-green  { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.4); }
@@ -158,46 +166,40 @@
     .status-orange { background: rgba(255, 152, 0, 0.15);  color: #ffb74d; border: 1px solid rgba(255, 152, 0, 0.4); }
     .status-red    { background: rgba(255, 82, 82, 0.2);   color: #ff5252; border: 1px solid rgba(255, 82, 82, 0.5); }
 
-    .dir-arrow {
-      display: inline-block;
-      font-weight: bold;
-      margin-right: 3px;
-    }
-
-    .gust-val {
-      font-size: 0.7rem;
-      opacity: 0.85;
-    }
+    .dir-arrow { display: inline-block; font-weight: bold; margin-right: 2px; }
+    .gust-val { font-size: 0.65rem; opacity: 0.85; }
 
     /* SEGMENT 2 STYLES */
     .pane-segment {
       background: #131b2e;
       border: 1px solid #1e2d4a;
       border-radius: 8px;
-      padding: 16px;
+      padding: 12px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-      height: fit-content;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
     }
 
     .pane-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-bottom: 12px;
+      padding-bottom: 8px;
       border-bottom: 1px solid #1e2d4a;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
     }
 
-    .title { font-weight: 700; color: #00d8ff; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; }
-    .subtitle { font-size: 0.75rem; color: #8a99ad; }
+    .title { font-weight: 700; color: #00d8ff; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .subtitle { font-size: 0.7rem; color: #8a99ad; }
 
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-    .card { background: rgba(0, 0, 0, 0.25); border: 1px solid #1e2d4a; border-radius: 6px; padding: 10px; }
-    .card-label { font-size: 0.65rem; color: #8a99ad; text-transform: uppercase; }
-    .card-value { font-size: 1.1rem; font-weight: 700; color: #fff; font-family: monospace; margin-top: 2px; }
-    .card-sub { font-size: 0.65rem; color: #00e676; margin-top: 2px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+    .card { background: rgba(0, 0, 0, 0.25); border: 1px solid #1e2d4a; border-radius: 6px; padding: 8px; }
+    .card-label { font-size: 0.6rem; color: #8a99ad; text-transform: uppercase; }
+    .card-value { font-size: 0.95rem; font-weight: 700; color: #fff; font-family: monospace; margin-top: 2px; }
+    .card-sub { font-size: 0.6rem; color: #00e676; margin-top: 2px; }
 
-    .badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; }
+    .badge { display: inline-block; padding: 2px 5px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; }
     .badge-ok { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid #00e676; }
     .badge-warn { background: rgba(255, 171, 0, 0.15); color: #ffab00; border: 1px solid #ffab00; }
   </style>
@@ -207,7 +209,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.1.8</div>
+    <div class="rev-badge">REV: 1.1.9</div>
   </div>
 
   <div class="dashboard-container">
@@ -226,25 +228,27 @@
           <span>📊 Hourly Multi-Model Wind Forecast (Dunkeswell)</span>
           <div class="legend-bar">
             <div class="legend-item"><div class="legend-box" style="background:#00e676;"></div> ≤15 (All)</div>
-            <div class="legend-item"><div class="legend-box" style="background:#ffee58;"></div> 16-20 (Licensed)</div>
-            <div class="legend-item"><div class="legend-box" style="background:#ffb74d;"></div> 21-25 (Advanced)</div>
-            <div class="legend-item"><div class="legend-box" style="background:#ff5252;"></div> >25 (Limit Exceeded)</div>
+            <div class="legend-item"><div class="legend-box" style="background:#ffee58;"></div> 16-20 (Lic)</div>
+            <div class="legend-item"><div class="legend-box" style="background:#ffb74d;"></div> 21-25 (Adv)</div>
+            <div class="legend-item"><div class="legend-box" style="background:#ff5252;"></div> >25 (Limit)</div>
           </div>
         </div>
-        <table class="multi-table">
-          <thead>
-            <tr>
-              <th style="text-align: left;">Time</th>
-              <th>ECMWF</th>
-              <th>GFS</th>
-              <th>ICON-EU</th>
-              <th>AROME</th>
-            </tr>
-          </thead>
-          <tbody id="multi-model-rows">
-            <tr><td colspan="5" style="padding: 20px; color: #8a99ad;">Fetching Live Model Forecasts...</td></tr>
-          </tbody>
-        </table>
+        <div class="table-wrapper">
+          <table class="multi-table">
+            <thead>
+              <tr>
+                <th style="text-align: left;">Time</th>
+                <th>ECMWF</th>
+                <th>GFS</th>
+                <th>ICON-EU</th>
+                <th>AROME</th>
+              </tr>
+            </thead>
+            <tbody id="multi-model-rows">
+              <tr><td colspan="5" style="padding: 15px; color: #8a99ad;">Fetching Live Model Forecasts...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
     </div>
@@ -269,45 +273,45 @@
         </div>
       </div>
 
-      <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 0.75rem;">
         <thead>
-          <tr style="border-bottom: 1px solid #1e2d4a; color: #8a99ad; font-size: 0.7rem; text-transform: uppercase;">
-            <th style="text-align: left; padding: 8px 6px;">Altitude</th>
-            <th style="text-align: left; padding: 8px 6px;">Dir / Speed (mph)</th>
-            <th style="text-align: left; padding: 8px 6px;">Temp</th>
-            <th style="text-align: left; padding: 8px 6px;">Limits</th>
+          <tr style="border-bottom: 1px solid #1e2d4a; color: #8a99ad; font-size: 0.65rem; text-transform: uppercase;">
+            <th style="text-align: left; padding: 6px 4px;">Altitude</th>
+            <th style="text-align: left; padding: 6px 4px;">Dir / Speed (mph)</th>
+            <th style="text-align: left; padding: 6px 4px;">Temp</th>
+            <th style="text-align: left; padding: 6px 4px;">Limits</th>
           </tr>
         </thead>
         <tbody>
           <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-            <td style="padding: 8px 6px;">Surface (839')</td>
-            <td style="padding: 8px 6px;"><span class="dir-arrow">↙</span> 220° / 14 mph</td>
-            <td style="padding: 8px 6px;">18°C</td>
-            <td style="padding: 8px 6px;"><span class="badge badge-ok">STUDENT OK</span></td>
+            <td style="padding: 6px 4px;">Surface (839')</td>
+            <td style="padding: 6px 4px;"><span class="dir-arrow">↙</span> 220° / 14 mph</td>
+            <td style="padding: 6px 4px;">18°C</td>
+            <td style="padding: 6px 4px;"><span class="badge badge-ok">STUDENT OK</span></td>
           </tr>
           <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-            <td style="padding: 8px 6px;">3,000' AGL</td>
-            <td style="padding: 8px 6px;"><span class="dir-arrow">↙</span> 235° / 21 mph</td>
-            <td style="padding: 8px 6px;">12°C</td>
-            <td style="padding: 8px 6px;"><span class="badge badge-ok">TANDEM OK</span></td>
+            <td style="padding: 6px 4px;">3,000' AGL</td>
+            <td style="padding: 6px 4px;"><span class="dir-arrow">↙</span> 235° / 21 mph</td>
+            <td style="padding: 6px 4px;">12°C</td>
+            <td style="padding: 6px 4px;"><span class="badge badge-ok">TANDEM OK</span></td>
           </tr>
           <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-            <td style="padding: 8px 6px;">7,000' AGL</td>
-            <td style="padding: 8px 6px;"><span class="dir-arrow">↙</span> 240° / 28 mph</td>
-            <td style="padding: 8px 6px;">4°C</td>
-            <td style="padding: 8px 6px;"><span class="badge badge-ok">HOP & POP</span></td>
+            <td style="padding: 6px 4px;">7,000' AGL</td>
+            <td style="padding: 6px 4px;"><span class="dir-arrow">↙</span> 240° / 28 mph</td>
+            <td style="padding: 6px 4px;">4°C</td>
+            <td style="padding: 6px 4px;"><span class="badge badge-ok">HOP & POP</span></td>
           </tr>
           <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-            <td style="padding: 8px 6px;">10,000' AGL</td>
-            <td style="padding: 8px 6px;"><span class="dir-arrow">W</span> 250° / 37 mph</td>
-            <td style="padding: 8px 6px;">-2°C</td>
-            <td style="padding: 8px 6px;"><span class="badge badge-warn">MOD DRIFT</span></td>
+            <td style="padding: 6px 4px;">10,000' AGL</td>
+            <td style="padding: 6px 4px;"><span class="dir-arrow">W</span> 250° / 37 mph</td>
+            <td style="padding: 6px 4px;">-2°C</td>
+            <td style="padding: 6px 4px;"><span class="badge badge-warn">MOD DRIFT</span></td>
           </tr>
           <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-            <td style="padding: 8px 6px;">15,000' AGL</td>
-            <td style="padding: 8px 6px;"><span class="dir-arrow">W</span> 260° / 52 mph</td>
-            <td style="padding: 8px 6px;">-12°C</td>
-            <td style="padding: 8px 6px;"><span class="badge badge-warn">HIGH DRIFT</span></td>
+            <td style="padding: 6px 4px;">15,000' AGL</td>
+            <td style="padding: 6px 4px;"><span class="dir-arrow">W</span> 260° / 52 mph</td>
+            <td style="padding: 6px 4px;">-12°C</td>
+            <td style="padding: 6px 4px;"><span class="badge badge-warn">HIGH DRIFT</span></td>
           </tr>
         </tbody>
       </table>
@@ -416,7 +420,7 @@
         document.getElementById('multi-model-rows').innerHTML = rowsHTML;
       } catch (err) {
         console.error("Multi-model fetch error:", err);
-        document.getElementById('multi-model-rows').innerHTML = `<tr><td colspan="5" style="padding: 20px; color: #ff5252;">Error parsing model forecasts. Check browser console.</td></tr>`;
+        document.getElementById('multi-model-rows').innerHTML = `<tr><td colspan="5" style="padding: 15px; color: #ff5252;">Error parsing model forecasts. Check browser console.</td></tr>`;
       }
     }
 
