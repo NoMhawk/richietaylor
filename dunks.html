@@ -174,7 +174,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.1.5</div>
+    <div class="rev-badge">REV: 1.1.6</div>
   </div>
 
   <div class="dashboard-container">
@@ -279,8 +279,9 @@
   </div>
 
   <script>
-    const lat = 50.8600;
-    const lon = -3.2378;
+    // RUNWAY INTERSECTION COORDINATES
+    const lat = 50.8622;
+    const lon = -3.2365;
 
     // 1. LEAFLET SATELLITE MAP
     const map = L.map('map').setView([lat, lon], 15);
@@ -289,7 +290,7 @@
       maxNativeZoom: 18
     }).addTo(map);
 
-    // Multi-Model Wind Rose Overlay
+    // Multi-Model Wind Rose Overlay Centered Exactly on Intersection
     const windRoseHTML = `
       <div style="position: relative; width: 220px; height: 220px; pointer-events: none;">
         <svg width="220" height="220" style="position: absolute; top:0; left:0;">
@@ -297,22 +298,22 @@
           <circle cx="110" cy="110" r="6" fill="#ffffff" stroke="#000" stroke-width="2"/>
         </svg>
         <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(12deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
-          <div style="background: rgba(163, 255, 180, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 140px; margin-left: 10px;">
+          <div style="background: rgba(163, 255, 180, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 140px; margin-left: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.6);">
             7 G:15 mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">AROME-HD</span>
           </div>
         </div>
         <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(22deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
-          <div style="background: rgba(194, 255, 210, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 120px; margin-left: 10px;">
+          <div style="background: rgba(194, 255, 210, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 120px; margin-left: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.6);">
             6 G:9 mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">GFS</span>
           </div>
         </div>
         <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(28deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
-          <div style="background: rgba(0, 255, 117, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 135px; margin-left: 10px;">
+          <div style="background: rgba(0, 255, 117, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 135px; margin-left: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.6);">
             6 G:15 mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">UKV</span>
           </div>
         </div>
         <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(35deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
-          <div style="background: rgba(0, 240, 255, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 130px; margin-left: 10px;">
+          <div style="background: rgba(0, 240, 255, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 130px; margin-left: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.6);">
             7 G:13 mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">ECMWF</span>
           </div>
         </div>
@@ -323,15 +324,12 @@
       icon: L.divIcon({ html: windRoseHTML, className: '', iconSize: [220, 220], iconAnchor: [110, 110] })
     }).addTo(map);
 
-    // Convert degrees to direction arrow
     function getArrow(deg) {
       if (deg === undefined || deg === null) return '↓';
-      const arrows = ['↓', '↙', '←', '↖', '↑', '↗', '→', '↘'];
-      const idx = Math.round(deg / 45) % 8;
       return `<span class="dir-arrow" style="transform: rotate(${deg}deg); display: inline-block;">↑</span>`;
     }
 
-    // 2. FETCH MULTI-MODEL FORECAST DATA SAFELY
+    // 2. FETCH MULTI-MODEL FORECAST DATA
     async function fetchModelData() {
       const params = `latitude=${lat}&longitude=${lon}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=mph&forecast_days=1`;
       
@@ -353,7 +351,6 @@
         const times = ecmwf.hourly.time;
         let rowsHTML = '';
 
-        // Generate 12 daytime operational hours (08:00 - 20:00)
         for (let i = 8; i <= 19; i++) {
           const timeStr = new Date(times[i]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
