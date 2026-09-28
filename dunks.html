@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Skydive Southwest - Dunkeswell Operations Weather</title>
+  <title>Skydive Southwest - Dunkeswell Weather</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Leaflet & Windy Web API SDK -->
+  <!-- Leaflet & Windy Web API SDK (Updated CDN Links) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
   <script src="https://api.windy.com/assets/map-forecast/lib/tomtom.min.js"></script>
-  <script src="https://api.windy.com/assets/map-forecast/lib/windySdk.js"></script>
+  <script src="https://api4.windy.com/assets/map-forecast/lib/windySdk.js"></script>
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -33,6 +33,7 @@
       position: relative;
       width: 100%;
       height: 600px;
+      min-height: 600px;
       border-radius: 8px;
       overflow: hidden;
       border: 1px solid #1e2d4a;
@@ -40,8 +41,12 @@
     }
 
     #windy {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
+      z-index: 1;
     }
 
     .bottom-bar {
@@ -240,14 +245,29 @@
 
     let windyStore = null;
 
-    windyInit(options, windyAPI => {
-      const { map, picker, store } = windyAPI;
-      windyStore = store;
+    // Safety check for script load
+    function initWindyMap() {
+      if (typeof windyInit === 'function') {
+        windyInit(options, windyAPI => {
+          const { map, picker, store } = windyAPI;
+          windyStore = store;
 
-      picker.open({ lat: lat, lon: lon });
-      picker.on('pickerOpened', params => updateBar(params));
-      picker.on('pickerMoved', params => updateBar(params));
-    });
+          setTimeout(() => {
+            map.invalidateSize();
+            store.set('overlay', 'wind');
+          }, 300);
+
+          picker.open({ lat: lat, lon: lon });
+          picker.on('pickerOpened', params => updateBar(params));
+          picker.on('pickerMoved', params => updateBar(params));
+        });
+      } else {
+        console.error("Windy API SDK script failed to load. Checking fallback...");
+      }
+    }
+
+    // Trigger after DOM and scripts load
+    window.addEventListener('load', initWindyMap);
 
     function updateBar(params) {
       if (!params) return;
