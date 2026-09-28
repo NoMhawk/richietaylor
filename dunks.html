@@ -19,7 +19,7 @@
       background: #0b0f19;
       color: #f0f4f8;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      padding: 12px 16px;
+      padding: 10px 14px;
     }
 
     .top-header {
@@ -27,14 +27,14 @@
       justify-content: space-between;
       align-items: center;
       max-width: 100%;
-      margin-bottom: 10px;
-      padding-bottom: 6px;
+      margin-bottom: 8px;
+      padding-bottom: 4px;
       border-bottom: 1px solid #1e2d4a;
-      height: 32px;
+      height: 28px;
     }
 
     .site-title {
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: 700;
       color: #00d8ff;
       text-transform: uppercase;
@@ -48,7 +48,7 @@
       font-family: monospace;
       padding: 3px 8px;
       border-radius: 4px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       box-shadow: 0 0 10px rgba(0, 136, 255, 0.4);
     }
 
@@ -56,15 +56,15 @@
     .dashboard-container {
       display: grid;
       grid-template-columns: 1.8fr 1fr;
-      gap: 12px;
+      gap: 10px;
       width: 100%;
-      height: calc(100vh - 60px);
+      height: calc(100vh - 50px);
     }
 
     .segment-1-stack, .right-column-stack {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
       height: 100%;
     }
 
@@ -73,7 +73,7 @@
       position: relative;
       width: 100%;
       flex: 1 1 50%;
-      min-height: 250px;
+      min-height: 240px;
       border-radius: 8px;
       overflow: hidden;
       border: 1px solid #1e2d4a;
@@ -90,7 +90,7 @@
       background: #131b2e;
       border: 1px solid #1e2d4a;
       border-radius: 8px;
-      padding: 10px 12px;
+      padding: 8px 10px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.5);
       display: flex;
       flex-direction: column;
@@ -98,11 +98,11 @@
     }
 
     .table-title {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 700;
       color: #00d8ff;
       text-transform: uppercase;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       letter-spacing: 0.5px;
       display: flex;
       justify-content: space-between;
@@ -112,7 +112,7 @@
     .legend-bar {
       display: flex;
       gap: 8px;
-      font-size: 0.6rem;
+      font-size: 0.58rem;
       color: #8a99ad;
       font-family: monospace;
     }
@@ -129,24 +129,24 @@
     .multi-table-horizontal {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-family: monospace;
       text-align: center;
     }
 
     .multi-table-horizontal th {
-      padding: 6px 8px;
+      padding: 5px 6px;
       background: rgba(0, 0, 0, 0.4);
       color: #8a99ad;
       border-bottom: 1px solid #1e2d4a;
       border-right: 1px solid rgba(255,255,255,0.04);
       text-transform: uppercase;
-      font-size: 0.65rem;
+      font-size: 0.62rem;
       white-space: nowrap;
     }
 
     .multi-table-horizontal td {
-      padding: 5px 6px;
+      padding: 4px 5px;
       border-bottom: 1px solid rgba(255,255,255,0.04);
       border-right: 1px solid rgba(255,255,255,0.04);
       white-space: nowrap;
@@ -166,10 +166,10 @@
     /* COLOUR-CODED CELL BADGES */
     .wind-badge {
       display: inline-block;
-      padding: 2px 5px;
+      padding: 2px 4px;
       border-radius: 4px;
       font-weight: bold;
-      min-width: 62px;
+      min-width: 58px;
     }
 
     .status-green  { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.4); }
@@ -178,14 +178,14 @@
     .status-red    { background: rgba(255, 82, 82, 0.2);   color: #ff5252; border: 1px solid rgba(255, 82, 82, 0.5); }
 
     .dir-arrow { display: inline-block; font-weight: bold; margin-right: 2px; }
-    .gust-val { font-size: 0.62rem; opacity: 0.85; }
+    .gust-val { font-size: 0.6rem; opacity: 0.85; }
 
-    /* SEGMENTS 2 & 3 STYLES */
+    /* SEGMENTS 2, 3, & 4 STYLES */
     .pane-segment {
       background: #131b2e;
       border: 1px solid #1e2d4a;
       border-radius: 8px;
-      padding: 10px 12px;
+      padding: 8px 10px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.4);
       display: flex;
       flex-direction: column;
@@ -195,36 +195,47 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-bottom: 6px;
+      padding-bottom: 4px;
       border-bottom: 1px solid #1e2d4a;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
-    .title { font-weight: 700; color: #00d8ff; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
-    .subtitle { font-size: 0.68rem; color: #8a99ad; }
+    .title { font-weight: 700; color: #00d8ff; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .subtitle { font-size: 0.65rem; color: #8a99ad; }
 
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
-    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 6px; }
 
-    .card { background: rgba(0, 0, 0, 0.25); border: 1px solid #1e2d4a; border-radius: 6px; padding: 6px 8px; }
-    .card-label { font-size: 0.58rem; color: #8a99ad; text-transform: uppercase; }
-    .card-value { font-size: 0.9rem; font-weight: 700; color: #fff; font-family: monospace; margin-top: 2px; }
-    .card-sub { font-size: 0.58rem; color: #00e676; margin-top: 2px; }
+    .card { background: rgba(0, 0, 0, 0.25); border: 1px solid #1e2d4a; border-radius: 6px; padding: 5px 7px; }
+    .card-label { font-size: 0.55rem; color: #8a99ad; text-transform: uppercase; }
+    .card-value { font-size: 0.85rem; font-weight: 700; color: #fff; font-family: monospace; margin-top: 1px; }
+    .card-sub { font-size: 0.55rem; color: #00e676; margin-top: 1px; }
 
     .raw-metar-box {
       background: rgba(0, 0, 0, 0.35);
       border: 1px solid #1e2d4a;
       border-radius: 4px;
-      padding: 6px;
+      padding: 5px;
       font-family: monospace;
-      font-size: 0.65rem;
+      font-size: 0.62rem;
       color: #00e676;
       word-break: break-all;
     }
 
-    .badge { display: inline-block; padding: 2px 5px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; }
-    .badge-ok { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid #00e676; }
-    .badge-warn { background: rgba(255, 171, 0, 0.15); color: #ffab00; border: 1px solid #ffab00; }
+    .radar-frame-box {
+      width: 100%;
+      height: 120px;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid #1e2d4a;
+      background: #0b0f19;
+    }
+
+    .radar-frame-box iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
   </style>
 </head>
 <body>
@@ -232,7 +243,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.2.2</div>
+    <div class="rev-badge">REV: 1.2.3</div>
   </div>
 
   <div class="dashboard-container">
@@ -272,11 +283,11 @@
 
     </div>
 
-    <!-- RIGHT COLUMN: SEGMENT 2 & SEGMENT 3 -->
+    <!-- RIGHT COLUMN: SEGMENT 2, 3 & 4 -->
     <div class="right-column-stack">
       
       <!-- SEGMENT 2: CLOUD BASE & UPPER WINDS PROFILE -->
-      <div class="pane-segment" style="flex: 1;">
+      <div class="pane-segment" style="flex: 1.2;">
         <div class="pane-header">
           <div class="title">☁️ Cloud Base & Upper Winds</div>
           <div class="subtitle">Dunkeswell EGTU (839' MSL)</div>
@@ -294,49 +305,49 @@
           </div>
         </div>
 
-        <table style="width: 100%; border-collapse: collapse; font-size: 0.72rem;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.68rem;">
           <thead>
-            <tr style="border-bottom: 1px solid #1e2d4a; color: #8a99ad; font-size: 0.62rem; text-transform: uppercase;">
-              <th style="text-align: left; padding: 5px 4px;">Altitude</th>
-              <th style="text-align: left; padding: 5px 4px;">Dir / Speed (mph)</th>
-              <th style="text-align: left; padding: 5px 4px;">Temp</th>
+            <tr style="border-bottom: 1px solid #1e2d4a; color: #8a99ad; font-size: 0.6rem; text-transform: uppercase;">
+              <th style="text-align: left; padding: 4px 2px;">Altitude</th>
+              <th style="text-align: left; padding: 4px 2px;">Dir / Speed (mph)</th>
+              <th style="text-align: left; padding: 4px 2px;">Temp</th>
             </tr>
           </thead>
           <tbody>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-              <td style="padding: 4px;">Surface (839')</td>
-              <td style="padding: 4px;"><span class="dir-arrow">↙</span> 220° / 14 mph</td>
-              <td style="padding: 4px;">18°C</td>
+              <td style="padding: 3px 2px;">Surface (839')</td>
+              <td style="padding: 3px 2px;"><span class="dir-arrow">↙</span> 220° / 14 mph</td>
+              <td style="padding: 3px 2px;">18°C</td>
             </tr>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-              <td style="padding: 4px;">3,000' AGL</td>
-              <td style="padding: 4px;"><span class="dir-arrow">↙</span> 235° / 21 mph</td>
-              <td style="padding: 4px;">12°C</td>
+              <td style="padding: 3px 2px;">3,000' AGL</td>
+              <td style="padding: 3px 2px;"><span class="dir-arrow">↙</span> 235° / 21 mph</td>
+              <td style="padding: 3px 2px;">12°C</td>
             </tr>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-              <td style="padding: 4px;">7,000' AGL</td>
-              <td style="padding: 4px;"><span class="dir-arrow">↙</span> 240° / 28 mph</td>
-              <td style="padding: 4px;">4°C</td>
+              <td style="padding: 3px 2px;">7,000' AGL</td>
+              <td style="padding: 3px 2px;"><span class="dir-arrow">↙</span> 240° / 28 mph</td>
+              <td style="padding: 3px 2px;">4°C</td>
             </tr>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-              <td style="padding: 4px;">10,000' AGL</td>
-              <td style="padding: 4px;"><span class="dir-arrow">W</span> 250° / 37 mph</td>
-              <td style="padding: 4px;">-2°C</td>
+              <td style="padding: 3px 2px;">10,000' AGL</td>
+              <td style="padding: 3px 2px;"><span class="dir-arrow">W</span> 250° / 37 mph</td>
+              <td style="padding: 3px 2px;">-2°C</td>
             </tr>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-              <td style="padding: 4px;">15,000' AGL</td>
-              <td style="padding: 4px;"><span class="dir-arrow">W</span> 260° / 52 mph</td>
-              <td style="padding: 4px;">-12°C</td>
+              <td style="padding: 3px 2px;">15,000' AGL</td>
+              <td style="padding: 3px 2px;"><span class="dir-arrow">W</span> 260° / 52 mph</td>
+              <td style="padding: 3px 2px;">-12°C</td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <!-- SEGMENT 3: LIVE METAR & RUNWAY CROSSWIND SAFETY -->
+      <!-- SEGMENT 3: LIVE METAR & RUNWAY SAFETY -->
       <div class="pane-segment" style="flex: 1;">
         <div class="pane-header">
           <div class="title">📡 Live METAR & Runway Safety</div>
-          <div class="subtitle">EGTE / Dunkeswell Rwy 04/22</div>
+          <div class="subtitle">EGTE / Rwy 04/22</div>
         </div>
 
         <div class="grid-3">
@@ -354,9 +365,23 @@
           </div>
         </div>
 
-        <div class="card-label" style="margin-bottom: 4px;">Decoded Surface METAR</div>
         <div class="raw-metar-box" id="raw-metar">
           EGTE 281620Z 22012KT 9999 FEW035 18/11 Q1018 NOSIG
+        </div>
+      </div>
+
+      <!-- SEGMENT 4: LIVE RAIN RADAR & CONVECTIVE TRACKING -->
+      <div class="pane-segment" style="flex: 1;">
+        <div class="pane-header">
+          <div class="title">🌧️ Live Rain Radar & Showers</div>
+          <div class="subtitle">South West Coverage</div>
+        </div>
+
+        <div class="radar-frame-box">
+          <iframe 
+            src="https://embed.windy.com/embed2.html?lat=50.8600&lon=-3.2378&width=100%25&height=120&zoom=8&level=surface&overlay=radar&product=radar&menu=false&message=false&marker=true&calendar=now&pressure=false&type=map&location=coordinates&detail=false&metricWind=mph&metricTemp=%C2%B0C" 
+            allowfullscreen>
+          </iframe>
         </div>
       </div>
 
@@ -483,7 +508,7 @@
       }
     }
 
-    // 3. FETCH LIVE METAR (EXETER EGTE)
+    // 3. FETCH LIVE METAR
     async function fetchMetar() {
       try {
         const res = await fetch(`https://metar.vatsim.net/EGTE`);
