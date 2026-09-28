@@ -15,7 +15,7 @@
     html, body {
       width: 100%;
       height: 100vh;
-      overflow: hidden; /* Prevents page scrolling */
+      overflow: hidden; /* Prevents page scrolling on TV/Widescreen monitors */
       background: #0b0f19;
       color: #f0f4f8;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -58,7 +58,7 @@
       grid-template-columns: 1.8fr 1fr;
       gap: 12px;
       width: 100%;
-      height: calc(100vh - 60px); /* Fits exact viewport height */
+      height: calc(100vh - 60px);
     }
 
     .segment-1-stack {
@@ -83,7 +83,7 @@
 
     #map { width: 100%; height: 100%; }
 
-    /* 1B: MULTI-MODEL HOURLY COMPARISON TABLE CARD */
+    /* 1B: HORIZONTAL MULTI-MODEL HOURLY COMPARISON TABLE */
     .multi-table-card {
       width: 100%;
       flex: 1 1 50%;
@@ -122,43 +122,54 @@
 
     .table-wrapper {
       flex: 1;
-      overflow-y: auto;
+      overflow-x: auto;
+      overflow-y: hidden;
     }
 
-    .multi-table {
+    .multi-table-horizontal {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-family: monospace;
       text-align: center;
     }
 
-    .multi-table th {
-      padding: 4px 6px;
+    .multi-table-horizontal th {
+      padding: 6px 8px;
       background: rgba(0, 0, 0, 0.4);
       color: #8a99ad;
       border-bottom: 1px solid #1e2d4a;
+      border-right: 1px solid rgba(255,255,255,0.04);
       text-transform: uppercase;
       font-size: 0.65rem;
-      position: sticky;
-      top: 0;
-      z-index: 2;
+      white-space: nowrap;
     }
 
-    .multi-table td {
-      padding: 3px 4px;
+    .multi-table-horizontal td {
+      padding: 5px 6px;
       border-bottom: 1px solid rgba(255,255,255,0.04);
+      border-right: 1px solid rgba(255,255,255,0.04);
+      white-space: nowrap;
     }
 
-    .multi-table tr:hover { background: rgba(0, 216, 255, 0.05); }
+    .multi-table-horizontal .model-name-th {
+      position: sticky;
+      left: 0;
+      background: #131b2e;
+      z-index: 3;
+      text-align: left;
+      color: #00d8ff;
+      font-weight: bold;
+      border-right: 1px solid #1e2d4a;
+    }
 
     /* COLOUR-CODED CELL BADGES */
     .wind-badge {
       display: inline-block;
-      padding: 2px 4px;
+      padding: 2px 5px;
       border-radius: 4px;
       font-weight: bold;
-      width: 95%;
+      min-width: 62px;
     }
 
     .status-green  { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.4); }
@@ -167,7 +178,7 @@
     .status-red    { background: rgba(255, 82, 82, 0.2);   color: #ff5252; border: 1px solid rgba(255, 82, 82, 0.5); }
 
     .dir-arrow { display: inline-block; font-weight: bold; margin-right: 2px; }
-    .gust-val { font-size: 0.65rem; opacity: 0.85; }
+    .gust-val { font-size: 0.62rem; opacity: 0.85; }
 
     /* SEGMENT 2 STYLES */
     .pane-segment {
@@ -209,12 +220,12 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.1.9</div>
+    <div class="rev-badge">REV: 1.2.0</div>
   </div>
 
   <div class="dashboard-container">
     
-    <!-- SEGMENT 1: SATELLITE MAP + MULTI-MODEL HOURLY TABLE -->
+    <!-- SEGMENT 1: SATELLITE MAP + HORIZONTAL MULTI-MODEL TABLE -->
     <div class="segment-1-stack">
       
       <!-- 1A: SATELLITE MAP WITH MULTI-MODEL WIND ROSE -->
@@ -222,7 +233,7 @@
         <div id="map"></div>
       </div>
 
-      <!-- 1B: MULTI-MODEL HOURLY COMPARISON TABLE -->
+      <!-- 1B: HORIZONTAL MULTI-MODEL HOURLY COMPARISON TABLE -->
       <div class="multi-table-card">
         <div class="table-title">
           <span>📊 Hourly Multi-Model Wind Forecast (Dunkeswell)</span>
@@ -234,18 +245,15 @@
           </div>
         </div>
         <div class="table-wrapper">
-          <table class="multi-table">
+          <table class="multi-table-horizontal">
             <thead>
-              <tr>
-                <th style="text-align: left;">Time</th>
-                <th>ECMWF</th>
-                <th>GFS</th>
-                <th>ICON-EU</th>
-                <th>AROME</th>
+              <tr id="header-times-row">
+                <th class="model-name-th">Model \ Time</th>
+                <!-- Hourly columns dynamically populated via JS -->
               </tr>
             </thead>
             <tbody id="multi-model-rows">
-              <tr><td colspan="5" style="padding: 15px; color: #8a99ad;">Fetching Live Model Forecasts...</td></tr>
+              <tr><td colspan="13" style="padding: 15px; color: #8a99ad;">Fetching Live Model Forecasts...</td></tr>
             </tbody>
           </table>
         </div>
@@ -371,7 +379,7 @@
       return 'status-red';
     }
 
-    // 2. FETCH MULTI-MODEL FORECAST DATA (ECMWF, GFS, ICON, AROME)
+    // 2. FETCH AND BUILD TRANSPOSED HORIZONTAL MULTI-MODEL TABLE
     async function fetchModelData() {
       const params = `latitude=${lat}&longitude=${lon}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=mph&forecast_days=1`;
       
@@ -389,13 +397,33 @@
         const arome = await aromeRes.json();
 
         const times = ecmwf.hourly.time;
-        let rowsHTML = '';
+        const models = [
+          { name: 'ECMWF', data: ecmwf },
+          { name: 'GFS', data: gfs },
+          { name: 'ICON-EU', data: icon },
+          { name: 'AROME', data: arome }
+        ];
 
+        // 1. Build Header Row (Times across top)
+        let headerHTML = `<th class="model-name-th">Model \\ Time</th>`;
         for (let i = 8; i <= 19; i++) {
           const timeStr = new Date(times[i]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          headerHTML += `<th>${timeStr}</th>`;
+        }
+        document.getElementById('header-times-row').innerHTML = headerHTML;
 
-          const renderCell = (dataset) => {
-            if (!dataset || !dataset.hourly) return '--';
+        // 2. Build Model Rows (Models down side)
+        let rowsHTML = '';
+        models.forEach(model => {
+          rowsHTML += `<tr><td class="model-name-th">${model.name}</td>`;
+          
+          for (let i = 8; i <= 19; i++) {
+            const dataset = model.data;
+            if (!dataset || !dataset.hourly) {
+              rowsHTML += `<td>--</td>`;
+              continue;
+            }
+
             const speed = Math.round(dataset.hourly.wind_speed_10m[i] || 0);
             const gust = Math.round(dataset.hourly.wind_gusts_10m ? (dataset.hourly.wind_gusts_10m[i] || 0) : speed);
             const dir = dataset.hourly.wind_direction_10m[i];
@@ -403,24 +431,21 @@
             const peak = Math.max(speed, gust);
             const statusClass = getStatusClass(peak);
 
-            return `<div class="wind-badge ${statusClass}">${getArrow(dir)}${speed} <span class="gust-val">G:${gust}</span></div>`;
-          };
-
-          rowsHTML += `
-            <tr>
-              <td style="text-align: left; font-weight: bold; color: #00d8ff;">${timeStr}</td>
-              <td>${renderCell(ecmwf)}</td>
-              <td>${renderCell(gfs)}</td>
-              <td>${renderCell(icon)}</td>
-              <td>${renderCell(arome)}</td>
-            </tr>
-          `;
-        }
+            rowsHTML += `
+              <td>
+                <div class="wind-badge ${statusClass}">
+                  ${getArrow(dir)}${speed} <span class="gust-val">G:${gust}</span>
+                </div>
+              </td>
+            `;
+          }
+          rowsHTML += `</tr>`;
+        });
 
         document.getElementById('multi-model-rows').innerHTML = rowsHTML;
       } catch (err) {
         console.error("Multi-model fetch error:", err);
-        document.getElementById('multi-model-rows').innerHTML = `<tr><td colspan="5" style="padding: 15px; color: #ff5252;">Error parsing model forecasts. Check browser console.</td></tr>`;
+        document.getElementById('multi-model-rows').innerHTML = `<tr><td colspan="13" style="padding: 15px; color: #ff5252;">Error loading forecast data. Check browser console.</td></tr>`;
       }
     }
 
