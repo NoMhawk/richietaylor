@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Skydive Southwest - Dunkeswell Operations Weather</title>
+  <title>Skydive Southwest - Dunkeswell Weather</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
@@ -22,11 +22,16 @@
       margin: 0 auto;
     }
 
-    /* SEGMENT 1: WINDY EMBED CONTAINER */
-    .windy-card {
-      position: relative;
+    /* SEGMENT 1: MAP + WIND FORECAST TABLE */
+    .segment-1-box {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .map-card {
       width: 100%;
-      height: 650px;
+      height: 400px;
       border-radius: 8px;
       overflow: hidden;
       border: 1px solid #1e2d4a;
@@ -34,7 +39,17 @@
       background: #131b2e;
     }
 
-    .windy-iframe {
+    .forecast-card {
+      width: 100%;
+      height: 280px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #1e2d4a;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      background: #131b2e;
+    }
+
+    iframe {
       width: 100%;
       height: 100%;
       border: none;
@@ -47,6 +62,7 @@
       border-radius: 8px;
       padding: 16px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      height: fit-content;
     }
 
     .pane-header {
@@ -81,13 +97,25 @@
 
   <div class="dashboard-container">
     
-    <!-- SEGMENT 1: WINDY EMBEDDED MAP WITH WIND FORECAST TABLE -->
-    <div class="windy-card">
-      <iframe 
-        class="windy-iframe"
-        src="https://embed.windy.com/embed2.html?lat=50.8600&lon=-3.2378&detailLat=50.8600&detailLon=-3.2378&width=100%25&height=650&zoom=11&level=surface&overlay=wind&product=ecmwf&menu=true&message=true&marker=true&calendar=now&pressure=true&type=map&location=coordinates&detail=true&metricWind=kt&metricTemp=%C2%B0C" 
-        allowfullscreen>
-      </iframe>
+    <!-- SEGMENT 1: ANIMATED MAP + WIND FORECAST TABLE -->
+    <div class="segment-1-box">
+      <!-- 1A: ANIMATED WIND STREAM MAP -->
+      <div class="map-card">
+        <iframe 
+          src="https://embed.windy.com/embed2.html?lat=50.8600&lon=-3.2378&width=100%25&height=400&zoom=11&level=surface&overlay=wind&product=ecmwf&menu=true&message=true&marker=true&calendar=now&pressure=true&type=map&location=coordinates&metricWind=kt&metricTemp=%C2%B0C" 
+          allowfullscreen>
+        </iframe>
+      </div>
+
+      <!-- 1B: DETAILED HOURLY WIND FORECAST TABLE & DIRECTION ARROWS -->
+      <div class="forecast-card">
+        <iframe 
+          src="https://www.meteoblue.com/en/weather/widget/three/dunkeswell_united-kingdom_2650013?geoloc=fixed&nocurrent=0&noheader=1&max_days=3&wind_unit=kn&temp_unit=C" 
+          frameborder="0" 
+          scrolling="no" 
+          allowtransparency="true">
+        </iframe>
+      </div>
     </div>
 
     <!-- SEGMENT 2: CLOUD BASE & UPPER WINDS PROFILE -->
