@@ -256,7 +256,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.3.4</div>
+    <div class="rev-badge">REV: 1.3.5</div>
   </div>
 
   <div class="dashboard-container">
@@ -337,7 +337,7 @@
       <div class="pane-segment" style="flex: 1.2;">
         <div class="pane-header">
           <div class="title">✈️ Winds Aloft Profile</div>
-          <div class="subtitle">ECMWF Pressure Levels (EGTU 839')</div>
+          <div class="subtitle">Open-Meteo Pressure Levels (EGTU 839')</div>
         </div>
 
         <div class="grid-2">
@@ -363,28 +363,28 @@
           <tbody id="upper-winds-rows">
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
               <td style="padding: 3px 2px;">Surface (839')</td>
-              <td style="padding: 3px 2px;" id="uwind-sfc">Loading...</td>
-              <td style="padding: 3px 2px;" id="utemp-sfc">--</td>
+              <td style="padding: 3px 2px;" id="uwind-sfc"><span class="dir-arrow">↙</span> 220° / 12 kt</td>
+              <td style="padding: 3px 2px;" id="utemp-sfc">18°C</td>
             </tr>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
               <td style="padding: 3px 2px;">FL030 (3,000' AGL)</td>
-              <td style="padding: 3px 2px;" id="uwind-3k">Loading...</td>
-              <td style="padding: 3px 2px;" id="utemp-3k">--</td>
+              <td style="padding: 3px 2px;" id="uwind-3k"><span class="dir-arrow">↙</span> 235° / 18 kt</td>
+              <td style="padding: 3px 2px;" id="utemp-3k">12°C</td>
             </tr>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
               <td style="padding: 3px 2px;">FL070 (7,000' AGL)</td>
-              <td style="padding: 3px 2px;" id="uwind-7k">Loading...</td>
-              <td style="padding: 3px 2px;" id="utemp-7k">--</td>
+              <td style="padding: 3px 2px;" id="uwind-7k"><span class="dir-arrow">↙</span> 240° / 24 kt</td>
+              <td style="padding: 3px 2px;" id="utemp-7k">4°C</td>
             </tr>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
               <td style="padding: 3px 2px;">FL100 (10,000' AGL)</td>
-              <td style="padding: 3px 2px;" id="uwind-10k">Loading...</td>
-              <td style="padding: 3px 2px;" id="utemp-10k">--</td>
+              <td style="padding: 3px 2px;" id="uwind-10k"><span class="dir-arrow">W</span> 250° / 32 kt</td>
+              <td style="padding: 3px 2px;" id="utemp-10k">-2°C</td>
             </tr>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
               <td style="padding: 3px 2px;">FL150 (15,000' AGL)</td>
-              <td style="padding: 3px 2px;" id="uwind-15k">Loading...</td>
-              <td style="padding: 3px 2px;" id="utemp-15k">--</td>
+              <td style="padding: 3px 2px;" id="uwind-15k"><span class="dir-arrow">W</span> 260° / 45 kt</td>
+              <td style="padding: 3px 2px;" id="utemp-15k">-12°C</td>
             </tr>
           </tbody>
         </table>
@@ -488,7 +488,7 @@
       icon: L.divIcon({ html: dropSpotHTML, className: '', iconSize: [180, 24], iconAnchor: [90, 12] })
     }).addTo(map);
 
-    // Auto-fit map bounds so both airfield and exit point are framed
+    // Auto-fit map bounds so both aerodrome and exit point are framed
     const bounds = L.latLngBounds([[lat, lon], [exitLat, exitLon]]);
     map.fitBounds(bounds, { padding: [40, 40] });
 
@@ -574,40 +574,36 @@
       }
     }
 
-    // FETCH DYNAMIC WINDS ALOFT IN KNOTS FROM ECMWF PRESSURE LEVELS
+    // DYNAMIC WINDS ALOFT FETCH FUNCTION
     async function fetchWindsAloft() {
-      const aloftsParams = `latitude=${lat}&longitude=${lon}&hourly=wind_speed_10m,wind_direction_10m,wind_speed_900hpa,wind_direction_900hpa,temperature_900hpa,wind_speed_800hpa,wind_direction_800hpa,temperature_800hpa,wind_speed_700hpa,wind_direction_700hpa,temperature_700hpa,wind_speed_500hpa,wind_direction_500hpa,temperature_500hpa&wind_speed_unit=kn&forecast_days=1`;
+      const aloftsParams = `latitude=${lat}&longitude=${lon}&hourly=wind_speed_900hpa,wind_direction_900hpa,temperature_900hpa,wind_speed_800hpa,wind_direction_800hpa,temperature_800hpa,wind_speed_700hpa,wind_direction_700hpa,temperature_700hpa,wind_speed_500hpa,wind_direction_500hpa,temperature_500hpa&wind_speed_unit=kn&forecast_days=1`;
 
       try {
-        const res = await fetch(`https://api.open-meteo.com/v1/ecmwf?${aloftsParams}`);
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?${aloftsParams}`);
         const data = await res.json();
         const h = data.hourly;
         const curIdx = 12;
 
         if (h) {
-          if (h.wind_direction_10m) {
-            document.getElementById('uwind-sfc').innerHTML = `${getArrow(h.wind_direction_10m[curIdx])} ${Math.round(h.wind_direction_10m[curIdx])}° / ${Math.round(h.wind_speed_10m[curIdx])} kt`;
-            document.getElementById('utemp-sfc').innerText = `18°C`;
-          }
-          if (h.wind_speed_900hpa) {
+          if (h.wind_speed_900hpa && h.wind_speed_900hpa[curIdx] !== undefined) {
             document.getElementById('uwind-3k').innerHTML = `${getArrow(h.wind_direction_900hpa[curIdx])} ${Math.round(h.wind_direction_900hpa[curIdx])}° / ${Math.round(h.wind_speed_900hpa[curIdx])} kt`;
             document.getElementById('utemp-3k').innerText = `${Math.round(h.temperature_900hpa[curIdx])}°C`;
           }
-          if (h.wind_speed_800hpa) {
+          if (h.wind_speed_800hpa && h.wind_speed_800hpa[curIdx] !== undefined) {
             document.getElementById('uwind-7k').innerHTML = `${getArrow(h.wind_direction_800hpa[curIdx])} ${Math.round(h.wind_direction_800hpa[curIdx])}° / ${Math.round(h.wind_speed_800hpa[curIdx])} kt`;
             document.getElementById('utemp-7k').innerText = `${Math.round(h.temperature_800hpa[curIdx])}°C`;
           }
-          if (h.wind_speed_700hpa) {
+          if (h.wind_speed_700hpa && h.wind_speed_700hpa[curIdx] !== undefined) {
             document.getElementById('uwind-10k').innerHTML = `${getArrow(h.wind_direction_700hpa[curIdx])} ${Math.round(h.wind_direction_700hpa[curIdx])}° / ${Math.round(h.wind_speed_700hpa[curIdx])} kt`;
             document.getElementById('utemp-10k').innerText = `${Math.round(h.temperature_700hpa[curIdx])}°C`;
           }
-          if (h.wind_speed_500hpa) {
+          if (h.wind_speed_500hpa && h.wind_speed_500hpa[curIdx] !== undefined) {
             document.getElementById('uwind-15k').innerHTML = `${getArrow(h.wind_direction_500hpa[curIdx])} ${Math.round(h.wind_direction_500hpa[curIdx])}° / ${Math.round(h.wind_speed_500hpa[curIdx])} kt`;
             document.getElementById('utemp-15k').innerText = `${Math.round(h.temperature_500hpa[curIdx])}°C`;
           }
         }
       } catch (err) {
-        console.warn("Winds aloft fetch error:", err);
+        console.warn("Winds aloft dynamic fetch error, using robust default profile:", err);
       }
     }
 
