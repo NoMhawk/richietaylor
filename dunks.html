@@ -209,10 +209,6 @@
     .card-label { font-size: 0.6rem; color: #8a99ad; text-transform: uppercase; }
     .card-value { font-size: 0.95rem; font-weight: 700; color: #fff; font-family: monospace; margin-top: 2px; }
     .card-sub { font-size: 0.6rem; color: #00e676; margin-top: 2px; }
-
-    .badge { display: inline-block; padding: 2px 5px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; }
-    .badge-ok { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid #00e676; }
-    .badge-warn { background: rgba(255, 171, 0, 0.15); color: #ffab00; border: 1px solid #ffab00; }
   </style>
 </head>
 <body>
@@ -220,7 +216,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.2.0</div>
+    <div class="rev-badge">REV: 1.2.1</div>
   </div>
 
   <div class="dashboard-container">
@@ -277,7 +273,6 @@
         <div class="card">
           <div class="card-label">Density Altitude</div>
           <div class="card-value">1,120 FT</div>
-          <div class="card-sub">+281 FT Offset</div>
         </div>
       </div>
 
@@ -287,7 +282,6 @@
             <th style="text-align: left; padding: 6px 4px;">Altitude</th>
             <th style="text-align: left; padding: 6px 4px;">Dir / Speed (mph)</th>
             <th style="text-align: left; padding: 6px 4px;">Temp</th>
-            <th style="text-align: left; padding: 6px 4px;">Limits</th>
           </tr>
         </thead>
         <tbody>
@@ -295,31 +289,26 @@
             <td style="padding: 6px 4px;">Surface (839')</td>
             <td style="padding: 6px 4px;"><span class="dir-arrow">↙</span> 220° / 14 mph</td>
             <td style="padding: 6px 4px;">18°C</td>
-            <td style="padding: 6px 4px;"><span class="badge badge-ok">STUDENT OK</span></td>
           </tr>
           <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
             <td style="padding: 6px 4px;">3,000' AGL</td>
             <td style="padding: 6px 4px;"><span class="dir-arrow">↙</span> 235° / 21 mph</td>
             <td style="padding: 6px 4px;">12°C</td>
-            <td style="padding: 6px 4px;"><span class="badge badge-ok">TANDEM OK</span></td>
           </tr>
           <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
             <td style="padding: 6px 4px;">7,000' AGL</td>
             <td style="padding: 6px 4px;"><span class="dir-arrow">↙</span> 240° / 28 mph</td>
             <td style="padding: 6px 4px;">4°C</td>
-            <td style="padding: 6px 4px;"><span class="badge badge-ok">HOP & POP</span></td>
           </tr>
           <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
             <td style="padding: 6px 4px;">10,000' AGL</td>
             <td style="padding: 6px 4px;"><span class="dir-arrow">W</span> 250° / 37 mph</td>
             <td style="padding: 6px 4px;">-2°C</td>
-            <td style="padding: 6px 4px;"><span class="badge badge-warn">MOD DRIFT</span></td>
           </tr>
           <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
             <td style="padding: 6px 4px;">15,000' AGL</td>
             <td style="padding: 6px 4px;"><span class="dir-arrow">W</span> 260° / 52 mph</td>
             <td style="padding: 6px 4px;">-12°C</td>
-            <td style="padding: 6px 4px;"><span class="badge badge-warn">HIGH DRIFT</span></td>
           </tr>
         </tbody>
       </table>
@@ -404,7 +393,6 @@
           { name: 'AROME', data: arome }
         ];
 
-        // 1. Build Header Row (Times across top)
         let headerHTML = `<th class="model-name-th">Model \\ Time</th>`;
         for (let i = 8; i <= 19; i++) {
           const timeStr = new Date(times[i]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -412,7 +400,6 @@
         }
         document.getElementById('header-times-row').innerHTML = headerHTML;
 
-        // 2. Build Model Rows (Models down side)
         let rowsHTML = '';
         models.forEach(model => {
           rowsHTML += `<tr><td class="model-name-th">${model.name}</td>`;
