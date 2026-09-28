@@ -52,10 +52,26 @@
       margin: 0 auto;
     }
 
-    /* SEGMENT 1: UNIFIED MAP + FORECAST DRAWER */
-    .windy-card {
+    /* SEGMENT 1: MAP + FORECAST TABLE SPLIT CONTAINER */
+    .segment-1-box {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .map-card {
       width: 100%;
-      height: 750px;
+      height: 480px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #1e2d4a;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      background: #131b2e;
+    }
+
+    .forecast-card {
+      width: 100%;
+      height: 250px;
       border-radius: 8px;
       overflow: hidden;
       border: 1px solid #1e2d4a;
@@ -112,17 +128,28 @@
   <!-- PAGE HEADER & REVISION BADGE -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.0.2</div>
+    <div class="rev-badge">REV: 1.0.3</div>
   </div>
 
   <div class="dashboard-container">
     
-    <!-- SEGMENT 1: WINDY EMBED WITH FORCED SPOT FORECAST DRAWER -->
-    <div class="windy-card">
-      <iframe 
-        src="https://embed.windy.com/embed2.html?lat=50.8600&lon=-3.2378&detailLat=50.8600&detailLon=-3.2378&width=100%25&height=750&zoom=11&level=surface&overlay=wind&product=ecmwf&menu=true&message=true&marker=true&calendar=now&pressure=true&type=map&location=coordinates&detail=true&metricWind=kt&metricTemp=%C2%B0C" 
-        allowfullscreen>
-      </iframe>
+    <!-- SEGMENT 1: WINDY ANIMATED MAP + HOURLY FORECAST TABLE -->
+    <div class="segment-1-box">
+      <!-- 1A: ANIMATED WIND SPEED & DIRECTION MAP OVERLAY -->
+      <div class="map-card">
+        <iframe 
+          src="https://embed.windy.com/embed2.html?lat=50.8600&lon=-3.2378&width=100%25&height=480&zoom=11&level=surface&overlay=wind&product=ecmwf&menu=true&message=true&marker=true&calendar=now&pressure=true&type=map&location=coordinates&detail=false&metricWind=kt&metricTemp=%C2%B0C" 
+          allowfullscreen>
+        </iframe>
+      </div>
+
+      <!-- 1B: SPOT FORECAST TABLE (HOURLY WIND, GUSTS, TEMPERATURE) -->
+      <div class="forecast-card">
+        <iframe 
+          src="https://embed.windy.com/embed2.html?lat=50.8600&lon=-3.2378&detailLat=50.8600&detailLon=-3.2378&width=100%25&height=250&zoom=11&level=surface&overlay=wind&product=ecmwf&menu=false&message=false&marker=true&calendar=now&pressure=false&type=forecast&location=coordinates&detail=true&metricWind=kt&metricTemp=%C2%B0C" 
+          allowfullscreen>
+        </iframe>
+      </div>
     </div>
 
     <!-- SEGMENT 2: CLOUD BASE & UPPER WINDS PROFILE -->
