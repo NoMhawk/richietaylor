@@ -52,7 +52,7 @@
       margin: 0 auto;
     }
 
-    /* SEGMENT 1: MAP + FORECAST TABLE SPLIT CONTAINER */
+    /* SEGMENT 1: MAP & HOURLY TABLE DUAL STACK */
     .segment-1-box {
       display: flex;
       flex-direction: column;
@@ -71,7 +71,7 @@
 
     .forecast-card {
       width: 100%;
-      height: 250px;
+      height: 280px;
       border-radius: 8px;
       overflow: hidden;
       border: 1px solid #1e2d4a;
@@ -128,14 +128,14 @@
   <!-- PAGE HEADER & REVISION BADGE -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.0.3</div>
+    <div class="rev-badge">REV: 1.0.4</div>
   </div>
 
   <div class="dashboard-container">
     
-    <!-- SEGMENT 1: WINDY ANIMATED MAP + HOURLY FORECAST TABLE -->
+    <!-- SEGMENT 1: WIND MAP + HOURLY FORECAST TABLE -->
     <div class="segment-1-box">
-      <!-- 1A: ANIMATED WIND SPEED & DIRECTION MAP OVERLAY -->
+      <!-- 1A: ANIMATED COLORED WIND MAP OVERLAY -->
       <div class="map-card">
         <iframe 
           src="https://embed.windy.com/embed2.html?lat=50.8600&lon=-3.2378&width=100%25&height=480&zoom=11&level=surface&overlay=wind&product=ecmwf&menu=true&message=true&marker=true&calendar=now&pressure=true&type=map&location=coordinates&detail=false&metricWind=kt&metricTemp=%C2%B0C" 
@@ -143,10 +143,10 @@
         </iframe>
       </div>
 
-      <!-- 1B: SPOT FORECAST TABLE (HOURLY WIND, GUSTS, TEMPERATURE) -->
+      <!-- 1B: HOURLY WIND FORECAST TABLE WITH DIRECTION ARROWS -->
       <div class="forecast-card">
         <iframe 
-          src="https://embed.windy.com/embed2.html?lat=50.8600&lon=-3.2378&detailLat=50.8600&detailLon=-3.2378&width=100%25&height=250&zoom=11&level=surface&overlay=wind&product=ecmwf&menu=false&message=false&marker=true&calendar=now&pressure=false&type=forecast&location=coordinates&detail=true&metricWind=kt&metricTemp=%C2%B0C" 
+          src="https://embed.windy.com/embed2.html?lat=50.8600&lon=-3.2378&detailLat=50.8600&detailLon=-3.2378&width=100%25&height=280&zoom=11&level=surface&overlay=wind&product=ecmwf&menu=false&message=false&marker=true&calendar=now&pressure=false&type=forecast&location=coordinates&detail=true&metricWind=kt&metricTemp=%C2%B0C" 
           allowfullscreen>
         </iframe>
       </div>
