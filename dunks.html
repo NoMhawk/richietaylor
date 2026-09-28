@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Skydive Southwest - Weather Dashboard Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Leaflet & Windy Web API SDK -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
+  <script src="https://api.windy.com/assets/map-forecast/lib/tomtom.min.js"></script>
+  <script src="https://api.windy.com/assets/map-forecast/lib/windySdk.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0b0f19;
+      color: #f0f4f8;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding: 16px;
+    }
+
+    .dashboard-container {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* SEGMENT 1 CONTAINER */
+    #windy-container {
+      position: relative;
+      width: 100%;
+      height: 600px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #1e2d4a;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+
+    #windy {
+      width: 100%;
+      height: 100%;
+    }
+
+    .bottom-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(19, 27, 46, 0.92);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid #1e2d4a;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .info-group { display: flex; gap: 20px; }
+    .stat-item { display: flex; flex-direction: column; }
+    .stat-label { font-size: 0.65rem; color: #8a99ad; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-val { font-size: 1.1rem; font-weight: 700; color: #00d8ff; font-family: monospace; margin-top: 2px; }
+    .stat-sub { font-size: 0.65rem; color: #00e676; }
+
+    .model-btn {
+      background: #131b2e;
+      border: 1px solid #1e2d4a;
+      color: #f0f4f8;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-left: 4px;
+    }
+    .model-btn.active { background: #0088ff; border-color: #0088ff; }
+
+    /* SEGMENT 2 CONTAINER */
+    .pane-segment {
+      background: #131b2e;
+      border: 1px solid #1e2d4a;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+
+    .pane-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #1e2d4a;
+      margin-bottom: 14px;
+    }
+
+    .title { font-weight: 700; color: #00d8ff; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .subtitle { font-size: 0.75rem; color: #8a99ad; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .card { background: rgba(0, 0, 0, 0.25); border: 1px solid #1e2d4a; border-radius: 6px; padding: 10px; }
+    .card-label { font-size: 0.65rem; color: #8a99ad; text-transform: uppercase; }
+    .card-value { font-size: 1.1rem; font-weight: 700; color: #fff; font-family: monospace; margin-top: 2px; }
+    .card-sub { font-size: 0.65rem; color: #00e676; margin-top: 2px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    th { text-align: left; padding: 8px 6px; color: #8a99ad; border-bottom: 1px solid #1e2d4a; font-size: 0.7rem; text-transform: uppercase; }
+    td { padding: 8px 6px; border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace; }
+    .arrow { display: inline-block; color: #00d8ff; font-weight: bold; margin-right: 4px; }
+
+    .badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; }
+    .badge-ok { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid #00e676; }
+    .badge-warn { background: rgba(255, 171, 0, 0.15); color: #ffab00; border: 1px solid #ffab00; }
+  </style>
+</head>
+<body>
+
+  <div class="dashboard-container">
+    
+    <!-- SEGMENT 1: WINDY API MAP -->
+    <div id="windy-container">
+      <div id="windy"></div>
+      <div class="bottom-bar">
+        <div class="info-group">
+          <div class="stat-item">
+            <div class="stat-label">Spot</div>
+            <div class="stat-val">Dunkeswell EGTU</div>
+            <div class="stat-sub">839' MSL</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Surface Wind</div>
+            <div id="wind-speed" class="stat-val">-- kt</div>
+            <div id="wind-dir" class="stat-sub">--°</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Gusts</div>
+            <div id="wind-gust" class="stat-val" style="color: #ffab00;">-- kt</div>
+            <div class="stat-sub">Peak</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Temp</div>
+            <div id="temp-val" class="stat-val">-- °C</div>
+            <div class="stat-sub">Surface</div>
+          </div>
+        </div>
+
+        <div>
+          <button class="model-btn active" onclick="setModel('ecmwf')">ECMWF</button>
+          <button class="model-btn" onclick="setModel('gfs')">GFS</button>
+          <button class="model-btn" onclick="setModel('iconEu')">ICON-EU</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEGMENT 2: CLOUD & UPPER WINDS PROFILE -->
+    <div class="pane-segment">
+      <div class="pane-header">
+        <div class="title">☁️ Cloud Base & Upper Winds</div>
+        <div class="subtitle">Dunkeswell EGTU</div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-label">Cloud Base Ceiling</div>
+          <div class="card-value">SCT 4,500'</div>
+          <div class="card-sub">BKN at 12,000' AGL</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Density Altitude</div>
+          <div class="card-value">1,120 FT</div>
+          <div class="card-sub">+281 FT Offset</div>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Altitude</th>
+            <th>Dir / Speed</th>
+            <th>Temp</th>
+            <th>Limits</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Surface (839')</td>
+            <td><span class="arrow">↙</span> 220° / 12 kt</td>
+            <td>18°C</td>
+            <td><span class="badge badge-ok">STUDENT OK</span></td>
+          </tr>
+          <tr>
+            <td>3,000' AGL</td>
+            <td><span class="arrow">↙</span> 235° / 18 kt</td>
+            <td>12°C</td>
+            <td><span class="badge badge-ok">TANDEM OK</span></td>
+          </tr>
+          <tr>
+            <td>7,000' AGL</td>
+            <td><span class="arrow">↙</span> 240° / 24 kt</td>
+            <td>4°C</td>
+            <td><span class="badge badge-ok">HOP & POP</span></td>
+          </tr>
+          <tr>
+            <td>10,000' AGL</td>
+            <td><span class="arrow">W</span> 250° / 32 kt</td>
+            <td>-2°C</td>
+            <td><span class="badge badge-warn">MOD DRIFT</span></td>
+          </tr>
+          <tr>
+            <td>15,000' AGL</td>
+            <td><span class="arrow">W</span> 260° / 45 kt</td>
+            <td>-12°C</td>
+            <td><span class="badge badge-warn">HIGH DRIFT</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <script>
+    const WINDY_API_KEY = 'L70kFIN8BjgywE9aoZW9fjxjZl8WGpuM';
+    const lat = 50.8600;
+    const lon = -3.2378;
+
+    const options = {
+      key: WINDY_API_KEY,
+      lat: lat,
+      lon: lon,
+      zoom: 12,
+      overlay: 'wind',
+      product: 'ecmwf',
+      metricWind: 'kt',
+      metricTemp: '°C'
+    };
+
+    let windyStore = null;
+
+    windyInit(options, windyAPI => {
+      const { map, picker, store } = windyAPI;
+      windyStore = store;
+
+      picker.open({ lat: lat, lon: lon });
+      picker.on('pickerOpened', params => updateBar(params));
+      picker.on('pickerMoved', params => updateBar(params));
+    });
+
+    function updateBar(params) {
+      if (!params) return;
+      if (params.wind) {
+        document.getElementById('wind-speed').textContent = `${Math.round(params.wind.wind)} kt`;
+        document.getElementById('wind-dir').textContent = `${Math.round(params.wind.dir)}°`;
+      }
+      if (params.gust) {
+        document.getElementById('wind-gust').textContent = `${Math.round(params.gust)} kt`;
+      }
+      if (params.temp) {
+        document.getElementById('temp-val').textContent = `${Math.round(params.temp)}°C`;
+      }
+    }
+
+    function setModel(model) {
+      if (windyStore) {
+        windyStore.set('product', model);
+        document.querySelectorAll('.model-btn').forEach(btn => btn.classList.remove('active'));
+        if (event && event.target) event.target.classList.add('active');
+      }
+    }
+  </script>
+</body>
+</html>
