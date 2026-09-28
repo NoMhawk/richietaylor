@@ -15,7 +15,7 @@
     html, body {
       width: 100%;
       height: 100vh;
-      overflow: hidden; /* Prevents page scrolling on TV/Widescreen monitors */
+      overflow: hidden;
       background: #0b0f19;
       color: #f0f4f8;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -52,7 +52,6 @@
       box-shadow: 0 0 10px rgba(0, 136, 255, 0.4);
     }
 
-    /* WIDESCREEN DASHBOARD CONTAINER */
     .dashboard-container {
       display: grid;
       grid-template-columns: 1.8fr 1fr;
@@ -68,7 +67,6 @@
       height: 100%;
     }
 
-    /* 1A: SATELLITE MAP */
     .map-card {
       position: relative;
       width: 100%;
@@ -83,7 +81,6 @@
 
     #map { width: 100%; height: 100%; }
 
-    /* 1B: HORIZONTAL MULTI-MODEL HOURLY COMPARISON TABLE */
     .multi-table-card {
       width: 100%;
       flex: 1 1 35%;
@@ -97,7 +94,6 @@
       overflow: hidden;
     }
 
-    /* 1C: DROP SPOT CALCULATOR CARD */
     .dropspot-card {
       width: 100%;
       background: #131b2e;
@@ -173,7 +169,6 @@
       border-right: 1px solid #1e2d4a;
     }
 
-    /* COLOUR-CODED CELL BADGES */
     .wind-badge {
       display: inline-block;
       padding: 2px 4px;
@@ -190,7 +185,6 @@
     .dir-arrow { display: inline-block; font-weight: bold; margin-right: 2px; }
     .gust-val { font-size: 0.6rem; opacity: 0.85; }
 
-    /* SEGMENTS 2, 3, & 4 STYLES */
     .pane-segment {
       background: #131b2e;
       border: 1px solid #1e2d4a;
@@ -233,7 +227,6 @@
       word-break: break-all;
     }
 
-    /* SEGMENT 4: MINIMALIST LIVE RAIN RADAR */
     .radar-frame-box {
       position: relative;
       width: 100%;
@@ -256,7 +249,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.3.6</div>
+    <div class="rev-badge">REV: 1.3.7</div>
   </div>
 
   <div class="dashboard-container">
@@ -264,7 +257,7 @@
     <!-- SEGMENT 1: SATELLITE MAP + HORIZONTAL MODEL TABLE + DROP SPOT CALCULATOR -->
     <div class="segment-1-stack">
       
-      <!-- 1A: SATELLITE MAP WITH MULTI-MODEL WIND ROSE & ACCURATE EGTU COORDS -->
+      <!-- 1A: SATELLITE MAP WITH DYNAMIC LIVE WIND ROSE -->
       <div class="map-card">
         <div id="map"></div>
       </div>
@@ -272,7 +265,7 @@
       <!-- 1B: HORIZONTAL MULTI-MODEL HOURLY COMPARISON TABLE -->
       <div class="multi-table-card">
         <div class="table-title">
-          <span>📊 Hourly Multi-Model Wind Forecast (Dunkeswell EGTU: 50.8683° N, 3.2383° W)</span>
+          <span>📊 Hourly Multi-Model Wind Forecast (Dunkeswell EGTU)</span>
           <div class="legend-bar">
             <div class="legend-item"><div class="legend-box" style="background:#00e676;"></div> ≤15 (All)</div>
             <div class="legend-item"><div class="legend-box" style="background:#ffee58;"></div> 16-20 (Lic)</div>
@@ -294,7 +287,7 @@
         </div>
       </div>
 
-      <!-- 1C: CLEAR DROP SPOT & JUMP RUN CALCULATOR WITH MAP COORDINATES -->
+      <!-- 1C: CLEAR DROP SPOT & JUMP RUN CALCULATOR -->
       <div class="dropspot-card">
         <div class="table-title" style="margin-bottom: 6px;">
           <span>🎯 Calculated Clear Drop Spot & Exit Point (15,000' AGL)</span>
@@ -302,23 +295,23 @@
         <div class="grid-5">
           <div class="card">
             <div class="card-label">Suggested Jump Run</div>
-            <div class="card-value" style="color: #00d8ff;" id="calc-jumprun">090° (Easterly Flow)</div>
+            <div class="card-value" style="color: #00d8ff;" id="calc-jumprun">--</div>
             <div class="card-sub">Head-Wind Axis</div>
           </div>
           <div class="card">
             <div class="card-label">Calculated Offset</div>
-            <div class="card-value" style="color: #ffee58;">0.85 NM</div>
-            <div class="card-sub">Upwind @ East</div>
+            <div class="card-value" style="color: #ffee58;" id="calc-offset">--</div>
+            <div class="card-sub">Upwind Vector</div>
           </div>
           <div class="card">
             <div class="card-label">Exit Map Coordinates</div>
-            <div class="card-value" style="color: #00e676; font-size: 0.75rem;" id="calc-coords">50.8683, -3.2160</div>
+            <div class="card-value" style="color: #00e676; font-size: 0.75rem;" id="calc-coords">50.8683, -3.2383</div>
             <div class="card-sub">WGS84 Lat / Lon</div>
           </div>
           <div class="card">
             <div class="card-label">OS Grid Reference</div>
             <div class="card-value" style="color: #fff; font-size: 0.8rem;">ST 132 081</div>
-            <div class="card-sub">Dunkeswell East</div>
+            <div class="card-sub">Dunkeswell EGTU</div>
           </div>
           <div class="card">
             <div class="card-label">Opening Target</div>
@@ -337,7 +330,7 @@
       <div class="pane-segment" style="flex: 1.2;">
         <div class="pane-header">
           <div class="title">✈️ Winds Aloft Profile</div>
-          <div class="subtitle">EGTU (839' MSL / 50.8683° N, 3.2383° W)</div>
+          <div class="subtitle">Open-Meteo Pressure Levels (EGTU 839')</div>
         </div>
 
         <div class="grid-2">
@@ -363,27 +356,27 @@
           <tbody id="upper-winds-rows">
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
               <td style="padding: 3px 2px;">Surface (839')</td>
-              <td style="padding: 3px 2px;" id="uwind-sfc">--</td>
+              <td style="padding: 3px 2px;" id="uwind-sfc">Loading...</td>
               <td style="padding: 3px 2px;" id="utemp-sfc">--</td>
             </tr>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
               <td style="padding: 3px 2px;">FL030 (3,000' AGL)</td>
-              <td style="padding: 3px 2px;" id="uwind-3k">--</td>
+              <td style="padding: 3px 2px;" id="uwind-3k">Loading...</td>
               <td style="padding: 3px 2px;" id="utemp-3k">--</td>
             </tr>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
               <td style="padding: 3px 2px;">FL070 (7,000' AGL)</td>
-              <td style="padding: 3px 2px;" id="uwind-7k">--</td>
+              <td style="padding: 3px 2px;" id="uwind-7k">Loading...</td>
               <td style="padding: 3px 2px;" id="utemp-7k">--</td>
             </tr>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
               <td style="padding: 3px 2px;">FL100 (10,000' AGL)</td>
-              <td style="padding: 3px 2px;" id="uwind-10k">--</td>
+              <td style="padding: 3px 2px;" id="uwind-10k">Loading...</td>
               <td style="padding: 3px 2px;" id="utemp-10k">--</td>
             </tr>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
               <td style="padding: 3px 2px;">FL150 (15,000' AGL)</td>
-              <td style="padding: 3px 2px;" id="uwind-15k">--</td>
+              <td style="padding: 3px 2px;" id="uwind-15k">Loading...</td>
               <td style="padding: 3px 2px;" id="utemp-15k">--</td>
             </tr>
           </tbody>
@@ -437,66 +430,23 @@
   </div>
 
   <script>
-    // EXACT DUNKESWELL AERODROME (EGTU) COORDINATES
+    // EXACT EGTU RUNWAY INTERSECTION COORDINATES
     const lat = 50.8683;
     const lon = -3.2383;
-    const exitLat = 50.8683;
-    const exitLon = -3.2160;
 
-    // 1. LEAFLET SATELLITE MAP WITH ACCURATE EGTU FIT
-    const map = L.map('map');
+    // 1. LEAFLET SATELLITE MAP
+    const map = L.map('map').setView([lat, lon], 14);
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       maxZoom: 19,
       maxNativeZoom: 18
     }).addTo(map);
 
-    // Multi-Model Wind Rose Overlay at Aerodrome Center
-    const windRoseHTML = `
-      <div style="position: relative; width: 220px; height: 220px; pointer-events: none;">
-        <svg width="220" height="220" style="position: absolute; top:0; left:0;">
-          <circle cx="110" cy="110" r="80" stroke="#ffffff" stroke-opacity="0.5" stroke-width="1.5" fill="none" />
-          <circle cx="110" cy="110" r="6" fill="#ffffff" stroke="#000" stroke-width="2"/>
-        </svg>
-        <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(90deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
-          <div style="background: rgba(163, 255, 180, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 140px; margin-left: 10px;">
-            11 G:15 mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">AROME-HD</span>
-          </div>
-        </div>
-        <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(85deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
-          <div style="background: rgba(194, 255, 210, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 120px; margin-left: 10px;">
-            10 G:13 mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">GFS</span>
-          </div>
-        </div>
-        <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(95deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
-          <div style="background: rgba(0, 240, 255, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 130px; margin-left: 10px;">
-            11 G:14 mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">ECMWF</span>
-          </div>
-        </div>
-      </div>
-    `;
+    let windRoseMarker = null;
+    let exitSpotMarker = null;
 
-    L.marker([lat, lon], {
-      icon: L.divIcon({ html: windRoseHTML, className: '', iconSize: [220, 220], iconAnchor: [110, 110] })
-    }).addTo(map);
-
-    // Exit Point Target Marker
-    const dropSpotHTML = `
-      <div style="background: #ffee58; color: #000; padding: 4px 8px; border-radius: 12px; font-weight: bold; font-family: monospace; font-size: 10px; border: 2px solid #000; box-shadow: 0 0 12px #ffee58; white-space: nowrap;">
-        🎯 EXIT POINT (50.8683, -3.2160)
-      </div>
-    `;
-    L.marker([exitLat, exitLon], {
-      icon: L.divIcon({ html: dropSpotHTML, className: '', iconSize: [180, 24], iconAnchor: [90, 12] })
-    }).addTo(map);
-
-    // Frame Dunkeswell Airfield and Exit Point
-    const bounds = L.latLngBounds([[lat, lon], [exitLat, exitLon]]);
-    map.fitBounds(bounds, { padding: [40, 40] });
-
-    // METEOROLOGICAL DIRECTION ARROW ROTATION (Pointing in the direction wind is blowing TO)
     function getArrow(deg) {
       if (deg === undefined || deg === null) return '↑';
-      // Rotate standard arrow to match meteorological 'from' direction
+      // Rotate arrow so it points in the direction wind is blowing TO (downwind drift)
       const rotateDeg = (deg + 180) % 360;
       return `<span class="dir-arrow" style="transform: rotate(${rotateDeg}deg); display: inline-block;">↑</span>`;
     }
@@ -508,7 +458,73 @@
       return 'status-red';
     }
 
-    // 2. FETCH MULTI-MODEL SURFACE FORECAST FOR EXACT EGTU COORDS
+    function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
+      if (windRoseMarker) map.removeLayer(windRoseMarker);
+
+      const aromeRot = (aromeDir + 180) % 360;
+      const gfsRot = (gfsDir + 180) % 360;
+      const ecmwfRot = (ecmwfDir + 180) % 360;
+
+      const windRoseHTML = `
+        <div style="position: relative; width: 220px; height: 220px; pointer-events: none;">
+          <svg width="220" height="220" style="position: absolute; top:0; left:0;">
+            <circle cx="110" cy="110" r="80" stroke="#ffffff" stroke-opacity="0.5" stroke-width="1.5" fill="none" />
+            <circle cx="110" cy="110" r="6" fill="#ffffff" stroke="#000" stroke-width="2"/>
+          </svg>
+          <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(${aromeRot}deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
+            <div style="background: rgba(163, 255, 180, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 140px; margin-left: 10px;">
+              ${aromeSpd} G:${aromeGst} mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">AROME-HD</span>
+            </div>
+          </div>
+          <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(${gfsRot}deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
+            <div style="background: rgba(194, 255, 210, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 120px; margin-left: 10px;">
+              ${gfsSpd} G:${gfsGst} mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">GFS</span>
+            </div>
+          </div>
+          <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(${ecmwfRot}deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
+            <div style="background: rgba(0, 240, 255, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 130px; margin-left: 10px;">
+              ${ecmwfSpd} G:${ecmwfGst} mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">ECMWF</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      windRoseMarker = L.marker([lat, lon], {
+        icon: L.divIcon({ html: windRoseHTML, className: '', iconSize: [220, 220], iconAnchor: [110, 110] })
+      }).addTo(map);
+    }
+
+    function updateDropSpotMarker(avgDir, avgSpd) {
+      if (exitSpotMarker) map.removeLayer(exitSpotMarker);
+
+      // Compute upwind offset (1.0 NM displacement into wind)
+      const offsetNM = 0.95;
+      const rad = (avgDir * Math.PI) / 180;
+      const dLat = (offsetNM / 60) * Math.cos(rad);
+      const dLon = (offsetNM / (60 * Math.cos((lat * Math.PI) / 180))) * Math.sin(rad);
+
+      const exitLat = lat + dLat;
+      const exitLon = lon + dLon;
+
+      const dropSpotHTML = `
+        <div style="background: #ffee58; color: #000; padding: 4px 8px; border-radius: 12px; font-weight: bold; font-family: monospace; font-size: 10px; border: 2px solid #000; box-shadow: 0 0 12px #ffee58; white-space: nowrap;">
+          🎯 EXIT POINT (${exitLat.toFixed(4)}, ${exitLon.toFixed(4)})
+        </div>
+      `;
+
+      exitSpotMarker = L.marker([exitLat, exitLon], {
+        icon: L.divIcon({ html: dropSpotHTML, className: '', iconSize: [180, 24], iconAnchor: [90, 12] })
+      }).addTo(map);
+
+      document.getElementById('calc-jumprun').innerText = `${Math.round(avgDir)}° (Headwind)`;
+      document.getElementById('calc-offset').innerText = `${offsetNM} NM`;
+      document.getElementById('calc-coords').innerText = `${exitLat.toFixed(4)}, ${exitLon.toFixed(4)}`;
+
+      const bounds = L.latLngBounds([[lat, lon], [exitLat, exitLon]]);
+      map.fitBounds(bounds, { padding: [40, 40] });
+    }
+
+    // 2. FETCH MULTI-MODEL SURFACE FORECAST DATA
     async function fetchModelData() {
       const surfaceParams = `latitude=${lat}&longitude=${lon}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=mph&forecast_days=1`;
       
@@ -534,8 +550,13 @@
         ];
 
         let headerHTML = `<th class="model-name-th">Model \\ Time</th>`;
+        const nowHour = new Date().getHours();
+        let currentIdx = 12;
+
         for (let i = 8; i <= 19; i++) {
-          const timeStr = new Date(times[i]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          const timeDate = new Date(times[i]);
+          if (timeDate.getHours() === nowHour) currentIdx = i;
+          const timeStr = timeDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
           headerHTML += `<th>${timeStr}</th>`;
         }
         document.getElementById('header-times-row').innerHTML = headerHTML;
@@ -571,41 +592,72 @@
 
         document.getElementById('multi-model-rows').innerHTML = rowsHTML;
 
-        // FETCH WINDS ALOFT DATA
-        fetchWindsAloft();
+        // DYNAMICALLY UPDATE WIND ROSE WITH CURRENT HOUR MODEL DATA
+        const aromeDir = arome.hourly ? arome.hourly.wind_direction_10m[currentIdx] : 90;
+        const aromeSpd = arome.hourly ? Math.round(arome.hourly.wind_speed_10m[currentIdx]) : 11;
+        const aromeGst = arome.hourly ? Math.round(arome.hourly.wind_gusts_10m[currentIdx]) : 15;
+
+        const gfsDir = gfs.hourly ? gfs.hourly.wind_direction_10m[currentIdx] : 90;
+        const gfsSpd = gfs.hourly ? Math.round(gfs.hourly.wind_speed_10m[currentIdx]) : 10;
+        const gfsGst = gfs.hourly ? Math.round(gfs.hourly.wind_gusts_10m[currentIdx]) : 13;
+
+        const ecmwfDir = ecmwf.hourly ? ecmwf.hourly.wind_direction_10m[currentIdx] : 90;
+        const ecmwfSpd = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_speed_10m[currentIdx]) : 11;
+        const ecmwfGst = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_gusts_10m[currentIdx]) : 14;
+
+        updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst);
+
+        const avgDir = (aromeDir + gfsDir + ecmwfDir) / 3;
+        const avgSpd = (aromeSpd + gfsSpd + ecmwfSpd) / 3;
+        updateDropSpotMarker(avgDir, avgSpd);
+
+        // FETCH WINDS ALOFT SEPARATELY
+        fetchWindsAloft(currentIdx);
       } catch (err) {
         console.error("Multi-model fetch error:", err);
       }
     }
 
-    // WINDS ALOFT FETCH FOR EXACT DUNKESWELL COORDS
-    async function fetchWindsAloft() {
-      const aloftsParams = `latitude=${lat}&longitude=${lon}&hourly=wind_speed_10m,wind_direction_10m,wind_speed_900hpa,wind_direction_900hpa,temperature_900hpa,wind_speed_800hpa,wind_direction_800hpa,temperature_800hpa,wind_speed_700hpa,wind_direction_700hpa,temperature_700hpa,wind_speed_500hpa,wind_direction_500hpa,temperature_500hpa&wind_speed_unit=kn&forecast_days=1`;
+    // WINDS ALOFT FETCH FUNCTION (Converts m/s or km/h to Knots)
+    async function fetchWindsAloft(idx) {
+      const aloftsParams = `latitude=${lat}&longitude=${lon}&hourly=wind_speed_10m,wind_direction_10m,wind_speed_900hpa,wind_direction_900hpa,temperature_900hpa,wind_speed_800hpa,wind_direction_800hpa,temperature_800hpa,wind_speed_700hpa,wind_direction_700hpa,temperature_700hpa,wind_speed_500hpa,wind_direction_500hpa,temperature_500hpa&forecast_days=1`;
 
       try {
-        const res = await fetch(`https://api.open-meteo.com/v1/ecmwf?${aloftsParams}`);
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?${aloftsParams}`);
         const data = await res.json();
         const h = data.hourly;
-        const curIdx = 12;
+        const curIdx = idx || 12;
+
+        const toKnots = (kmh) => Math.round((kmh || 0) * 0.539957);
 
         if (h) {
-          document.getElementById('uwind-sfc').innerHTML = `${getArrow(h.wind_direction_10m ? h.wind_direction_10m[curIdx] : 90)} ${Math.round(h.wind_direction_10m ? h.wind_direction_10m[curIdx] : 90)}° / ${Math.round(h.wind_speed_10m ? h.wind_speed_10m[curIdx] : 10)} kt`;
-          document.getElementById('utemp-sfc').innerText = `18°C`;
+          if (h.wind_speed_10m) {
+            document.getElementById('uwind-sfc').innerHTML = `${getArrow(h.wind_direction_10m[curIdx])} ${Math.round(h.wind_direction_10m[curIdx])}° / ${toKnots(h.wind_speed_10m[curIdx])} kt`;
+            document.getElementById('utemp-sfc').innerText = `18°C`;
+          }
 
-          document.getElementById('uwind-3k').innerHTML = `${getArrow(h.wind_direction_900hpa ? h.wind_direction_900hpa[curIdx] : 85)} ${Math.round(h.wind_direction_900hpa ? h.wind_direction_900hpa[curIdx] : 85)}° / ${Math.round(h.wind_speed_900hpa ? h.wind_speed_900hpa[curIdx] : 14)} kt`;
-          document.getElementById('utemp-3k').innerText = `${Math.round(h.temperature_900hpa ? h.temperature_900hpa[curIdx] : 12)}°C`;
+          if (h.wind_speed_900hpa) {
+            document.getElementById('uwind-3k').innerHTML = `${getArrow(h.wind_direction_900hpa[curIdx])} ${Math.round(h.wind_direction_900hpa[curIdx])}° / ${toKnots(h.wind_speed_900hpa[curIdx])} kt`;
+            document.getElementById('utemp-3k').innerText = `${Math.round(h.temperature_900hpa[curIdx])}°C`;
+          }
 
-          document.getElementById('uwind-7k').innerHTML = `${getArrow(h.wind_direction_800hpa ? h.wind_direction_800hpa[curIdx] : 80)} ${Math.round(h.wind_direction_800hpa ? h.wind_direction_800hpa[curIdx] : 80)}° / ${Math.round(h.wind_speed_800hpa ? h.wind_speed_800hpa[curIdx] : 18)} kt`;
-          document.getElementById('utemp-7k').innerText = `${Math.round(h.temperature_800hpa ? h.temperature_800hpa[curIdx] : 4)}°C`;
+          if (h.wind_speed_800hpa) {
+            document.getElementById('uwind-7k').innerHTML = `${getArrow(h.wind_direction_800hpa[curIdx])} ${Math.round(h.wind_direction_800hpa[curIdx])}° / ${toKnots(h.wind_speed_800hpa[curIdx])} kt`;
+            document.getElementById('utemp-7k').innerText = `${Math.round(h.temperature_800hpa[curIdx])}°C`;
+          }
 
-          document.getElementById('uwind-10k').innerHTML = `${getArrow(h.wind_direction_700hpa ? h.wind_direction_700hpa[curIdx] : 75)} ${Math.round(h.wind_direction_700hpa ? h.wind_direction_700hpa[curIdx] : 75)}° / ${Math.round(h.wind_speed_700hpa ? h.wind_speed_700hpa[curIdx] : 24)} kt`;
-          document.getElementById('utemp-10k').innerText = `${Math.round(h.temperature_700hpa ? h.temperature_700hpa[curIdx] : -2)}°C`;
+          if (h.wind_speed_700hpa) {
+            document.getElementById('uwind-10k').innerHTML = `${getArrow(h.wind_direction_700hpa[curIdx])} ${Math.round(h.wind_direction_700hpa[curIdx])}° / ${toKnots(h.wind_speed_700hpa[curIdx])} kt`;
+            document.getElementById('utemp-10k').innerText = `${Math.round(h.temperature_700hpa[curIdx])}°C`;
+          }
 
-          document.getElementById('uwind-15k').innerHTML = `${getArrow(h.wind_direction_500hpa ? h.wind_direction_500hpa[curIdx] : 70)} ${Math.round(h.wind_direction_500hpa ? h.wind_direction_500hpa[curIdx] : 70)}° / ${Math.round(h.wind_speed_500hpa ? h.wind_speed_500hpa[curIdx] : 32)} kt`;
-          document.getElementById('utemp-15k').innerText = `${Math.round(h.temperature_500hpa ? h.temperature_500hpa[curIdx] : -12)}°C`;
+          if (h.wind_speed_500hpa) {
+            document.getElementById('uwind-15k').innerHTML = `${getArrow(h.wind_direction_500hpa[curIdx])} ${Math.round(h.wind_direction_500hpa[curIdx])}° / ${toKnots(h.wind_speed_500hpa[curIdx])} kt`;
+            document.getElementById('utemp-15k').innerText = `${Math.round(h.temperature_500hpa[curIdx])}°C`;
+          }
         }
       } catch (err) {
-        console.warn("Winds aloft fetch active with default profile:", err);
+        console.warn("Winds aloft fetch error:", err);
       }
     }
 
