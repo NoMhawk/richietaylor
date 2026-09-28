@@ -55,7 +55,7 @@
       margin: 0 auto;
     }
 
-    /* SEGMENT 1: MAP WITH NATIVE MULTI-MODEL WIND ROSE */
+    /* SEGMENT 1: MAP WITH MULTI-MODEL WIND ROSE */
     .map-card {
       position: relative;
       width: 100%;
@@ -70,16 +70,6 @@
     #map {
       width: 100%;
       height: 100%;
-    }
-
-    /* WIND ROSE SVG OVERLAY STYLES */
-    .wind-rose-container {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-      z-index: 1000;
     }
 
     /* SEGMENT 2 STYLES */
@@ -125,7 +115,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.0.9</div>
+    <div class="rev-badge">REV: 1.1.0</div>
   </div>
 
   <div class="dashboard-container">
@@ -202,17 +192,17 @@
   </div>
 
   <script>
-    // Initialize dark map view centered on Dunkeswell
     const lat = 50.8600;
     const lon = -3.2378;
     const map = L.map('map').setView([lat, lon], 11);
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap &copy; CARTO',
-      maxZoom: 18
+    // FREE KEYLESS MAP TILE PROVIDER (Esri Dark Canvas)
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+      maxZoom: 16
     }).addTo(map);
 
-    // Multi-Model Wind Rose HTML Marker (ECMWF, GFS, UKV, AROME, ICON-EU)
+    // Multi-Model Wind Rose Overlay
     const windRoseHTML = `
       <div style="position: relative; width: 220px; height: 220px; pointer-events: none;">
         <!-- Radius Circle -->
