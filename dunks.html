@@ -5,12 +5,6 @@
   <title>Skydive Southwest - Dunkeswell Weather</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Leaflet & Windy API CDN -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
-  <script src="https://api.windy.com/assets/map-forecast/lib/tomtom.min.js"></script>
-  <script src="https://api.windy.com/assets/map-forecast/lib/windySdk.js"></script>
-
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -58,21 +52,45 @@
       margin: 0 auto;
     }
 
-    /* SEGMENT 1: MAP CONTAINER */
-    #windy-map-container {
-      position: relative;
-      width: 100%;
-      height: 680px;
-      border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid #1e2d4a;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-      background: #131b2e;
+    /* SEGMENT 1: SIDE-BY-SIDE OPTIONS GRID */
+    .segment-1-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
     }
 
-    #windy {
+    .option-card {
+      background: #131b2e;
+      border: 1px solid #1e2d4a;
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .option-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #00d8ff;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .frame-container {
+      width: 100%;
+      height: 600px;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid #1e2d4a;
+      background: #0b0f19;
+    }
+
+    iframe {
       width: 100%;
       height: 100%;
+      border: none;
     }
 
     /* SEGMENT 2: CLOUD & UPPER WINDS CONTAINER */
@@ -118,14 +136,38 @@
   <!-- PAGE HEADER & REVISION BADGE -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.0.5</div>
+    <div class="rev-badge">REV: 1.0.7</div>
   </div>
 
   <div class="dashboard-container">
     
-    <!-- SEGMENT 1: WINDY API MAP WITH MODEL COMPARISON OVERLAY -->
-    <div id="windy-map-container">
-      <div id="windy"></div>
+    <!-- SEGMENT 1: OPTION A AND OPTION B SIDE-BY-SIDE -->
+    <div class="segment-1-grid">
+      
+      <!-- OPTION A: WINDY INTERACTIVE EMBED -->
+      <div class="option-card">
+        <div class="option-title">Option A: Windy Interactive Map</div>
+        <div class="frame-container">
+          <iframe 
+            src="https://embed.windy.com/embed2.html?lat=50.8600&lon=-3.2378&detailLat=50.8600&detailLon=-3.2378&width=100%25&height=600&zoom=11&level=surface&overlay=wind&product=ecmwf&menu=true&message=true&marker=true&calendar=now&pressure=true&type=map&location=coordinates&detail=true&metricWind=kt&metricTemp=%C2%B0C" 
+            allowfullscreen>
+          </iframe>
+        </div>
+      </div>
+
+      <!-- OPTION B: METEOBLUE MULTI-MODEL FORECAST WIDGET -->
+      <div class="option-card">
+        <div class="option-title">Option B: Meteoblue Multi-Model Engine</div>
+        <div class="frame-container">
+          <iframe 
+            src="https://www.meteoblue.com/en/weather/widget/three/dunkeswell_united-kingdom_2650013?geoloc=fixed&nocurrent=0&noheader=1&max_days=3&wind_unit=kn&temp_unit=C" 
+            frameborder="0" 
+            scrolling="no" 
+            allowtransparency="true">
+          </iframe>
+        </div>
+      </div>
+
     </div>
 
     <!-- SEGMENT 2: CLOUD BASE & UPPER WINDS PROFILE -->
@@ -193,32 +235,6 @@
     </div>
 
   </div>
-
-  <script>
-    const lat = 50.8600;
-    const lon = -3.2378;
-
-    const options = {
-      key: 'L70kFIN8BjgywE9aoZW9fjxjZl8WGpuM',
-      lat: lat,
-      lon: lon,
-      zoom: 11,
-      overlay: 'wind',
-      product: 'ecmwf',
-      metricWind: 'kt',
-      metricTemp: '°C'
-    };
-
-    windyInit(options, windyAPI => {
-      const { map, picker, broadcast } = windyAPI;
-
-      // Open the model comparison picker over Dunkeswell
-      picker.open({ lat: lat, lon: lon });
-      
-      // Force opening comparison/wind rose mode if available in SDK session
-      broadcast.fire('openForecast', { lat: lat, lon: lon });
-    });
-  </script>
 
 </body>
 </html>
