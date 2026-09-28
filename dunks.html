@@ -52,26 +52,10 @@
       margin: 0 auto;
     }
 
-    /* SEGMENT 1: MAP + HOURLY TABLE CONTAINER */
-    .segment-1-box {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .map-card {
+    /* SEGMENT 1: UNIFIED MAP + FORECAST DRAWER */
+    .windy-card {
       width: 100%;
-      height: 420px;
-      border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid #1e2d4a;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-      background: #131b2e;
-    }
-
-    .table-card {
-      width: 100%;
-      height: 240px;
+      height: 750px;
       border-radius: 8px;
       overflow: hidden;
       border: 1px solid #1e2d4a;
@@ -128,28 +112,17 @@
   <!-- PAGE HEADER & REVISION BADGE -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.0.1</div>
+    <div class="rev-badge">REV: 1.0.2</div>
   </div>
 
   <div class="dashboard-container">
     
-    <!-- SEGMENT 1: WINDY ANIMATED MAP + WIND FORECAST TABLE -->
-    <div class="segment-1-box">
-      <!-- 1A: WIND MAP CANVAS -->
-      <div class="map-card">
-        <iframe 
-          src="https://embed.windy.com/embed2.html?lat=50.8600&lon=-3.2378&width=100%25&height=420&zoom=11&level=surface&overlay=wind&product=ecmwf&menu=true&message=true&marker=true&calendar=now&pressure=true&type=map&location=coordinates&metricWind=kt&metricTemp=%C2%B0C" 
-          allowfullscreen>
-        </iframe>
-      </div>
-
-      <!-- 1B: WINDY HOURLY WIND FORECAST TABLE -->
-      <div class="table-card">
-        <iframe 
-          src="https://embed.windy.com/config/forecast?lat=50.8600&lon=-3.2378&width=100%25&height=240&metricWind=kt&metricTemp=%C2%B0C" 
-          allowfullscreen>
-        </iframe>
-      </div>
+    <!-- SEGMENT 1: WINDY EMBED WITH FORCED SPOT FORECAST DRAWER -->
+    <div class="windy-card">
+      <iframe 
+        src="https://embed.windy.com/embed2.html?lat=50.8600&lon=-3.2378&detailLat=50.8600&detailLon=-3.2378&width=100%25&height=750&zoom=11&level=surface&overlay=wind&product=ecmwf&menu=true&message=true&marker=true&calendar=now&pressure=true&type=map&location=coordinates&detail=true&metricWind=kt&metricTemp=%C2%B0C" 
+        allowfullscreen>
+      </iframe>
     </div>
 
     <!-- SEGMENT 2: CLOUD BASE & UPPER WINDS PROFILE -->
