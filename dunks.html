@@ -98,6 +98,26 @@
       align-items: center;
     }
 
+    .legend-bar {
+      display: flex;
+      gap: 10px;
+      font-size: 0.65rem;
+      color: #8a99ad;
+      font-family: monospace;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .legend-box {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+    }
+
     .multi-table {
       width: 100%;
       border-collapse: collapse;
@@ -116,7 +136,7 @@
     }
 
     .multi-table td {
-      padding: 8px 6px;
+      padding: 6px;
       border-bottom: 1px solid rgba(255,255,255,0.04);
     }
 
@@ -124,16 +144,29 @@
       background: rgba(0, 216, 255, 0.05);
     }
 
+    /* COLOUR-CODED CELL BADGES */
+    .wind-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+      width: 90%;
+    }
+
+    .status-green  { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.4); }
+    .status-yellow { background: rgba(255, 235, 59, 0.15); color: #ffee58; border: 1px solid rgba(255, 235, 59, 0.4); }
+    .status-orange { background: rgba(255, 152, 0, 0.15);  color: #ffb74d; border: 1px solid rgba(255, 152, 0, 0.4); }
+    .status-red    { background: rgba(255, 82, 82, 0.2);   color: #ff5252; border: 1px solid rgba(255, 82, 82, 0.5); }
+
     .dir-arrow {
       display: inline-block;
       font-weight: bold;
-      color: #00d8ff;
       margin-right: 3px;
     }
 
     .gust-val {
-      color: #ffab00;
       font-size: 0.7rem;
+      opacity: 0.85;
     }
 
     /* SEGMENT 2 STYLES */
@@ -174,7 +207,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.1.6</div>
+    <div class="rev-badge">REV: 1.1.7</div>
   </div>
 
   <div class="dashboard-container">
@@ -191,7 +224,12 @@
       <div class="multi-table-card">
         <div class="table-title">
           <span>📊 Hourly Multi-Model Wind Forecast (Dunkeswell)</span>
-          <span style="color: #8a99ad; font-size: 0.7rem;">Units: MPH | Live API</span>
+          <div class="legend-bar">
+            <div class="legend-item"><div class="legend-box" style="background:#00e676;"></div> ≤15 (All)</div>
+            <div class="legend-item"><div class="legend-box" style="background:#ffee58;"></div> 16-20 (Licensed)</div>
+            <div class="legend-item"><div class="legend-box" style="background:#ffb74d;"></div> 21-25 (Advanced)</div>
+            <div class="legend-item"><div class="legend-box" style="background:#ff5252;"></div> >25 (Limit Exceeded)</div>
+          </div>
         </div>
         <table class="multi-table">
           <thead>
@@ -279,7 +317,6 @@
   </div>
 
   <script>
-    // RUNWAY INTERSECTION COORDINATES
     const lat = 50.8622;
     const lon = -3.2365;
 
@@ -290,7 +327,7 @@
       maxNativeZoom: 18
     }).addTo(map);
 
-    // Multi-Model Wind Rose Overlay Centered Exactly on Intersection
+    // Multi-Model Wind Rose Overlay
     const windRoseHTML = `
       <div style="position: relative; width: 220px; height: 220px; pointer-events: none;">
         <svg width="220" height="220" style="position: absolute; top:0; left:0;">
@@ -298,22 +335,22 @@
           <circle cx="110" cy="110" r="6" fill="#ffffff" stroke="#000" stroke-width="2"/>
         </svg>
         <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(12deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
-          <div style="background: rgba(163, 255, 180, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 140px; margin-left: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.6);">
+          <div style="background: rgba(163, 255, 180, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 140px; margin-left: 10px;">
             7 G:15 mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">AROME-HD</span>
           </div>
         </div>
         <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(22deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
-          <div style="background: rgba(194, 255, 210, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 120px; margin-left: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.6);">
+          <div style="background: rgba(194, 255, 210, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 120px; margin-left: 10px;">
             6 G:9 mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">GFS</span>
           </div>
         </div>
         <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(28deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
-          <div style="background: rgba(0, 255, 117, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 135px; margin-left: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.6);">
+          <div style="background: rgba(0, 255, 117, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 135px; margin-left: 10px;">
             6 G:15 mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">UKV</span>
           </div>
         </div>
         <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(35deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
-          <div style="background: rgba(0, 240, 255, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 130px; margin-left: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.6);">
+          <div style="background: rgba(0, 240, 255, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 130px; margin-left: 10px;">
             7 G:13 mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">ECMWF</span>
           </div>
         </div>
@@ -327,6 +364,14 @@
     function getArrow(deg) {
       if (deg === undefined || deg === null) return '↓';
       return `<span class="dir-arrow" style="transform: rotate(${deg}deg); display: inline-block;">↑</span>`;
+    }
+
+    // Determine colour class based on peak wind speed / gust
+    function getStatusClass(val) {
+      if (val <= 15) return 'status-green';
+      if (val <= 20) return 'status-yellow';
+      if (val <= 25) return 'status-orange';
+      return 'status-red';
     }
 
     // 2. FETCH MULTI-MODEL FORECAST DATA
@@ -359,7 +404,11 @@
             const speed = Math.round(dataset.hourly.wind_speed_10m[i] || 0);
             const gust = Math.round(dataset.hourly.wind_gusts_10m ? (dataset.hourly.wind_gusts_10m[i] || 0) : speed);
             const dir = dataset.hourly.wind_direction_10m[i];
-            return `${getArrow(dir)}${speed} <span class="gust-val">G:${gust}</span>`;
+            
+            const peak = Math.max(speed, gust);
+            const statusClass = getStatusClass(peak);
+
+            return `<div class="wind-badge ${statusClass}">${getArrow(dir)}${speed} <span class="gust-val">G:${gust}</span></div>`;
           };
 
           rowsHTML += `
