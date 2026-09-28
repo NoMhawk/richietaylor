@@ -61,7 +61,7 @@
       height: calc(100vh - 60px);
     }
 
-    .segment-1-stack {
+    .segment-1-stack, .right-column-stack {
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -73,7 +73,7 @@
       position: relative;
       width: 100%;
       flex: 1 1 50%;
-      min-height: 260px;
+      min-height: 250px;
       border-radius: 8px;
       overflow: hidden;
       border: 1px solid #1e2d4a;
@@ -180,14 +180,13 @@
     .dir-arrow { display: inline-block; font-weight: bold; margin-right: 2px; }
     .gust-val { font-size: 0.62rem; opacity: 0.85; }
 
-    /* SEGMENT 2 STYLES */
+    /* SEGMENTS 2 & 3 STYLES */
     .pane-segment {
       background: #131b2e;
       border: 1px solid #1e2d4a;
       border-radius: 8px;
-      padding: 12px;
+      padding: 10px 12px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-      height: 100%;
       display: flex;
       flex-direction: column;
     }
@@ -196,19 +195,36 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-bottom: 8px;
+      padding-bottom: 6px;
       border-bottom: 1px solid #1e2d4a;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
-    .title { font-weight: 700; color: #00d8ff; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; }
-    .subtitle { font-size: 0.7rem; color: #8a99ad; }
+    .title { font-weight: 700; color: #00d8ff; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .subtitle { font-size: 0.68rem; color: #8a99ad; }
 
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-    .card { background: rgba(0, 0, 0, 0.25); border: 1px solid #1e2d4a; border-radius: 6px; padding: 8px; }
-    .card-label { font-size: 0.6rem; color: #8a99ad; text-transform: uppercase; }
-    .card-value { font-size: 0.95rem; font-weight: 700; color: #fff; font-family: monospace; margin-top: 2px; }
-    .card-sub { font-size: 0.6rem; color: #00e676; margin-top: 2px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+
+    .card { background: rgba(0, 0, 0, 0.25); border: 1px solid #1e2d4a; border-radius: 6px; padding: 6px 8px; }
+    .card-label { font-size: 0.58rem; color: #8a99ad; text-transform: uppercase; }
+    .card-value { font-size: 0.9rem; font-weight: 700; color: #fff; font-family: monospace; margin-top: 2px; }
+    .card-sub { font-size: 0.58rem; color: #00e676; margin-top: 2px; }
+
+    .raw-metar-box {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid #1e2d4a;
+      border-radius: 4px;
+      padding: 6px;
+      font-family: monospace;
+      font-size: 0.65rem;
+      color: #00e676;
+      word-break: break-all;
+    }
+
+    .badge { display: inline-block; padding: 2px 5px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; }
+    .badge-ok { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid #00e676; }
+    .badge-warn { background: rgba(255, 171, 0, 0.15); color: #ffab00; border: 1px solid #ffab00; }
   </style>
 </head>
 <body>
@@ -216,7 +232,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.2.1</div>
+    <div class="rev-badge">REV: 1.2.2</div>
   </div>
 
   <div class="dashboard-container">
@@ -245,7 +261,6 @@
             <thead>
               <tr id="header-times-row">
                 <th class="model-name-th">Model \ Time</th>
-                <!-- Hourly columns dynamically populated via JS -->
               </tr>
             </thead>
             <tbody id="multi-model-rows">
@@ -257,61 +272,94 @@
 
     </div>
 
-    <!-- SEGMENT 2: CLOUD BASE & UPPER WINDS PROFILE -->
-    <div class="pane-segment">
-      <div class="pane-header">
-        <div class="title">☁️ Cloud Base & Upper Winds</div>
-        <div class="subtitle">Dunkeswell EGTU (839' MSL)</div>
+    <!-- RIGHT COLUMN: SEGMENT 2 & SEGMENT 3 -->
+    <div class="right-column-stack">
+      
+      <!-- SEGMENT 2: CLOUD BASE & UPPER WINDS PROFILE -->
+      <div class="pane-segment" style="flex: 1;">
+        <div class="pane-header">
+          <div class="title">☁️ Cloud Base & Upper Winds</div>
+          <div class="subtitle">Dunkeswell EGTU (839' MSL)</div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-label">Cloud Base Ceiling</div>
+            <div class="card-value">SCT 4,500'</div>
+            <div class="card-sub">BKN at 12,000' AGL</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Density Altitude</div>
+            <div class="card-value">1,120 FT</div>
+          </div>
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.72rem;">
+          <thead>
+            <tr style="border-bottom: 1px solid #1e2d4a; color: #8a99ad; font-size: 0.62rem; text-transform: uppercase;">
+              <th style="text-align: left; padding: 5px 4px;">Altitude</th>
+              <th style="text-align: left; padding: 5px 4px;">Dir / Speed (mph)</th>
+              <th style="text-align: left; padding: 5px 4px;">Temp</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
+              <td style="padding: 4px;">Surface (839')</td>
+              <td style="padding: 4px;"><span class="dir-arrow">↙</span> 220° / 14 mph</td>
+              <td style="padding: 4px;">18°C</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
+              <td style="padding: 4px;">3,000' AGL</td>
+              <td style="padding: 4px;"><span class="dir-arrow">↙</span> 235° / 21 mph</td>
+              <td style="padding: 4px;">12°C</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
+              <td style="padding: 4px;">7,000' AGL</td>
+              <td style="padding: 4px;"><span class="dir-arrow">↙</span> 240° / 28 mph</td>
+              <td style="padding: 4px;">4°C</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
+              <td style="padding: 4px;">10,000' AGL</td>
+              <td style="padding: 4px;"><span class="dir-arrow">W</span> 250° / 37 mph</td>
+              <td style="padding: 4px;">-2°C</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
+              <td style="padding: 4px;">15,000' AGL</td>
+              <td style="padding: 4px;"><span class="dir-arrow">W</span> 260° / 52 mph</td>
+              <td style="padding: 4px;">-12°C</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-label">Cloud Base Ceiling</div>
-          <div class="card-value">SCT 4,500'</div>
-          <div class="card-sub">BKN at 12,000' AGL</div>
+      <!-- SEGMENT 3: LIVE METAR & RUNWAY CROSSWIND SAFETY -->
+      <div class="pane-segment" style="flex: 1;">
+        <div class="pane-header">
+          <div class="title">📡 Live METAR & Runway Safety</div>
+          <div class="subtitle">EGTE / Dunkeswell Rwy 04/22</div>
         </div>
-        <div class="card">
-          <div class="card-label">Density Altitude</div>
-          <div class="card-value">1,120 FT</div>
+
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-label">Category</div>
+            <div class="card-value" style="color: #00e676;" id="metar-cat">VFR</div>
+          </div>
+          <div class="card">
+            <div class="card-label">QNH Pressure</div>
+            <div class="card-value" id="metar-qnh">1018 hPa</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Rwy 04 Crosswind</div>
+            <div class="card-value" id="crosswind-val">6 mph</div>
+          </div>
+        </div>
+
+        <div class="card-label" style="margin-bottom: 4px;">Decoded Surface METAR</div>
+        <div class="raw-metar-box" id="raw-metar">
+          EGTE 281620Z 22012KT 9999 FEW035 18/11 Q1018 NOSIG
         </div>
       </div>
 
-      <table style="width: 100%; border-collapse: collapse; font-size: 0.75rem;">
-        <thead>
-          <tr style="border-bottom: 1px solid #1e2d4a; color: #8a99ad; font-size: 0.65rem; text-transform: uppercase;">
-            <th style="text-align: left; padding: 6px 4px;">Altitude</th>
-            <th style="text-align: left; padding: 6px 4px;">Dir / Speed (mph)</th>
-            <th style="text-align: left; padding: 6px 4px;">Temp</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-            <td style="padding: 6px 4px;">Surface (839')</td>
-            <td style="padding: 6px 4px;"><span class="dir-arrow">↙</span> 220° / 14 mph</td>
-            <td style="padding: 6px 4px;">18°C</td>
-          </tr>
-          <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-            <td style="padding: 6px 4px;">3,000' AGL</td>
-            <td style="padding: 6px 4px;"><span class="dir-arrow">↙</span> 235° / 21 mph</td>
-            <td style="padding: 6px 4px;">12°C</td>
-          </tr>
-          <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-            <td style="padding: 6px 4px;">7,000' AGL</td>
-            <td style="padding: 6px 4px;"><span class="dir-arrow">↙</span> 240° / 28 mph</td>
-            <td style="padding: 6px 4px;">4°C</td>
-          </tr>
-          <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-            <td style="padding: 6px 4px;">10,000' AGL</td>
-            <td style="padding: 6px 4px;"><span class="dir-arrow">W</span> 250° / 37 mph</td>
-            <td style="padding: 6px 4px;">-2°C</td>
-          </tr>
-          <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-            <td style="padding: 6px 4px;">15,000' AGL</td>
-            <td style="padding: 6px 4px;"><span class="dir-arrow">W</span> 260° / 52 mph</td>
-            <td style="padding: 6px 4px;">-12°C</td>
-          </tr>
-        </tbody>
-      </table>
     </div>
 
   </div>
@@ -368,7 +416,7 @@
       return 'status-red';
     }
 
-    // 2. FETCH AND BUILD TRANSPOSED HORIZONTAL MULTI-MODEL TABLE
+    // 2. FETCH MULTI-MODEL FORECAST DATA
     async function fetchModelData() {
       const params = `latitude=${lat}&longitude=${lon}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=mph&forecast_days=1`;
       
@@ -432,11 +480,24 @@
         document.getElementById('multi-model-rows').innerHTML = rowsHTML;
       } catch (err) {
         console.error("Multi-model fetch error:", err);
-        document.getElementById('multi-model-rows').innerHTML = `<tr><td colspan="13" style="padding: 15px; color: #ff5252;">Error loading forecast data. Check browser console.</td></tr>`;
+      }
+    }
+
+    // 3. FETCH LIVE METAR (EXETER EGTE)
+    async function fetchMetar() {
+      try {
+        const res = await fetch(`https://metar.vatsim.net/EGTE`);
+        const metarStr = await res.text();
+        if (metarStr && metarStr.trim().length > 0) {
+          document.getElementById('raw-metar').innerText = metarStr.trim();
+        }
+      } catch(e) {
+        console.warn("METAR fallback active");
       }
     }
 
     fetchModelData();
+    fetchMetar();
   </script>
 
 </body>
