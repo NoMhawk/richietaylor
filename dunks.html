@@ -233,8 +233,8 @@
       border: none;
     }
 
-    /* INDIVIDUAL FAN-OUT BADGE STYLING */
-    .fan-pill {
+    /* BADGE PILL STYLING */
+    .axis-pill {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -249,9 +249,11 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.7);
       white-space: nowrap;
       pointer-events: none;
+      height: 22px;
+      box-sizing: border-box;
     }
 
-    .fan-pill-tag {
+    .axis-pill-tag {
       background: #000;
       color: #fff;
       font-size: 8px;
@@ -266,12 +268,12 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 2.0.0</div>
+    <div class="rev-badge">REV: 2.0.1</div>
   </div>
 
   <div class="dashboard-container">
     
-    <!-- SEGMENT 1: SATELLITE MAP (FAN-OUT WIND ROSE) + HORIZONTAL MODEL TABLE -->
+    <!-- SEGMENT 1: SATELLITE MAP (AXIS STAGGERED WIND ROSE) + HORIZONTAL MODEL TABLE -->
     <div class="segment-1-stack">
       
       <!-- 1A: SATELLITE MAP -->
@@ -462,7 +464,7 @@
       };
     }
 
-    // TRUE FAN-OUT FROM CENTER POINT
+    // AXIS-ALIGNED STAGGERED VECTOR RAYS
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
       windRoseLayerGroup.clearLayers();
 
@@ -475,46 +477,38 @@
         fillOpacity: 1
       }).addTo(windRoseLayerGroup);
 
-      // Raw model configs
-      let modelList = [
-        { name: 'AROME-HD', dir: aromeDir, spd: aromeSpd, gst: aromeGst, color: '#00e676', bg: 'rgba(0, 230, 118, 0.95)' },
-        { name: 'GFS',      dir: gfsDir,   spd: gfsSpd,   gst: gfsGst,   color: '#ffee58', bg: 'rgba(255, 235, 59, 0.95)' },
-        { name: 'ECMWF',    dir: ecmwfDir, spd: ecmwfSpd, gst: ecmwfGst, color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)' }
+      // Model configurations with staggered distances along their true vector angle
+      const models = [
+        { name: 'AROME-HD', dir: aromeDir, spd: aromeSpd, gst: aromeGst, color: '#00e676', bg: 'rgba(0, 230, 118, 0.95)', dist: 0.14, dash: '4,3' },
+        { name: 'GFS',      dir: gfsDir,   spd: gfsSpd,   gst: gfsGst,   color: '#ffee58', bg: 'rgba(255, 235, 59, 0.95)', dist: 0.20, dash: null },
+        { name: 'ECMWF',    dir: ecmwfDir, spd: ecmwfSpd, gst: ecmwfGst, color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)', dist: 0.26, dash: null }
       ];
 
-      // Detect direction consensus and calculate clean angular fan offsets
-      // If models share identical directions, offset them by -7°, 0°, +7° so they fan out cleanly from center
-      const angleOffsets = [-7, 0, 7];
-      const rayLengthNM = 0.18; // Vector distance on map
+      models.forEach(m => {
+        // Target endpoint for vector line & badge along exact model bearing
+        const endPt = computeDestinationPoint(lat, lon, m.dir, m.dist);
 
-      modelList.forEach((m, idx) => {
-        // Calculate effective bearing including fan spread offset
-        let spreadDir = (m.dir + angleOffsets[idx] + 360) % 360;
-        
-        // Target endpoint for vector line & badge
-        const endPt = computeDestinationPoint(lat, lon, spreadDir, rayLengthNM);
-
-        // 1. Draw dedicated vector ray directly from center dot
+        // 1. Draw dedicated vector ray directly from center dot to badge
         L.polyline([[lat, lon], [endPt.lat, endPt.lon]], {
           color: m.color,
           weight: 2.8,
           opacity: 0.9,
-          dashArray: m.name === 'AROME-HD' ? '4,3' : null
+          dashArray: m.dash
         }).addTo(windRoseLayerGroup);
 
-        // 2. Individual badge anchored at the tip of its own ray
+        // 2. Badge pill anchored smoothly at left-middle edge
         const pillHTML = `
-          <div class="fan-pill" style="background: ${m.bg};">
+          <div class="axis-pill" style="background: ${m.bg};">
             <span>${m.spd} G:${m.gst}</span>
-            <span class="fan-pill-tag">${m.name}</span>
+            <span class="axis-pill-tag">${m.name}</span>
           </div>
         `;
 
-        // Determine anchor point based on direction quadrant so badges don't overlap the vector lines
+        // Exact left-middle anchor point alignment
         let anchorX = 0;
         let anchorY = 11;
-        if (spreadDir > 180 && spreadDir < 360) {
-          anchorX = 120; // Align right edge when pointing West
+        if (m.dir > 180 && m.dir < 360) {
+          anchorX = 120; // Flip anchor to right edge if pointing West
         }
 
         L.marker([endPt.lat, endPt.lon], {
