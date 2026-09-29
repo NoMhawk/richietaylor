@@ -243,7 +243,7 @@
       border: none;
     }
 
-    /* SPOT BADGE */
+    /* CLEAN SIMPLE DROP SPOT BADGE */
     .spot-clean-badge {
       background: #ffee58;
       color: #000;
@@ -295,7 +295,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.5.2</div>
+    <div class="rev-badge">REV: 1.5.3</div>
   </div>
 
   <div class="dashboard-container">
@@ -303,7 +303,7 @@
     <!-- SEGMENT 1: SATELLITE MAP + HORIZONTAL MODEL TABLE + DROP SPOT CALCULATOR -->
     <div class="segment-1-stack">
       
-      <!-- 1A: SATELLITE MAP WITH RUNWAY CROSS CENTER & RADIAL WIND ROSE -->
+      <!-- 1A: SATELLITE MAP WITH PRECISE RUNWAY CROSS CENTER & RADIAL WIND ROSE -->
       <div class="map-card">
         <div id="map"></div>
       </div>
@@ -506,8 +506,6 @@
     }
 
     // GEOGRAPHIC DESTINATION POINT CALCULATION (WGS84)
-    // bearingDeg: True compass bearing (0 = North, 90 = East, 180 = South, 270 = West)
-    // distanceNM: Distance in nautical miles
     function computeDestinationPoint(originLat, originLon, bearingDeg, distanceNM) {
       const R = 3440.065; // Earth radius in nautical miles
       const d = distanceNM;
@@ -526,8 +524,8 @@
       );
 
       return {
-        lat: (lat2 * Math.PI) / 180,
-        lon: (lon2 * Math.PI) / 180
+        lat: (lat2 * 180) / Math.PI,
+        lon: (lon2 * 180) / Math.PI
       };
     }
 
@@ -543,7 +541,7 @@
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
       if (windRoseMarker) map.removeLayer(windRoseMarker);
 
-      // Radial arms pointing toward incoming wind source directions
+      // Radial arms point toward the incoming wind source direction
       const aromePt = getRadialPoint(aromeDir, 80);
       const gfsPt   = getRadialPoint(gfsDir, 62);
       const ecmwfPt = getRadialPoint(ecmwfDir, 44);
@@ -580,7 +578,7 @@
       }).addTo(map);
     }
 
-    // ACCURATE UPWIND EXIT SPOT & BROKEN JUMP RUN LINE
+    // UPWIND EXIT SPOT & BROKEN JUMP RUN LINE
     function updateDropSpotMarker(avgDir, avgSpd) {
       if (exitSpotMarker) map.removeLayer(exitSpotMarker);
       if (jumprunLine) map.removeLayer(jumprunLine);
@@ -589,20 +587,22 @@
       const offsetNM = parseFloat((avgSpd / 15).toFixed(2));
       const headwindDir = Math.round(avgDir);
       
-      // UPWIND APPROACH BEARING: Opposite of wind direction (avgDir + 180)
-      const upwindBearing = (avgDir + 180) % 360;
+      // Direct upwind projection: Clear Drop Spot is located UPWIND towards avgDir (e.g. 144 deg South-East)
+      const upwindBearing = avgDir;
 
-      // Project Exit Point strictly UPWIND from runway center
+      // Project Exit Spot strictly UPWIND (South-East)
       const exitPt = computeDestinationPoint(lat, lon, upwindBearing, offsetNM);
 
-      // Project Extended Line Point further upwind along approach
-      const extPt = computeDestinationPoint(lat, lon, upwindBearing, offsetNM + 0.4);
+      // Downwind approach start point (North-West)
+      const entryBearing = (avgDir + 180) % 360;
+      const entryPt = computeDestinationPoint(lat, lon, entryBearing, 0.5);
 
-      // Calculate exact geographic midpoint along line for heading badge
-      const midPt = computeDestinationPoint(lat, lon, upwindBearing, offsetNM / 2);
+      // Midpoint along the jump run line
+      const midLat = (lat + exitPt.lat) / 2;
+      const midLon = (lon + exitPt.lon) / 2;
 
-      // 1. BROKEN CYAN DASHED FLIGHT PATH LINE
-      jumprunLine = L.polyline([[extPt.lat, extPt.lon], [lat, lon]], {
+      // 1. BROKEN CYAN DASHED FLIGHT PATH LINE (Runs NW through PLA to SE Exit Spot)
+      jumprunLine = L.polyline([[entryPt.lat, entryPt.lon], [exitPt.lat, exitPt.lon]], {
         color: '#00d8ff',
         weight: 3,
         opacity: 0.9,
@@ -611,11 +611,11 @@
 
       // 2. MIDPOINT HEADING BADGE ON-AXIS ALONG FLIGHT LINE
       const headingHTML = `<div class="line-heading-label">${headwindDir}°</div>`;
-      lineHeadingMarker = L.marker([midPt.lat, midPt.lon], {
+      lineHeadingMarker = L.marker([midLat, midLon], {
         icon: L.divIcon({ html: headingHTML, className: '', iconSize: [40, 20], iconAnchor: [20, 10] })
       }).addTo(map);
 
-      // 3. CLEAN SPOT BADGE (DISTANCE WITH "NM")
+      // 3. CLEAN SPOT BADGE AT UPWIND EXIT POINT (DISTANCE WITH "NM")
       const dropSpotHTML = `<div class="spot-clean-badge">${offsetNM}NM</div>`;
       exitSpotMarker = L.marker([exitPt.lat, exitPt.lon], {
         icon: L.divIcon({ html: dropSpotHTML, className: '', iconSize: [60, 26], iconAnchor: [30, 13] })
@@ -625,7 +625,7 @@
       document.getElementById('calc-offset').innerText = `${offsetNM} NM`;
       document.getElementById('calc-coords').innerText = `${exitPt.lat.toFixed(4)}, ${exitPt.lon.toFixed(4)}`;
 
-      const bounds = L.latLngBounds([[lat, lon], [extPt.lat, extPt.lon]]);
+      const bounds = L.latLngBounds([[entryPt.lat, entryPt.lon], [exitPt.lat, exitPt.lon]]);
       map.fitBounds(bounds, { padding: [40, 40] });
     }
 
