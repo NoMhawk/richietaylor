@@ -295,7 +295,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.5.4</div>
+    <div class="rev-badge">REV: 1.5.5</div>
   </div>
 
   <div class="dashboard-container">
@@ -541,7 +541,7 @@
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
       if (windRoseMarker) map.removeLayer(windRoseMarker);
 
-      // Radial arms point toward the incoming wind source direction
+      // Radial arms point toward incoming wind source directions
       const aromePt = getRadialPoint(aromeDir, 80);
       const gfsPt   = getRadialPoint(gfsDir, 62);
       const ecmwfPt = getRadialPoint(ecmwfDir, 44);
@@ -590,7 +590,7 @@
       // Upwind bearing for Exit Spot offset (e.g. 144 deg SE)
       const upwindBearing = avgDir;
 
-      // 1. EXACT CLEAR DROP SPOT LOCATION AT offsetNM (e.g., 1.27 NM upwind)
+      // 1. EXACT CLEAR DROP SPOT LOCATION AT CALCULATED OFFSET (e.g., 1.27 NM upwind)
       const exitPt = computeDestinationPoint(lat, lon, upwindBearing, offsetNM);
 
       // 2. EXTENDED LINE ENDPOINT PAST EXIT SPOT (additional 0.5 NM upwind)
@@ -600,7 +600,7 @@
       const entryBearing = (avgDir + 180) % 360;
       const entryPt = computeDestinationPoint(lat, lon, entryBearing, 0.5);
 
-      // 4. MIDPOINT BETWEEN PLA AND EXIT SPOT FOR HEADING LABEL
+      // 4. MIDPOINT BETWEEN PLA AND EXIT SPOT FOR HEADING LABEL (at offsetNM / 2)
       const midPt = computeDestinationPoint(lat, lon, upwindBearing, offsetNM / 2);
 
       // DRAW DASHED FLIGHT PATH LINE THROUGH ALL POINTS
@@ -611,13 +611,13 @@
         dashArray: '10, 8'
       }).addTo(map);
 
-      // MIDPOINT HEADING BADGE ON-AXIS ALONG FLIGHT LINE
+      // HEADING BADGE MIDWAY BETWEEN PLA AND EXIT SPOT (approx 0.63 NM upwind)
       const headingHTML = `<div class="line-heading-label">${headwindDir}°</div>`;
       lineHeadingMarker = L.marker([midPt.lat, midPt.lon], {
         icon: L.divIcon({ html: headingHTML, className: '', iconSize: [40, 20], iconAnchor: [20, 10] })
       }).addTo(map);
 
-      // YELLOW CLEAR DROP SPOT BADGE DIRECTLY AT THE offsetNM MEASUREMENT POINT
+      // YELLOW CLEAR DROP SPOT BADGE ANCHORED EXACTLY AT offsetNM (1.27 NM)
       const dropSpotHTML = `<div class="spot-clean-badge">${offsetNM}NM</div>`;
       exitSpotMarker = L.marker([exitPt.lat, exitPt.lon], {
         icon: L.divIcon({ html: dropSpotHTML, className: '', iconSize: [60, 26], iconAnchor: [30, 13] })
