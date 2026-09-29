@@ -67,23 +67,50 @@
       height: 100%;
     }
 
+    /* DUAL MAP ROW LAYOUT */
+    .dual-map-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      flex: 1 1 50%;
+      min-height: 220px;
+    }
+
     .map-card {
       position: relative;
       width: 100%;
-      flex: 1 1 45%;
-      min-height: 220px;
+      height: 100%;
       border-radius: 8px;
       overflow: hidden;
       border: 1px solid #1e2d4a;
       box-shadow: 0 8px 24px rgba(0,0,0,0.5);
       background: #131b2e;
+      display: flex;
+      flex-direction: column;
     }
 
-    #map { width: 100%; height: 100%; }
+    .map-card-header {
+      position: absolute;
+      top: 6px;
+      left: 8px;
+      z-index: 1000;
+      background: rgba(11, 15, 25, 0.85);
+      backdrop-filter: blur(4px);
+      padding: 3px 8px;
+      border-radius: 4px;
+      border: 1px solid #1e2d4a;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #00d8ff;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .map-container { width: 100%; height: 100%; }
 
     .multi-table-card {
       width: 100%;
-      flex: 1 1 35%;
+      flex: 1 1 28%;
       background: #131b2e;
       border: 1px solid #1e2d4a;
       border-radius: 8px;
@@ -261,7 +288,7 @@
       gap: 5px;
     }
 
-    /* UPRIGHT WIND ROSE LABELS WITH CLEAR BORDER & SHADOW */
+    /* UPRIGHT WIND ROSE LABELS */
     .rose-label-badge {
       position: absolute;
       padding: 3px 6px;
@@ -283,17 +310,29 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.5.9</div>
+    <div class="rev-badge">REV: 1.6.0</div>
   </div>
 
   <div class="dashboard-container">
     
-    <!-- SEGMENT 1: SATELLITE MAP + HORIZONTAL MODEL TABLE + DROP SPOT CALCULATOR -->
+    <!-- SEGMENT 1: DUAL MAPS + HORIZONTAL MODEL TABLE + DROP SPOT CALCULATOR -->
     <div class="segment-1-stack">
       
-      <!-- 1A: SATELLITE MAP WITH RUNWAY CROSS CENTER & RADIAL WIND ROSE -->
-      <div class="map-card">
-        <div id="map"></div>
+      <!-- 1A: DUAL MAP ROW -->
+      <div class="dual-map-grid">
+        
+        <!-- MAP 1: MULTI-MODEL WIND ROSE MAP -->
+        <div class="map-card">
+          <div class="map-card-header">🌬️ Map 1: Surface Wind Rose Vectors</div>
+          <div id="map-wind" class="map-container"></div>
+        </div>
+
+        <!-- MAP 2: JUMP RUN & CLEAR DROP SPOT MAP -->
+        <div class="map-card">
+          <div class="map-card-header">🎯 Map 2: Jump Run & Clear Drop Spot</div>
+          <div id="map-spot" class="map-container"></div>
+        </div>
+
       </div>
 
       <!-- 1B: HORIZONTAL MULTI-MODEL HOURLY COMPARISON TABLE -->
@@ -468,12 +507,16 @@
     const lat = 50.860619;
     const lon = -3.233961;
 
-    // 1. LEAFLET SATELLITE MAP
-    const map = L.map('map').setView([lat, lon], 14);
+    // 1. INITIALIZE MAP 1 (WIND ROSE) & MAP 2 (DROP SPOT)
+    const mapWind = L.map('map-wind', { zoomControl: false }).setView([lat, lon], 14);
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      maxZoom: 19,
-      maxNativeZoom: 18
-    }).addTo(map);
+      maxZoom: 19, maxNativeZoom: 18
+    }).addTo(mapWind);
+
+    const mapSpot = L.map('map-spot', { zoomControl: false }).setView([lat, lon], 14);
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 19, maxNativeZoom: 18
+    }).addTo(mapSpot);
 
     let windRoseMarker = null;
     let exitSpotMarker = null;
@@ -520,103 +563,84 @@
     function getRadialPoint(deg, radius) {
       const rad = ((deg - 90) * Math.PI) / 180;
       return {
-        x: 120 + radius * Math.cos(rad),
-        y: 120 + radius * Math.sin(rad)
+        x: 100 + radius * Math.cos(rad),
+        y: 100 + radius * Math.sin(rad)
       };
     }
 
-    // FULLY REBUILT WIND ROSE WITH ANTI-CLUTTER FAN-OUT
+    // MAP 1: DEDICATED WIND ROSE MAP
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
-      if (windRoseMarker) map.removeLayer(windRoseMarker);
+      if (windRoseMarker) mapWind.removeLayer(windRoseMarker);
 
-      // Stagger radial distances if directions are close to prevent badge overlap
-      const ecmwfRadius = 60;
-      const gfsRadius   = 95;
-      const aromeRadius = 130;
-
-      // Calculate radial endpoints
-      const ecmwfPt = getRadialPoint(ecmwfDir, ecmwfRadius);
-      const gfsPt   = getRadialPoint(gfsDir, gfsRadius);
-      const aromePt = getRadialPoint(aromeDir, aromeRadius);
+      const ecmwfPt = getRadialPoint(ecmwfDir, 50);
+      const gfsPt   = getRadialPoint(gfsDir, 70);
+      const aromePt = getRadialPoint(aromeDir, 90);
 
       const windRoseHTML = `
-        <div style="position: relative; width: 240px; height: 240px; pointer-events: none;">
-          <svg width="240" height="240" viewBox="0 0 240 240" style="position: absolute; top:0; left:0;">
-            <circle cx="120" cy="120" r="75" stroke="#ffffff" stroke-opacity="0.25" stroke-width="1.5" fill="none" />
-            <circle cx="120" cy="120" r="5" fill="#00d8ff" stroke="#000000" stroke-width="2"/>
+        <div style="position: relative; width: 200px; height: 200px; pointer-events: none;">
+          <svg width="200" height="200" viewBox="0 0 200 200" style="position: absolute; top:0; left:0;">
+            <circle cx="100" cy="100" r="60" stroke="#ffffff" stroke-opacity="0.3" stroke-width="1.5" fill="none" />
+            <circle cx="100" cy="100" r="4" fill="#00d8ff" stroke="#000000" stroke-width="2"/>
 
-            <!-- ECMWF Vector Ray -->
-            <line x1="120" y1="120" x2="${ecmwfPt.x}" y2="${ecmwfPt.y}" stroke="#00d8ff" stroke-width="2.5"/>
-
-            <!-- GFS Vector Ray -->
-            <line x1="120" y1="120" x2="${gfsPt.x}" y2="${gfsPt.y}" stroke="#ffee58" stroke-width="2.5"/>
-
-            <!-- AROME Vector Ray -->
-            <line x1="120" y1="120" x2="${aromePt.x}" y2="${aromePt.y}" stroke="#00e676" stroke-width="2.5" stroke-dasharray="4,2"/>
+            <line x1="100" y1="100" x2="${ecmwfPt.x}" y2="${ecmwfPt.y}" stroke="#00d8ff" stroke-width="2.5"/>
+            <line x1="100" y1="100" x2="${gfsPt.x}"   y2="${gfsPt.y}"   stroke="#ffee58" stroke-width="2.5"/>
+            <line x1="100" y1="100" x2="${aromePt.x}" y2="${aromePt.y}" stroke="#00e676" stroke-width="2.5" stroke-dasharray="4,2"/>
           </svg>
 
-          <!-- STAGGERED UN-OVERLAPPED MODEL BADGES -->
           <div class="rose-label-badge" style="left: ${ecmwfPt.x}px; top: ${ecmwfPt.y}px; background: rgba(0, 216, 255, 0.95);">
-            ${ecmwfSpd} G:${ecmwfGst} mph <span style="background:#222; color:#fff; font-size:7px; padding:1px 3px; border-radius:2px;">ECMWF</span>
+            ${ecmwfSpd} G:${ecmwfGst} <span style="background:#222; color:#fff; font-size:7px; padding:1px 2px; border-radius:2px;">ECMWF</span>
           </div>
 
           <div class="rose-label-badge" style="left: ${gfsPt.x}px; top: ${gfsPt.y}px; background: rgba(255, 235, 59, 0.95);">
-            ${gfsSpd} G:${gfsGst} mph <span style="background:#222; color:#fff; font-size:7px; padding:1px 3px; border-radius:2px;">GFS</span>
+            ${gfsSpd} G:${gfsGst} <span style="background:#222; color:#fff; font-size:7px; padding:1px 2px; border-radius:2px;">GFS</span>
           </div>
 
           <div class="rose-label-badge" style="left: ${aromePt.x}px; top: ${aromePt.y}px; background: rgba(0, 230, 118, 0.95);">
-            ${aromeSpd} G:${aromeGst} mph <span style="background:#222; color:#fff; font-size:7px; padding:1px 3px; border-radius:2px;">AROME</span>
+            ${aromeSpd} G:${aromeGst} <span style="background:#222; color:#fff; font-size:7px; padding:1px 2px; border-radius:2px;">AROME</span>
           </div>
         </div>
       `;
 
       windRoseMarker = L.marker([lat, lon], {
-        icon: L.divIcon({ html: windRoseHTML, className: '', iconSize: [240, 240], iconAnchor: [120, 120] })
-      }).addTo(map);
+        icon: L.divIcon({ html: windRoseHTML, className: '', iconSize: [200, 200], iconAnchor: [100, 100] })
+      }).addTo(mapWind);
+
+      mapWind.setView([lat, lon], 14);
     }
 
-    // ACCURATE SPOT OFFSET CALCULATION (1 mph wind = ~100 ft drift offset = 0.0164 NM per mph)
+    // MAP 2: DEDICATED JUMP RUN & DROP SPOT MAP
     function updateDropSpotMarker(avgDir, avgSpd) {
-      if (exitSpotMarker) map.removeLayer(exitSpotMarker);
-      if (jumprunLine) map.removeLayer(jumprunLine);
+      if (exitSpotMarker) mapSpot.removeLayer(exitSpotMarker);
+      if (jumprunLine) mapSpot.removeLayer(jumprunLine);
 
-      // REALISTIC SPOT OFFSET: ~100 ft per mph of wind (19 mph = 1900 ft = 0.31 NM)
       const offsetNM = parseFloat((avgSpd / 60).toFixed(2));
       const headwindDir = Math.round(avgDir);
-      
-      // Upwind bearing for Exit Spot offset (e.g. 144 deg SE)
       const upwindBearing = avgDir;
 
-      // 1. EXACT CLEAR DROP SPOT LOCATION AT REALISTIC OFFSET (~0.31 NM upwind)
       const exitPt = computeDestinationPoint(lat, lon, upwindBearing, offsetNM);
+      const extendedPt = computeDestinationPoint(lat, lon, upwindBearing, offsetNM + 0.3);
 
-      // 2. EXTENDED LINE ENDPOINT PAST EXIT SPOT (additional 0.25 NM upwind)
-      const extendedPt = computeDestinationPoint(lat, lon, upwindBearing, offsetNM + 0.25);
-
-      // 3. DOWNWIND ENTRY START POINT (0.3 NM NW of PLA)
       const entryBearing = (avgDir + 180) % 360;
       const entryPt = computeDestinationPoint(lat, lon, entryBearing, 0.3);
 
-      // DRAW DASHED FLIGHT PATH LINE THROUGH ALL POINTS
       jumprunLine = L.polyline([[entryPt.lat, entryPt.lon], [lat, lon], [exitPt.lat, exitPt.lon], [extendedPt.lat, extendedPt.lon]], {
         color: '#00d8ff',
-        weight: 3,
+        weight: 3.5,
         opacity: 0.9,
         dashArray: '8, 6'
-      }).addTo(map);
+      }).addTo(mapSpot);
 
-      // COMBINED BADGE ANCHORED EXACTLY AT REALISTIC EXIT SPOT (e.g., 0.31 NM)
       const dropSpotHTML = `<div class="spot-clean-badge"><span>🎯</span><span>${headwindDir}°</span><span>|</span><span>${offsetNM}NM</span></div>`;
       exitSpotMarker = L.marker([exitPt.lat, exitPt.lon], {
         icon: L.divIcon({ html: dropSpotHTML, className: '', iconSize: [110, 30], iconAnchor: [55, 15] })
-      }).addTo(map);
+      }).addTo(mapSpot);
 
       document.getElementById('calc-jumprun').innerText = `${headwindDir}° (Headwind)`;
       document.getElementById('calc-offset').innerText = `${offsetNM} NM`;
       document.getElementById('calc-coords').innerText = `${exitPt.lat.toFixed(4)}, ${exitPt.lon.toFixed(4)}`;
 
       const bounds = L.latLngBounds([[entryPt.lat, entryPt.lon], [extendedPt.lat, extendedPt.lon]]);
-      map.fitBounds(bounds, { padding: [50, 50] });
+      mapSpot.fitBounds(bounds, { padding: [45, 45] });
     }
 
     // 2. FETCH MULTI-MODEL FORECAST DATA
