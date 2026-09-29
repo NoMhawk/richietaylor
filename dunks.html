@@ -243,7 +243,7 @@
       border: none;
     }
 
-    /* CLEAN SIMPLE DROP SPOT BADGE */
+    /* CLEAN YELLOW DROP SPOT BADGE */
     .spot-clean-badge {
       background: #ffee58;
       color: #000;
@@ -295,7 +295,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.5.3</div>
+    <div class="rev-badge">REV: 1.5.4</div>
   </div>
 
   <div class="dashboard-container">
@@ -303,7 +303,7 @@
     <!-- SEGMENT 1: SATELLITE MAP + HORIZONTAL MODEL TABLE + DROP SPOT CALCULATOR -->
     <div class="segment-1-stack">
       
-      <!-- 1A: SATELLITE MAP WITH PRECISE RUNWAY CROSS CENTER & RADIAL WIND ROSE -->
+      <!-- 1A: SATELLITE MAP WITH RUNWAY CROSS CENTER & RADIAL WIND ROSE -->
       <div class="map-card">
         <div id="map"></div>
       </div>
@@ -578,7 +578,7 @@
       }).addTo(map);
     }
 
-    // UPWIND EXIT SPOT & BROKEN JUMP RUN LINE
+    // ACCURATE UPWIND EXIT SPOT & EXTENDED BROKEN JUMP RUN LINE
     function updateDropSpotMarker(avgDir, avgSpd) {
       if (exitSpotMarker) map.removeLayer(exitSpotMarker);
       if (jumprunLine) map.removeLayer(jumprunLine);
@@ -587,35 +587,37 @@
       const offsetNM = parseFloat((avgSpd / 15).toFixed(2));
       const headwindDir = Math.round(avgDir);
       
-      // Direct upwind projection: Clear Drop Spot is located UPWIND towards avgDir (e.g. 144 deg South-East)
+      // Upwind bearing for Exit Spot offset (e.g. 144 deg SE)
       const upwindBearing = avgDir;
 
-      // Project Exit Spot strictly UPWIND (South-East)
+      // 1. EXACT CLEAR DROP SPOT LOCATION AT offsetNM (e.g., 1.27 NM upwind)
       const exitPt = computeDestinationPoint(lat, lon, upwindBearing, offsetNM);
 
-      // Downwind approach start point (North-West)
+      // 2. EXTENDED LINE ENDPOINT PAST EXIT SPOT (additional 0.5 NM upwind)
+      const extendedPt = computeDestinationPoint(lat, lon, upwindBearing, offsetNM + 0.5);
+
+      // 3. DOWNWIND ENTRY START POINT (0.5 NM NW of PLA)
       const entryBearing = (avgDir + 180) % 360;
       const entryPt = computeDestinationPoint(lat, lon, entryBearing, 0.5);
 
-      // Midpoint along the jump run line
-      const midLat = (lat + exitPt.lat) / 2;
-      const midLon = (lon + exitPt.lon) / 2;
+      // 4. MIDPOINT BETWEEN PLA AND EXIT SPOT FOR HEADING LABEL
+      const midPt = computeDestinationPoint(lat, lon, upwindBearing, offsetNM / 2);
 
-      // 1. BROKEN CYAN DASHED FLIGHT PATH LINE (Runs NW through PLA to SE Exit Spot)
-      jumprunLine = L.polyline([[entryPt.lat, entryPt.lon], [exitPt.lat, exitPt.lon]], {
+      // DRAW DASHED FLIGHT PATH LINE THROUGH ALL POINTS
+      jumprunLine = L.polyline([[entryPt.lat, entryPt.lon], [lat, lon], [exitPt.lat, exitPt.lon], [extendedPt.lat, extendedPt.lon]], {
         color: '#00d8ff',
         weight: 3,
         opacity: 0.9,
         dashArray: '10, 8'
       }).addTo(map);
 
-      // 2. MIDPOINT HEADING BADGE ON-AXIS ALONG FLIGHT LINE
+      // MIDPOINT HEADING BADGE ON-AXIS ALONG FLIGHT LINE
       const headingHTML = `<div class="line-heading-label">${headwindDir}°</div>`;
-      lineHeadingMarker = L.marker([midLat, midLon], {
+      lineHeadingMarker = L.marker([midPt.lat, midPt.lon], {
         icon: L.divIcon({ html: headingHTML, className: '', iconSize: [40, 20], iconAnchor: [20, 10] })
       }).addTo(map);
 
-      // 3. CLEAN SPOT BADGE AT UPWIND EXIT POINT (DISTANCE WITH "NM")
+      // YELLOW CLEAR DROP SPOT BADGE DIRECTLY AT THE offsetNM MEASUREMENT POINT
       const dropSpotHTML = `<div class="spot-clean-badge">${offsetNM}NM</div>`;
       exitSpotMarker = L.marker([exitPt.lat, exitPt.lon], {
         icon: L.divIcon({ html: dropSpotHTML, className: '', iconSize: [60, 26], iconAnchor: [30, 13] })
@@ -625,7 +627,7 @@
       document.getElementById('calc-offset').innerText = `${offsetNM} NM`;
       document.getElementById('calc-coords').innerText = `${exitPt.lat.toFixed(4)}, ${exitPt.lon.toFixed(4)}`;
 
-      const bounds = L.latLngBounds([[entryPt.lat, entryPt.lon], [exitPt.lat, exitPt.lon]]);
+      const bounds = L.latLngBounds([[entryPt.lat, entryPt.lon], [extendedPt.lat, extendedPt.lon]]);
       map.fitBounds(bounds, { padding: [40, 40] });
     }
 
