@@ -355,7 +355,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 2.6.0</div>
+    <div class="rev-badge">REV: 2.6.1</div>
   </div>
 
   <div class="dashboard-container">
@@ -579,14 +579,12 @@
       return { lat: (lat2 * 180) / Math.PI, lon: (lon2 * 180) / Math.PI };
     }
 
-    // Robust cloud base calculation accounting for cloud cover and temperature-dewpoint spread
     function calculateCloudBase(tempC, dewpointC, cloudCoverPct) {
       if (cloudCoverPct < 25 || dewpointC === undefined || tempC === undefined) return null;
       const spread = tempC - dewpointC;
-      if (spread < 0.5) return 0; // Fog / ground level
+      if (spread < 0.5) return 0;
       
       const baseFt = Math.round((spread / 2.5) * 1000);
-      // If calculated base is unrealistically low despite scattered/broken layers, validate against threshold
       if (baseFt < 800 && cloudCoverPct < 50) return null; 
       return Math.max(0, baseFt);
     }
@@ -624,6 +622,7 @@
       windRoseLayerGroup.clearLayers();
       manualLayerGroup.clearLayers();
 
+      // Airfield Center Point
       L.circleMarker([lat, lon], {
         radius: 6, fillColor: '#00d8ff', color: '#000', weight: 2, fillOpacity: 1
       }).addTo(windRoseLayerGroup);
@@ -637,7 +636,8 @@
       const baseDistances = [0.10, 0.22, 0.34];
 
       rawModels.forEach((m, idx) => {
-        const endPt = computeDestinationPoint(lat, lon, m.dir, baseDistances[idx]);
+        const distNM = baseDistances[idx];
+        const endPt = computeDestinationPoint(lat, lon, m.dir, distNM);
 
         L.polyline([[lat, lon], [endPt.lat, endPt.lon]], {
           color: m.color, weight: 2.8, opacity: 0.9, dashArray: m.dash
@@ -659,7 +659,7 @@
 
       const avgWindDir = (aromeDir + gfsDir + ecmwfDir) / 3;
       const autoRunIn = avgWindDir;
-      const avgSpeed = (aromeSpd + gfsSpd + ecmwfGst) / 3;
+      const avgSpeed = (aromeSpd + gfsSpd + ecmwfSpd) / 3;
       const autoSpotOffset = Math.min(0.28, Math.max(0.12, (avgSpeed / 100) * 1.2));
 
       const displayMode = document.getElementById('select-display-mode').value;
