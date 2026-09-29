@@ -261,7 +261,6 @@
       line-height: 1;
     }
 
-    /* UPRIGHT WIND ROSE LABEL BADGES */
     .rose-label {
       position: absolute;
       padding: 2px 6px;
@@ -282,7 +281,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.4.6</div>
+    <div class="rev-badge">REV: 1.4.7</div>
   </div>
 
   <div class="dashboard-container">
@@ -480,7 +479,9 @@
 
     function getArrow(deg) {
       if (deg === undefined || deg === null) return '↑';
-      return `<span class="dir-arrow" style="transform: rotate(${deg}deg); display: inline-block;">↑</span>`;
+      // Rotate arrow glyph to direction wind is blowing TO (downwind drift)
+      const rotateDeg = (deg + 180) % 360;
+      return `<span class="dir-arrow" style="transform: rotate(${rotateDeg}deg); display: inline-block;">↑</span>`;
     }
 
     function getStatusClass(val) {
@@ -490,9 +491,9 @@
       return 'status-red';
     }
 
-    // HELPER TO CONVERT POLAR BEARINGS TO CANVAS SVG COORDINATES
+    // MAP METEOROLOGICAL BEARING TO TRUE UPWIND CANVAS VECTOR
     function getVectorCoords(deg, length) {
-      // Deg 0 = Up (North), 90 = Right (East)
+      // Met bearing deg: 0 = North (Top), 135 = SE (Bottom-Right)
       const rad = ((deg - 90) * Math.PI) / 180;
       return {
         x: 110 + length * Math.cos(rad),
@@ -503,9 +504,10 @@
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
       if (windRoseMarker) map.removeLayer(windRoseMarker);
 
-      const aromePt = getVectorCoords(aromeDir, 80);
+      // Stagger label radii to prevent badge overlap when directions are similar
+      const aromePt = getVectorCoords(aromeDir, 85);
       const gfsPt   = getVectorCoords(gfsDir, 65);
-      const ecmwfPt = getVectorCoords(ecmwfDir, 50);
+      const ecmwfPt = getVectorCoords(ecmwfDir, 45);
 
       const windRoseHTML = `
         <div style="position: relative; width: 220px; height: 220px; pointer-events: none;">
@@ -514,13 +516,13 @@
             <circle cx="110" cy="110" r="75" stroke="#ffffff" stroke-opacity="0.4" stroke-width="1.5" fill="none" />
             <circle cx="110" cy="110" r="5" fill="#00d8ff" stroke="#000000" stroke-width="2"/>
 
-            <!-- Vector Line Rays from Center -->
+            <!-- Vector Line Rays from Center to Upwind Source -->
             <line x1="110" y1="110" x2="${aromePt.x}" y2="${aromePt.y}" stroke="#00e676" stroke-width="2.5" stroke-dasharray="4,2"/>
             <line x1="110" y1="110" x2="${gfsPt.x}"   y2="${gfsPt.y}"   stroke="#ffee58" stroke-width="2.5"/>
             <line x1="110" y1="110" x2="${ecmwfPt.x}" y2="${ecmwfPt.y}" stroke="#00d8ff" stroke-width="2.5"/>
           </svg>
 
-          <!-- UPRIGHT HTML LABELS PLACED AT RAY ENDPOINTS -->
+          <!-- UPRIGHT HTML LABELS PLACED AT UPWIND RAY ENDPOINTS -->
           <div class="rose-label" style="left: ${aromePt.x}px; top: ${aromePt.y}px; background: rgba(0, 230, 118, 0.95);">
             ${aromeSpd} G:${aromeGst} mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">AROME</span>
           </div>
@@ -651,17 +653,17 @@
         document.getElementById('multi-model-rows').innerHTML = rowsHTML;
 
         // DYNAMIC WIND ROSE & DROP SPOT UPDATE
-        const aromeDir = arome.hourly ? arome.hourly.wind_direction_10m[currentIdx] : 90;
-        const aromeSpd = arome.hourly ? Math.round(arome.hourly.wind_speed_10m[currentIdx]) : 11;
-        const aromeGst = arome.hourly ? Math.round(arome.hourly.wind_gusts_10m[currentIdx]) : 15;
+        const aromeDir = arome.hourly ? arome.hourly.wind_direction_10m[currentIdx] : 135;
+        const aromeSpd = arome.hourly ? Math.round(arome.hourly.wind_speed_10m[currentIdx]) : 18;
+        const aromeGst = arome.hourly ? Math.round(arome.hourly.wind_gusts_10m[currentIdx]) : 27;
 
-        const gfsDir = gfs.hourly ? gfs.hourly.wind_direction_10m[currentIdx] : 90;
-        const gfsSpd = gfs.hourly ? Math.round(gfs.hourly.wind_speed_10m[currentIdx]) : 10;
-        const gfsGst = gfs.hourly ? Math.round(gfs.hourly.wind_gusts_10m[currentIdx]) : 13;
+        const gfsDir = gfs.hourly ? gfs.hourly.wind_direction_10m[currentIdx] : 135;
+        const gfsSpd = gfs.hourly ? Math.round(gfs.hourly.wind_speed_10m[currentIdx]) : 20;
+        const gfsGst = gfs.hourly ? Math.round(gfs.hourly.wind_gusts_10m[currentIdx]) : 27;
 
-        const ecmwfDir = ecmwf.hourly ? ecmwf.hourly.wind_direction_10m[currentIdx] : 90;
-        const ecmwfSpd = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_speed_10m[currentIdx]) : 11;
-        const ecmwfGst = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_gusts_10m[currentIdx]) : 14;
+        const ecmwfDir = ecmwf.hourly ? ecmwf.hourly.wind_direction_10m[currentIdx] : 135;
+        const ecmwfSpd = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_speed_10m[currentIdx]) : 18;
+        const ecmwfGst = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_gusts_10m[currentIdx]) : 32;
 
         updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst);
 
