@@ -243,22 +243,22 @@
       border: none;
     }
 
-    /* COMBINED SPOT BADGE WITH BEARING AND DISTANCE */
+    /* SPOT BADGE CONTAINING BOTH BEARING AND DISTANCE */
     .spot-clean-badge {
       background: #ffee58;
       color: #000;
-      padding: 5px 10px;
+      padding: 4px 9px;
       border-radius: 20px;
       font-weight: 900;
       font-family: monospace;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       border: 2px solid #000;
       box-shadow: 0 0 12px rgba(255, 238, 88, 0.85);
       white-space: nowrap;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 5px;
     }
 
     /* UPRIGHT WIND ROSE LABELS */
@@ -282,7 +282,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.5.6</div>
+    <div class="rev-badge">REV: 1.5.7</div>
   </div>
 
   <div class="dashboard-container">
@@ -564,36 +564,37 @@
       }).addTo(map);
     }
 
-    // ACCURATE UPWIND EXIT SPOT & EXTENDED BROKEN JUMP RUN LINE
+    // ACCURATE SPOT OFFSET CALCULATION (1 mph wind = ~100 ft drift offset = 0.0164 NM per mph)
     function updateDropSpotMarker(avgDir, avgSpd) {
       if (exitSpotMarker) map.removeLayer(exitSpotMarker);
       if (jumprunLine) map.removeLayer(jumprunLine);
 
-      const offsetNM = parseFloat((avgSpd / 15).toFixed(2));
+      // REALISTIC SPOT OFFSET: ~100 ft per mph of wind (19 mph = 1900 ft = 0.31 NM)
+      const offsetNM = parseFloat((avgSpd / 60).toFixed(2));
       const headwindDir = Math.round(avgDir);
       
       // Upwind bearing for Exit Spot offset (e.g. 144 deg SE)
       const upwindBearing = avgDir;
 
-      // 1. EXACT CLEAR DROP SPOT LOCATION AT CALCULATED OFFSET (e.g., 1.27 NM upwind)
+      // 1. EXACT CLEAR DROP SPOT LOCATION AT REALISTIC OFFSET (~0.31 NM upwind)
       const exitPt = computeDestinationPoint(lat, lon, upwindBearing, offsetNM);
 
-      // 2. EXTENDED LINE ENDPOINT PAST EXIT SPOT (additional 0.5 NM upwind)
-      const extendedPt = computeDestinationPoint(lat, lon, upwindBearing, offsetNM + 0.5);
+      // 2. EXTENDED LINE ENDPOINT PAST EXIT SPOT (additional 0.25 NM upwind)
+      const extendedPt = computeDestinationPoint(lat, lon, upwindBearing, offsetNM + 0.25);
 
-      // 3. DOWNWIND ENTRY START POINT (0.5 NM NW of PLA)
+      // 3. DOWNWIND ENTRY START POINT (0.3 NM NW of PLA)
       const entryBearing = (avgDir + 180) % 360;
-      const entryPt = computeDestinationPoint(lat, lon, entryBearing, 0.5);
+      const entryPt = computeDestinationPoint(lat, lon, entryBearing, 0.3);
 
       // DRAW DASHED FLIGHT PATH LINE THROUGH ALL POINTS
       jumprunLine = L.polyline([[entryPt.lat, entryPt.lon], [lat, lon], [exitPt.lat, exitPt.lon], [extendedPt.lat, extendedPt.lon]], {
         color: '#00d8ff',
         weight: 3,
         opacity: 0.9,
-        dashArray: '10, 8'
+        dashArray: '8, 6'
       }).addTo(map);
 
-      // SINGLE COMBINED SPOT BADGE CONTAINING BOTH BEARING & DISTANCE AT THE EXIT SPOT LOCATION
+      // COMBINED BADGE ANCHORED EXACTLY AT REALISTIC EXIT SPOT (e.g., 0.31 NM)
       const dropSpotHTML = `<div class="spot-clean-badge"><span>🎯</span><span>${headwindDir}°</span><span>|</span><span>${offsetNM}NM</span></div>`;
       exitSpotMarker = L.marker([exitPt.lat, exitPt.lon], {
         icon: L.divIcon({ html: dropSpotHTML, className: '', iconSize: [110, 30], iconAnchor: [55, 15] })
@@ -604,7 +605,7 @@
       document.getElementById('calc-coords').innerText = `${exitPt.lat.toFixed(4)}, ${exitPt.lon.toFixed(4)}`;
 
       const bounds = L.latLngBounds([[entryPt.lat, entryPt.lon], [extendedPt.lat, extendedPt.lon]]);
-      map.fitBounds(bounds, { padding: [40, 40] });
+      map.fitBounds(bounds, { padding: [50, 50] });
     }
 
     // 2. FETCH MULTI-MODEL FORECAST DATA
