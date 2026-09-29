@@ -243,7 +243,7 @@
       border: none;
     }
 
-    /* CLEAN SIMPLE DROP SPOT BADGE */
+    /* SPOT BADGE */
     .spot-clean-badge {
       background: #ffee58;
       color: #000;
@@ -260,7 +260,7 @@
       justify-content: center;
     }
 
-    /* ON-AXIS HEADING LABEL ALONG BROKEN JUMP RUN LINE */
+    /* MIDPOINT HEADING BADGE ALONG JUMP RUN AXIS */
     .line-heading-label {
       background: #00d8ff;
       color: #000;
@@ -274,13 +274,14 @@
       white-space: nowrap;
     }
 
-    .rose-label {
+    /* UPRIGHT WIND ROSE LABELS */
+    .rose-label-badge {
       position: absolute;
-      padding: 2px 6px;
-      border-radius: 8px;
+      padding: 2px 5px;
+      border-radius: 6px;
       border: 1px solid #000;
       font-family: sans-serif;
-      font-size: 10px;
+      font-size: 9px;
       font-weight: bold;
       white-space: nowrap;
       color: #000;
@@ -294,7 +295,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.5.0</div>
+    <div class="rev-badge">REV: 1.5.1</div>
   </div>
 
   <div class="dashboard-container">
@@ -302,7 +303,7 @@
     <!-- SEGMENT 1: SATELLITE MAP + HORIZONTAL MODEL TABLE + DROP SPOT CALCULATOR -->
     <div class="segment-1-stack">
       
-      <!-- 1A: SATELLITE MAP WITH PRECISE RUNWAY CROSS CENTER & RADIAL WIND ROSE -->
+      <!-- 1A: SATELLITE MAP WITH RUNWAY CROSS CENTER & RADIAL WIND ROSE -->
       <div class="map-card">
         <div id="map"></div>
       </div>
@@ -504,22 +505,22 @@
       return 'status-red';
     }
 
-    // DIRECT POLAR TO SVG CANVAS MATH (0deg = 12 o'clock North)
-    function getRadialEndpoint(deg, length) {
+    // DIRECT POLAR MATH FOR SVG CANVAS (0 deg = 12 o'clock North)
+    function getRadialPoint(deg, radius) {
       const rad = ((deg - 90) * Math.PI) / 180;
       return {
-        x: 110 + length * Math.cos(rad),
-        y: 110 + length * Math.sin(rad)
+        x: 110 + radius * Math.cos(rad),
+        y: 110 + radius * Math.sin(rad)
       };
     }
 
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
       if (windRoseMarker) map.removeLayer(windRoseMarker);
 
-      // Radial arms point toward the incoming wind source direction
-      const aromePt = getRadialEndpoint(aromeDir, 85);
-      const gfsPt   = getRadialEndpoint(gfsDir, 65);
-      const ecmwfPt = getRadialEndpoint(ecmwfDir, 45);
+      // Rays point toward the incoming wind source direction
+      const aromePt = getRadialPoint(aromeDir, 80);
+      const gfsPt   = getRadialPoint(gfsDir, 62);
+      const ecmwfPt = getRadialPoint(ecmwfDir, 44);
 
       const windRoseHTML = `
         <div style="position: relative; width: 220px; height: 220px; pointer-events: none;">
@@ -527,21 +528,23 @@
             <circle cx="110" cy="110" r="75" stroke="#ffffff" stroke-opacity="0.4" stroke-width="1.5" fill="none" />
             <circle cx="110" cy="110" r="5" fill="#00d8ff" stroke="#000000" stroke-width="2"/>
 
+            <!-- Straight Radial Vectors from Center -->
             <line x1="110" y1="110" x2="${aromePt.x}" y2="${aromePt.y}" stroke="#00e676" stroke-width="2.5" stroke-dasharray="4,2"/>
             <line x1="110" y1="110" x2="${gfsPt.x}"   y2="${gfsPt.y}"   stroke="#ffee58" stroke-width="2.5"/>
             <line x1="110" y1="110" x2="${ecmwfPt.x}" y2="${ecmwfPt.y}" stroke="#00d8ff" stroke-width="2.5"/>
           </svg>
 
-          <div class="rose-label" style="left: ${aromePt.x}px; top: ${aromePt.y}px; background: rgba(0, 230, 118, 0.95);">
-            ${aromeSpd} G:${aromeGst} mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">AROME</span>
+          <!-- UPRIGHT TEXT BADGES PLACED AT VECTOR ENDPOINTS -->
+          <div class="rose-label-badge" style="left: ${aromePt.x}px; top: ${aromePt.y}px; background: rgba(0, 230, 118, 0.95);">
+            ${aromeSpd} G:${aromeGst} mph <span style="background:#222; color:#fff; font-size:7.5px; padding:1px 3px; border-radius:2px;">AROME</span>
           </div>
 
-          <div class="rose-label" style="left: ${gfsPt.x}px; top: ${gfsPt.y}px; background: rgba(255, 235, 59, 0.95);">
-            ${gfsSpd} G:${gfsGst} mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">GFS</span>
+          <div class="rose-label-badge" style="left: ${gfsPt.x}px; top: ${gfsPt.y}px; background: rgba(255, 235, 59, 0.95);">
+            ${gfsSpd} G:${gfsGst} mph <span style="background:#222; color:#fff; font-size:7.5px; padding:1px 3px; border-radius:2px;">GFS</span>
           </div>
 
-          <div class="rose-label" style="left: ${ecmwfPt.x}px; top: ${ecmwfPt.y}px; background: rgba(0, 216, 255, 0.95);">
-            ${ecmwfSpd} G:${ecmwfGst} mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">ECMWF</span>
+          <div class="rose-label-badge" style="left: ${ecmwfPt.x}px; top: ${ecmwfPt.y}px; background: rgba(0, 216, 255, 0.95);">
+            ${ecmwfSpd} G:${ecmwfGst} mph <span style="background:#222; color:#fff; font-size:7.5px; padding:1px 3px; border-radius:2px;">ECMWF</span>
           </div>
         </div>
       `;
@@ -560,7 +563,7 @@
       const offsetNM = parseFloat((avgSpd / 15).toFixed(2));
       const headwindDir = Math.round(avgDir);
       
-      // Upwind Bearing for Exit Spot offset
+      // Upwind Bearing for Exit Spot displacement
       const upwindBearing = (avgDir + 180) % 360;
       const rad = (upwindBearing * Math.PI) / 180;
       
