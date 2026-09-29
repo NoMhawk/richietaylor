@@ -233,42 +233,31 @@
       border: none;
     }
 
-    /* BADGE STACK CONTAINER - OVERRIDE LEAFLET'S DEFAULT OFFSET MARGINS */
-    .stack-wrapper {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-      width: 130px;
-      height: 72px;
-      margin-left: 0 !important;
-      margin-top: 0 !important;
-      pointer-events: none;
-    }
-
-    .stack-pill {
+    /* INDIVIDUAL FAN-OUT BADGE STYLING */
+    .fan-pill {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 4px;
-      padding: 2px 5px;
+      padding: 2px 6px;
       border-radius: 4px;
       color: #000;
       font-family: sans-serif;
       font-size: 10px;
       font-weight: bold;
-      border: 1px solid #000;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+      border: 1.5px solid #000;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.7);
       white-space: nowrap;
-      height: 22px;
-      box-sizing: border-box;
+      pointer-events: none;
     }
 
-    .stack-pill-tag {
+    .fan-pill-tag {
       background: #000;
       color: #fff;
       font-size: 8px;
-      padding: 1px 3px;
+      padding: 1px 4px;
       border-radius: 2px;
+      text-transform: uppercase;
     }
   </style>
 </head>
@@ -277,15 +266,15 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.7.5</div>
+    <div class="rev-badge">REV: 2.0.0</div>
   </div>
 
   <div class="dashboard-container">
     
-    <!-- SEGMENT 1: SATELLITE MAP (WIND ROSE ONLY) + HORIZONTAL MODEL TABLE -->
+    <!-- SEGMENT 1: SATELLITE MAP (FAN-OUT WIND ROSE) + HORIZONTAL MODEL TABLE -->
     <div class="segment-1-stack">
       
-      <!-- 1A: SATELLITE MAP WITH CLEAN WIND ROSE OVERLAY -->
+      <!-- 1A: SATELLITE MAP -->
       <div class="map-card">
         <div id="map"></div>
       </div>
@@ -424,7 +413,7 @@
   </div>
 
   <script>
-    // EXACT DUNKESWELL RUNWAY CROSS COORDINATES
+    // DUNKESWELL RUNWAY CROSS COORDINATES
     const lat = 50.860619;
     const lon = -3.233961;
 
@@ -449,7 +438,7 @@
       return 'status-red';
     }
 
-    // GEOGRAPHIC DESTINATION POINT (WGS84)
+    // GEOGRAPHIC DESTINATION POINT CALCULATION (WGS84)
     function computeDestinationPoint(originLat, originLon, bearingDeg, distanceNM) {
       const R = 3440.065; // Earth radius in nautical miles
       const d = distanceNM;
@@ -473,11 +462,11 @@
       };
     }
 
-    // DRAW CLEAN WIND ROSE WITH GEOGRAPHIC VECTOR LINES & STACKED BADGE CONTAINER
+    // TRUE FAN-OUT FROM CENTER POINT
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
       windRoseLayerGroup.clearLayers();
 
-      // Airfield center point
+      // Airfield Center Point
       L.circleMarker([lat, lon], {
         radius: 6,
         fillColor: '#00d8ff',
@@ -486,43 +475,57 @@
         fillOpacity: 1
       }).addTo(windRoseLayerGroup);
 
-      // Average direction vector for primary ray
-      const avgDir = (aromeDir + gfsDir + ecmwfDir) / 3;
-      const stackEndPt = computeDestinationPoint(lat, lon, avgDir, 0.18);
+      // Raw model configs
+      let modelList = [
+        { name: 'AROME-HD', dir: aromeDir, spd: aromeSpd, gst: aromeGst, color: '#00e676', bg: 'rgba(0, 230, 118, 0.95)' },
+        { name: 'GFS',      dir: gfsDir,   spd: gfsSpd,   gst: gfsGst,   color: '#ffee58', bg: 'rgba(255, 235, 59, 0.95)' },
+        { name: 'ECMWF',    dir: ecmwfDir, spd: ecmwfSpd, gst: ecmwfGst, color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)' }
+      ];
 
-      // Vector ray from airfield center to middle of stacked badges
-      L.polyline([[lat, lon], [stackEndPt.lat, stackEndPt.lon]], {
-        color: '#ffee58',
-        weight: 3,
-        opacity: 0.95
-      }).addTo(windRoseLayerGroup);
+      // Detect direction consensus and calculate clean angular fan offsets
+      // If models share identical directions, offset them by -7°, 0°, +7° so they fan out cleanly from center
+      const angleOffsets = [-7, 0, 7];
+      const rayLengthNM = 0.18; // Vector distance on map
 
-      // Stacked container anchored precisely at left-middle edge [0, 36]
-      const stackHTML = `
-        <div class="stack-wrapper">
-          <div class="stack-pill" style="background: rgba(0, 230, 118, 0.95);">
-            <span>${aromeSpd} G:${aromeGst}</span>
-            <span class="stack-pill-tag">AROME-HD</span>
-          </div>
-          <div class="stack-pill" style="background: rgba(255, 235, 59, 0.95);">
-            <span>${gfsSpd} G:${gfsGst}</span>
-            <span class="stack-pill-tag">GFS</span>
-          </div>
-          <div class="stack-pill" style="background: rgba(0, 216, 255, 0.95);">
-            <span>${ecmwfSpd} G:${ecmwfGst}</span>
-            <span class="stack-pill-tag">ECMWF</span>
-          </div>
-        </div>
-      `;
+      modelList.forEach((m, idx) => {
+        // Calculate effective bearing including fan spread offset
+        let spreadDir = (m.dir + angleOffsets[idx] + 360) % 360;
+        
+        // Target endpoint for vector line & badge
+        const endPt = computeDestinationPoint(lat, lon, spreadDir, rayLengthNM);
 
-      L.marker([stackEndPt.lat, stackEndPt.lon], {
-        icon: L.divIcon({
-          html: stackHTML,
-          className: '',
-          iconSize: [130, 72],
-          iconAnchor: [0, 36] // Anchors cleanly at left-center edge of the 72px tall stack
-        })
-      }).addTo(windRoseLayerGroup);
+        // 1. Draw dedicated vector ray directly from center dot
+        L.polyline([[lat, lon], [endPt.lat, endPt.lon]], {
+          color: m.color,
+          weight: 2.8,
+          opacity: 0.9,
+          dashArray: m.name === 'AROME-HD' ? '4,3' : null
+        }).addTo(windRoseLayerGroup);
+
+        // 2. Individual badge anchored at the tip of its own ray
+        const pillHTML = `
+          <div class="fan-pill" style="background: ${m.bg};">
+            <span>${m.spd} G:${m.gst}</span>
+            <span class="fan-pill-tag">${m.name}</span>
+          </div>
+        `;
+
+        // Determine anchor point based on direction quadrant so badges don't overlap the vector lines
+        let anchorX = 0;
+        let anchorY = 11;
+        if (spreadDir > 180 && spreadDir < 360) {
+          anchorX = 120; // Align right edge when pointing West
+        }
+
+        L.marker([endPt.lat, endPt.lon], {
+          icon: L.divIcon({
+            html: pillHTML,
+            className: '',
+            iconSize: [120, 22],
+            iconAnchor: [anchorX, anchorY]
+          })
+        }).addTo(windRoseLayerGroup);
+      });
     }
 
     // 2. FETCH MULTI-MODEL FORECAST DATA
