@@ -243,35 +243,22 @@
       border: none;
     }
 
-    /* CLEAN YELLOW DROP SPOT BADGE */
+    /* COMBINED SPOT BADGE WITH BEARING AND DISTANCE */
     .spot-clean-badge {
       background: #ffee58;
       color: #000;
-      padding: 4px 8px;
+      padding: 5px 10px;
       border-radius: 20px;
       font-weight: 900;
       font-family: monospace;
-      font-size: 0.72rem;
+      font-size: 0.75rem;
       border: 2px solid #000;
-      box-shadow: 0 0 10px rgba(255, 238, 88, 0.8);
+      box-shadow: 0 0 12px rgba(255, 238, 88, 0.85);
       white-space: nowrap;
       display: flex;
       align-items: center;
       justify-content: center;
-    }
-
-    /* MIDPOINT HEADING BADGE ALONG JUMP RUN AXIS */
-    .line-heading-label {
-      background: #00d8ff;
-      color: #000;
-      font-weight: 900;
-      font-family: monospace;
-      font-size: 0.65rem;
-      padding: 2px 6px;
-      border-radius: 4px;
-      border: 1.5px solid #000;
-      box-shadow: 0 0 8px rgba(0, 216, 255, 0.9);
-      white-space: nowrap;
+      gap: 6px;
     }
 
     /* UPRIGHT WIND ROSE LABELS */
@@ -295,7 +282,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.5.5</div>
+    <div class="rev-badge">REV: 1.5.6</div>
   </div>
 
   <div class="dashboard-container">
@@ -490,7 +477,6 @@
     let windRoseMarker = null;
     let exitSpotMarker = null;
     let jumprunLine = null;
-    let lineHeadingMarker = null;
 
     function getArrow(deg) {
       if (deg === undefined || deg === null) return '↑';
@@ -582,7 +568,6 @@
     function updateDropSpotMarker(avgDir, avgSpd) {
       if (exitSpotMarker) map.removeLayer(exitSpotMarker);
       if (jumprunLine) map.removeLayer(jumprunLine);
-      if (lineHeadingMarker) map.removeLayer(lineHeadingMarker);
 
       const offsetNM = parseFloat((avgSpd / 15).toFixed(2));
       const headwindDir = Math.round(avgDir);
@@ -600,9 +585,6 @@
       const entryBearing = (avgDir + 180) % 360;
       const entryPt = computeDestinationPoint(lat, lon, entryBearing, 0.5);
 
-      // 4. MIDPOINT BETWEEN PLA AND EXIT SPOT FOR HEADING LABEL (at offsetNM / 2)
-      const midPt = computeDestinationPoint(lat, lon, upwindBearing, offsetNM / 2);
-
       // DRAW DASHED FLIGHT PATH LINE THROUGH ALL POINTS
       jumprunLine = L.polyline([[entryPt.lat, entryPt.lon], [lat, lon], [exitPt.lat, exitPt.lon], [extendedPt.lat, extendedPt.lon]], {
         color: '#00d8ff',
@@ -611,16 +593,10 @@
         dashArray: '10, 8'
       }).addTo(map);
 
-      // HEADING BADGE MIDWAY BETWEEN PLA AND EXIT SPOT (approx 0.63 NM upwind)
-      const headingHTML = `<div class="line-heading-label">${headwindDir}°</div>`;
-      lineHeadingMarker = L.marker([midPt.lat, midPt.lon], {
-        icon: L.divIcon({ html: headingHTML, className: '', iconSize: [40, 20], iconAnchor: [20, 10] })
-      }).addTo(map);
-
-      // YELLOW CLEAR DROP SPOT BADGE ANCHORED EXACTLY AT offsetNM (1.27 NM)
-      const dropSpotHTML = `<div class="spot-clean-badge">${offsetNM}NM</div>`;
+      // SINGLE COMBINED SPOT BADGE CONTAINING BOTH BEARING & DISTANCE AT THE EXIT SPOT LOCATION
+      const dropSpotHTML = `<div class="spot-clean-badge"><span>🎯</span><span>${headwindDir}°</span><span>|</span><span>${offsetNM}NM</span></div>`;
       exitSpotMarker = L.marker([exitPt.lat, exitPt.lon], {
-        icon: L.divIcon({ html: dropSpotHTML, className: '', iconSize: [60, 26], iconAnchor: [30, 13] })
+        icon: L.divIcon({ html: dropSpotHTML, className: '', iconSize: [110, 30], iconAnchor: [55, 15] })
       }).addTo(map);
 
       document.getElementById('calc-jumprun').innerText = `${headwindDir}° (Headwind)`;
