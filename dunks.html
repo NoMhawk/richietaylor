@@ -355,7 +355,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 2.6.1</div>
+    <div class="rev-badge">REV: 2.7.0</div>
   </div>
 
   <div class="dashboard-container">
@@ -579,14 +579,16 @@
       return { lat: (lat2 * 180) / Math.PI, lon: (lon2 * 180) / Math.PI };
     }
 
+    // Accurate cloud base calculation above field elevation (AGL) based on spread and moisture
     function calculateCloudBase(tempC, dewpointC, cloudCoverPct) {
-      if (cloudCoverPct < 25 || dewpointC === undefined || tempC === undefined) return null;
+      if (cloudCoverPct < 20 || dewpointC === undefined || tempC === undefined) return null;
       const spread = tempC - dewpointC;
-      if (spread < 0.5) return 0;
+      if (spread < 0.3) return 0; // Fog
       
-      const baseFt = Math.round((spread / 2.5) * 1000);
-      if (baseFt < 800 && cloudCoverPct < 50) return null; 
-      return Math.max(0, baseFt);
+      // Standard formula: (Spread / 2.5°C) * 1000 ft + Airfield Elevation
+      const baseAGL = Math.round((spread / 2.5) * 1000);
+      if (baseAGL < 400 && cloudCoverPct < 40) return null; // Filter erroneous ground clutter
+      return Math.max(0, baseAGL);
     }
 
     function toggleSpotMode() {
@@ -622,7 +624,7 @@
       windRoseLayerGroup.clearLayers();
       manualLayerGroup.clearLayers();
 
-      // Airfield Center Point
+      // Airfield Center Marker
       L.circleMarker([lat, lon], {
         radius: 6, fillColor: '#00d8ff', color: '#000', weight: 2, fillOpacity: 1
       }).addTo(windRoseLayerGroup);
@@ -633,7 +635,8 @@
         { name: 'ECMWF',    dir: ecmwfDir, spd: ecmwfSpd, gst: ecmwfGst, color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)', dash: null }
       ];
 
-      const baseDistances = [0.10, 0.22, 0.34];
+      // Staggered offsets for each model vector so they don't stack on top of each other
+      const baseDistances = [0.12, 0.23, 0.34];
 
       rawModels.forEach((m, idx) => {
         const distNM = baseDistances[idx];
