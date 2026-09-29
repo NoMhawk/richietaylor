@@ -288,7 +288,7 @@
       gap: 5px;
     }
 
-    /* UPRIGHT WIND ROSE LABELS */
+    /* UPRIGHT WIND ROSE LABELS ANCHORED AT OUTER RING ENDPOINTS */
     .rose-label-badge {
       position: absolute;
       padding: 3px 6px;
@@ -310,7 +310,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.6.0</div>
+    <div class="rev-badge">REV: 1.6.1</div>
   </div>
 
   <div class="dashboard-container">
@@ -559,50 +559,66 @@
       };
     }
 
-    // SVG RADIAL POINT MATH
+    // SVG RADIAL POINT MATH (0 deg = North 12 o'clock)
     function getRadialPoint(deg, radius) {
       const rad = ((deg - 90) * Math.PI) / 180;
       return {
-        x: 100 + radius * Math.cos(rad),
-        y: 100 + radius * Math.sin(rad)
+        x: 140 + radius * Math.cos(rad),
+        y: 140 + radius * Math.sin(rad)
       };
     }
 
-    // MAP 1: DEDICATED WIND ROSE MAP
+    // MAP 1: INWARD VECTOR WIND ROSE WITH ANGULAR DE-CONFLICTION
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
       if (windRoseMarker) mapWind.removeLayer(windRoseMarker);
 
-      const ecmwfPt = getRadialPoint(ecmwfDir, 50);
-      const gfsPt   = getRadialPoint(gfsDir, 70);
-      const aromePt = getRadialPoint(aromeDir, 90);
+      // Apply angular offsets if model directions are nearly identical
+      let aromeAngle = aromeDir;
+      let gfsAngle = gfsDir;
+      let ecmwfAngle = ecmwfDir;
+
+      if (Math.abs(aromeDir - gfsDir) < 12 && Math.abs(gfsDir - ecmwfDir) < 12) {
+        aromeAngle -= 14;
+        ecmwfAngle += 14;
+      }
+
+      // Outer ring distance (100px radius) for vector origin & badges
+      const ringRadius = 90;
+
+      // Inward vector start points (outside the circle ring)
+      const ecmwfStart = getRadialPoint(ecmwfAngle, ringRadius);
+      const gfsStart   = getRadialPoint(gfsAngle, ringRadius);
+      const aromeStart = getRadialPoint(aromeAngle, ringRadius);
 
       const windRoseHTML = `
-        <div style="position: relative; width: 200px; height: 200px; pointer-events: none;">
-          <svg width="200" height="200" viewBox="0 0 200 200" style="position: absolute; top:0; left:0;">
-            <circle cx="100" cy="100" r="60" stroke="#ffffff" stroke-opacity="0.3" stroke-width="1.5" fill="none" />
-            <circle cx="100" cy="100" r="4" fill="#00d8ff" stroke="#000000" stroke-width="2"/>
+        <div style="position: relative; width: 280px; height: 280px; pointer-events: none;">
+          <svg width="280" height="280" viewBox="0 0 280 280" style="position: absolute; top:0; left:0;">
+            <circle cx="140" cy="140" r="90" stroke="#ffffff" stroke-opacity="0.3" stroke-width="1.5" fill="none" />
+            <circle cx="140" cy="140" r="5" fill="#00d8ff" stroke="#000000" stroke-width="2"/>
 
-            <line x1="100" y1="100" x2="${ecmwfPt.x}" y2="${ecmwfPt.y}" stroke="#00d8ff" stroke-width="2.5"/>
-            <line x1="100" y1="100" x2="${gfsPt.x}"   y2="${gfsPt.y}"   stroke="#ffee58" stroke-width="2.5"/>
-            <line x1="100" y1="100" x2="${aromePt.x}" y2="${aromePt.y}" stroke="#00e676" stroke-width="2.5" stroke-dasharray="4,2"/>
+            <!-- Inward Vector Lines Pointing to Runway Intersection -->
+            <line x1="${ecmwfStart.x}" y1="${ecmwfStart.y}" x2="140" y2="140" stroke="#00d8ff" stroke-width="2.5"/>
+            <line x1="${gfsStart.x}"   y1="${gfsStart.y}"   x2="140" y2="140" stroke="#ffee58" stroke-width="2.5"/>
+            <line x1="${aromeStart.x}" y1="${aromeStart.y}" x2="140" y2="140" stroke="#00e676" stroke-width="2.5" stroke-dasharray="4,2"/>
           </svg>
 
-          <div class="rose-label-badge" style="left: ${ecmwfPt.x}px; top: ${ecmwfPt.y}px; background: rgba(0, 216, 255, 0.95);">
+          <!-- Badges Positioned Outside Ring Outer Endpoints -->
+          <div class="rose-label-badge" style="left: ${ecmwfStart.x}px; top: ${ecmwfStart.y}px; background: rgba(0, 216, 255, 0.95);">
             ${ecmwfSpd} G:${ecmwfGst} <span style="background:#222; color:#fff; font-size:7px; padding:1px 2px; border-radius:2px;">ECMWF</span>
           </div>
 
-          <div class="rose-label-badge" style="left: ${gfsPt.x}px; top: ${gfsPt.y}px; background: rgba(255, 235, 59, 0.95);">
+          <div class="rose-label-badge" style="left: ${gfsStart.x}px; top: ${gfsStart.y}px; background: rgba(255, 235, 59, 0.95);">
             ${gfsSpd} G:${gfsGst} <span style="background:#222; color:#fff; font-size:7px; padding:1px 2px; border-radius:2px;">GFS</span>
           </div>
 
-          <div class="rose-label-badge" style="left: ${aromePt.x}px; top: ${aromePt.y}px; background: rgba(0, 230, 118, 0.95);">
+          <div class="rose-label-badge" style="left: ${aromeStart.x}px; top: ${aromeStart.y}px; background: rgba(0, 230, 118, 0.95);">
             ${aromeSpd} G:${aromeGst} <span style="background:#222; color:#fff; font-size:7px; padding:1px 2px; border-radius:2px;">AROME</span>
           </div>
         </div>
       `;
 
       windRoseMarker = L.marker([lat, lon], {
-        icon: L.divIcon({ html: windRoseHTML, className: '', iconSize: [200, 200], iconAnchor: [100, 100] })
+        icon: L.divIcon({ html: windRoseHTML, className: '', iconSize: [280, 280], iconAnchor: [140, 140] })
       }).addTo(mapWind);
 
       mapWind.setView([lat, lon], 14);
