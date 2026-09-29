@@ -233,14 +233,15 @@
       border: none;
     }
 
-    /* BADGE STACK CONTAINER FORM STYLING */
+    /* BADGE STACK CONTAINER - OVERRIDE LEAFLET'S DEFAULT OFFSET MARGINS */
     .stack-wrapper {
       display: flex;
       flex-direction: column;
       gap: 3px;
       width: 130px;
-      height: 76px;
-      justify-content: center;
+      height: 72px;
+      margin-left: 0 !important;
+      margin-top: 0 !important;
       pointer-events: none;
     }
 
@@ -259,6 +260,7 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.6);
       white-space: nowrap;
       height: 22px;
+      box-sizing: border-box;
     }
 
     .stack-pill-tag {
@@ -275,7 +277,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.7.4</div>
+    <div class="rev-badge">REV: 1.7.5</div>
   </div>
 
   <div class="dashboard-container">
@@ -495,7 +497,7 @@
         opacity: 0.95
       }).addTo(windRoseLayerGroup);
 
-      // Stacked container anchored precisely at left-middle edge [0, 38]
+      // Stacked container anchored precisely at left-middle edge [0, 36]
       const stackHTML = `
         <div class="stack-wrapper">
           <div class="stack-pill" style="background: rgba(0, 230, 118, 0.95);">
@@ -517,8 +519,8 @@
         icon: L.divIcon({
           html: stackHTML,
           className: '',
-          iconSize: [130, 76],
-          iconAnchor: [0, 38] // Anchors cleanly at left-center edge of the 76px tall stack
+          iconSize: [130, 72],
+          iconAnchor: [0, 36] // Anchors cleanly at left-center edge of the 72px tall stack
         })
       }).addTo(windRoseLayerGroup);
     }
@@ -593,16 +595,16 @@
 
         // DYNAMIC WIND ROSE UPDATE
         const aromeDir = arome.hourly ? arome.hourly.wind_direction_10m[currentIdx] : 144;
-        const aromeSpd = arome.hourly ? Math.round(arome.hourly.wind_speed_10m[currentIdx]) : 13;
-        const aromeGst = arome.hourly ? Math.round(arome.hourly.wind_gusts_10m[currentIdx]) : 22;
+        const aromeSpd = arome.hourly ? Math.round(arome.hourly.wind_speed_10m[currentIdx]) : 18;
+        const aromeGst = arome.hourly ? Math.round(arome.hourly.wind_gusts_10m[currentIdx]) : 30;
 
         const gfsDir = gfs.hourly ? gfs.hourly.wind_direction_10m[currentIdx] : 144;
-        const gfsSpd = gfs.hourly ? Math.round(gfs.hourly.wind_speed_10m[currentIdx]) : 18;
-        const gfsGst = gfs.hourly ? Math.round(gfs.hourly.wind_gusts_10m[currentIdx]) : 29;
+        const gfsSpd = gfs.hourly ? Math.round(gfs.hourly.wind_speed_10m[currentIdx]) : 20;
+        const gfsGst = gfs.hourly ? Math.round(gfs.hourly.wind_gusts_10m[currentIdx]) : 30;
 
         const ecmwfDir = ecmwf.hourly ? ecmwf.hourly.wind_direction_10m[currentIdx] : 144;
-        const ecmwfSpd = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_speed_10m[currentIdx]) : 16;
-        const ecmwfGst = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_gusts_10m[currentIdx]) : 30;
+        const ecmwfSpd = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_speed_10m[currentIdx]) : 18;
+        const ecmwfGst = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_gusts_10m[currentIdx]) : 33;
 
         updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst);
 
