@@ -243,7 +243,6 @@
       border: none;
     }
 
-    /* COMPACT CIRCLE SPOT BADGE */
     .spot-circle-badge {
       background: #ffee58;
       color: #000;
@@ -261,6 +260,27 @@
       box-shadow: 0 0 10px rgba(255, 238, 88, 0.8);
       line-height: 1;
     }
+
+    /* DIRECT DEGREE VECTOR ARM CONTAINER */
+    .vector-arm {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 220px;
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .vector-label-box {
+      position: absolute;
+      top: 15px; /* Positioned directly along 0deg (North) baseline */
+      font-family: sans-serif;
+      font-size: 11px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
   </style>
 </head>
 <body>
@@ -268,7 +288,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.4.2</div>
+    <div class="rev-badge">REV: 1.4.4</div>
   </div>
 
   <div class="dashboard-container">
@@ -276,7 +296,7 @@
     <!-- SEGMENT 1: SATELLITE MAP + HORIZONTAL MODEL TABLE + DROP SPOT CALCULATOR -->
     <div class="segment-1-stack">
       
-      <!-- 1A: SATELLITE MAP WITH ACCURATE WIND ROSE AND SPOT -->
+      <!-- 1A: SATELLITE MAP WITH JUMP RUN PATH & DIRECT DEGREE WIND ROSE -->
       <div class="map-card">
         <div id="map"></div>
       </div>
@@ -462,10 +482,10 @@
 
     let windRoseMarker = null;
     let exitSpotMarker = null;
+    let jumprunLine = null;
 
     function getArrow(deg) {
       if (deg === undefined || deg === null) return '↑';
-      // Rotate arrow glyph (↑) directly to wind bearing
       return `<span class="dir-arrow" style="transform: rotate(${deg}deg); display: inline-block;">↑</span>`;
     }
 
@@ -476,32 +496,35 @@
       return 'status-red';
     }
 
+    // RAW 1:1 BEARING ROTATION MATH FOR WIND ROSE
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
       if (windRoseMarker) map.removeLayer(windRoseMarker);
 
-      // Direct degree rotation for wind rose arms
-      const aromeRot = aromeDir;
-      const gfsRot = gfsDir;
-      const ecmwfRot = ecmwfDir;
-
       const windRoseHTML = `
         <div style="position: relative; width: 220px; height: 220px; pointer-events: none;">
+          <!-- CENTER COMPASS ROSE -->
           <svg width="220" height="220" style="position: absolute; top:0; left:0;">
-            <circle cx="110" cy="110" r="80" stroke="#ffffff" stroke-opacity="0.5" stroke-width="1.5" fill="none" />
+            <circle cx="110" cy="110" r="80" stroke="#ffffff" stroke-opacity="0.4" stroke-width="1.5" fill="none" />
             <circle cx="110" cy="110" r="6" fill="#ffffff" stroke="#000" stroke-width="2"/>
           </svg>
-          <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(${aromeRot}deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
-            <div style="background: rgba(163, 255, 180, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 140px; margin-left: 10px;">
+
+          <!-- AROME VECTOR ARM (1:1 DEGREE BEARING) -->
+          <div class="vector-arm" style="transform: rotate(${aromeDir}deg);">
+            <div class="vector-label-box" style="background: rgba(163, 255, 180, 0.95); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000;">
               ${aromeSpd} G:${aromeGst} mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">AROME-HD</span>
             </div>
           </div>
-          <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(${gfsRot}deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
-            <div style="background: rgba(194, 255, 210, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 120px; margin-left: 10px;">
+
+          <!-- GFS VECTOR ARM (1:1 DEGREE BEARING) -->
+          <div class="vector-arm" style="transform: rotate(${gfsDir}deg);">
+            <div class="vector-label-box" style="background: rgba(194, 255, 210, 0.95); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; top: 32px;">
               ${gfsSpd} G:${gfsGst} mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">GFS</span>
             </div>
           </div>
-          <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(${ecmwfRot}deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
-            <div style="background: rgba(0, 240, 255, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 130px; margin-left: 10px;">
+
+          <!-- ECMWF VECTOR ARM (1:1 DEGREE BEARING) -->
+          <div class="vector-arm" style="transform: rotate(${ecmwfDir}deg);">
+            <div class="vector-label-box" style="background: rgba(0, 240, 255, 0.95); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; top: 49px;">
               ${ecmwfSpd} G:${ecmwfGst} mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">ECMWF</span>
             </div>
           </div>
@@ -513,11 +536,11 @@
       }).addTo(map);
     }
 
-    // DYNAMIC DWELL SPOT OFFSET CALCULATOR
+    // DYNAMIC EXIT SPOT & DASHED FLIGHT PATH LINE
     function updateDropSpotMarker(avgDir, avgSpd) {
       if (exitSpotMarker) map.removeLayer(exitSpotMarker);
+      if (jumprunLine) map.removeLayer(jumprunLine);
 
-      // Dynamic offset: ~0.066 NM per mph of surface wind speed
       const offsetNM = parseFloat((avgSpd / 15).toFixed(2));
       const rad = (avgDir * Math.PI) / 180;
       
@@ -527,6 +550,15 @@
       const exitLat = lat + dLat;
       const exitLon = lon + dLon;
 
+      // 1. DASHED FLIGHT PATH LINE
+      jumprunLine = L.polyline([[exitLat, exitLon], [lat, lon]], {
+        color: '#00d8ff',
+        weight: 3,
+        opacity: 0.85,
+        dashArray: '8, 8'
+      }).addTo(map);
+
+      // 2. CIRCULAR SPOT BADGE
       const dropSpotHTML = `
         <div class="spot-circle-badge">
           <span>🎯</span>
