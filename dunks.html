@@ -67,50 +67,23 @@
       height: 100%;
     }
 
-    /* DUAL MAP ROW LAYOUT */
-    .dual-map-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      flex: 1 1 50%;
-      min-height: 220px;
-    }
-
     .map-card {
       position: relative;
       width: 100%;
-      height: 100%;
+      flex: 1 1 45%;
+      min-height: 220px;
       border-radius: 8px;
       overflow: hidden;
       border: 1px solid #1e2d4a;
       box-shadow: 0 8px 24px rgba(0,0,0,0.5);
       background: #131b2e;
-      display: flex;
-      flex-direction: column;
     }
 
-    .map-card-header {
-      position: absolute;
-      top: 6px;
-      left: 8px;
-      z-index: 1000;
-      background: rgba(11, 15, 25, 0.85);
-      backdrop-filter: blur(4px);
-      padding: 3px 8px;
-      border-radius: 4px;
-      border: 1px solid #1e2d4a;
-      font-size: 0.65rem;
-      font-weight: 700;
-      color: #00d8ff;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .map-container { width: 100%; height: 100%; }
+    #map { width: 100%; height: 100%; }
 
     .multi-table-card {
       width: 100%;
-      flex: 1 1 28%;
+      flex: 1 1 35%;
       background: #131b2e;
       border: 1px solid #1e2d4a;
       border-radius: 8px;
@@ -288,14 +261,7 @@
       gap: 5px;
     }
 
-    /* COMPACT STACKED BADGES */
-    .compact-stack-container {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      pointer-events: none;
-    }
-
+    /* INDIVIDUAL COMPACT MODEL PILL */
     .compact-model-pill {
       display: flex;
       align-items: center;
@@ -307,8 +273,9 @@
       font-size: 10px;
       font-weight: 700;
       color: #000;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.6);
       white-space: nowrap;
+      pointer-events: none;
     }
 
     .compact-model-tag {
@@ -331,29 +298,17 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.6.3</div>
+    <div class="rev-badge">REV: 1.6.5</div>
   </div>
 
   <div class="dashboard-container">
     
-    <!-- SEGMENT 1: DUAL MAPS + HORIZONTAL MODEL TABLE + DROP SPOT CALCULATOR -->
+    <!-- SEGMENT 1: SATELLITE MAP + HORIZONTAL MODEL TABLE + DROP SPOT CALCULATOR -->
     <div class="segment-1-stack">
       
-      <!-- 1A: DUAL MAP ROW -->
-      <div class="dual-map-grid">
-        
-        <!-- MAP 1: SURFACE WIND MODELS -->
-        <div class="map-card">
-          <div class="map-card-header">🌬️ Map 1: Surface Wind Models</div>
-          <div id="map-wind" class="map-container"></div>
-        </div>
-
-        <!-- MAP 2: JUMP RUN & CLEAR DROP SPOT MAP -->
-        <div class="map-card">
-          <div class="map-card-header">🎯 Map 2: Jump Run & Clear Drop Spot</div>
-          <div id="map-spot" class="map-container"></div>
-        </div>
-
+      <!-- 1A: MAP WITH WIND ROSE & DROP SPOT -->
+      <div class="map-card">
+        <div id="map"></div>
       </div>
 
       <!-- 1B: HORIZONTAL MULTI-MODEL HOURLY COMPARISON TABLE -->
@@ -528,21 +483,13 @@
     const lat = 50.860619;
     const lon = -3.233961;
 
-    // 1. MAP 1 (VECTOR TOPOGRAPHIC TILE)
-    const mapWind = L.map('map-wind', { zoomControl: false }).setView([lat, lon], 14);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(mapWind);
-
-    // MAP 2 (SATELLITE TILE)
-    const mapSpot = L.map('map-spot', { zoomControl: false }).setView([lat, lon], 14);
+    // 1. LEAFLET SATELLITE MAP
+    const map = L.map('map').setView([lat, lon], 14);
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       maxZoom: 19, maxNativeZoom: 18
-    }).addTo(mapSpot);
+    }).addTo(map);
 
-    let windRoseLine = null;
-    let windRoseStackMarker = null;
+    let windRoseGroup = L.layerGroup().addTo(map);
     let exitSpotMarker = null;
     let jumprunLine = null;
 
@@ -583,54 +530,55 @@
       };
     }
 
-    // MAP 1: STACKED MODEL BADGES PROJECTED DOWNWIND (TOWARD THE DIRECTION THE WIND BLOWS TO)
+    // MAP OVERLAY WIND ROSE: INDIVIDUAL VECTORS & BADGES WITH NATURAL STACKING WHEN DIRECTIONS AGREE
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
-      if (windRoseLine) mapWind.removeLayer(windRoseLine);
-      if (windRoseStackMarker) mapWind.removeLayer(windRoseStackMarker);
+      windRoseGroup.clearLayers();
 
-      const avgDir = (aromeDir + gfsDir + ecmwfDir) / 3;
-      
-      // DOWNWIND FLOW ANGLE (e.g., 110 deg wind source pushes toward 290 deg WNW)
-      const downwindAngle = (avgDir + 180) % 360;
+      // Center circle marker on airfield cross
+      L.circleMarker([lat, lon], {
+        radius: 5,
+        fillColor: '#00d8ff',
+        color: '#000',
+        weight: 2,
+        fillOpacity: 1
+      }).addTo(windRoseGroup);
 
-      // Anchor point offset (~0.18 NM downwind)
-      const stackAnchorPt = computeDestinationPoint(lat, lon, downwindAngle, 0.18);
+      // Distances for model rays (slightly staggered lengths so badges stack neatly along identical vectors)
+      const models = [
+        { name: 'AROME-HD', dir: aromeDir, spd: aromeSpd, gst: aromeGst, color: '#00e676', bgClass: 'bg-arome', dist: 0.12, dash: '4, 4' },
+        { name: 'GFS',      dir: gfsDir,   spd: gfsSpd,   gst: gfsGst,   color: '#ffee58', bgClass: 'bg-gfs',   dist: 0.17, dash: null },
+        { name: 'ECMWF',    dir: ecmwfDir, spd: ecmwfSpd, gst: ecmwfGst, color: '#00d8ff', bgClass: 'bg-ecmwf', dist: 0.22, dash: null }
+      ];
 
-      // Single vector line connecting runway cross to stacked model badges
-      windRoseLine = L.polyline([[lat, lon], [stackAnchorPt.lat, stackAnchorPt.lon]], {
-        color: '#ffee58',
-        weight: 3,
-        opacity: 0.95
-      }).addTo(mapWind);
+      models.forEach(m => {
+        const endPt = computeDestinationPoint(lat, lon, m.dir, m.dist);
 
-      const stackedBadgesHTML = `
-        <div class="compact-stack-container">
-          <div class="compact-model-pill bg-arome">
-            <span>${aromeSpd} G:${aromeGst}</span>
-            <span class="compact-model-tag">AROME-HD</span>
+        // Vector Ray
+        L.polyline([[lat, lon], [endPt.lat, endPt.lon]], {
+          color: m.color,
+          weight: 2.5,
+          opacity: 0.9,
+          dashArray: m.dash
+        }).addTo(windRoseGroup);
+
+        // Model Badge at vector tip
+        const pillHTML = `
+          <div class="compact-model-pill ${m.bgClass}">
+            <span>${m.spd} G:${m.gst}</span>
+            <span class="compact-model-tag">${m.name}</span>
           </div>
-          <div class="compact-model-pill bg-gfs">
-            <span>${gfsSpd} G:${gfsGst}</span>
-            <span class="compact-model-tag">GFS</span>
-          </div>
-          <div class="compact-model-pill bg-ecmwf">
-            <span>${ecmwfSpd} G:${ecmwfGst}</span>
-            <span class="compact-model-tag">ECMWF</span>
-          </div>
-        </div>
-      `;
+        `;
 
-      windRoseStackMarker = L.marker([stackAnchorPt.lat, stackAnchorPt.lon], {
-        icon: L.divIcon({ html: stackedBadgesHTML, className: '', iconSize: [120, 75], iconAnchor: [60, 37] })
-      }).addTo(mapWind);
-
-      mapWind.setView([lat, lon], 14);
+        L.marker([endPt.lat, endPt.lon], {
+          icon: L.divIcon({ html: pillHTML, className: '', iconSize: [110, 24], iconAnchor: [0, 12] })
+        }).addTo(windRoseGroup);
+      });
     }
 
-    // MAP 2: DEDICATED JUMP RUN & DROP SPOT MAP
+    // JUMP RUN & DROP SPOT OVERLAY
     function updateDropSpotMarker(avgDir, avgSpd) {
-      if (exitSpotMarker) mapSpot.removeLayer(exitSpotMarker);
-      if (jumprunLine) mapSpot.removeLayer(jumprunLine);
+      if (exitSpotMarker) map.removeLayer(exitSpotMarker);
+      if (jumprunLine) map.removeLayer(jumprunLine);
 
       const offsetNM = parseFloat((avgSpd / 60).toFixed(2));
       const headwindDir = Math.round(avgDir);
@@ -647,19 +595,19 @@
         weight: 3.5,
         opacity: 0.9,
         dashArray: '8, 6'
-      }).addTo(mapSpot);
+      }).addTo(map);
 
       const dropSpotHTML = `<div class="spot-clean-badge"><span>🎯</span><span>${headwindDir}°</span><span>|</span><span>${offsetNM}NM</span></div>`;
       exitSpotMarker = L.marker([exitPt.lat, exitPt.lon], {
         icon: L.divIcon({ html: dropSpotHTML, className: '', iconSize: [110, 30], iconAnchor: [55, 15] })
-      }).addTo(mapSpot);
+      }).addTo(map);
 
       document.getElementById('calc-jumprun').innerText = `${headwindDir}° (Headwind)`;
       document.getElementById('calc-offset').innerText = `${offsetNM} NM`;
       document.getElementById('calc-coords').innerText = `${exitPt.lat.toFixed(4)}, ${exitPt.lon.toFixed(4)}`;
 
       const bounds = L.latLngBounds([[entryPt.lat, entryPt.lon], [extendedPt.lat, extendedPt.lon]]);
-      mapSpot.fitBounds(bounds, { padding: [45, 45] });
+      map.fitBounds(bounds, { padding: [45, 45] });
     }
 
     // 2. FETCH MULTI-MODEL FORECAST DATA
