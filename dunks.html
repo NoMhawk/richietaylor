@@ -295,7 +295,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.5.1</div>
+    <div class="rev-badge">REV: 1.5.2</div>
   </div>
 
   <div class="dashboard-container">
@@ -476,7 +476,7 @@
   </div>
 
   <script>
-    // DUNKESWELL RUNWAY CROSS COORDINATES
+    // EXACT DUNKESWELL RUNWAY CROSS COORDINATES
     const lat = 50.860619;
     const lon = -3.233961;
 
@@ -505,7 +505,33 @@
       return 'status-red';
     }
 
-    // DIRECT POLAR MATH FOR SVG CANVAS (0 deg = 12 o'clock North)
+    // GEOGRAPHIC DESTINATION POINT CALCULATION (WGS84)
+    // bearingDeg: True compass bearing (0 = North, 90 = East, 180 = South, 270 = West)
+    // distanceNM: Distance in nautical miles
+    function computeDestinationPoint(originLat, originLon, bearingDeg, distanceNM) {
+      const R = 3440.065; // Earth radius in nautical miles
+      const d = distanceNM;
+      const brng = (bearingDeg * Math.PI) / 180;
+      const lat1 = (originLat * Math.PI) / 180;
+      const lon1 = (originLon * Math.PI) / 180;
+
+      const lat2 = Math.asin(
+        Math.sin(lat1) * Math.cos(d / R) +
+        Math.cos(lat1) * Math.sin(d / R) * Math.cos(brng)
+      );
+
+      const lon2 = lon1 + Math.atan2(
+        Math.sin(brng) * Math.sin(d / R) * Math.cos(lat1),
+        Math.cos(d / R) - Math.sin(lat1) * Math.sin(lat2)
+      );
+
+      return {
+        lat: (lat2 * Math.PI) / 180,
+        lon: (lon2 * Math.PI) / 180
+      };
+    }
+
+    // WIND ROSE SVG RADIAL ENDPOINTS (0 deg = North 12 o'clock)
     function getRadialPoint(deg, radius) {
       const rad = ((deg - 90) * Math.PI) / 180;
       return {
@@ -517,7 +543,7 @@
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
       if (windRoseMarker) map.removeLayer(windRoseMarker);
 
-      // Rays point toward the incoming wind source direction
+      // Radial arms pointing toward incoming wind source directions
       const aromePt = getRadialPoint(aromeDir, 80);
       const gfsPt   = getRadialPoint(gfsDir, 62);
       const ecmwfPt = getRadialPoint(ecmwfDir, 44);
@@ -528,13 +554,13 @@
             <circle cx="110" cy="110" r="75" stroke="#ffffff" stroke-opacity="0.4" stroke-width="1.5" fill="none" />
             <circle cx="110" cy="110" r="5" fill="#00d8ff" stroke="#000000" stroke-width="2"/>
 
-            <!-- Straight Radial Vectors from Center -->
+            <!-- Radial Model Vectors -->
             <line x1="110" y1="110" x2="${aromePt.x}" y2="${aromePt.y}" stroke="#00e676" stroke-width="2.5" stroke-dasharray="4,2"/>
             <line x1="110" y1="110" x2="${gfsPt.x}"   y2="${gfsPt.y}"   stroke="#ffee58" stroke-width="2.5"/>
             <line x1="110" y1="110" x2="${ecmwfPt.x}" y2="${ecmwfPt.y}" stroke="#00d8ff" stroke-width="2.5"/>
           </svg>
 
-          <!-- UPRIGHT TEXT BADGES PLACED AT VECTOR ENDPOINTS -->
+          <!-- UPRIGHT BADGES AT VECTOR ENDPOINTS -->
           <div class="rose-label-badge" style="left: ${aromePt.x}px; top: ${aromePt.y}px; background: rgba(0, 230, 118, 0.95);">
             ${aromeSpd} G:${aromeGst} mph <span style="background:#222; color:#fff; font-size:7.5px; padding:1px 3px; border-radius:2px;">AROME</span>
           </div>
@@ -554,7 +580,7 @@
       }).addTo(map);
     }
 
-    // ACCURATE UPWIND EXIT SPOT & BROKEN JUMP RUN LINE WITH MIDPOINT HEADING
+    // ACCURATE UPWIND EXIT SPOT & BROKEN JUMP RUN LINE
     function updateDropSpotMarker(avgDir, avgSpd) {
       if (exitSpotMarker) map.removeLayer(exitSpotMarker);
       if (jumprunLine) map.removeLayer(jumprunLine);
@@ -563,50 +589,43 @@
       const offsetNM = parseFloat((avgSpd / 15).toFixed(2));
       const headwindDir = Math.round(avgDir);
       
-      // Upwind Bearing for Exit Spot displacement
+      // UPWIND APPROACH BEARING: Opposite of wind direction (avgDir + 180)
       const upwindBearing = (avgDir + 180) % 360;
-      const rad = (upwindBearing * Math.PI) / 180;
-      
-      const dLat = (offsetNM / 60) * Math.cos(rad);
-      const dLon = (offsetNM / (60 * Math.cos((lat * Math.PI) / 180))) * Math.sin(rad);
 
-      const exitLat = lat + dLat;
-      const exitLon = lon + dLon;
+      // Project Exit Point strictly UPWIND from runway center
+      const exitPt = computeDestinationPoint(lat, lon, upwindBearing, offsetNM);
 
-      // Extended Line upwind
-      const extNM = offsetNM + 0.4;
-      const extLat = lat + (extNM / 60) * Math.cos(rad);
-      const extLon = lon + (extNM / (60 * Math.cos((lat * Math.PI) / 180))) * Math.sin(rad);
+      // Project Extended Line Point further upwind along approach
+      const extPt = computeDestinationPoint(lat, lon, upwindBearing, offsetNM + 0.4);
 
-      // Midpoint between Exit Spot and Dropzone for the Heading Callout
-      const midLat = (lat + exitLat) / 2;
-      const midLon = (lon + exitLon) / 2;
+      // Calculate exact geographic midpoint along line for heading badge
+      const midPt = computeDestinationPoint(lat, lon, upwindBearing, offsetNM / 2);
 
-      // 1. DASHED CYAN BROKEN JUMP RUN LINE
-      jumprunLine = L.polyline([[extLat, extLon], [lat, lon]], {
+      // 1. BROKEN CYAN DASHED FLIGHT PATH LINE
+      jumprunLine = L.polyline([[extPt.lat, extPt.lon], [lat, lon]], {
         color: '#00d8ff',
         weight: 3,
         opacity: 0.9,
         dashArray: '10, 8'
       }).addTo(map);
 
-      // 2. MIDPOINT HEADING BADGE ON-AXIS ALONG LINE
+      // 2. MIDPOINT HEADING BADGE ON-AXIS ALONG FLIGHT LINE
       const headingHTML = `<div class="line-heading-label">${headwindDir}°</div>`;
-      lineHeadingMarker = L.marker([midLat, midLon], {
+      lineHeadingMarker = L.marker([midPt.lat, midPt.lon], {
         icon: L.divIcon({ html: headingHTML, className: '', iconSize: [40, 20], iconAnchor: [20, 10] })
       }).addTo(map);
 
       // 3. CLEAN SPOT BADGE (DISTANCE WITH "NM")
       const dropSpotHTML = `<div class="spot-clean-badge">${offsetNM}NM</div>`;
-      exitSpotMarker = L.marker([exitLat, exitLon], {
+      exitSpotMarker = L.marker([exitPt.lat, exitPt.lon], {
         icon: L.divIcon({ html: dropSpotHTML, className: '', iconSize: [60, 26], iconAnchor: [30, 13] })
       }).addTo(map);
 
       document.getElementById('calc-jumprun').innerText = `${headwindDir}° (Headwind)`;
       document.getElementById('calc-offset').innerText = `${offsetNM} NM`;
-      document.getElementById('calc-coords').innerText = `${exitLat.toFixed(4)}, ${exitLon.toFixed(4)}`;
+      document.getElementById('calc-coords').innerText = `${exitPt.lat.toFixed(4)}, ${exitPt.lon.toFixed(4)}`;
 
-      const bounds = L.latLngBounds([[lat, lon], [extLat, extLon]]);
+      const bounds = L.latLngBounds([[lat, lon], [extPt.lat, extPt.lon]]);
       map.fitBounds(bounds, { padding: [40, 40] });
     }
 
@@ -679,15 +698,15 @@
         document.getElementById('multi-model-rows').innerHTML = rowsHTML;
 
         // DYNAMIC WIND ROSE & DROP SPOT UPDATE
-        const aromeDir = arome.hourly ? arome.hourly.wind_direction_10m[currentIdx] : 135;
+        const aromeDir = arome.hourly ? arome.hourly.wind_direction_10m[currentIdx] : 144;
         const aromeSpd = arome.hourly ? Math.round(arome.hourly.wind_speed_10m[currentIdx]) : 18;
         const aromeGst = arome.hourly ? Math.round(arome.hourly.wind_gusts_10m[currentIdx]) : 27;
 
-        const gfsDir = gfs.hourly ? gfs.hourly.wind_direction_10m[currentIdx] : 135;
+        const gfsDir = gfs.hourly ? gfs.hourly.wind_direction_10m[currentIdx] : 144;
         const gfsSpd = gfs.hourly ? Math.round(gfs.hourly.wind_speed_10m[currentIdx]) : 20;
         const gfsGst = gfs.hourly ? Math.round(gfs.hourly.wind_gusts_10m[currentIdx]) : 27;
 
-        const ecmwfDir = ecmwf.hourly ? ecmwf.hourly.wind_direction_10m[currentIdx] : 135;
+        const ecmwfDir = ecmwf.hourly ? ecmwf.hourly.wind_direction_10m[currentIdx] : 144;
         const ecmwfSpd = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_speed_10m[currentIdx]) : 18;
         const ecmwfGst = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_gusts_10m[currentIdx]) : 32;
 
