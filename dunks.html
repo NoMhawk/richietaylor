@@ -265,9 +265,9 @@
     .rose-label-badge {
       position: absolute;
       padding: 2px 5px;
-      border-radius: 6px;
+      border-radius: 5px;
       border: 1px solid #000;
-      font-family: sans-serif;
+      font-family: monospace;
       font-size: 9px;
       font-weight: bold;
       white-space: nowrap;
@@ -282,7 +282,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.5.7</div>
+    <div class="rev-badge">REV: 1.5.8</div>
   </div>
 
   <div class="dashboard-container">
@@ -515,52 +515,53 @@
       };
     }
 
-    // WIND ROSE SVG RADIAL ENDPOINTS (0 deg = North 12 o'clock)
+    // WIND ROSE RADIAL VECTOR ENDPOINTS (0 deg = North 12 o'clock)
     function getRadialPoint(deg, radius) {
       const rad = ((deg - 90) * Math.PI) / 180;
       return {
-        x: 110 + radius * Math.cos(rad),
-        y: 110 + radius * Math.sin(rad)
+        x: 100 + radius * Math.cos(rad),
+        y: 100 + radius * Math.sin(rad)
       };
     }
 
+    // REBUILT CLEAN WIND ROSE
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
       if (windRoseMarker) map.removeLayer(windRoseMarker);
 
       // Radial arms point toward incoming wind source directions
-      const aromePt = getRadialPoint(aromeDir, 80);
-      const gfsPt   = getRadialPoint(gfsDir, 62);
-      const ecmwfPt = getRadialPoint(ecmwfDir, 44);
+      const aromePt = getRadialPoint(aromeDir, 70);
+      const gfsPt   = getRadialPoint(gfsDir, 55);
+      const ecmwfPt = getRadialPoint(ecmwfDir, 40);
 
       const windRoseHTML = `
-        <div style="position: relative; width: 220px; height: 220px; pointer-events: none;">
-          <svg width="220" height="220" viewBox="0 0 220 220" style="position: absolute; top:0; left:0;">
-            <circle cx="110" cy="110" r="75" stroke="#ffffff" stroke-opacity="0.4" stroke-width="1.5" fill="none" />
-            <circle cx="110" cy="110" r="5" fill="#00d8ff" stroke="#000000" stroke-width="2"/>
+        <div style="position: relative; width: 200px; height: 200px; pointer-events: none;">
+          <svg width="200" height="200" viewBox="0 0 200 200" style="position: absolute; top:0; left:0;">
+            <circle cx="100" cy="100" r="65" stroke="#ffffff" stroke-opacity="0.3" stroke-width="1.5" fill="none" />
+            <circle cx="100" cy="100" r="4" fill="#00d8ff" stroke="#000000" stroke-width="2"/>
 
             <!-- Radial Model Vectors -->
-            <line x1="110" y1="110" x2="${aromePt.x}" y2="${aromePt.y}" stroke="#00e676" stroke-width="2.5" stroke-dasharray="4,2"/>
-            <line x1="110" y1="110" x2="${gfsPt.x}"   y2="${gfsPt.y}"   stroke="#ffee58" stroke-width="2.5"/>
-            <line x1="110" y1="110" x2="${ecmwfPt.x}" y2="${ecmwfPt.y}" stroke="#00d8ff" stroke-width="2.5"/>
+            <line x1="100" y1="100" x2="${aromePt.x}" y2="${aromePt.y}" stroke="#00e676" stroke-width="2.5" stroke-dasharray="4,2"/>
+            <line x1="100" y1="100" x2="${gfsPt.x}"   y2="${gfsPt.y}"   stroke="#ffee58" stroke-width="2.5"/>
+            <line x1="100" y1="100" x2="${ecmwfPt.x}" y2="${ecmwfPt.y}" stroke="#00d8ff" stroke-width="2.5"/>
           </svg>
 
           <!-- UPRIGHT BADGES AT VECTOR ENDPOINTS -->
           <div class="rose-label-badge" style="left: ${aromePt.x}px; top: ${aromePt.y}px; background: rgba(0, 230, 118, 0.95);">
-            ${aromeSpd} G:${aromeGst} mph <span style="background:#222; color:#fff; font-size:7.5px; padding:1px 3px; border-radius:2px;">AROME</span>
+            ${aromeSpd} G:${aromeGst} mph <span style="background:#222; color:#fff; font-size:7px; padding:1px 3px; border-radius:2px;">AROME</span>
           </div>
 
           <div class="rose-label-badge" style="left: ${gfsPt.x}px; top: ${gfsPt.y}px; background: rgba(255, 235, 59, 0.95);">
-            ${gfsSpd} G:${gfsGst} mph <span style="background:#222; color:#fff; font-size:7.5px; padding:1px 3px; border-radius:2px;">GFS</span>
+            ${gfsSpd} G:${gfsGst} mph <span style="background:#222; color:#fff; font-size:7px; padding:1px 3px; border-radius:2px;">GFS</span>
           </div>
 
           <div class="rose-label-badge" style="left: ${ecmwfPt.x}px; top: ${ecmwfPt.y}px; background: rgba(0, 216, 255, 0.95);">
-            ${ecmwfSpd} G:${ecmwfGst} mph <span style="background:#222; color:#fff; font-size:7.5px; padding:1px 3px; border-radius:2px;">ECMWF</span>
+            ${ecmwfSpd} G:${ecmwfGst} mph <span style="background:#222; color:#fff; font-size:7px; padding:1px 3px; border-radius:2px;">ECMWF</span>
           </div>
         </div>
       `;
 
       windRoseMarker = L.marker([lat, lon], {
-        icon: L.divIcon({ html: windRoseHTML, className: '', iconSize: [220, 220], iconAnchor: [110, 110] })
+        icon: L.divIcon({ html: windRoseHTML, className: '', iconSize: [200, 200], iconAnchor: [100, 100] })
       }).addTo(map);
     }
 
