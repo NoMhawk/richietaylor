@@ -239,7 +239,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.7.2</div>
+    <div class="rev-badge">REV: 1.7.3</div>
   </div>
 
   <div class="dashboard-container">
@@ -435,7 +435,7 @@
       };
     }
 
-    // DRAW CLEAN WIND ROSE WITH GEOGRAPHIC VECTOR LINES
+    // DRAW CLEAN WIND ROSE WITH GEOGRAPHIC VECTOR LINES & STACKED BADGE CONTAINER
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
       windRoseLayerGroup.clearLayers();
 
@@ -448,54 +448,43 @@
         fillOpacity: 1
       }).addTo(windRoseLayerGroup);
 
-      const models = [
-        { name: 'AROME-HD', dir: aromeDir, spd: aromeSpd, gst: aromeGst, color: '#00e676', bg: 'rgba(0, 230, 118, 0.95)', dist: 0.12, dash: '4,4' },
-        { name: 'GFS',      dir: gfsDir,   spd: gfsSpd,   gst: gfsGst,   color: '#ffee58', bg: 'rgba(255, 235, 59, 0.95)', dist: 0.18, dash: null },
-        { name: 'ECMWF',    dir: ecmwfDir, spd: ecmwfSpd, gst: ecmwfGst, color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)', dist: 0.24, dash: null }
-      ];
+      // Average direction vector for primary ray
+      const avgDir = (aromeDir + gfsDir + ecmwfDir) / 3;
+      const stackEndPt = computeDestinationPoint(lat, lon, avgDir, 0.18);
 
-      models.forEach(m => {
-        const endPt = computeDestinationPoint(lat, lon, m.dir, m.dist);
+      // Single primary vector ray from airfield center to stack anchor
+      L.polyline([[lat, lon], [stackEndPt.lat, stackEndPt.lon]], {
+        color: '#ffee58',
+        weight: 3,
+        opacity: 0.95
+      }).addTo(windRoseLayerGroup);
 
-        // Geographic Line from airfield center to badge location
-        L.polyline([[lat, lon], [endPt.lat, endPt.lon]], {
-          color: m.color,
-          weight: 2.5,
-          opacity: 0.9,
-          dashArray: m.dash
-        }).addTo(windRoseLayerGroup);
-
-        // Badge Pill centered at endpoint
-        const pillHTML = `
-          <div style="
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            background: ${m.bg};
-            color: #000;
-            font-family: sans-serif;
-            font-size: 10px;
-            font-weight: bold;
-            border: 1px solid #000;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.6);
-            white-space: nowrap;
-          ">
-            <span>${m.spd} G:${m.gst}</span>
-            <span style="background:#000; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">${m.name}</span>
+      // Vertical stack container anchored cleanly by left-middle edge [0, 36]
+      const stackHTML = `
+        <div style="display: flex; flex-direction: column; gap: 3px; pointer-events: none;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; padding: 2px 5px; border-radius: 4px; background: rgba(0, 230, 118, 0.95); color: #000; font-family: sans-serif; font-size: 10px; font-weight: bold; border: 1px solid #000; box-shadow: 0 2px 6px rgba(0,0,0,0.6); white-space: nowrap;">
+            <span>${aromeSpd} G:${aromeGst}</span>
+            <span style="background:#000; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">AROME-HD</span>
           </div>
-        `;
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; padding: 2px 5px; border-radius: 4px; background: rgba(255, 235, 59, 0.95); color: #000; font-family: sans-serif; font-size: 10px; font-weight: bold; border: 1px solid #000; box-shadow: 0 2px 6px rgba(0,0,0,0.6); white-space: nowrap;">
+            <span>${gfsSpd} G:${gfsGst}</span>
+            <span style="background:#000; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">GFS</span>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; padding: 2px 5px; border-radius: 4px; background: rgba(0, 216, 255, 0.95); color: #000; font-family: sans-serif; font-size: 10px; font-weight: bold; border: 1px solid #000; box-shadow: 0 2px 6px rgba(0,0,0,0.6); white-space: nowrap;">
+            <span>${ecmwfSpd} G:${ecmwfGst}</span>
+            <span style="background:#000; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">ECMWF</span>
+          </div>
+        </div>
+      `;
 
-        L.marker([endPt.lat, endPt.lon], {
-          icon: L.divIcon({
-            html: pillHTML,
-            className: '',
-            iconSize: [110, 24],
-            iconAnchor: [55, 12] // Anchored precisely at center of badge
-          })
-        }).addTo(windRoseLayerGroup);
-      });
+      L.marker([stackEndPt.lat, stackEndPt.lon], {
+        icon: L.divIcon({
+          html: stackHTML,
+          className: '',
+          iconSize: [120, 72],
+          iconAnchor: [0, 36] // Anchors cleanly at left-center edge of stacked badges
+        })
+      }).addTo(windRoseLayerGroup);
     }
 
     // 2. FETCH MULTI-MODEL FORECAST DATA
@@ -568,16 +557,16 @@
 
         // DYNAMIC WIND ROSE UPDATE
         const aromeDir = arome.hourly ? arome.hourly.wind_direction_10m[currentIdx] : 144;
-        const aromeSpd = arome.hourly ? Math.round(arome.hourly.wind_speed_10m[currentIdx]) : 18;
-        const aromeGst = arome.hourly ? Math.round(arome.hourly.wind_gusts_10m[currentIdx]) : 27;
+        const aromeSpd = arome.hourly ? Math.round(arome.hourly.wind_speed_10m[currentIdx]) : 13;
+        const aromeGst = arome.hourly ? Math.round(arome.hourly.wind_gusts_10m[currentIdx]) : 22;
 
         const gfsDir = gfs.hourly ? gfs.hourly.wind_direction_10m[currentIdx] : 144;
-        const gfsSpd = gfs.hourly ? Math.round(gfs.hourly.wind_speed_10m[currentIdx]) : 20;
-        const gfsGst = gfs.hourly ? Math.round(gfs.hourly.wind_gusts_10m[currentIdx]) : 27;
+        const gfsSpd = gfs.hourly ? Math.round(gfs.hourly.wind_speed_10m[currentIdx]) : 18;
+        const gfsGst = gfs.hourly ? Math.round(gfs.hourly.wind_gusts_10m[currentIdx]) : 29;
 
         const ecmwfDir = ecmwf.hourly ? ecmwf.hourly.wind_direction_10m[currentIdx] : 144;
-        const ecmwfSpd = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_speed_10m[currentIdx]) : 18;
-        const ecmwfGst = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_gusts_10m[currentIdx]) : 32;
+        const ecmwfSpd = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_speed_10m[currentIdx]) : 16;
+        const ecmwfGst = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_gusts_10m[currentIdx]) : 30;
 
         updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst);
 
