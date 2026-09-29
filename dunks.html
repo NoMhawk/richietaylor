@@ -260,6 +260,21 @@
       box-shadow: 0 0 10px rgba(255, 238, 88, 0.8);
       line-height: 1;
     }
+
+    /* UPRIGHT WIND ROSE LABEL BADGES */
+    .rose-label {
+      position: absolute;
+      padding: 2px 6px;
+      border-radius: 8px;
+      border: 1px solid #000;
+      font-family: sans-serif;
+      font-size: 10px;
+      font-weight: bold;
+      white-space: nowrap;
+      color: #000;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+      transform: translate(-50%, -50%);
+    }
   </style>
 </head>
 <body>
@@ -267,7 +282,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.4.5</div>
+    <div class="rev-badge">REV: 1.4.6</div>
   </div>
 
   <div class="dashboard-container">
@@ -448,7 +463,7 @@
   </div>
 
   <script>
-    // EXACT DUNKESWELL RUNWAY CROSS COORDINATES
+    // DUNKESWELL RUNWAY CROSS COORDINATES
     const lat = 50.860619;
     const lon = -3.233961;
 
@@ -475,47 +490,48 @@
       return 'status-red';
     }
 
-    // CLEAN RADIAL SVG WIND ROSE CENTERED DIRECTLY ON RUNWAY CROSS
+    // HELPER TO CONVERT POLAR BEARINGS TO CANVAS SVG COORDINATES
+    function getVectorCoords(deg, length) {
+      // Deg 0 = Up (North), 90 = Right (East)
+      const rad = ((deg - 90) * Math.PI) / 180;
+      return {
+        x: 110 + length * Math.cos(rad),
+        y: 110 + length * Math.sin(rad)
+      };
+    }
+
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
       if (windRoseMarker) map.removeLayer(windRoseMarker);
 
+      const aromePt = getVectorCoords(aromeDir, 80);
+      const gfsPt   = getVectorCoords(gfsDir, 65);
+      const ecmwfPt = getVectorCoords(ecmwfDir, 50);
+
       const windRoseHTML = `
         <div style="position: relative; width: 220px; height: 220px; pointer-events: none;">
+          <!-- Compass Ring centered at (110, 110) -->
           <svg width="220" height="220" viewBox="0 0 220 220" style="position: absolute; top:0; left:0;">
-            <!-- Outer Ring & Center Dot -->
             <circle cx="110" cy="110" r="75" stroke="#ffffff" stroke-opacity="0.4" stroke-width="1.5" fill="none" />
             <circle cx="110" cy="110" r="5" fill="#00d8ff" stroke="#000000" stroke-width="2"/>
 
-            <!-- AROME Vector Arm -->
-            <g transform="rotate(${aromeDir}, 110, 110)">
-              <line x1="110" y1="110" x2="110" y2="35" stroke="#00e676" stroke-width="2.5" stroke-dasharray="4,2"/>
-              <foreignObject x="40" y="8" width="140" height="26">
-                <div style="background: rgba(0, 230, 118, 0.95); color: #000; padding: 2px 6px; border-radius: 8px; border: 1px solid #000; font-family: sans-serif; font-size: 10px; font-weight: bold; text-align: center; white-space: nowrap;">
-                  ${aromeSpd} G:${aromeGst} mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">AROME</span>
-                </div>
-              </foreignObject>
-            </g>
-
-            <!-- GFS Vector Arm -->
-            <g transform="rotate(${gfsDir}, 110, 110)">
-              <line x1="110" y1="110" x2="110" y2="45" stroke="#ffee58" stroke-width="2.5"/>
-              <foreignObject x="50" y="20" width="120" height="26">
-                <div style="background: rgba(255, 235, 59, 0.95); color: #000; padding: 2px 6px; border-radius: 8px; border: 1px solid #000; font-family: sans-serif; font-size: 10px; font-weight: bold; text-align: center; white-space: nowrap;">
-                  ${gfsSpd} G:${gfsGst} mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">GFS</span>
-                </div>
-              </foreignObject>
-            </g>
-
-            <!-- ECMWF Vector Arm -->
-            <g transform="rotate(${ecmwfDir}, 110, 110)">
-              <line x1="110" y1="110" x2="110" y2="55" stroke="#00d8ff" stroke-width="2.5"/>
-              <foreignObject x="45" y="32" width="130" height="26">
-                <div style="background: rgba(0, 216, 255, 0.95); color: #000; padding: 2px 6px; border-radius: 8px; border: 1px solid #000; font-family: sans-serif; font-size: 10px; font-weight: bold; text-align: center; white-space: nowrap;">
-                  ${ecmwfSpd} G:${ecmwfGst} mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">ECMWF</span>
-                </div>
-              </foreignObject>
-            </g>
+            <!-- Vector Line Rays from Center -->
+            <line x1="110" y1="110" x2="${aromePt.x}" y2="${aromePt.y}" stroke="#00e676" stroke-width="2.5" stroke-dasharray="4,2"/>
+            <line x1="110" y1="110" x2="${gfsPt.x}"   y2="${gfsPt.y}"   stroke="#ffee58" stroke-width="2.5"/>
+            <line x1="110" y1="110" x2="${ecmwfPt.x}" y2="${ecmwfPt.y}" stroke="#00d8ff" stroke-width="2.5"/>
           </svg>
+
+          <!-- UPRIGHT HTML LABELS PLACED AT RAY ENDPOINTS -->
+          <div class="rose-label" style="left: ${aromePt.x}px; top: ${aromePt.y}px; background: rgba(0, 230, 118, 0.95);">
+            ${aromeSpd} G:${aromeGst} mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">AROME</span>
+          </div>
+
+          <div class="rose-label" style="left: ${gfsPt.x}px; top: ${gfsPt.y}px; background: rgba(255, 235, 59, 0.95);">
+            ${gfsSpd} G:${gfsGst} mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">GFS</span>
+          </div>
+
+          <div class="rose-label" style="left: ${ecmwfPt.x}px; top: ${ecmwfPt.y}px; background: rgba(0, 216, 255, 0.95);">
+            ${ecmwfSpd} G:${ecmwfGst} mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">ECMWF</span>
+          </div>
         </div>
       `;
 
