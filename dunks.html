@@ -52,7 +52,6 @@
       box-shadow: 0 0 10px rgba(0, 136, 255, 0.4);
     }
 
-    /* REBALANCED GRID LAYOUT */
     .dashboard-container {
       display: grid;
       grid-template-columns: 1.45fr 1fr;
@@ -71,7 +70,7 @@
     .map-card {
       position: relative;
       width: 100%;
-      flex: 1 1 72%; /* EXPANDED MAP HEIGHT */
+      flex: 1 1 72%;
       border-radius: 8px;
       overflow: hidden;
       border: 1px solid #1e2d4a;
@@ -156,10 +155,9 @@
       accent-color: #00d8ff;
     }
 
-    /* COMPACT HOURLY WIND TABLE */
     .multi-table-card {
       width: 100%;
-      flex: 0 0 auto; /* STREAMLINED HEIGHT */
+      flex: 0 0 auto;
       background: #131b2e;
       border: 1px solid #1e2d4a;
       border-radius: 8px;
@@ -245,6 +243,16 @@
     .status-orange { background: rgba(255, 152, 0, 0.15);  color: #ffb74d; border: 1px solid rgba(255, 152, 0, 0.4); }
     .status-red    { background: rgba(255, 82, 82, 0.2);   color: #ff5252; border: 1px solid rgba(255, 82, 82, 0.5); }
 
+    .cloud-badge {
+      display: inline-block;
+      padding: 1px 3px;
+      border-radius: 3px;
+      font-weight: bold;
+      color: #00d8ff;
+      background: rgba(0, 216, 255, 0.12);
+      border: 1px solid rgba(0, 216, 255, 0.3);
+    }
+
     .dir-arrow { display: inline-block; font-weight: bold; margin-right: 1px; }
     .gust-val { font-size: 0.55rem; opacity: 0.85; }
 
@@ -289,7 +297,6 @@
       word-break: break-all;
     }
 
-    /* EXPANDED RADAR HEIGHT */
     .radar-frame-box {
       position: relative;
       width: 100%;
@@ -348,7 +355,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 2.4.0</div>
+    <div class="rev-badge">REV: 2.5.0</div>
   </div>
 
   <div class="dashboard-container">
@@ -398,10 +405,10 @@
         <div id="map"></div>
       </div>
 
-      <!-- STREAMLINED MULTI-MODEL TABLE -->
+      <!-- STREAMLINED MULTI-MODEL & CLOUD BASE TABLE -->
       <div class="multi-table-card">
         <div class="table-title">
-          <span>📊 Hourly Multi-Model Wind Forecast (Dunkeswell EGTU)</span>
+          <span>📊 Hourly Multi-Model Wind Forecast & Cloud Base (Dunkeswell EGTU)</span>
           <div class="legend-bar">
             <div class="legend-item"><div class="legend-box" style="background:#00e676;"></div> ≤15</div>
             <div class="legend-item"><div class="legend-box" style="background:#ffee58;"></div> 16-20</div>
@@ -425,7 +432,7 @@
 
     </div>
 
-    <!-- RIGHT COLUMN: STREAMLINED WINDS ALOFT & EXPANDED RADAR -->
+    <!-- RIGHT COLUMN: WINDS ALOFT & RADAR -->
     <div class="right-column-stack">
       
       <!-- COMPACT WINDS ALOFT PROFILE -->
@@ -501,7 +508,7 @@
         </div>
       </div>
 
-      <!-- EXPANDED RAIN RADAR -->
+      <!-- RAIN RADAR -->
       <div class="pane-segment" style="flex: 1;">
         <div class="pane-header">
           <div class="title">🌧️ Live Rain Radar</div>
@@ -511,7 +518,7 @@
         <div class="radar-frame-box">
           <iframe 
             src="https://embed.windy.com/embed2.html?lat=50.7500&lon=-3.5000&width=100%25&height=220&zoom=7&level=surface&overlay=radar&product=radar&menu=false&message=false&marker=false&calendar=false&pressure=false&type=map&location=coordinates&detail=false&play=true&metricWind=mph&metricTemp=%C2%B0C" 
-            allowfullscreen>
+            callfullscreen>
           </iframe>
         </div>
       </div>
@@ -523,6 +530,7 @@
   <script>
     const lat = 50.860619;
     const lon = -3.233961;
+    const fieldElevationFt = 839; // Dunkeswell airfield elevation
 
     const map = L.map('map', { zoomControl: false }).setView([lat, lon], 15);
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
@@ -571,6 +579,16 @@
       return { lat: (lat2 * 180) / Math.PI, lon: (lon2 * 180) / Math.PI };
     }
 
+    // Estimate cloud base AGL in feet using temperature-dewpoint spread
+    function calculateCloudBase(tempC, dewpointC, cloudCoverPct) {
+      if (cloudCoverPct < 15 || dewpointC === undefined || tempC === undefined) return null;
+      const spread = tempC - dewpointC;
+      if (spread < 0.2) return 0; // Fog / ground level
+      // Standard dry adiabatic lapse rate formula (~2.5°C per 1,000 ft)
+      const baseFt = Math.round((spread / 2.5) * 1000);
+      return Math.max(0, baseFt);
+    }
+
     function toggleSpotMode() {
       isManualMode = !isManualMode;
       const btn = document.getElementById('toggle-mode-btn');
@@ -604,12 +622,10 @@
       windRoseLayerGroup.clearLayers();
       manualLayerGroup.clearLayers();
 
-      // Airfield Center
       L.circleMarker([lat, lon], {
         radius: 6, fillColor: '#00d8ff', color: '#000', weight: 2, fillOpacity: 1
       }).addTo(windRoseLayerGroup);
 
-      // WIND ROSE VECTORS
       const rawModels = [
         { name: 'AROME-HD', dir: aromeDir, spd: aromeSpd, gst: aromeGst, color: '#00e676', bg: 'rgba(0, 230, 118, 0.95)', dash: '4,3' },
         { name: 'GFS',      dir: gfsDir,   spd: gfsSpd,   gst: gfsGst,   color: '#ffee58', bg: 'rgba(255, 235, 59, 0.95)', dash: null },
@@ -639,16 +655,14 @@
         }).addTo(windRoseLayerGroup);
       });
 
-      // AUTO JUMP RUN & SPOT
       const avgWindDir = (aromeDir + gfsDir + ecmwfDir) / 3;
       const autoRunIn = avgWindDir;
-      const avgSpeed = (aromeSpd + gfsSpd + ecmwfSpd) / 3;
+      const avgSpeed = (aromeSpd + gfsSpd + ecmwfGst) / 3;
       const autoSpotOffset = Math.min(0.28, Math.max(0.12, (avgSpeed / 100) * 1.2));
 
       const displayMode = document.getElementById('select-display-mode').value;
 
       if (!isManualMode || displayMode === 'both') {
-        // Render Auto Vectors
         const autoSpotPt = computeDestinationPoint(lat, lon, autoRunIn, autoSpotOffset);
         const startAutoRun = computeDestinationPoint(lat, lon, (autoRunIn + 180) % 360, autoSpotOffset * 0.6);
         const endAutoRun = computeDestinationPoint(lat, lon, autoRunIn, autoSpotOffset * 1.6);
@@ -671,7 +685,6 @@
       }
 
       if (isManualMode) {
-        // Render Manual Override Vectors
         const manualHeading = parseFloat(document.getElementById('slider-heading').value);
         const manualOffset = parseFloat(document.getElementById('slider-dist').value);
 
@@ -679,7 +692,6 @@
         const startManRun = computeDestinationPoint(lat, lon, (manualHeading + 180) % 360, manualOffset * 0.6);
         const endManRun = computeDestinationPoint(lat, lon, manualHeading, manualOffset * 1.6);
 
-        // Orange Dashed Line for Manual Pattern
         L.polyline([[startManRun.lat, startManRun.lon], [endManRun.lat, endManRun.lon]], {
           color: '#ff9800', weight: 3.5, dashArray: '4,4', opacity: 1
         }).addTo(manualLayerGroup);
@@ -692,12 +704,10 @@
           })
         }).addTo(manualLayerGroup);
 
-        // Orange Manual Spot Marker
         L.circleMarker([manSpotPt.lat, manSpotPt.lon], {
           pane: 'topSpotPane', radius: 8, fillColor: '#ff9800', color: '#ffffff', weight: 2.5, fillOpacity: 1
         }).addTo(manualLayerGroup);
 
-        // Update Overlay Display Text
         document.getElementById('card-runin').innerText = `${Math.round(manualHeading)}° M (MAN)`;
         document.getElementById('card-spot-dist').innerText = `${manualOffset.toFixed(2)} NM`;
       } else {
@@ -707,7 +717,7 @@
     }
 
     async function fetchModelData() {
-      const surfaceParams = `latitude=${lat}&longitude=${lon}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=mph&forecast_days=1`;
+      const surfaceParams = `latitude=${lat}&longitude=${lon}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,temperature_2m,dewpoint_2m,cloud_cover&wind_speed_unit=mph&forecast_days=1`;
       
       try {
         const [ecmwfRes, gfsRes, iconRes, aromeRes] = await Promise.all([
@@ -770,6 +780,26 @@
           }
           rowsHTML += `</tr>`;
         });
+
+        // Add Cloud Base Row
+        rowsHTML += `<tr><td class="model-name-th" style="color: #00d8ff;">Cloud Base</td>`;
+        for (let i = 8; i <= 19; i++) {
+          const temp = ecmwf.hourly.temperature_2m ? ecmwf.hourly.temperature_2m[i] : 18;
+          const dew = ecmwf.hourly.dewpoint_2m ? ecmwf.hourly.dewpoint_2m[i] : 11;
+          const cover = ecmwf.hourly.cloud_cover ? ecmwf.hourly.cloud_cover[i] : 50;
+
+          const baseAgl = calculateCloudBase(temp, dew, cover);
+          const baseStr = (baseAgl !== null && baseAgl < 25000) ? `${baseAgl.toLocaleString()}'` : 'CLR';
+
+          rowsHTML += `
+            <td>
+              <div class="cloud-badge">
+                ${baseStr}
+              </div>
+            </td>
+          `;
+        }
+        rowsHTML += `</tr>`;
 
         document.getElementById('multi-model-rows').innerHTML = rowsHTML;
 
