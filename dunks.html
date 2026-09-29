@@ -232,6 +232,42 @@
       height: 100%;
       border: none;
     }
+
+    /* BADGE STACK CONTAINER FORM STYLING */
+    .stack-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      width: 130px;
+      height: 76px;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .stack-pill {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+      padding: 2px 5px;
+      border-radius: 4px;
+      color: #000;
+      font-family: sans-serif;
+      font-size: 10px;
+      font-weight: bold;
+      border: 1px solid #000;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+      white-space: nowrap;
+      height: 22px;
+    }
+
+    .stack-pill-tag {
+      background: #000;
+      color: #fff;
+      font-size: 8px;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
   </style>
 </head>
 <body>
@@ -239,7 +275,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.7.3</div>
+    <div class="rev-badge">REV: 1.7.4</div>
   </div>
 
   <div class="dashboard-container">
@@ -452,27 +488,27 @@
       const avgDir = (aromeDir + gfsDir + ecmwfDir) / 3;
       const stackEndPt = computeDestinationPoint(lat, lon, avgDir, 0.18);
 
-      // Single primary vector ray from airfield center to stack anchor
+      // Vector ray from airfield center to middle of stacked badges
       L.polyline([[lat, lon], [stackEndPt.lat, stackEndPt.lon]], {
         color: '#ffee58',
         weight: 3,
         opacity: 0.95
       }).addTo(windRoseLayerGroup);
 
-      // Vertical stack container anchored cleanly by left-middle edge [0, 36]
+      // Stacked container anchored precisely at left-middle edge [0, 38]
       const stackHTML = `
-        <div style="display: flex; flex-direction: column; gap: 3px; pointer-events: none;">
-          <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; padding: 2px 5px; border-radius: 4px; background: rgba(0, 230, 118, 0.95); color: #000; font-family: sans-serif; font-size: 10px; font-weight: bold; border: 1px solid #000; box-shadow: 0 2px 6px rgba(0,0,0,0.6); white-space: nowrap;">
+        <div class="stack-wrapper">
+          <div class="stack-pill" style="background: rgba(0, 230, 118, 0.95);">
             <span>${aromeSpd} G:${aromeGst}</span>
-            <span style="background:#000; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">AROME-HD</span>
+            <span class="stack-pill-tag">AROME-HD</span>
           </div>
-          <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; padding: 2px 5px; border-radius: 4px; background: rgba(255, 235, 59, 0.95); color: #000; font-family: sans-serif; font-size: 10px; font-weight: bold; border: 1px solid #000; box-shadow: 0 2px 6px rgba(0,0,0,0.6); white-space: nowrap;">
+          <div class="stack-pill" style="background: rgba(255, 235, 59, 0.95);">
             <span>${gfsSpd} G:${gfsGst}</span>
-            <span style="background:#000; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">GFS</span>
+            <span class="stack-pill-tag">GFS</span>
           </div>
-          <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; padding: 2px 5px; border-radius: 4px; background: rgba(0, 216, 255, 0.95); color: #000; font-family: sans-serif; font-size: 10px; font-weight: bold; border: 1px solid #000; box-shadow: 0 2px 6px rgba(0,0,0,0.6); white-space: nowrap;">
+          <div class="stack-pill" style="background: rgba(0, 216, 255, 0.95);">
             <span>${ecmwfSpd} G:${ecmwfGst}</span>
-            <span style="background:#000; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">ECMWF</span>
+            <span class="stack-pill-tag">ECMWF</span>
           </div>
         </div>
       `;
@@ -481,8 +517,8 @@
         icon: L.divIcon({
           html: stackHTML,
           className: '',
-          iconSize: [120, 72],
-          iconAnchor: [0, 36] // Anchors cleanly at left-center edge of stacked badges
+          iconSize: [130, 76],
+          iconAnchor: [0, 38] // Anchors cleanly at left-center edge of the 76px tall stack
         })
       }).addTo(windRoseLayerGroup);
     }
