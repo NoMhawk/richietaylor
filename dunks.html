@@ -270,7 +270,7 @@
       border: none;
     }
 
-    /* SPOT BADGE */
+    /* CLEAR DROP SPOT BADGE */
     .spot-clean-badge {
       background: #ffee58;
       color: #000;
@@ -288,21 +288,42 @@
       gap: 5px;
     }
 
-    /* UPRIGHT WIND ROSE LABELS ANCHORED AT OUTER RING ENDPOINTS */
-    .rose-label-badge {
-      position: absolute;
-      padding: 3px 6px;
-      border-radius: 5px;
-      border: 1.5px solid #000;
-      font-family: monospace;
-      font-size: 9px;
-      font-weight: bold;
-      white-space: nowrap;
-      color: #000;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.8);
-      transform: translate(-50%, -50%);
-      z-index: 100;
+    /* COMPACT VERTICALLY STACKED MODEL BADGES MATCHING IMAGE 2 */
+    .compact-stack-container {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      pointer-events: none;
     }
+
+    .compact-model-pill {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      color: #000;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+      white-space: nowrap;
+    }
+
+    .compact-model-tag {
+      background: #000;
+      color: #fff;
+      font-size: 8px;
+      font-weight: 800;
+      padding: 1px 4px;
+      border-radius: 3px;
+      text-transform: uppercase;
+    }
+
+    .bg-arome { background: rgba(0, 230, 118, 0.9); }
+    .bg-gfs   { background: rgba(255, 235, 59, 0.9); }
+    .bg-ecmwf { background: rgba(0, 216, 255, 0.9); }
   </style>
 </head>
 <body>
@@ -310,7 +331,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.6.1</div>
+    <div class="rev-badge">REV: 1.6.2</div>
   </div>
 
   <div class="dashboard-container">
@@ -321,13 +342,13 @@
       <!-- 1A: DUAL MAP ROW -->
       <div class="dual-map-grid">
         
-        <!-- MAP 1: MULTI-MODEL WIND ROSE MAP -->
+        <!-- MAP 1: MULTI-MODEL WIND ROSE MAP (VECTOR TOPOGRAPHIC TILE) -->
         <div class="map-card">
-          <div class="map-card-header">🌬️ Map 1: Surface Wind Rose Vectors</div>
+          <div class="map-card-header">🌬️ Map 1: Surface Wind Models</div>
           <div id="map-wind" class="map-container"></div>
         </div>
 
-        <!-- MAP 2: JUMP RUN & CLEAR DROP SPOT MAP -->
+        <!-- MAP 2: JUMP RUN & CLEAR DROP SPOT MAP (SATELLITE TILE) -->
         <div class="map-card">
           <div class="map-card-header">🎯 Map 2: Jump Run & Clear Drop Spot</div>
           <div id="map-spot" class="map-container"></div>
@@ -507,18 +528,21 @@
     const lat = 50.860619;
     const lon = -3.233961;
 
-    // 1. INITIALIZE MAP 1 (WIND ROSE) & MAP 2 (DROP SPOT)
+    // 1. INITIALIZE MAP 1 (VECTOR TILE TOPOGRAPHIC MAP MATCHING TARGET IMAGE)
     const mapWind = L.map('map-wind', { zoomControl: false }).setView([lat, lon], 14);
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      maxZoom: 19, maxNativeZoom: 18
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
     }).addTo(mapWind);
 
+    // MAP 2 (SATELLITE IMAGE MAP FOR DROP SPOT)
     const mapSpot = L.map('map-spot', { zoomControl: false }).setView([lat, lon], 14);
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       maxZoom: 19, maxNativeZoom: 18
     }).addTo(mapSpot);
 
-    let windRoseMarker = null;
+    let windRoseLine = null;
+    let windRoseStackMarker = null;
     let exitSpotMarker = null;
     let jumprunLine = null;
 
@@ -559,66 +583,43 @@
       };
     }
 
-    // SVG RADIAL POINT MATH (0 deg = North 12 o'clock)
-    function getRadialPoint(deg, radius) {
-      const rad = ((deg - 90) * Math.PI) / 180;
-      return {
-        x: 140 + radius * Math.cos(rad),
-        y: 140 + radius * Math.sin(rad)
-      };
-    }
-
-    // MAP 1: INWARD VECTOR WIND ROSE WITH ANGULAR DE-CONFLICTION
+    // MAP 1: STACKED MODEL BADGES ALONG THE WIND VECTOR (MATCHES TARGET IMAGE 2)
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
-      if (windRoseMarker) mapWind.removeLayer(windRoseMarker);
+      if (windRoseLine) mapWind.removeLayer(windRoseLine);
+      if (windRoseStackMarker) mapWind.removeLayer(windRoseStackMarker);
 
-      // Apply angular offsets if model directions are nearly identical
-      let aromeAngle = aromeDir;
-      let gfsAngle = gfsDir;
-      let ecmwfAngle = ecmwfDir;
+      const avgDir = (aromeDir + gfsDir + ecmwfDir) / 3;
+      
+      // Vector endpoint offset (~0.18 NM outward from runway cross)
+      const stackAnchorPt = computeDestinationPoint(lat, lon, avgDir, 0.18);
 
-      if (Math.abs(aromeDir - gfsDir) < 12 && Math.abs(gfsDir - ecmwfDir) < 12) {
-        aromeAngle -= 14;
-        ecmwfAngle += 14;
-      }
+      // Single vector line connecting runway cross to stacked model badges
+      windRoseLine = L.polyline([[lat, lon], [stackAnchorPt.lat, stackAnchorPt.lon]], {
+        color: '#ffee58',
+        weight: 3,
+        opacity: 0.95
+      }).addTo(mapWind);
 
-      // Outer ring distance (100px radius) for vector origin & badges
-      const ringRadius = 90;
-
-      // Inward vector start points (outside the circle ring)
-      const ecmwfStart = getRadialPoint(ecmwfAngle, ringRadius);
-      const gfsStart   = getRadialPoint(gfsAngle, ringRadius);
-      const aromeStart = getRadialPoint(aromeAngle, ringRadius);
-
-      const windRoseHTML = `
-        <div style="position: relative; width: 280px; height: 280px; pointer-events: none;">
-          <svg width="280" height="280" viewBox="0 0 280 280" style="position: absolute; top:0; left:0;">
-            <circle cx="140" cy="140" r="90" stroke="#ffffff" stroke-opacity="0.3" stroke-width="1.5" fill="none" />
-            <circle cx="140" cy="140" r="5" fill="#00d8ff" stroke="#000000" stroke-width="2"/>
-
-            <!-- Inward Vector Lines Pointing to Runway Intersection -->
-            <line x1="${ecmwfStart.x}" y1="${ecmwfStart.y}" x2="140" y2="140" stroke="#00d8ff" stroke-width="2.5"/>
-            <line x1="${gfsStart.x}"   y1="${gfsStart.y}"   x2="140" y2="140" stroke="#ffee58" stroke-width="2.5"/>
-            <line x1="${aromeStart.x}" y1="${aromeStart.y}" x2="140" y2="140" stroke="#00e676" stroke-width="2.5" stroke-dasharray="4,2"/>
-          </svg>
-
-          <!-- Badges Positioned Outside Ring Outer Endpoints -->
-          <div class="rose-label-badge" style="left: ${ecmwfStart.x}px; top: ${ecmwfStart.y}px; background: rgba(0, 216, 255, 0.95);">
-            ${ecmwfSpd} G:${ecmwfGst} <span style="background:#222; color:#fff; font-size:7px; padding:1px 2px; border-radius:2px;">ECMWF</span>
+      // Compact vertically stacked pills HTML matching target
+      const stackedBadgesHTML = `
+        <div class="compact-stack-container">
+          <div class="compact-model-pill bg-arome">
+            <span>${aromeSpd} G:${aromeGst}</span>
+            <span class="compact-model-tag">AROME-HD</span>
           </div>
-
-          <div class="rose-label-badge" style="left: ${gfsStart.x}px; top: ${gfsStart.y}px; background: rgba(255, 235, 59, 0.95);">
-            ${gfsSpd} G:${gfsGst} <span style="background:#222; color:#fff; font-size:7px; padding:1px 2px; border-radius:2px;">GFS</span>
+          <div class="compact-model-pill bg-gfs">
+            <span>${gfsSpd} G:${gfsGst}</span>
+            <span class="compact-model-tag">GFS</span>
           </div>
-
-          <div class="rose-label-badge" style="left: ${aromeStart.x}px; top: ${aromeStart.y}px; background: rgba(0, 230, 118, 0.95);">
-            ${aromeSpd} G:${aromeGst} <span style="background:#222; color:#fff; font-size:7px; padding:1px 2px; border-radius:2px;">AROME</span>
+          <div class="compact-model-pill bg-ecmwf">
+            <span>${ecmwfSpd} G:${ecmwfGst}</span>
+            <span class="compact-model-tag">ECMWF</span>
           </div>
         </div>
       `;
 
-      windRoseMarker = L.marker([lat, lon], {
-        icon: L.divIcon({ html: windRoseHTML, className: '', iconSize: [280, 280], iconAnchor: [140, 140] })
+      windRoseStackMarker = L.marker([stackAnchorPt.lat, stackAnchorPt.lon], {
+        icon: L.divIcon({ html: stackedBadgesHTML, className: '', iconSize: [120, 75], iconAnchor: [0, 37] })
       }).addTo(mapWind);
 
       mapWind.setView([lat, lon], 14);
