@@ -308,7 +308,7 @@
       color: #ffffff;
       font-size: 16px;
       font-weight: bold;
-      text-shadow: 0 0 4px #000;
+      text-shadow: 0 0 6px #000;
       line-height: 1;
       pointer-events: none;
     }
@@ -319,7 +319,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 2.3.0</div>
+    <div class="rev-badge">REV: 2.3.1</div>
   </div>
 
   <div class="dashboard-container">
@@ -491,6 +491,10 @@
       maxZoom: 19, maxNativeZoom: 18
     }).addTo(map);
 
+    // Create a dedicated top pane for the red spot so it renders above all other vectors
+    map.createPane('topSpotPane');
+    map.getPane('topSpotPane').style.zIndex = 650;
+
     let windRoseLayerGroup = L.layerGroup().addTo(map);
 
     function getArrow(deg) {
@@ -584,20 +588,18 @@
       });
 
       // 2. JUMP RUN & SPOT CALCULATION
-      // Jump run heading into wind (bearing = surface wind direction + 180°)
       const avgWindDir = (aromeDir + gfsDir + ecmwfDir) / 3;
       const runInHeading = (avgWindDir + 180) % 360;
       
-      // Calculate offset distance based on average wind speed (e.g., 0.18 NM upwind)
       const avgSpeed = (aromeSpd + gfsSpd + ecmwfSpd) / 3;
       const spotOffsetNM = Math.min(0.28, Math.max(0.12, (avgSpeed / 100) * 1.2));
 
-      // Calculate start and end points of Jump Run
-      const spotPt = computeDestinationPoint(lat, lon, avgWindDir, spotOffsetNM); // Upwind Spot
-      const startJumpRunPt = computeDestinationPoint(lat, lon, (avgWindDir + 180) % 360, spotOffsetNM * 0.8); // Run-In Start
-      const endJumpRunPt = computeDestinationPoint(lat, lon, avgWindDir, spotOffsetNM * 1.6); // Run-In End
+      // Compute Jump Run & Spot points
+      const spotPt = computeDestinationPoint(lat, lon, avgWindDir, spotOffsetNM);
+      const startJumpRunPt = computeDestinationPoint(lat, lon, (avgWindDir + 180) % 360, spotOffsetNM * 0.8);
+      const endJumpRunPt = computeDestinationPoint(lat, lon, avgWindDir, spotOffsetNM * 1.6);
 
-      // Draw Dotted White Jump Run Line
+      // Dotted White Jump Run Line
       L.polyline([[startJumpRunPt.lat, startJumpRunPt.lon], [endJumpRunPt.lat, endJumpRunPt.lon]], {
         color: '#ffffff',
         weight: 3,
@@ -605,8 +607,8 @@
         opacity: 0.95
       }).addTo(windRoseLayerGroup);
 
-      // Arrow Marker at end of Jump Run Line
-      let arrowRotationAngle = (runInHeading - 90 + 360) % 360;
+      // Correct Arrow Angle pointing downwind in direction of flight (heading + 90deg offset for CSS arrow character ▶)
+      let arrowRotationAngle = (runInHeading + 90 + 360) % 360;
       const arrowHTML = `<div class="jumprun-arrow" style="transform: rotate(${arrowRotationAngle}deg);">▶</div>`;
 
       L.marker([endJumpRunPt.lat, endJumpRunPt.lon], {
@@ -618,12 +620,13 @@
         })
       }).addTo(windRoseLayerGroup);
 
-      // Red Dot Marker for the Spot
+      // Red Dot Marker for the Spot (Placed in topSpotPane to always stay on top of everything)
       L.circleMarker([spotPt.lat, spotPt.lon], {
-        radius: 6,
+        pane: 'topSpotPane',
+        radius: 7,
         fillColor: '#ff2a2a',
         color: '#ffffff',
-        weight: 2,
+        weight: 2.5,
         fillOpacity: 1
       }).addTo(windRoseLayerGroup);
 
