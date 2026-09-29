@@ -243,11 +243,12 @@
       border: none;
     }
 
+    /* COMPACT CIRCLE SPOT BADGE */
     .spot-circle-badge {
       background: #ffee58;
       color: #000;
-      width: 42px;
-      height: 42px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
       display: flex;
       flex-direction: column;
@@ -255,7 +256,7 @@
       justify-content: center;
       font-weight: 900;
       font-family: monospace;
-      font-size: 0.62rem;
+      font-size: 0.6rem;
       border: 2px solid #000;
       box-shadow: 0 0 10px rgba(255, 238, 88, 0.8);
       line-height: 1;
@@ -267,7 +268,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.4.1</div>
+    <div class="rev-badge">REV: 1.4.2</div>
   </div>
 
   <div class="dashboard-container">
@@ -275,7 +276,7 @@
     <!-- SEGMENT 1: SATELLITE MAP + HORIZONTAL MODEL TABLE + DROP SPOT CALCULATOR -->
     <div class="segment-1-stack">
       
-      <!-- 1A: SATELLITE MAP WITH LIVE DYNAMIC WIND ROSE -->
+      <!-- 1A: SATELLITE MAP WITH ACCURATE WIND ROSE AND SPOT -->
       <div class="map-card">
         <div id="map"></div>
       </div>
@@ -318,7 +319,7 @@
           </div>
           <div class="card">
             <div class="card-label">Calculated Offset</div>
-            <div class="card-value" style="color: #ffee58;" id="calc-offset">0.95 NM</div>
+            <div class="card-value" style="color: #ffee58;" id="calc-offset">--</div>
             <div class="card-sub">Upwind Vector</div>
           </div>
           <div class="card">
@@ -460,12 +461,12 @@
     }).addTo(map);
 
     let windRoseMarker = null;
+    let exitSpotMarker = null;
 
-    // ARROW ROTATION FIX: Points downwind in direction wind blows TO
     function getArrow(deg) {
       if (deg === undefined || deg === null) return '↑';
-      const rotateDeg = (deg + 180) % 360;
-      return `<span class="dir-arrow" style="transform: rotate(${rotateDeg}deg); display: inline-block;">↑</span>`;
+      // Rotate arrow glyph (↑) directly to wind bearing
+      return `<span class="dir-arrow" style="transform: rotate(${deg}deg); display: inline-block;">↑</span>`;
     }
 
     function getStatusClass(val) {
@@ -478,10 +479,10 @@
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
       if (windRoseMarker) map.removeLayer(windRoseMarker);
 
-      // Rotate vectors directly off true meteorological direction
-      const aromeRot = (aromeDir + 180) % 360;
-      const gfsRot = (gfsDir + 180) % 360;
-      const ecmwfRot = (ecmwfDir + 180) % 360;
+      // Direct degree rotation for wind rose arms
+      const aromeRot = aromeDir;
+      const gfsRot = gfsDir;
+      const ecmwfRot = ecmwfDir;
 
       const windRoseHTML = `
         <div style="position: relative; width: 220px; height: 220px; pointer-events: none;">
@@ -512,20 +513,40 @@
       }).addTo(map);
     }
 
-    // COMPACT CIRCLE TARGET MARKER (UPWIND OFFSET)
-    const exitLat = 50.8683;
-    const exitLon = -3.2160;
-    const dropSpotHTML = `
-      <div class="spot-circle-badge">
-        <span>🎯</span>
-        <span>0.95NM</span>
-      </div>
-    `;
-    L.marker([exitLat, exitLon], {
-      icon: L.divIcon({ html: dropSpotHTML, className: '', iconSize: [42, 42], iconAnchor: [21, 21] })
-    }).addTo(map);
+    // DYNAMIC DWELL SPOT OFFSET CALCULATOR
+    function updateDropSpotMarker(avgDir, avgSpd) {
+      if (exitSpotMarker) map.removeLayer(exitSpotMarker);
 
-    // 2. FETCH MULTI-MODEL SURFACE FORECAST
+      // Dynamic offset: ~0.066 NM per mph of surface wind speed
+      const offsetNM = parseFloat((avgSpd / 15).toFixed(2));
+      const rad = (avgDir * Math.PI) / 180;
+      
+      const dLat = (offsetNM / 60) * Math.cos(rad);
+      const dLon = (offsetNM / (60 * Math.cos((lat * Math.PI) / 180))) * Math.sin(rad);
+
+      const exitLat = lat + dLat;
+      const exitLon = lon + dLon;
+
+      const dropSpotHTML = `
+        <div class="spot-circle-badge">
+          <span>🎯</span>
+          <span>${offsetNM}NM</span>
+        </div>
+      `;
+
+      exitSpotMarker = L.marker([exitLat, exitLon], {
+        icon: L.divIcon({ html: dropSpotHTML, className: '', iconSize: [44, 44], iconAnchor: [22, 22] })
+      }).addTo(map);
+
+      document.getElementById('calc-jumprun').innerText = `${Math.round(avgDir)}° (Headwind)`;
+      document.getElementById('calc-offset').innerText = `${offsetNM} NM`;
+      document.getElementById('calc-coords').innerText = `${exitLat.toFixed(4)}, ${exitLon.toFixed(4)}`;
+
+      const bounds = L.latLngBounds([[lat, lon], [exitLat, exitLon]]);
+      map.fitBounds(bounds, { padding: [40, 40] });
+    }
+
+    // 2. FETCH MULTI-MODEL FORECAST DATA
     async function fetchModelData() {
       const surfaceParams = `latitude=${lat}&longitude=${lon}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=mph&forecast_days=1`;
       
@@ -593,7 +614,7 @@
 
         document.getElementById('multi-model-rows').innerHTML = rowsHTML;
 
-        // DYNAMICALLY UPDATE MAP WIND ROSE WITH LIVE DATA
+        // DYNAMIC WIND ROSE & DROP SPOT UPDATE
         const aromeDir = arome.hourly ? arome.hourly.wind_direction_10m[currentIdx] : 90;
         const aromeSpd = arome.hourly ? Math.round(arome.hourly.wind_speed_10m[currentIdx]) : 11;
         const aromeGst = arome.hourly ? Math.round(arome.hourly.wind_gusts_10m[currentIdx]) : 15;
@@ -608,17 +629,16 @@
 
         updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst);
 
-        // WINDS ALOFT IN MPH MATCHING SURFACE
-        const sfcDir = ecmwfDir;
-        const sfcSpd = ecmwfSpd;
+        const avgDir = (aromeDir + gfsDir + ecmwfDir) / 3;
+        const avgSpd = (aromeSpd + gfsSpd + ecmwfSpd) / 3;
+        updateDropSpotMarker(avgDir, avgSpd);
 
-        document.getElementById('uwind-sfc').innerHTML = `${getArrow(sfcDir)} ${Math.round(sfcDir)}° / ${sfcSpd} mph`;
-        document.getElementById('uwind-3k').innerHTML  = `${getArrow((sfcDir + 10) % 360)} ${Math.round((sfcDir + 10) % 360)}° / ${Math.round(sfcSpd * 1.8)} mph`;
-        document.getElementById('uwind-7k').innerHTML  = `${getArrow((sfcDir + 18) % 360)} ${Math.round((sfcDir + 18) % 360)}° / ${Math.round(sfcSpd * 2.3)} mph`;
-        document.getElementById('uwind-10k').innerHTML = `${getArrow((sfcDir + 25) % 360)} ${Math.round((sfcDir + 25) % 360)}° / ${Math.round(sfcSpd * 2.8)} mph`;
-        document.getElementById('uwind-15k').innerHTML = `${getArrow((sfcDir + 30) % 360)} ${Math.round((sfcDir + 30) % 360)}° / ${Math.round(sfcSpd * 3.4)} mph`;
-
-        document.getElementById('calc-jumprun').innerText = `${Math.round(sfcDir)}° (Headwind)`;
+        // WINDS ALOFT PROFILE IN MPH
+        document.getElementById('uwind-sfc').innerHTML = `${getArrow(ecmwfDir)} ${Math.round(ecmwfDir)}° / ${ecmwfSpd} mph`;
+        document.getElementById('uwind-3k').innerHTML  = `${getArrow((ecmwfDir + 10) % 360)} ${Math.round((ecmwfDir + 10) % 360)}° / ${Math.round(ecmwfSpd * 1.8)} mph`;
+        document.getElementById('uwind-7k').innerHTML  = `${getArrow((ecmwfDir + 18) % 360)} ${Math.round((ecmwfDir + 18) % 360)}° / ${Math.round(ecmwfSpd * 2.3)} mph`;
+        document.getElementById('uwind-10k').innerHTML = `${getArrow((ecmwfDir + 25) % 360)} ${Math.round((ecmwfDir + 25) % 360)}° / ${Math.round(ecmwfSpd * 2.8)} mph`;
+        document.getElementById('uwind-15k').innerHTML = `${getArrow((ecmwfDir + 30) % 360)} ${Math.round((ecmwfDir + 30) % 360)}° / ${Math.round(ecmwfSpd * 3.4)} mph`;
 
       } catch (err) {
         console.error("Multi-model fetch error:", err);
