@@ -19,7 +19,7 @@
       background: #0b0f19;
       color: #f0f4f8;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      padding: 10px 14px;
+      padding: 8px 12px;
     }
 
     .top-header {
@@ -27,14 +27,14 @@
       justify-content: space-between;
       align-items: center;
       max-width: 100%;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       padding-bottom: 4px;
       border-bottom: 1px solid #1e2d4a;
-      height: 28px;
+      height: 24px;
     }
 
     .site-title {
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       font-weight: 700;
       color: #00d8ff;
       text-transform: uppercase;
@@ -46,18 +46,19 @@
       color: #fff;
       font-weight: 800;
       font-family: monospace;
-      padding: 3px 8px;
+      padding: 2px 6px;
       border-radius: 4px;
-      font-size: 0.78rem;
+      font-size: 0.72rem;
       box-shadow: 0 0 10px rgba(0, 136, 255, 0.4);
     }
 
+    /* REBALANCED GRID LAYOUT */
     .dashboard-container {
       display: grid;
-      grid-template-columns: 1.8fr 1fr;
+      grid-template-columns: 1.45fr 1fr;
       gap: 10px;
       width: 100%;
-      height: calc(100vh - 50px);
+      height: calc(100vh - 42px);
     }
 
     .segment-1-stack, .right-column-stack {
@@ -70,8 +71,7 @@
     .map-card {
       position: relative;
       width: 100%;
-      flex: 1 1 55%;
-      min-height: 260px;
+      flex: 1 1 72%; /* EXPANDED MAP HEIGHT */
       border-radius: 8px;
       overflow: hidden;
       border: 1px solid #1e2d4a;
@@ -81,52 +81,89 @@
 
     #map { width: 100%; height: 100%; }
 
-    /* OVERLAY CARD FOR JUMP RUN & SPOT INFO */
+    /* DZ CONTROL OVERLAY PANEL */
     .spot-overlay-card {
       position: absolute;
-      top: 10px;
-      right: 10px;
+      top: 8px;
+      right: 8px;
       z-index: 1000;
-      background: rgba(11, 15, 25, 0.88);
+      background: rgba(11, 15, 25, 0.92);
       backdrop-filter: blur(8px);
       border: 1px solid #1e2d4a;
       border-radius: 6px;
-      padding: 6px 10px;
+      padding: 8px 10px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.6);
       font-family: monospace;
-      pointer-events: none;
+      width: 240px;
+    }
+
+    .spot-overlay-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #1e2d4a;
     }
 
     .spot-overlay-title {
-      font-size: 0.6rem;
+      font-size: 0.62rem;
       font-weight: 700;
-      color: #8a99ad;
+      color: #00d8ff;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 2px;
+    }
+
+    .mode-toggle-btn {
+      background: #1e2d4a;
+      color: #ffee58;
+      border: 1px solid #ffee58;
+      border-radius: 3px;
+      font-size: 0.58rem;
+      font-weight: bold;
+      padding: 1px 5px;
+      cursor: pointer;
     }
 
     .spot-overlay-row {
       display: flex;
-      gap: 12px;
+      justify-content: space-between;
       align-items: center;
+      margin-bottom: 4px;
     }
 
-    .spot-val-group {
+    .spot-val-group { display: flex; flex-direction: column; }
+    .spot-val-label { font-size: 0.5rem; color: #8a99ad; text-transform: uppercase; }
+    .spot-val-num { font-size: 0.8rem; font-weight: 800; color: #fff; }
+
+    .control-slider-group {
       display: flex;
       flex-direction: column;
+      gap: 2px;
+      margin-top: 4px;
+      padding-top: 4px;
+      border-top: 1px dashed rgba(255,255,255,0.1);
     }
 
-    .spot-val-label { font-size: 0.52rem; color: #00d8ff; text-transform: uppercase; }
-    .spot-val-num { font-size: 0.82rem; font-weight: 800; color: #fff; }
+    .slider-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.58rem;
+    }
 
+    .slider-row input[type=range] {
+      width: 110px;
+      accent-color: #00d8ff;
+    }
+
+    /* COMPACT HOURLY WIND TABLE */
     .multi-table-card {
       width: 100%;
-      flex: 1 1 45%;
+      flex: 0 0 auto; /* STREAMLINED HEIGHT */
       background: #131b2e;
       border: 1px solid #1e2d4a;
       border-radius: 8px;
-      padding: 8px 10px;
+      padding: 6px 8px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.5);
       display: flex;
       flex-direction: column;
@@ -134,12 +171,11 @@
     }
 
     .table-title {
-      font-size: 0.72rem;
+      font-size: 0.65rem;
       font-weight: 700;
       color: #00d8ff;
       text-transform: uppercase;
-      margin-bottom: 4px;
-      letter-spacing: 0.5px;
+      margin-bottom: 3px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -147,14 +183,14 @@
 
     .legend-bar {
       display: flex;
-      gap: 8px;
-      font-size: 0.58rem;
+      gap: 6px;
+      font-size: 0.55rem;
       color: #8a99ad;
       font-family: monospace;
     }
 
-    .legend-item { display: flex; align-items: center; gap: 3px; }
-    .legend-box { width: 8px; height: 8px; border-radius: 2px; }
+    .legend-item { display: flex; align-items: center; gap: 2px; }
+    .legend-box { width: 6px; height: 6px; border-radius: 1px; }
 
     .table-wrapper {
       flex: 1;
@@ -165,27 +201,24 @@
     .multi-table-horizontal {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.68rem;
+      font-size: 0.62rem;
       font-family: monospace;
       text-align: center;
     }
 
     .multi-table-horizontal th {
-      padding: 4px 5px;
+      padding: 2px 3px;
       background: rgba(0, 0, 0, 0.4);
       color: #8a99ad;
       border-bottom: 1px solid #1e2d4a;
       border-right: 1px solid rgba(255,255,255,0.04);
-      text-transform: uppercase;
-      font-size: 0.62rem;
-      white-space: nowrap;
+      font-size: 0.58rem;
     }
 
     .multi-table-horizontal td {
-      padding: 3px 4px;
+      padding: 2px 3px;
       border-bottom: 1px solid rgba(255,255,255,0.04);
       border-right: 1px solid rgba(255,255,255,0.04);
-      white-space: nowrap;
     }
 
     .multi-table-horizontal .model-name-th {
@@ -201,10 +234,10 @@
 
     .wind-badge {
       display: inline-block;
-      padding: 2px 4px;
-      border-radius: 4px;
+      padding: 1px 3px;
+      border-radius: 3px;
       font-weight: bold;
-      min-width: 58px;
+      min-width: 50px;
     }
 
     .status-green  { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.4); }
@@ -212,14 +245,14 @@
     .status-orange { background: rgba(255, 152, 0, 0.15);  color: #ffb74d; border: 1px solid rgba(255, 152, 0, 0.4); }
     .status-red    { background: rgba(255, 82, 82, 0.2);   color: #ff5252; border: 1px solid rgba(255, 82, 82, 0.5); }
 
-    .dir-arrow { display: inline-block; font-weight: bold; margin-right: 2px; }
-    .gust-val { font-size: 0.6rem; opacity: 0.85; }
+    .dir-arrow { display: inline-block; font-weight: bold; margin-right: 1px; }
+    .gust-val { font-size: 0.55rem; opacity: 0.85; }
 
     .pane-segment {
       background: #131b2e;
       border: 1px solid #1e2d4a;
       border-radius: 8px;
-      padding: 8px 10px;
+      padding: 6px 8px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.4);
       display: flex;
       flex-direction: column;
@@ -229,50 +262,47 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-bottom: 4px;
+      padding-bottom: 3px;
       border-bottom: 1px solid #1e2d4a;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
-    .title { font-weight: 700; color: #00d8ff; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
-    .subtitle { font-size: 0.65rem; color: #8a99ad; }
+    .title { font-weight: 700; color: #00d8ff; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .subtitle { font-size: 0.6rem; color: #8a99ad; }
 
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
-    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 4px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; margin-bottom: 4px; }
 
-    .card { background: rgba(0, 0, 0, 0.25); border: 1px solid #1e2d4a; border-radius: 6px; padding: 5px 7px; }
-    .card-label { font-size: 0.55rem; color: #8a99ad; text-transform: uppercase; }
-    .card-value { font-size: 0.85rem; font-weight: 700; color: #fff; font-family: monospace; margin-top: 1px; }
-    .card-sub { font-size: 0.55rem; color: #00e676; margin-top: 1px; }
+    .card { background: rgba(0, 0, 0, 0.25); border: 1px solid #1e2d4a; border-radius: 4px; padding: 4px 6px; }
+    .card-label { font-size: 0.5rem; color: #8a99ad; text-transform: uppercase; }
+    .card-value { font-size: 0.78rem; font-weight: 700; color: #fff; font-family: monospace; }
+    .card-sub { font-size: 0.5rem; color: #00e676; }
 
     .raw-metar-box {
       background: rgba(0, 0, 0, 0.35);
       border: 1px solid #1e2d4a;
       border-radius: 4px;
-      padding: 5px;
+      padding: 4px;
       font-family: monospace;
-      font-size: 0.62rem;
+      font-size: 0.58rem;
       color: #00e676;
       word-break: break-all;
     }
 
+    /* EXPANDED RADAR HEIGHT */
     .radar-frame-box {
       position: relative;
       width: 100%;
-      height: 120px;
+      flex: 1;
+      min-height: 180px;
       border-radius: 6px;
       overflow: hidden;
       border: 1px solid #1e2d4a;
       background: #0b0f19;
     }
 
-    .radar-frame-box iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
+    .radar-frame-box iframe { width: 100%; height: 100%; border: none; }
 
-    /* ROTATED BADGE PILL */
     .rotated-pill {
       display: flex;
       align-items: center;
@@ -303,7 +333,6 @@
       text-transform: uppercase;
     }
 
-    /* JUMP RUN ARROW HEAD STYLING */
     .jumprun-arrow {
       color: #ffffff;
       font-size: 16px;
@@ -319,19 +348,22 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 2.3.2</div>
+    <div class="rev-badge">REV: 2.4.0</div>
   </div>
 
   <div class="dashboard-container">
     
-    <!-- SEGMENT 1: SATELLITE MAP + HORIZONTAL MODEL TABLE -->
+    <!-- LEFT STACK: SATELLITE MAP + STREAMLINED TABLE -->
     <div class="segment-1-stack">
       
-      <!-- 1A: SATELLITE MAP WITH CORNER OVERLAY CARD -->
+      <!-- MAP CARD WITH DZ CONTROL OVERLAY -->
       <div class="map-card">
-        <!-- MAP OVERLAY FOR JUMP RUN & SPOT PARAMETERS -->
         <div class="spot-overlay-card">
-          <div class="spot-overlay-title">📍 Jump Run & Spot Calculation</div>
+          <div class="spot-overlay-header">
+            <span class="spot-overlay-title">🎯 DZ Control Spotting</span>
+            <button class="mode-toggle-btn" id="toggle-mode-btn" onclick="toggleSpotMode()">MODE: AUTO</button>
+          </div>
+          
           <div class="spot-overlay-row">
             <div class="spot-val-group">
               <span class="spot-val-label">Run-In Heading</span>
@@ -342,20 +374,39 @@
               <span class="spot-val-num" id="card-spot-dist">-- NM</span>
             </div>
           </div>
+
+          <!-- MANUAL OVERRIDE CONTROLS -->
+          <div class="control-slider-group" id="manual-controls" style="display: none;">
+            <div class="slider-row">
+              <span>Heading:</span>
+              <input type="range" id="slider-heading" min="0" max="359" value="144" oninput="updateManualSpot()">
+            </div>
+            <div class="slider-row">
+              <span>Offset:</span>
+              <input type="range" id="slider-dist" min="0.05" max="0.50" step="0.01" value="0.20" oninput="updateManualSpot()">
+            </div>
+            <div class="slider-row" style="margin-top:2px;">
+              <span>Overlay Mode:</span>
+              <select id="select-display-mode" onchange="updateManualSpot()" style="background:#131b2e; color:#fff; border:1px solid #1e2d4a; font-size:0.55rem; border-radius:2px;">
+                <option value="manual">Manual Only</option>
+                <option value="both" selected>Show Both</option>
+              </select>
+            </div>
+          </div>
         </div>
 
         <div id="map"></div>
       </div>
 
-      <!-- 1B: HORIZONTAL MULTI-MODEL HOURLY COMPARISON TABLE -->
+      <!-- STREAMLINED MULTI-MODEL TABLE -->
       <div class="multi-table-card">
         <div class="table-title">
           <span>📊 Hourly Multi-Model Wind Forecast (Dunkeswell EGTU)</span>
           <div class="legend-bar">
-            <div class="legend-item"><div class="legend-box" style="background:#00e676;"></div> ≤15 (All)</div>
-            <div class="legend-item"><div class="legend-box" style="background:#ffee58;"></div> 16-20 (Lic)</div>
-            <div class="legend-item"><div class="legend-box" style="background:#ffb74d;"></div> 21-25 (Adv)</div>
-            <div class="legend-item"><div class="legend-box" style="background:#ff5252;"></div> >25 (Limit)</div>
+            <div class="legend-item"><div class="legend-box" style="background:#00e676;"></div> ≤15</div>
+            <div class="legend-item"><div class="legend-box" style="background:#ffee58;"></div> 16-20</div>
+            <div class="legend-item"><div class="legend-box" style="background:#ffb74d;"></div> 21-25</div>
+            <div class="legend-item"><div class="legend-box" style="background:#ff5252;"></div> >25</div>
           </div>
         </div>
         <div class="table-wrapper">
@@ -366,7 +417,7 @@
               </tr>
             </thead>
             <tbody id="multi-model-rows">
-              <tr><td colspan="13" style="padding: 12px; color: #8a99ad;">Fetching Live Model Forecasts...</td></tr>
+              <tr><td colspan="13" style="padding: 6px; color: #8a99ad;">Fetching Live Forecasts...</td></tr>
             </tbody>
           </table>
         </div>
@@ -374,84 +425,73 @@
 
     </div>
 
-    <!-- RIGHT COLUMN: SEGMENT 2, 3 & 4 -->
+    <!-- RIGHT COLUMN: STREAMLINED WINDS ALOFT & EXPANDED RADAR -->
     <div class="right-column-stack">
       
-      <!-- SEGMENT 2: WINDS ALOFT PROFILE -->
-      <div class="pane-segment" style="flex: 1.2;">
+      <!-- COMPACT WINDS ALOFT PROFILE -->
+      <div class="pane-segment" style="flex: 0 0 auto;">
         <div class="pane-header">
           <div class="title">✈️ Winds Aloft Profile</div>
-          <div class="subtitle">Aviation Upper Winds (EGTU 839')</div>
+          <div class="subtitle">EGTU (839')</div>
         </div>
 
         <div class="grid-2">
           <div class="card">
-            <div class="card-label">Cloud Base Ceiling</div>
+            <div class="card-label">Ceiling</div>
             <div class="card-value">SCT 4,500'</div>
-            <div class="card-sub">BKN at 12,000' AGL</div>
           </div>
           <div class="card">
-            <div class="card-label">Density Altitude</div>
+            <div class="card-label">Density Alt</div>
             <div class="card-value">1,120 FT</div>
           </div>
         </div>
 
-        <table style="width: 100%; border-collapse: collapse; font-size: 0.68rem;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.62rem;">
           <thead>
-            <tr style="border-bottom: 1px solid #1e2d4a; color: #8a99ad; font-size: 0.6rem; text-transform: uppercase;">
-              <th style="text-align: left; padding: 4px 2px;">Altitude</th>
-              <th style="text-align: left; padding: 4px 2px;">Dir / Speed (mph)</th>
-              <th style="text-align: left; padding: 4px 2px;">Temp</th>
+            <tr style="border-bottom: 1px solid #1e2d4a; color: #8a99ad; font-size: 0.55rem; text-transform: uppercase;">
+              <th style="text-align: left; padding: 2px;">Alt</th>
+              <th style="text-align: left; padding: 2px;">Dir / Speed</th>
+              <th style="text-align: left; padding: 2px;">Temp</th>
             </tr>
           </thead>
           <tbody id="upper-winds-rows">
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-              <td style="padding: 3px 2px;">Surface (839')</td>
-              <td style="padding: 3px 2px;" id="uwind-sfc">--</td>
-              <td style="padding: 3px 2px;" id="utemp-sfc">18°C</td>
+              <td style="padding: 2px;">Sfc (839')</td><td id="uwind-sfc">--</td><td id="utemp-sfc">18°C</td>
             </tr>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-              <td style="padding: 3px 2px;">FL030 (3,000' AGL)</td>
-              <td style="padding: 3px 2px;" id="uwind-3k">--</td>
-              <td style="padding: 3px 2px;" id="utemp-3k">12°C</td>
+              <td style="padding: 2px;">FL030 (3k')</td><td id="uwind-3k">--</td><td id="utemp-3k">12°C</td>
             </tr>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-              <td style="padding: 3px 2px;">FL070 (7,000' AGL)</td>
-              <td style="padding: 3px 2px;" id="uwind-7k">--</td>
-              <td style="padding: 3px 2px;" id="utemp-7k">4°C</td>
+              <td style="padding: 2px;">FL070 (7k')</td><td id="uwind-7k">--</td><td id="utemp-7k">4°C</td>
             </tr>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-              <td style="padding: 3px 2px;">FL100 (10,000' AGL)</td>
-              <td style="padding: 3px 2px;" id="uwind-10k">--</td>
-              <td style="padding: 3px 2px;" id="utemp-10k">-2°C</td>
+              <td style="padding: 2px;">FL100 (10k')</td><td id="uwind-10k">--</td><td id="utemp-10k">-2°C</td>
             </tr>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-              <td style="padding: 3px 2px;">FL150 (15,000' AGL)</td>
-              <td style="padding: 3px 2px;" id="uwind-15k">--</td>
-              <td style="padding: 3px 2px;" id="utemp-15k">-12°C</td>
+              <td style="padding: 2px;">FL150 (15k')</td><td id="uwind-15k">--</td><td id="utemp-15k">-12°C</td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <!-- SEGMENT 3: LIVE METAR & RUNWAY SAFETY -->
-      <div class="pane-segment" style="flex: 1;">
+      <!-- METAR & RUNWAY -->
+      <div class="pane-segment" style="flex: 0 0 auto;">
         <div class="pane-header">
-          <div class="title">📡 Live METAR & Runway Safety</div>
+          <div class="title">📡 METAR & Safety</div>
           <div class="subtitle">EGTE / Rwy 04/22</div>
         </div>
 
         <div class="grid-3">
           <div class="card">
-            <div class="card-label">Category</div>
+            <div class="card-label">Cat</div>
             <div class="card-value" style="color: #00e676;" id="metar-cat">VFR</div>
           </div>
           <div class="card">
-            <div class="card-label">QNH Pressure</div>
+            <div class="card-label">QNH</div>
             <div class="card-value" id="metar-qnh">1018 hPa</div>
           </div>
           <div class="card">
-            <div class="card-label">Rwy 04 Crosswind</div>
+            <div class="card-label">Crosswind</div>
             <div class="card-value" id="crosswind-val">6 mph</div>
           </div>
         </div>
@@ -461,16 +501,16 @@
         </div>
       </div>
 
-      <!-- SEGMENT 4: NO-TEXT LIVE RAIN RADAR MAP -->
-      <div class="pane-segment" style="flex: 1.1;">
+      <!-- EXPANDED RAIN RADAR -->
+      <div class="pane-segment" style="flex: 1;">
         <div class="pane-header">
-          <div class="title">🌧️ Live Rain Radar & Showers</div>
-          <div class="subtitle">South West Coastline</div>
+          <div class="title">🌧️ Live Rain Radar</div>
+          <div class="subtitle">South West Sweep</div>
         </div>
 
         <div class="radar-frame-box">
           <iframe 
-            src="https://embed.windy.com/embed2.html?lat=50.7500&lon=-3.5000&width=100%25&height=120&zoom=7&level=surface&overlay=radar&product=radar&menu=false&message=false&marker=false&calendar=false&pressure=false&type=map&location=coordinates&detail=false&play=true&metricWind=mph&metricTemp=%C2%B0C" 
+            src="https://embed.windy.com/embed2.html?lat=50.7500&lon=-3.5000&width=100%25&height=220&zoom=7&level=surface&overlay=radar&product=radar&menu=false&message=false&marker=false&calendar=false&pressure=false&type=map&location=coordinates&detail=false&play=true&metricWind=mph&metricTemp=%C2%B0C" 
             allowfullscreen>
           </iframe>
         </div>
@@ -481,21 +521,22 @@
   </div>
 
   <script>
-    // DUNKESWELL RUNWAY CROSS COORDINATES
     const lat = 50.860619;
     const lon = -3.233961;
 
-    // 1. LEAFLET SATELLITE MAP
     const map = L.map('map', { zoomControl: false }).setView([lat, lon], 15);
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       maxZoom: 19, maxNativeZoom: 18
     }).addTo(map);
 
-    // Dedicated top pane for red spot dot so it always renders above wind rose lines & labels
     map.createPane('topSpotPane');
     map.getPane('topSpotPane').style.zIndex = 650;
 
     let windRoseLayerGroup = L.layerGroup().addTo(map);
+    let manualLayerGroup = L.layerGroup().addTo(map);
+
+    let isManualMode = false;
+    let cachedWeatherData = null;
 
     function getArrow(deg) {
       if (deg === undefined || deg === null) return '↑';
@@ -510,9 +551,8 @@
       return 'status-red';
     }
 
-    // GEOGRAPHIC DESTINATION POINT CALCULATION (WGS84)
     function computeDestinationPoint(originLat, originLon, bearingDeg, distanceNM) {
-      const R = 3440.065; // Earth radius in nautical miles
+      const R = 3440.065;
       const d = distanceNM;
       const brng = (bearingDeg * Math.PI) / 180;
       const lat1 = (originLat * Math.PI) / 180;
@@ -528,26 +568,48 @@
         Math.cos(d / R) - Math.sin(lat1) * Math.sin(lat2)
       );
 
-      return {
-        lat: (lat2 * 180) / Math.PI,
-        lon: (lon2 * 180) / Math.PI
-      };
+      return { lat: (lat2 * 180) / Math.PI, lon: (lon2 * 180) / Math.PI };
     }
 
-    // RENDER WIND ROSE, ROTATED LABELS, UPWIND JUMP RUN & RED SPOT
+    function toggleSpotMode() {
+      isManualMode = !isManualMode;
+      const btn = document.getElementById('toggle-mode-btn');
+      const controls = document.getElementById('manual-controls');
+
+      if (isManualMode) {
+        btn.innerText = "MODE: MANUAL";
+        btn.style.borderColor = "#ff5252";
+        btn.style.color = "#ff5252";
+        controls.style.display = "flex";
+      } else {
+        btn.innerText = "MODE: AUTO";
+        btn.style.borderColor = "#ffee58";
+        btn.style.color = "#ffee58";
+        controls.style.display = "none";
+        manualLayerGroup.clearLayers();
+      }
+
+      if (cachedWeatherData) {
+        updateWindRoseOnMap(...cachedWeatherData);
+      }
+    }
+
+    function updateManualSpot() {
+      if (cachedWeatherData) {
+        updateWindRoseOnMap(...cachedWeatherData);
+      }
+    }
+
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
       windRoseLayerGroup.clearLayers();
+      manualLayerGroup.clearLayers();
 
-      // 1. Airfield Center Point (Blue Circle)
+      // Airfield Center
       L.circleMarker([lat, lon], {
-        radius: 6,
-        fillColor: '#00d8ff',
-        color: '#000000',
-        weight: 2,
-        fillOpacity: 1
+        radius: 6, fillColor: '#00d8ff', color: '#000', weight: 2, fillOpacity: 1
       }).addTo(windRoseLayerGroup);
 
-      // Model configs
+      // WIND ROSE VECTORS
       const rawModels = [
         { name: 'AROME-HD', dir: aromeDir, spd: aromeSpd, gst: aromeGst, color: '#00e676', bg: 'rgba(0, 230, 118, 0.95)', dash: '4,3' },
         { name: 'GFS',      dir: gfsDir,   spd: gfsSpd,   gst: gfsGst,   color: '#ffee58', bg: 'rgba(255, 235, 59, 0.95)', dash: null },
@@ -557,15 +619,10 @@
       const baseDistances = [0.10, 0.22, 0.34];
 
       rawModels.forEach((m, idx) => {
-        const distNM = baseDistances[idx];
-        const endPt = computeDestinationPoint(lat, lon, m.dir, distNM);
+        const endPt = computeDestinationPoint(lat, lon, m.dir, baseDistances[idx]);
 
-        // Vector ray along degree direction
         L.polyline([[lat, lon], [endPt.lat, endPt.lon]], {
-          color: m.color,
-          weight: 2.8,
-          opacity: 0.9,
-          dashArray: m.dash
+          color: m.color, weight: 2.8, opacity: 0.9, dashArray: m.dash
         }).addTo(windRoseLayerGroup);
 
         let cssRotationAngle = (m.dir - 90 + 360) % 360;
@@ -578,67 +635,77 @@
         `;
 
         L.marker([endPt.lat, endPt.lon], {
-          icon: L.divIcon({
-            html: pillHTML,
-            className: '',
-            iconSize: [120, 22],
-            iconAnchor: [0, 11]
-          })
+          icon: L.divIcon({ html: pillHTML, className: '', iconSize: [120, 22], iconAnchor: [0, 11] })
         }).addTo(windRoseLayerGroup);
       });
 
-      // 2. UPWIND JUMP RUN & SPOT CALCULATION
-      // Surface wind direction (where wind is coming from) = Aircraft run-in heading into the wind
+      // AUTO JUMP RUN & SPOT
       const avgWindDir = (aromeDir + gfsDir + ecmwfDir) / 3;
-      const runInHeading = avgWindDir; 
-      
+      const autoRunIn = avgWindDir;
       const avgSpeed = (aromeSpd + gfsSpd + ecmwfSpd) / 3;
-      const spotOffsetNM = Math.min(0.28, Math.max(0.12, (avgSpeed / 100) * 1.2));
+      const autoSpotOffset = Math.min(0.28, Math.max(0.12, (avgSpeed / 100) * 1.2));
 
-      // Upwind Spot Point (located into the wind from dropzone center)
-      const spotPt = computeDestinationPoint(lat, lon, runInHeading, spotOffsetNM);
-      
-      // Jump Run line starts downwind of spot and flies directly over it into the wind
-      const startJumpRunPt = computeDestinationPoint(lat, lon, (runInHeading + 180) % 360, spotOffsetNM * 0.6);
-      const endJumpRunPt = computeDestinationPoint(lat, lon, runInHeading, spotOffsetNM * 1.6);
+      const displayMode = document.getElementById('select-display-mode').value;
 
-      // Dotted White Jump Run Line
-      L.polyline([[startJumpRunPt.lat, startJumpRunPt.lon], [endJumpRunPt.lat, endJumpRunPt.lon]], {
-        color: '#ffffff',
-        weight: 3,
-        dashArray: '5,6',
-        opacity: 0.95
-      }).addTo(windRoseLayerGroup);
+      if (!isManualMode || displayMode === 'both') {
+        // Render Auto Vectors
+        const autoSpotPt = computeDestinationPoint(lat, lon, autoRunIn, autoSpotOffset);
+        const startAutoRun = computeDestinationPoint(lat, lon, (autoRunIn + 180) % 360, autoSpotOffset * 0.6);
+        const endAutoRun = computeDestinationPoint(lat, lon, autoRunIn, autoSpotOffset * 1.6);
 
-      // White Arrowhead pointing UPWIND along the direction of flight
-      let arrowRotationAngle = (runInHeading - 90 + 360) % 360;
-      const arrowHTML = `<div class="jumprun-arrow" style="transform: rotate(${arrowRotationAngle}deg);">▶</div>`;
+        L.polyline([[startAutoRun.lat, startAutoRun.lon], [endAutoRun.lat, endAutoRun.lon]], {
+          color: '#ffffff', weight: 3, dashArray: '5,6', opacity: 0.95
+        }).addTo(windRoseLayerGroup);
 
-      L.marker([endJumpRunPt.lat, endJumpRunPt.lon], {
-        icon: L.divIcon({
-          html: arrowHTML,
-          className: '',
-          iconSize: [16, 16],
-          iconAnchor: [8, 8]
-        })
-      }).addTo(windRoseLayerGroup);
+        let arrowAngle = (autoRunIn - 90 + 360) % 360;
+        L.marker([endAutoRun.lat, endAutoRun.lon], {
+          icon: L.divIcon({
+            html: `<div class="jumprun-arrow" style="transform: rotate(${arrowAngle}deg);">▶</div>`,
+            className: '', iconSize: [16, 16], iconAnchor: [8, 8]
+          })
+        }).addTo(windRoseLayerGroup);
 
-      // Red Dot Marker for the Spot (Rendered on topSpotPane to always stay on top of all layers)
-      L.circleMarker([spotPt.lat, spotPt.lon], {
-        pane: 'topSpotPane',
-        radius: 7,
-        fillColor: '#ff2a2a',
-        color: '#ffffff',
-        weight: 2.5,
-        fillOpacity: 1
-      }).addTo(windRoseLayerGroup);
+        L.circleMarker([autoSpotPt.lat, autoSpotPt.lon], {
+          pane: 'topSpotPane', radius: 7, fillColor: '#ff2a2a', color: '#fff', weight: 2.5, fillOpacity: 1
+        }).addTo(windRoseLayerGroup);
+      }
 
-      // Update Map Overlay Corner Card Values
-      document.getElementById('card-runin').innerText = `${Math.round(runInHeading)}° M`;
-      document.getElementById('card-spot-dist').innerText = `${spotOffsetNM.toFixed(2)} NM`;
+      if (isManualMode) {
+        // Render Manual Override Vectors
+        const manualHeading = parseFloat(document.getElementById('slider-heading').value);
+        const manualOffset = parseFloat(document.getElementById('slider-dist').value);
+
+        const manSpotPt = computeDestinationPoint(lat, lon, manualHeading, manualOffset);
+        const startManRun = computeDestinationPoint(lat, lon, (manualHeading + 180) % 360, manualOffset * 0.6);
+        const endManRun = computeDestinationPoint(lat, lon, manualHeading, manualOffset * 1.6);
+
+        // Orange Dashed Line for Manual Pattern
+        L.polyline([[startManRun.lat, startManRun.lon], [endManRun.lat, endManRun.lon]], {
+          color: '#ff9800', weight: 3.5, dashArray: '4,4', opacity: 1
+        }).addTo(manualLayerGroup);
+
+        let manArrowAngle = (manualHeading - 90 + 360) % 360;
+        L.marker([endManRun.lat, endManRun.lon], {
+          icon: L.divIcon({
+            html: `<div class="jumprun-arrow" style="color:#ff9800; transform: rotate(${manArrowAngle}deg);">▶</div>`,
+            className: '', iconSize: [16, 16], iconAnchor: [8, 8]
+          })
+        }).addTo(manualLayerGroup);
+
+        // Orange Manual Spot Marker
+        L.circleMarker([manSpotPt.lat, manSpotPt.lon], {
+          pane: 'topSpotPane', radius: 8, fillColor: '#ff9800', color: '#ffffff', weight: 2.5, fillOpacity: 1
+        }).addTo(manualLayerGroup);
+
+        // Update Overlay Display Text
+        document.getElementById('card-runin').innerText = `${Math.round(manualHeading)}° M (MAN)`;
+        document.getElementById('card-spot-dist').innerText = `${manualOffset.toFixed(2)} NM`;
+      } else {
+        document.getElementById('card-runin').innerText = `${Math.round(autoRunIn)}° M`;
+        document.getElementById('card-spot-dist').innerText = `${autoSpotOffset.toFixed(2)} NM`;
+      }
     }
 
-    // 3. FETCH MULTI-MODEL FORECAST DATA
     async function fetchModelData() {
       const surfaceParams = `latitude=${lat}&longitude=${lon}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=mph&forecast_days=1`;
       
@@ -706,7 +773,6 @@
 
         document.getElementById('multi-model-rows').innerHTML = rowsHTML;
 
-        // DYNAMIC WIND ROSE UPDATE
         const aromeDir = arome.hourly ? arome.hourly.wind_direction_10m[currentIdx] : 144;
         const aromeSpd = arome.hourly ? Math.round(arome.hourly.wind_speed_10m[currentIdx]) : 18;
         const aromeGst = arome.hourly ? Math.round(arome.hourly.wind_gusts_10m[currentIdx]) : 30;
@@ -719,9 +785,9 @@
         const ecmwfSpd = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_speed_10m[currentIdx]) : 18;
         const ecmwfGst = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_gusts_10m[currentIdx]) : 33;
 
-        updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst);
+        cachedWeatherData = [aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst];
+        updateWindRoseOnMap(...cachedWeatherData);
 
-        // WINDS ALOFT PROFILE IN MPH
         document.getElementById('uwind-sfc').innerHTML = `${getArrow(ecmwfDir)} ${Math.round(ecmwfDir)}° / ${ecmwfSpd} mph`;
         document.getElementById('uwind-3k').innerHTML  = `${getArrow((ecmwfDir + 10) % 360)} ${Math.round((ecmwfDir + 10) % 360)}° / ${Math.round(ecmwfSpd * 1.8)} mph`;
         document.getElementById('uwind-7k').innerHTML  = `${getArrow((ecmwfDir + 18) % 360)} ${Math.round((ecmwfDir + 18) % 360)}° / ${Math.round(ecmwfSpd * 2.3)} mph`;
@@ -729,11 +795,10 @@
         document.getElementById('uwind-15k').innerHTML = `${getArrow((ecmwfDir + 30) % 360)} ${Math.round((ecmwfDir + 30) % 360)}° / ${Math.round(ecmwfSpd * 3.4)} mph`;
 
       } catch (err) {
-        console.error("Multi-model fetch error:", err);
+        console.error("Fetch error:", err);
       }
     }
 
-    // 4. FETCH LIVE METAR
     async function fetchMetar() {
       try {
         const res = await fetch(`https://metar.vatsim.net/EGTE`);
