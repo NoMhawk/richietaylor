@@ -267,7 +267,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.4.0</div>
+    <div class="rev-badge">REV: 1.4.1</div>
   </div>
 
   <div class="dashboard-container">
@@ -275,7 +275,7 @@
     <!-- SEGMENT 1: SATELLITE MAP + HORIZONTAL MODEL TABLE + DROP SPOT CALCULATOR -->
     <div class="segment-1-stack">
       
-      <!-- 1A: SATELLITE MAP WITH RESET DEFAULT WIND ROSE -->
+      <!-- 1A: SATELLITE MAP WITH LIVE DYNAMIC WIND ROSE -->
       <div class="map-card">
         <div id="map"></div>
       </div>
@@ -348,7 +348,7 @@
       <div class="pane-segment" style="flex: 1.2;">
         <div class="pane-header">
           <div class="title">✈️ Winds Aloft Profile</div>
-          <div class="subtitle">Aviation Profile Model (EGTU 839')</div>
+          <div class="subtitle">Aviation Upper Winds (EGTU 839')</div>
         </div>
 
         <div class="grid-2">
@@ -367,7 +367,7 @@
           <thead>
             <tr style="border-bottom: 1px solid #1e2d4a; color: #8a99ad; font-size: 0.6rem; text-transform: uppercase;">
               <th style="text-align: left; padding: 4px 2px;">Altitude</th>
-              <th style="text-align: left; padding: 4px 2px;">Dir / Speed (kt)</th>
+              <th style="text-align: left; padding: 4px 2px;">Dir / Speed (mph)</th>
               <th style="text-align: left; padding: 4px 2px;">Temp</th>
             </tr>
           </thead>
@@ -459,34 +459,58 @@
       maxNativeZoom: 18
     }).addTo(map);
 
-    // DEFAULT RESET WIND ROSE OVERLAY
-    const windRoseHTML = `
-      <div style="position: relative; width: 220px; height: 220px; pointer-events: none;">
-        <svg width="220" height="220" style="position: absolute; top:0; left:0;">
-          <circle cx="110" cy="110" r="80" stroke="#ffffff" stroke-opacity="0.5" stroke-width="1.5" fill="none" />
-          <circle cx="110" cy="110" r="6" fill="#ffffff" stroke="#000" stroke-width="2"/>
-        </svg>
-        <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(0deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
-          <div style="background: rgba(163, 255, 180, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 140px; margin-left: 10px;">
-            11 G:15 mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">AROME-HD</span>
-          </div>
-        </div>
-        <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(15deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
-          <div style="background: rgba(194, 255, 210, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 120px; margin-left: 10px;">
-            10 G:13 mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">GFS</span>
-          </div>
-        </div>
-        <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(30deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
-          <div style="background: rgba(0, 240, 255, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 130px; margin-left: 10px;">
-            11 G:14 mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">ECMWF</span>
-          </div>
-        </div>
-      </div>
-    `;
+    let windRoseMarker = null;
 
-    L.marker([lat, lon], {
-      icon: L.divIcon({ html: windRoseHTML, className: '', iconSize: [220, 220], iconAnchor: [110, 110] })
-    }).addTo(map);
+    // ARROW ROTATION FIX: Points downwind in direction wind blows TO
+    function getArrow(deg) {
+      if (deg === undefined || deg === null) return '↑';
+      const rotateDeg = (deg + 180) % 360;
+      return `<span class="dir-arrow" style="transform: rotate(${rotateDeg}deg); display: inline-block;">↑</span>`;
+    }
+
+    function getStatusClass(val) {
+      if (val <= 15) return 'status-green';
+      if (val <= 20) return 'status-yellow';
+      if (val <= 25) return 'status-orange';
+      return 'status-red';
+    }
+
+    function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
+      if (windRoseMarker) map.removeLayer(windRoseMarker);
+
+      // Rotate vectors directly off true meteorological direction
+      const aromeRot = (aromeDir + 180) % 360;
+      const gfsRot = (gfsDir + 180) % 360;
+      const ecmwfRot = (ecmwfDir + 180) % 360;
+
+      const windRoseHTML = `
+        <div style="position: relative; width: 220px; height: 220px; pointer-events: none;">
+          <svg width="220" height="220" style="position: absolute; top:0; left:0;">
+            <circle cx="110" cy="110" r="80" stroke="#ffffff" stroke-opacity="0.5" stroke-width="1.5" fill="none" />
+            <circle cx="110" cy="110" r="6" fill="#ffffff" stroke="#000" stroke-width="2"/>
+          </svg>
+          <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(${aromeRot}deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
+            <div style="background: rgba(163, 255, 180, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 140px; margin-left: 10px;">
+              ${aromeSpd} G:${aromeGst} mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">AROME-HD</span>
+            </div>
+          </div>
+          <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(${gfsRot}deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
+            <div style="background: rgba(194, 255, 210, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 120px; margin-left: 10px;">
+              ${gfsSpd} G:${gfsGst} mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">GFS</span>
+            </div>
+          </div>
+          <div style="position: absolute; top: 110px; left: 110px; transform-origin: 0 0; transform: rotate(${ecmwfRot}deg); font-family: sans-serif; font-size: 11px; font-weight: bold;">
+            <div style="background: rgba(0, 240, 255, 0.9); color: #000; padding: 2px 8px; border-radius: 10px; border: 1px solid #000; display: inline-block; width: 130px; margin-left: 10px;">
+              ${ecmwfSpd} G:${ecmwfGst} mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">ECMWF</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      windRoseMarker = L.marker([lat, lon], {
+        icon: L.divIcon({ html: windRoseHTML, className: '', iconSize: [220, 220], iconAnchor: [110, 110] })
+      }).addTo(map);
+    }
 
     // COMPACT CIRCLE TARGET MARKER (UPWIND OFFSET)
     const exitLat = 50.8683;
@@ -500,18 +524,6 @@
     L.marker([exitLat, exitLon], {
       icon: L.divIcon({ html: dropSpotHTML, className: '', iconSize: [42, 42], iconAnchor: [21, 21] })
     }).addTo(map);
-
-    function getArrow(deg) {
-      if (deg === undefined || deg === null) return '↑';
-      return `<span class="dir-arrow" style="transform: rotate(${deg}deg); display: inline-block;">↑</span>`;
-    }
-
-    function getStatusClass(val) {
-      if (val <= 15) return 'status-green';
-      if (val <= 20) return 'status-yellow';
-      if (val <= 25) return 'status-orange';
-      return 'status-red';
-    }
 
     // 2. FETCH MULTI-MODEL SURFACE FORECAST
     async function fetchModelData() {
@@ -581,16 +593,30 @@
 
         document.getElementById('multi-model-rows').innerHTML = rowsHTML;
 
-        // CALCULATE RELIABLE WINDS ALOFT PROFILE OFF SURFACE BASE
-        const sfcDir = ecmwf.hourly ? ecmwf.hourly.wind_direction_10m[currentIdx] : 90;
-        const sfcSpdMph = ecmwf.hourly ? ecmwf.hourly.wind_speed_10m[currentIdx] : 12;
-        const sfcSpdKt = Math.round(sfcSpdMph * 0.868976);
+        // DYNAMICALLY UPDATE MAP WIND ROSE WITH LIVE DATA
+        const aromeDir = arome.hourly ? arome.hourly.wind_direction_10m[currentIdx] : 90;
+        const aromeSpd = arome.hourly ? Math.round(arome.hourly.wind_speed_10m[currentIdx]) : 11;
+        const aromeGst = arome.hourly ? Math.round(arome.hourly.wind_gusts_10m[currentIdx]) : 15;
 
-        document.getElementById('uwind-sfc').innerHTML = `${getArrow(sfcDir)} ${Math.round(sfcDir)}° / ${sfcSpdKt} kt`;
-        document.getElementById('uwind-3k').innerHTML  = `${getArrow((sfcDir + 10) % 360)} ${Math.round((sfcDir + 10) % 360)}° / ${Math.round(sfcSpdKt * 1.8)} kt`;
-        document.getElementById('uwind-7k').innerHTML  = `${getArrow((sfcDir + 18) % 360)} ${Math.round((sfcDir + 18) % 360)}° / ${Math.round(sfcSpdKt * 2.3)} kt`;
-        document.getElementById('uwind-10k').innerHTML = `${getArrow((sfcDir + 25) % 360)} ${Math.round((sfcDir + 25) % 360)}° / ${Math.round(sfcSpdKt * 2.8)} kt`;
-        document.getElementById('uwind-15k').innerHTML = `${getArrow((sfcDir + 30) % 360)} ${Math.round((sfcDir + 30) % 360)}° / ${Math.round(sfcSpdKt * 3.4)} kt`;
+        const gfsDir = gfs.hourly ? gfs.hourly.wind_direction_10m[currentIdx] : 90;
+        const gfsSpd = gfs.hourly ? Math.round(gfs.hourly.wind_speed_10m[currentIdx]) : 10;
+        const gfsGst = gfs.hourly ? Math.round(gfs.hourly.wind_gusts_10m[currentIdx]) : 13;
+
+        const ecmwfDir = ecmwf.hourly ? ecmwf.hourly.wind_direction_10m[currentIdx] : 90;
+        const ecmwfSpd = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_speed_10m[currentIdx]) : 11;
+        const ecmwfGst = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_gusts_10m[currentIdx]) : 14;
+
+        updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst);
+
+        // WINDS ALOFT IN MPH MATCHING SURFACE
+        const sfcDir = ecmwfDir;
+        const sfcSpd = ecmwfSpd;
+
+        document.getElementById('uwind-sfc').innerHTML = `${getArrow(sfcDir)} ${Math.round(sfcDir)}° / ${sfcSpd} mph`;
+        document.getElementById('uwind-3k').innerHTML  = `${getArrow((sfcDir + 10) % 360)} ${Math.round((sfcDir + 10) % 360)}° / ${Math.round(sfcSpd * 1.8)} mph`;
+        document.getElementById('uwind-7k').innerHTML  = `${getArrow((sfcDir + 18) % 360)} ${Math.round((sfcDir + 18) % 360)}° / ${Math.round(sfcSpd * 2.3)} mph`;
+        document.getElementById('uwind-10k').innerHTML = `${getArrow((sfcDir + 25) % 360)} ${Math.round((sfcDir + 25) % 360)}° / ${Math.round(sfcSpd * 2.8)} mph`;
+        document.getElementById('uwind-15k').innerHTML = `${getArrow((sfcDir + 30) % 360)} ${Math.round((sfcDir + 30) % 360)}° / ${Math.round(sfcSpd * 3.4)} mph`;
 
         document.getElementById('calc-jumprun').innerText = `${Math.round(sfcDir)}° (Headwind)`;
 
