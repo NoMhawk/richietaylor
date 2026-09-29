@@ -70,8 +70,8 @@
     .map-card {
       position: relative;
       width: 100%;
-      flex: 1 1 45%;
-      min-height: 220px;
+      flex: 1 1 55%;
+      min-height: 250px;
       border-radius: 8px;
       overflow: hidden;
       border: 1px solid #1e2d4a;
@@ -83,7 +83,7 @@
 
     .multi-table-card {
       width: 100%;
-      flex: 1 1 35%;
+      flex: 1 1 45%;
       background: #131b2e;
       border: 1px solid #1e2d4a;
       border-radius: 8px;
@@ -92,15 +92,6 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
-    }
-
-    .dropspot-card {
-      width: 100%;
-      background: #131b2e;
-      border: 1px solid #1e2d4a;
-      border-radius: 8px;
-      padding: 8px 10px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
     }
 
     .table-title {
@@ -209,7 +200,6 @@
 
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
     .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 6px; }
-    .grid-5 { display: grid; grid-template-columns: 1fr 1fr 1fr 1.2fr 1fr; gap: 6px; }
 
     .card { background: rgba(0, 0, 0, 0.25); border: 1px solid #1e2d4a; border-radius: 6px; padding: 5px 7px; }
     .card-label { font-size: 0.55rem; color: #8a99ad; text-transform: uppercase; }
@@ -242,24 +232,6 @@
       height: 100%;
       border: none;
     }
-
-    /* CLEAR DROP SPOT BADGE */
-    .spot-clean-badge {
-      background: #ffee58;
-      color: #000;
-      padding: 4px 9px;
-      border-radius: 20px;
-      font-weight: 900;
-      font-family: monospace;
-      font-size: 0.72rem;
-      border: 2px solid #000;
-      box-shadow: 0 0 12px rgba(255, 238, 88, 0.85);
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-    }
   </style>
 </head>
 <body>
@@ -267,12 +239,12 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.7.0</div>
+    <div class="rev-badge">REV: 1.7.1</div>
   </div>
 
   <div class="dashboard-container">
     
-    <!-- SEGMENT 1: SATELLITE MAP + HORIZONTAL MODEL TABLE + DROP SPOT CALCULATOR -->
+    <!-- SEGMENT 1: SATELLITE MAP (WIND ROSE ONLY) + HORIZONTAL MODEL TABLE -->
     <div class="segment-1-stack">
       
       <!-- 1A: SATELLITE MAP WITH CLEAN PURE-SVG WIND ROSE -->
@@ -302,40 +274,6 @@
               <tr><td colspan="13" style="padding: 12px; color: #8a99ad;">Fetching Live Model Forecasts...</td></tr>
             </tbody>
           </table>
-        </div>
-      </div>
-
-      <!-- 1C: CLEAR DROP SPOT & JUMP RUN CALCULATOR -->
-      <div class="dropspot-card">
-        <div class="table-title" style="margin-bottom: 6px;">
-          <span>🎯 Calculated Clear Drop Spot & Exit Point (15,000' AGL)</span>
-        </div>
-        <div class="grid-5">
-          <div class="card">
-            <div class="card-label">Suggested Jump Run</div>
-            <div class="card-value" style="color: #00d8ff;" id="calc-jumprun">--</div>
-            <div class="card-sub">Head-Wind Axis</div>
-          </div>
-          <div class="card">
-            <div class="card-label">Calculated Offset</div>
-            <div class="card-value" style="color: #ffee58;" id="calc-offset">--</div>
-            <div class="card-sub">Upwind Vector</div>
-          </div>
-          <div class="card">
-            <div class="card-label">Exit Map Coordinates</div>
-            <div class="card-value" style="color: #00e676; font-size: 0.75rem;" id="calc-coords">50.8606, -3.2340</div>
-            <div class="card-sub">WGS84 Lat / Lon</div>
-          </div>
-          <div class="card">
-            <div class="card-label">OS Grid Reference</div>
-            <div class="card-value" style="color: #fff; font-size: 0.8rem;">ST 132 081</div>
-            <div class="card-sub">Dunkeswell EGTU</div>
-          </div>
-          <div class="card">
-            <div class="card-label">Opening Target</div>
-            <div class="card-value" style="color: #00e676;">PLA CENTER</div>
-            <div class="card-sub">Clear Pattern</div>
-          </div>
         </div>
       </div>
 
@@ -453,14 +391,12 @@
     const lon = -3.233961;
 
     // 1. LEAFLET SATELLITE MAP
-    const map = L.map('map').setView([lat, lon], 14);
+    const map = L.map('map', { zoomControl: false }).setView([lat, lon], 15);
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       maxZoom: 19, maxNativeZoom: 18
     }).addTo(map);
 
     let windRoseMarker = null;
-    let exitSpotMarker = null;
-    let jumprunLine = null;
 
     function getArrow(deg) {
       if (deg === undefined || deg === null) return '↑';
@@ -473,30 +409,6 @@
       if (val <= 20) return 'status-yellow';
       if (val <= 25) return 'status-orange';
       return 'status-red';
-    }
-
-    // GEOGRAPHIC DESTINATION POINT CALCULATION (WGS84)
-    function computeDestinationPoint(originLat, originLon, bearingDeg, distanceNM) {
-      const R = 3440.065; // Earth radius in nautical miles
-      const d = distanceNM;
-      const brng = (bearingDeg * Math.PI) / 180;
-      const lat1 = (originLat * Math.PI) / 180;
-      const lon1 = (originLon * Math.PI) / 180;
-
-      const lat2 = Math.asin(
-        Math.sin(lat1) * Math.cos(d / R) +
-        Math.cos(lat1) * Math.sin(d / R) * Math.cos(brng)
-      );
-
-      const lon2 = lon1 + Math.atan2(
-        Math.sin(brng) * Math.sin(d / R) * Math.cos(lat1),
-        Math.cos(d / R) - Math.sin(lat1) * Math.sin(lat2)
-      );
-
-      return {
-        lat: (lat2 * 180) / Math.PI,
-        lon: (lon2 * 180) / Math.PI
-      };
     }
 
     // PURE SVG OVERLAY FOR WIND ROSE & RAYS
@@ -512,6 +424,7 @@
         };
       }
 
+      // Slightly staggered radii so badges stack neatly when vector angles align
       const aromePt = getSvgPt(aromeDir, 65);
       const gfsPt   = getSvgPt(gfsDir, 90);
       const ecmwfPt = getSvgPt(ecmwfDir, 115);
@@ -519,11 +432,11 @@
       const svgHTML = `
         <div style="position: relative; width: 300px; height: 300px; pointer-events: none;">
           <svg width="300" height="300" viewBox="0 0 300 300" style="position: absolute; top:0; left:0;">
-            <!-- Outer compass ring & airfield center point -->
+            <!-- Compass Ring & Airfield Center Marker -->
             <circle cx="150" cy="150" r="100" stroke="#ffffff" stroke-opacity="0.3" stroke-width="1.5" fill="none" />
             <circle cx="150" cy="150" r="5" fill="#00d8ff" stroke="#000000" stroke-width="2"/>
 
-            <!-- Vector Rays extending cleanly through badge centers -->
+            <!-- Vector Rays extending through badge centers -->
             <line x1="150" y1="150" x2="${aromePt.x}" y2="${aromePt.y}" stroke="#00e676" stroke-width="2.5" stroke-dasharray="4,2"/>
             <line x1="150" y1="150" x2="${gfsPt.x}"   y2="${gfsPt.y}"   stroke="#ffee58" stroke-width="2.5"/>
             <line x1="150" y1="150" x2="${ecmwfPt.x}" y2="${ecmwfPt.y}" stroke="#00d8ff" stroke-width="2.5"/>
@@ -547,41 +460,6 @@
       windRoseMarker = L.marker([lat, lon], {
         icon: L.divIcon({ html: svgHTML, className: '', iconSize: [300, 300], iconAnchor: [150, 150] })
       }).addTo(map);
-    }
-
-    // JUMP RUN & DROP SPOT OVERLAY
-    function updateDropSpotMarker(avgDir, avgSpd) {
-      if (exitSpotMarker) map.removeLayer(exitSpotMarker);
-      if (jumprunLine) map.removeLayer(jumprunLine);
-
-      const offsetNM = parseFloat((avgSpd / 60).toFixed(2));
-      const headwindDir = Math.round(avgDir);
-      const upwindBearing = avgDir;
-
-      const exitPt = computeDestinationPoint(lat, lon, upwindBearing, offsetNM);
-      const extendedPt = computeDestinationPoint(lat, lon, upwindBearing, offsetNM + 0.3);
-
-      const entryBearing = (avgDir + 180) % 360;
-      const entryPt = computeDestinationPoint(lat, lon, entryBearing, 0.3);
-
-      jumprunLine = L.polyline([[entryPt.lat, entryPt.lon], [lat, lon], [exitPt.lat, exitPt.lon], [extendedPt.lat, extendedPt.lon]], {
-        color: '#00d8ff',
-        weight: 3.5,
-        opacity: 0.9,
-        dashArray: '8, 6'
-      }).addTo(map);
-
-      const dropSpotHTML = `<div class="spot-clean-badge"><span>🎯</span><span>${headwindDir}°</span><span>|</span><span>${offsetNM}NM</span></div>`;
-      exitSpotMarker = L.marker([exitPt.lat, exitPt.lon], {
-        icon: L.divIcon({ html: dropSpotHTML, className: '', iconSize: [110, 30], iconAnchor: [55, 15] })
-      }).addTo(map);
-
-      document.getElementById('calc-jumprun').innerText = `${headwindDir}° (Headwind)`;
-      document.getElementById('calc-offset').innerText = `${offsetNM} NM`;
-      document.getElementById('calc-coords').innerText = `${exitPt.lat.toFixed(4)}, ${exitPt.lon.toFixed(4)}`;
-
-      const bounds = L.latLngBounds([[entryPt.lat, entryPt.lon], [extendedPt.lat, extendedPt.lon]]);
-      map.fitBounds(bounds, { padding: [45, 45] });
     }
 
     // 2. FETCH MULTI-MODEL FORECAST DATA
@@ -652,7 +530,7 @@
 
         document.getElementById('multi-model-rows').innerHTML = rowsHTML;
 
-        // DYNAMIC WIND ROSE & DROP SPOT UPDATE
+        // DYNAMIC WIND ROSE UPDATE
         const aromeDir = arome.hourly ? arome.hourly.wind_direction_10m[currentIdx] : 144;
         const aromeSpd = arome.hourly ? Math.round(arome.hourly.wind_speed_10m[currentIdx]) : 18;
         const aromeGst = arome.hourly ? Math.round(arome.hourly.wind_gusts_10m[currentIdx]) : 27;
@@ -666,10 +544,6 @@
         const ecmwfGst = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_gusts_10m[currentIdx]) : 32;
 
         updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst);
-
-        const avgDir = (aromeDir + gfsDir + ecmwfDir) / 3;
-        const avgSpd = (aromeSpd + gfsSpd + ecmwfSpd) / 3;
-        updateDropSpotMarker(avgDir, avgSpd);
 
         // WINDS ALOFT PROFILE IN MPH
         document.getElementById('uwind-sfc').innerHTML = `${getArrow(ecmwfDir)} ${Math.round(ecmwfDir)}° / ${ecmwfSpd} mph`;
