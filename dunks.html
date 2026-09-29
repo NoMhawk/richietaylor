@@ -288,7 +288,7 @@
       gap: 5px;
     }
 
-    /* COMPACT VERTICALLY STACKED MODEL BADGES MATCHING IMAGE 2 */
+    /* COMPACT STACKED BADGES */
     .compact-stack-container {
       display: flex;
       flex-direction: column;
@@ -331,7 +331,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.6.2</div>
+    <div class="rev-badge">REV: 1.6.3</div>
   </div>
 
   <div class="dashboard-container">
@@ -342,13 +342,13 @@
       <!-- 1A: DUAL MAP ROW -->
       <div class="dual-map-grid">
         
-        <!-- MAP 1: MULTI-MODEL WIND ROSE MAP (VECTOR TOPOGRAPHIC TILE) -->
+        <!-- MAP 1: SURFACE WIND MODELS -->
         <div class="map-card">
           <div class="map-card-header">🌬️ Map 1: Surface Wind Models</div>
           <div id="map-wind" class="map-container"></div>
         </div>
 
-        <!-- MAP 2: JUMP RUN & CLEAR DROP SPOT MAP (SATELLITE TILE) -->
+        <!-- MAP 2: JUMP RUN & CLEAR DROP SPOT MAP -->
         <div class="map-card">
           <div class="map-card-header">🎯 Map 2: Jump Run & Clear Drop Spot</div>
           <div id="map-spot" class="map-container"></div>
@@ -528,14 +528,14 @@
     const lat = 50.860619;
     const lon = -3.233961;
 
-    // 1. INITIALIZE MAP 1 (VECTOR TILE TOPOGRAPHIC MAP MATCHING TARGET IMAGE)
+    // 1. MAP 1 (VECTOR TOPOGRAPHIC TILE)
     const mapWind = L.map('map-wind', { zoomControl: false }).setView([lat, lon], 14);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(mapWind);
 
-    // MAP 2 (SATELLITE IMAGE MAP FOR DROP SPOT)
+    // MAP 2 (SATELLITE TILE)
     const mapSpot = L.map('map-spot', { zoomControl: false }).setView([lat, lon], 14);
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       maxZoom: 19, maxNativeZoom: 18
@@ -583,15 +583,18 @@
       };
     }
 
-    // MAP 1: STACKED MODEL BADGES ALONG THE WIND VECTOR (MATCHES TARGET IMAGE 2)
+    // MAP 1: STACKED MODEL BADGES PROJECTED DOWNWIND (TOWARD THE DIRECTION THE WIND BLOWS TO)
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
       if (windRoseLine) mapWind.removeLayer(windRoseLine);
       if (windRoseStackMarker) mapWind.removeLayer(windRoseStackMarker);
 
       const avgDir = (aromeDir + gfsDir + ecmwfDir) / 3;
       
-      // Vector endpoint offset (~0.18 NM outward from runway cross)
-      const stackAnchorPt = computeDestinationPoint(lat, lon, avgDir, 0.18);
+      // DOWNWIND FLOW ANGLE (e.g., 110 deg wind source pushes toward 290 deg WNW)
+      const downwindAngle = (avgDir + 180) % 360;
+
+      // Anchor point offset (~0.18 NM downwind)
+      const stackAnchorPt = computeDestinationPoint(lat, lon, downwindAngle, 0.18);
 
       // Single vector line connecting runway cross to stacked model badges
       windRoseLine = L.polyline([[lat, lon], [stackAnchorPt.lat, stackAnchorPt.lon]], {
@@ -600,7 +603,6 @@
         opacity: 0.95
       }).addTo(mapWind);
 
-      // Compact vertically stacked pills HTML matching target
       const stackedBadgesHTML = `
         <div class="compact-stack-container">
           <div class="compact-model-pill bg-arome">
@@ -619,7 +621,7 @@
       `;
 
       windRoseStackMarker = L.marker([stackAnchorPt.lat, stackAnchorPt.lon], {
-        icon: L.divIcon({ html: stackedBadgesHTML, className: '', iconSize: [120, 75], iconAnchor: [0, 37] })
+        icon: L.divIcon({ html: stackedBadgesHTML, className: '', iconSize: [120, 75], iconAnchor: [60, 37] })
       }).addTo(mapWind);
 
       mapWind.setView([lat, lon], 14);
