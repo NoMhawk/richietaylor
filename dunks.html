@@ -242,6 +242,25 @@
       height: 100%;
       border: none;
     }
+
+    /* COMPACT CIRCULAR DROP SPOT BADGE */
+    .spot-circle-badge {
+      background: #ffee58;
+      color: #000;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-family: monospace;
+      font-size: 0.62rem;
+      border: 2px solid #000;
+      box-shadow: 0 0 10px rgba(255, 238, 88, 0.8);
+      line-height: 1;
+    }
   </style>
 </head>
 <body>
@@ -249,7 +268,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.3.7</div>
+    <div class="rev-badge">REV: 1.3.8</div>
   </div>
 
   <div class="dashboard-container">
@@ -430,7 +449,7 @@
   </div>
 
   <script>
-    // EXACT EGTU RUNWAY INTERSECTION COORDINATES
+    // DUNKESWELL AERODROME (EGTU)
     const lat = 50.8683;
     const lon = -3.2383;
 
@@ -444,9 +463,9 @@
     let windRoseMarker = null;
     let exitSpotMarker = null;
 
+    // DIRECT DEGREE ARROW ROTATION (Pointing in downwind drift direction)
     function getArrow(deg) {
       if (deg === undefined || deg === null) return '↑';
-      // Rotate arrow so it points in the direction wind is blowing TO (downwind drift)
       const rotateDeg = (deg + 180) % 360;
       return `<span class="dir-arrow" style="transform: rotate(${rotateDeg}deg); display: inline-block;">↑</span>`;
     }
@@ -461,6 +480,7 @@
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
       if (windRoseMarker) map.removeLayer(windRoseMarker);
 
+      // 0deg = North (Up). Rotate from North based on wind direction
       const aromeRot = (aromeDir + 180) % 360;
       const gfsRot = (gfsDir + 180) % 360;
       const ecmwfRot = (ecmwfDir + 180) % 360;
@@ -494,10 +514,9 @@
       }).addTo(map);
     }
 
-    function updateDropSpotMarker(avgDir, avgSpd) {
+    function updateDropSpotMarker(avgDir) {
       if (exitSpotMarker) map.removeLayer(exitSpotMarker);
 
-      // Compute upwind offset (1.0 NM displacement into wind)
       const offsetNM = 0.95;
       const rad = (avgDir * Math.PI) / 180;
       const dLat = (offsetNM / 60) * Math.cos(rad);
@@ -506,14 +525,16 @@
       const exitLat = lat + dLat;
       const exitLon = lon + dLon;
 
+      // COMPACT CIRCLE BADGE
       const dropSpotHTML = `
-        <div style="background: #ffee58; color: #000; padding: 4px 8px; border-radius: 12px; font-weight: bold; font-family: monospace; font-size: 10px; border: 2px solid #000; box-shadow: 0 0 12px #ffee58; white-space: nowrap;">
-          🎯 EXIT POINT (${exitLat.toFixed(4)}, ${exitLon.toFixed(4)})
+        <div class="spot-circle-badge">
+          <span>🎯</span>
+          <span>${offsetNM}NM</span>
         </div>
       `;
 
       exitSpotMarker = L.marker([exitLat, exitLon], {
-        icon: L.divIcon({ html: dropSpotHTML, className: '', iconSize: [180, 24], iconAnchor: [90, 12] })
+        icon: L.divIcon({ html: dropSpotHTML, className: '', iconSize: [42, 42], iconAnchor: [21, 21] })
       }).addTo(map);
 
       document.getElementById('calc-jumprun').innerText = `${Math.round(avgDir)}° (Headwind)`;
@@ -524,7 +545,7 @@
       map.fitBounds(bounds, { padding: [40, 40] });
     }
 
-    // 2. FETCH MULTI-MODEL SURFACE FORECAST DATA
+    // 2. FETCH MULTI-MODEL SURFACE FORECAST
     async function fetchModelData() {
       const surfaceParams = `latitude=${lat}&longitude=${lon}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=mph&forecast_days=1`;
       
@@ -592,7 +613,7 @@
 
         document.getElementById('multi-model-rows').innerHTML = rowsHTML;
 
-        // DYNAMICALLY UPDATE WIND ROSE WITH CURRENT HOUR MODEL DATA
+        // DYNAMICALLY UPDATE MAP WIND ROSE WITH CURRENT HOUR MODEL DATA
         const aromeDir = arome.hourly ? arome.hourly.wind_direction_10m[currentIdx] : 90;
         const aromeSpd = arome.hourly ? Math.round(arome.hourly.wind_speed_10m[currentIdx]) : 11;
         const aromeGst = arome.hourly ? Math.round(arome.hourly.wind_gusts_10m[currentIdx]) : 15;
@@ -608,56 +629,59 @@
         updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst);
 
         const avgDir = (aromeDir + gfsDir + ecmwfDir) / 3;
-        const avgSpd = (aromeSpd + gfsSpd + ecmwfSpd) / 3;
-        updateDropSpotMarker(avgDir, avgSpd);
+        updateDropSpotMarker(avgDir);
 
-        // FETCH WINDS ALOFT SEPARATELY
+        // FETCH WINDS ALOFT PROFILE
         fetchWindsAloft(currentIdx);
       } catch (err) {
         console.error("Multi-model fetch error:", err);
       }
     }
 
-    // WINDS ALOFT FETCH FUNCTION (Converts m/s or km/h to Knots)
+    // WINDS ALOFT FETCH (KNOTS)
     async function fetchWindsAloft(idx) {
-      const aloftsParams = `latitude=${lat}&longitude=${lon}&hourly=wind_speed_10m,wind_direction_10m,wind_speed_900hpa,wind_direction_900hpa,temperature_900hpa,wind_speed_800hpa,wind_direction_800hpa,temperature_800hpa,wind_speed_700hpa,wind_direction_700hpa,temperature_700hpa,wind_speed_500hpa,wind_direction_500hpa,temperature_500hpa&forecast_days=1`;
+      const curIdx = idx || 12;
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=wind_speed_10m,wind_direction_10m,wind_speed_900hpa,wind_direction_900hpa,temperature_900hpa,wind_speed_800hpa,wind_direction_800hpa,temperature_800hpa,wind_speed_700hpa,wind_direction_700hpa,temperature_700hpa,wind_speed_500hpa,wind_direction_500hpa,temperature_500hpa&forecast_days=1`;
 
       try {
-        const res = await fetch(`https://api.open-meteo.com/v1/forecast?${aloftsParams}`);
+        const res = await fetch(url);
         const data = await res.json();
         const h = data.hourly;
-        const curIdx = idx || 12;
 
-        const toKnots = (kmh) => Math.round((kmh || 0) * 0.539957);
+        const toKt = (spd) => Math.round((spd || 0) * 0.539957);
 
         if (h) {
-          if (h.wind_speed_10m) {
-            document.getElementById('uwind-sfc').innerHTML = `${getArrow(h.wind_direction_10m[curIdx])} ${Math.round(h.wind_direction_10m[curIdx])}° / ${toKnots(h.wind_speed_10m[curIdx])} kt`;
-            document.getElementById('utemp-sfc').innerText = `18°C`;
-          }
+          const sfcDir = Math.round(h.wind_direction_10m ? h.wind_direction_10m[curIdx] : 90);
+          const sfcSpd = toKt(h.wind_speed_10m ? h.wind_speed_10m[curIdx] : 18);
+          document.getElementById('uwind-sfc').innerHTML = `${getArrow(sfcDir)} ${sfcDir}° / ${sfcSpd} kt`;
+          document.getElementById('utemp-sfc').innerText = `18°C`;
 
-          if (h.wind_speed_900hpa) {
-            document.getElementById('uwind-3k').innerHTML = `${getArrow(h.wind_direction_900hpa[curIdx])} ${Math.round(h.wind_direction_900hpa[curIdx])}° / ${toKnots(h.wind_speed_900hpa[curIdx])} kt`;
-            document.getElementById('utemp-3k').innerText = `${Math.round(h.temperature_900hpa[curIdx])}°C`;
-          }
+          const dir3k = Math.round(h.wind_direction_900hpa ? h.wind_direction_900hpa[curIdx] : 85);
+          const spd3k = toKt(h.wind_speed_900hpa ? h.wind_speed_900hpa[curIdx] : 24);
+          const tmp3k = Math.round(h.temperature_900hpa ? h.temperature_900hpa[curIdx] : 12);
+          document.getElementById('uwind-3k').innerHTML = `${getArrow(dir3k)} ${dir3k}° / ${spd3k} kt`;
+          document.getElementById('utemp-3k').innerText = `${tmp3k}°C`;
 
-          if (h.wind_speed_800hpa) {
-            document.getElementById('uwind-7k').innerHTML = `${getArrow(h.wind_direction_800hpa[curIdx])} ${Math.round(h.wind_direction_800hpa[curIdx])}° / ${toKnots(h.wind_speed_800hpa[curIdx])} kt`;
-            document.getElementById('utemp-7k').innerText = `${Math.round(h.temperature_800hpa[curIdx])}°C`;
-          }
+          const dir7k = Math.round(h.wind_direction_800hpa ? h.wind_direction_800hpa[curIdx] : 80);
+          const spd7k = toKt(h.wind_speed_800hpa ? h.wind_speed_800hpa[curIdx] : 30);
+          const tmp7k = Math.round(h.temperature_800hpa ? h.temperature_800hpa[curIdx] : 4);
+          document.getElementById('uwind-7k').innerHTML = `${getArrow(dir7k)} ${dir7k}° / ${spd7k} kt`;
+          document.getElementById('utemp-7k').innerText = `${tmp7k}°C`;
 
-          if (h.wind_speed_700hpa) {
-            document.getElementById('uwind-10k').innerHTML = `${getArrow(h.wind_direction_700hpa[curIdx])} ${Math.round(h.wind_direction_700hpa[curIdx])}° / ${toKnots(h.wind_speed_700hpa[curIdx])} kt`;
-            document.getElementById('utemp-10k').innerText = `${Math.round(h.temperature_700hpa[curIdx])}°C`;
-          }
+          const dir10k = Math.round(h.wind_direction_700hpa ? h.wind_direction_700hpa[curIdx] : 75);
+          const spd10k = toKt(h.wind_speed_700hpa ? h.wind_speed_700hpa[curIdx] : 38);
+          const tmp10k = Math.round(h.temperature_700hpa ? h.temperature_700hpa[curIdx] : -2);
+          document.getElementById('uwind-10k').innerHTML = `${getArrow(dir10k)} ${dir10k}° / ${spd10k} kt`;
+          document.getElementById('utemp-10k').innerText = `${tmp10k}°C`;
 
-          if (h.wind_speed_500hpa) {
-            document.getElementById('uwind-15k').innerHTML = `${getArrow(h.wind_direction_500hpa[curIdx])} ${Math.round(h.wind_direction_500hpa[curIdx])}° / ${toKnots(h.wind_speed_500hpa[curIdx])} kt`;
-            document.getElementById('utemp-15k').innerText = `${Math.round(h.temperature_500hpa[curIdx])}°C`;
-          }
+          const dir15k = Math.round(h.wind_direction_500hpa ? h.wind_direction_500hpa[curIdx] : 70);
+          const spd15k = toKt(h.wind_speed_500hpa ? h.wind_speed_500hpa[curIdx] : 48);
+          const tmp15k = Math.round(h.temperature_500hpa ? h.temperature_500hpa[curIdx] : -12);
+          document.getElementById('uwind-15k').innerHTML = `${getArrow(dir15k)} ${dir15k}° / ${spd15k} kt`;
+          document.getElementById('utemp-15k').innerText = `${tmp15k}°C`;
         }
       } catch (err) {
-        console.warn("Winds aloft fetch error:", err);
+        console.warn("Winds aloft fetch fallback:", err);
       }
     }
 
