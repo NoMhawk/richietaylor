@@ -243,6 +243,29 @@
       border: none;
     }
 
+    /* SPOT BADGE WITH INTEGRATED JUMP RUN HEADING */
+    .spot-badge-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .heading-pill {
+      background: #00d8ff;
+      color: #000;
+      font-weight: 900;
+      font-family: monospace;
+      font-size: 0.58rem;
+      padding: 2px 6px;
+      border-radius: 6px;
+      border: 1px solid #000;
+      box-shadow: 0 0 8px rgba(0, 216, 255, 0.8);
+      margin-bottom: 2px;
+      white-space: nowrap;
+    }
+
     .spot-circle-badge {
       background: #ffee58;
       color: #000;
@@ -281,7 +304,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.4.7</div>
+    <div class="rev-badge">REV: 1.4.9</div>
   </div>
 
   <div class="dashboard-container">
@@ -289,7 +312,7 @@
     <!-- SEGMENT 1: SATELLITE MAP + HORIZONTAL MODEL TABLE + DROP SPOT CALCULATOR -->
     <div class="segment-1-stack">
       
-      <!-- 1A: SATELLITE MAP WITH PRECISE RUNWAY CROSS CENTER & RADIAL WIND ROSE -->
+      <!-- 1A: SATELLITE MAP WITH EXTENDED JUMP RUN LINE & HEADING BADGE -->
       <div class="map-card">
         <div id="map"></div>
       </div>
@@ -479,7 +502,6 @@
 
     function getArrow(deg) {
       if (deg === undefined || deg === null) return '↑';
-      // Rotate arrow glyph to direction wind is blowing TO (downwind drift)
       const rotateDeg = (deg + 180) % 360;
       return `<span class="dir-arrow" style="transform: rotate(${rotateDeg}deg); display: inline-block;">↑</span>`;
     }
@@ -491,10 +513,9 @@
       return 'status-red';
     }
 
-    // MAP METEOROLOGICAL BEARING TO TRUE UPWIND CANVAS VECTOR
-    function getVectorCoords(deg, length) {
-      // Met bearing deg: 0 = North (Top), 135 = SE (Bottom-Right)
-      const rad = ((deg - 90) * Math.PI) / 180;
+    function getUpwindVectorCoords(deg, length) {
+      const upwindDeg = (deg + 180) % 360;
+      const rad = ((upwindDeg - 90) * Math.PI) / 180;
       return {
         x: 110 + length * Math.cos(rad),
         y: 110 + length * Math.sin(rad)
@@ -504,25 +525,21 @@
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
       if (windRoseMarker) map.removeLayer(windRoseMarker);
 
-      // Stagger label radii to prevent badge overlap when directions are similar
-      const aromePt = getVectorCoords(aromeDir, 85);
-      const gfsPt   = getVectorCoords(gfsDir, 65);
-      const ecmwfPt = getVectorCoords(ecmwfDir, 45);
+      const aromePt = getUpwindVectorCoords(aromeDir, 85);
+      const gfsPt   = getUpwindVectorCoords(gfsDir, 65);
+      const ecmwfPt = getUpwindVectorCoords(ecmwfDir, 45);
 
       const windRoseHTML = `
         <div style="position: relative; width: 220px; height: 220px; pointer-events: none;">
-          <!-- Compass Ring centered at (110, 110) -->
           <svg width="220" height="220" viewBox="0 0 220 220" style="position: absolute; top:0; left:0;">
             <circle cx="110" cy="110" r="75" stroke="#ffffff" stroke-opacity="0.4" stroke-width="1.5" fill="none" />
             <circle cx="110" cy="110" r="5" fill="#00d8ff" stroke="#000000" stroke-width="2"/>
 
-            <!-- Vector Line Rays from Center to Upwind Source -->
             <line x1="110" y1="110" x2="${aromePt.x}" y2="${aromePt.y}" stroke="#00e676" stroke-width="2.5" stroke-dasharray="4,2"/>
             <line x1="110" y1="110" x2="${gfsPt.x}"   y2="${gfsPt.y}"   stroke="#ffee58" stroke-width="2.5"/>
             <line x1="110" y1="110" x2="${ecmwfPt.x}" y2="${ecmwfPt.y}" stroke="#00d8ff" stroke-width="2.5"/>
           </svg>
 
-          <!-- UPRIGHT HTML LABELS PLACED AT UPWIND RAY ENDPOINTS -->
           <div class="rose-label" style="left: ${aromePt.x}px; top: ${aromePt.y}px; background: rgba(0, 230, 118, 0.95);">
             ${aromeSpd} G:${aromeGst} mph <span style="background:#222; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">AROME</span>
           </div>
@@ -542,13 +559,17 @@
       }).addTo(map);
     }
 
-    // DYNAMIC EXIT SPOT & DASHED FLIGHT PATH LINE
+    // ACCURATE UPWIND EXIT SPOT & EXTENDED FLIGHT PATH WITH HEADING BADGE
     function updateDropSpotMarker(avgDir, avgSpd) {
       if (exitSpotMarker) map.removeLayer(exitSpotMarker);
       if (jumprunLine) map.removeLayer(jumprunLine);
 
       const offsetNM = parseFloat((avgSpd / 15).toFixed(2));
-      const rad = (avgDir * Math.PI) / 180;
+      const headwindDir = Math.round(avgDir);
+      
+      // Upwind Bearing for Exit Point Displacement
+      const upwindBearing = (avgDir + 180) % 360;
+      const rad = (upwindBearing * Math.PI) / 180;
       
       const dLat = (offsetNM / 60) * Math.cos(rad);
       const dLon = (offsetNM / (60 * Math.cos((lat * Math.PI) / 180))) * Math.sin(rad);
@@ -556,31 +577,39 @@
       const exitLat = lat + dLat;
       const exitLon = lon + dLon;
 
-      // 1. DASHED CYAN JUMP RUN LINE FROM EXIT POINT TO RUNWAY CROSS
-      jumprunLine = L.polyline([[exitLat, exitLon], [lat, lon]], {
+      // Extend Jump Run Line 0.5 NM past Exit Point upwind
+      const extNM = offsetNM + 0.5;
+      const extLat = lat + (extNM / 60) * Math.cos(rad);
+      const extLon = lon + (extNM / (60 * Math.cos((lat * Math.PI) / 180))) * Math.sin(rad);
+
+      // 1. DASHED CYAN JUMP RUN LINE (EXTENDED PAST EXIT POINT)
+      jumprunLine = L.polyline([[extLat, extLon], [exitLat, exitLon], [lat, lon]], {
         color: '#00d8ff',
         weight: 3,
         opacity: 0.85,
         dashArray: '8, 8'
       }).addTo(map);
 
-      // 2. CIRCULAR SPOT BADGE
+      // 2. CIRCULAR SPOT BADGE WITH DYNAMIC HEADING CALLOUT
       const dropSpotHTML = `
-        <div class="spot-circle-badge">
-          <span>🎯</span>
-          <span>${offsetNM}NM</span>
+        <div class="spot-badge-container">
+          <div class="heading-pill">${headwindDir}° HDG</div>
+          <div class="spot-circle-badge">
+            <span>🎯</span>
+            <span>${offsetNM}NM</span>
+          </div>
         </div>
       `;
 
       exitSpotMarker = L.marker([exitLat, exitLon], {
-        icon: L.divIcon({ html: dropSpotHTML, className: '', iconSize: [44, 44], iconAnchor: [22, 22] })
+        icon: L.divIcon({ html: dropSpotHTML, className: '', iconSize: [60, 65], iconAnchor: [30, 48] })
       }).addTo(map);
 
-      document.getElementById('calc-jumprun').innerText = `${Math.round(avgDir)}° (Headwind)`;
+      document.getElementById('calc-jumprun').innerText = `${headwindDir}° (Headwind)`;
       document.getElementById('calc-offset').innerText = `${offsetNM} NM`;
       document.getElementById('calc-coords').innerText = `${exitLat.toFixed(4)}, ${exitLon.toFixed(4)}`;
 
-      const bounds = L.latLngBounds([[lat, lon], [exitLat, exitLon]]);
+      const bounds = L.latLngBounds([[lat, lon], [extLat, extLon]]);
       map.fitBounds(bounds, { padding: [40, 40] });
     }
 
