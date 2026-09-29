@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Skydive Southwest - Dunkeswell Weather</title>
+  <title>Skydive Southwest - Dunkeswell Weather Operations</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Leaflet CSS & JS -->
@@ -71,7 +71,7 @@
       position: relative;
       width: 100%;
       flex: 1 1 55%;
-      min-height: 250px;
+      min-height: 260px;
       border-radius: 8px;
       overflow: hidden;
       border: 1px solid #1e2d4a;
@@ -239,7 +239,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 1.7.1</div>
+    <div class="rev-badge">REV: 1.7.2</div>
   </div>
 
   <div class="dashboard-container">
@@ -247,7 +247,7 @@
     <!-- SEGMENT 1: SATELLITE MAP (WIND ROSE ONLY) + HORIZONTAL MODEL TABLE -->
     <div class="segment-1-stack">
       
-      <!-- 1A: SATELLITE MAP WITH CLEAN PURE-SVG WIND ROSE -->
+      <!-- 1A: SATELLITE MAP WITH CLEAN WIND ROSE OVERLAY -->
       <div class="map-card">
         <div id="map"></div>
       </div>
@@ -396,7 +396,7 @@
       maxZoom: 19, maxNativeZoom: 18
     }).addTo(map);
 
-    let windRoseMarker = null;
+    let windRoseLayerGroup = L.layerGroup().addTo(map);
 
     function getArrow(deg) {
       if (deg === undefined || deg === null) return '↑';
@@ -411,55 +411,91 @@
       return 'status-red';
     }
 
-    // PURE SVG OVERLAY FOR WIND ROSE & RAYS
+    // GEOGRAPHIC DESTINATION POINT (WGS84)
+    function computeDestinationPoint(originLat, originLon, bearingDeg, distanceNM) {
+      const R = 3440.065; // Earth radius in nautical miles
+      const d = distanceNM;
+      const brng = (bearingDeg * Math.PI) / 180;
+      const lat1 = (originLat * Math.PI) / 180;
+      const lon1 = (originLon * Math.PI) / 180;
+
+      const lat2 = Math.asin(
+        Math.sin(lat1) * Math.cos(d / R) +
+        Math.cos(lat1) * Math.sin(d / R) * Math.cos(brng)
+      );
+
+      const lon2 = lon1 + Math.atan2(
+        Math.sin(brng) * Math.sin(d / R) * Math.cos(lat1),
+        Math.cos(d / R) - Math.sin(lat1) * Math.sin(lat2)
+      );
+
+      return {
+        lat: (lat2 * 180) / Math.PI,
+        lon: (lon2 * 180) / Math.PI
+      };
+    }
+
+    // DRAW CLEAN WIND ROSE WITH GEOGRAPHIC VECTOR LINES
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
-      if (windRoseMarker) map.removeLayer(windRoseMarker);
+      windRoseLayerGroup.clearLayers();
 
-      // SVG Math: 0 deg = North (top, y-axis up)
-      function getSvgPt(deg, radius) {
-        const rad = ((deg - 90) * Math.PI) / 180;
-        return {
-          x: 150 + radius * Math.cos(rad),
-          y: 150 + radius * Math.sin(rad)
-        };
-      }
+      // Airfield center point
+      L.circleMarker([lat, lon], {
+        radius: 6,
+        fillColor: '#00d8ff',
+        color: '#000000',
+        weight: 2,
+        fillOpacity: 1
+      }).addTo(windRoseLayerGroup);
 
-      // Slightly staggered radii so badges stack neatly when vector angles align
-      const aromePt = getSvgPt(aromeDir, 65);
-      const gfsPt   = getSvgPt(gfsDir, 90);
-      const ecmwfPt = getSvgPt(ecmwfDir, 115);
+      const models = [
+        { name: 'AROME-HD', dir: aromeDir, spd: aromeSpd, gst: aromeGst, color: '#00e676', bg: 'rgba(0, 230, 118, 0.95)', dist: 0.12, dash: '4,4' },
+        { name: 'GFS',      dir: gfsDir,   spd: gfsSpd,   gst: gfsGst,   color: '#ffee58', bg: 'rgba(255, 235, 59, 0.95)', dist: 0.18, dash: null },
+        { name: 'ECMWF',    dir: ecmwfDir, spd: ecmwfSpd, gst: ecmwfGst, color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)', dist: 0.24, dash: null }
+      ];
 
-      const svgHTML = `
-        <div style="position: relative; width: 300px; height: 300px; pointer-events: none;">
-          <svg width="300" height="300" viewBox="0 0 300 300" style="position: absolute; top:0; left:0;">
-            <!-- Compass Ring & Airfield Center Marker -->
-            <circle cx="150" cy="150" r="100" stroke="#ffffff" stroke-opacity="0.3" stroke-width="1.5" fill="none" />
-            <circle cx="150" cy="150" r="5" fill="#00d8ff" stroke="#000000" stroke-width="2"/>
+      models.forEach(m => {
+        const endPt = computeDestinationPoint(lat, lon, m.dir, m.dist);
 
-            <!-- Vector Rays extending through badge centers -->
-            <line x1="150" y1="150" x2="${aromePt.x}" y2="${aromePt.y}" stroke="#00e676" stroke-width="2.5" stroke-dasharray="4,2"/>
-            <line x1="150" y1="150" x2="${gfsPt.x}"   y2="${gfsPt.y}"   stroke="#ffee58" stroke-width="2.5"/>
-            <line x1="150" y1="150" x2="${ecmwfPt.x}" y2="${ecmwfPt.y}" stroke="#00d8ff" stroke-width="2.5"/>
-          </svg>
+        // Geographic Line from airfield center to badge location
+        L.polyline([[lat, lon], [endPt.lat, endPt.lon]], {
+          color: m.color,
+          weight: 2.5,
+          opacity: 0.9,
+          dashArray: m.dash
+        }).addTo(windRoseLayerGroup);
 
-          <!-- Badges anchored precisely at vector endpoints -->
-          <div style="position: absolute; left: ${aromePt.x}px; top: ${aromePt.y}px; transform: translate(-50%, -50%); padding: 2px 5px; border-radius: 4px; background: rgba(0, 230, 118, 0.95); color: #000; font-family: sans-serif; font-size: 10px; font-weight: bold; border: 1px solid #000; box-shadow: 0 2px 6px rgba(0,0,0,0.6); white-space: nowrap; display: flex; align-items: center; gap: 4px;">
-            <span>${aromeSpd} G:${aromeGst}</span><span style="background:#000; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">AROME-HD</span>
+        // Badge Pill centered at endpoint
+        const pillHTML = `
+          <div style="
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: ${m.bg};
+            color: #000;
+            font-family: sans-serif;
+            font-size: 10px;
+            font-weight: bold;
+            border: 1px solid #000;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+            white-space: nowrap;
+          ">
+            <span>${m.spd} G:${m.gst}</span>
+            <span style="background:#000; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">${m.name}</span>
           </div>
+        `;
 
-          <div style="position: absolute; left: ${gfsPt.x}px; top: ${gfsPt.y}px; transform: translate(-50%, -50%); padding: 2px 5px; border-radius: 4px; background: rgba(255, 235, 59, 0.95); color: #000; font-family: sans-serif; font-size: 10px; font-weight: bold; border: 1px solid #000; box-shadow: 0 2px 6px rgba(0,0,0,0.6); white-space: nowrap; display: flex; align-items: center; gap: 4px;">
-            <span>${gfsSpd} G:${gfsGst}</span><span style="background:#000; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">GFS</span>
-          </div>
-
-          <div style="position: absolute; left: ${ecmwfPt.x}px; top: ${ecmwfPt.y}px; transform: translate(-50%, -50%); padding: 2px 5px; border-radius: 4px; background: rgba(0, 216, 255, 0.95); color: #000; font-family: sans-serif; font-size: 10px; font-weight: bold; border: 1px solid #000; box-shadow: 0 2px 6px rgba(0,0,0,0.6); white-space: nowrap; display: flex; align-items: center; gap: 4px;">
-            <span>${ecmwfSpd} G:${ecmwfGst}</span><span style="background:#000; color:#fff; font-size:8px; padding:1px 3px; border-radius:2px;">ECMWF</span>
-          </div>
-        </div>
-      `;
-
-      windRoseMarker = L.marker([lat, lon], {
-        icon: L.divIcon({ html: svgHTML, className: '', iconSize: [300, 300], iconAnchor: [150, 150] })
-      }).addTo(map);
+        L.marker([endPt.lat, endPt.lon], {
+          icon: L.divIcon({
+            html: pillHTML,
+            className: '',
+            iconSize: [110, 24],
+            iconAnchor: [55, 12] // Anchored precisely at center of badge
+          })
+        }).addTo(windRoseLayerGroup);
+      });
     }
 
     // 2. FETCH MULTI-MODEL FORECAST DATA
