@@ -355,7 +355,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 2.5.0</div>
+    <div class="rev-badge">REV: 2.6.0</div>
   </div>
 
   <div class="dashboard-container">
@@ -432,7 +432,7 @@
 
     </div>
 
-    <!-- RIGHT COLUMN: WINDS ALOFT & RADAR -->
+    <!-- RIGHT COLUMN: WINDS ALOFT & SATELLITE -->
     <div class="right-column-stack">
       
       <!-- COMPACT WINDS ALOFT PROFILE -->
@@ -508,17 +508,17 @@
         </div>
       </div>
 
-      <!-- RAIN RADAR -->
+      <!-- LIVE SATELLITE VIEW -->
       <div class="pane-segment" style="flex: 1;">
         <div class="pane-header">
-          <div class="title">🌧️ Live Rain Radar</div>
-          <div class="subtitle">South West Sweep</div>
+          <div class="title">🛰️ Live Satellite Imagery</div>
+          <div class="subtitle">South West Cloud Cover</div>
         </div>
 
         <div class="radar-frame-box">
           <iframe 
-            src="https://embed.windy.com/embed2.html?lat=50.7500&lon=-3.5000&width=100%25&height=220&zoom=7&level=surface&overlay=radar&product=radar&menu=false&message=false&marker=false&calendar=false&pressure=false&type=map&location=coordinates&detail=false&play=true&metricWind=mph&metricTemp=%C2%B0C" 
-            callfullscreen>
+            src="https://embed.windy.com/embed2.html?lat=50.7500&lon=-3.5000&width=100%25&height=220&zoom=7&level=surface&overlay=satellite&product=satellite&menu=false&message=false&marker=false&calendar=false&pressure=false&type=map&location=coordinates&detail=false&play=true&metricWind=mph&metricTemp=%C2%B0C" 
+            allowfullscreen>
           </iframe>
         </div>
       </div>
@@ -530,7 +530,7 @@
   <script>
     const lat = 50.860619;
     const lon = -3.233961;
-    const fieldElevationFt = 839; // Dunkeswell airfield elevation
+    const fieldElevationFt = 839;
 
     const map = L.map('map', { zoomControl: false }).setView([lat, lon], 15);
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
@@ -579,13 +579,15 @@
       return { lat: (lat2 * 180) / Math.PI, lon: (lon2 * 180) / Math.PI };
     }
 
-    // Estimate cloud base AGL in feet using temperature-dewpoint spread
+    // Robust cloud base calculation accounting for cloud cover and temperature-dewpoint spread
     function calculateCloudBase(tempC, dewpointC, cloudCoverPct) {
-      if (cloudCoverPct < 15 || dewpointC === undefined || tempC === undefined) return null;
+      if (cloudCoverPct < 25 || dewpointC === undefined || tempC === undefined) return null;
       const spread = tempC - dewpointC;
-      if (spread < 0.2) return 0; // Fog / ground level
-      // Standard dry adiabatic lapse rate formula (~2.5°C per 1,000 ft)
+      if (spread < 0.5) return 0; // Fog / ground level
+      
       const baseFt = Math.round((spread / 2.5) * 1000);
+      // If calculated base is unrealistically low despite scattered/broken layers, validate against threshold
+      if (baseFt < 800 && cloudCoverPct < 50) return null; 
       return Math.max(0, baseFt);
     }
 
