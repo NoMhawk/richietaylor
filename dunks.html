@@ -233,8 +233,8 @@
       border: none;
     }
 
-    /* BADGE PILL STYLING */
-    .axis-pill {
+    /* INDEPENDENT BADGE PILL */
+    .ind-pill {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -246,14 +246,14 @@
       font-size: 10px;
       font-weight: bold;
       border: 1.5px solid #000;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.75);
       white-space: nowrap;
       pointer-events: none;
       height: 22px;
       box-sizing: border-box;
     }
 
-    .axis-pill-tag {
+    .ind-pill-tag {
       background: #000;
       color: #fff;
       font-size: 8px;
@@ -268,12 +268,12 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 2.0.1</div>
+    <div class="rev-badge">REV: 2.1.0</div>
   </div>
 
   <div class="dashboard-container">
     
-    <!-- SEGMENT 1: SATELLITE MAP (AXIS STAGGERED WIND ROSE) + HORIZONTAL MODEL TABLE -->
+    <!-- SEGMENT 1: SATELLITE MAP + HORIZONTAL MODEL TABLE -->
     <div class="segment-1-stack">
       
       <!-- 1A: SATELLITE MAP -->
@@ -464,7 +464,7 @@
       };
     }
 
-    // AXIS-ALIGNED STAGGERED VECTOR RAYS
+    // FULLY INDEPENDENT VECTORS & RADIAL DISTANCE STAGGERING
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
       windRoseLayerGroup.clearLayers();
 
@@ -477,18 +477,21 @@
         fillOpacity: 1
       }).addTo(windRoseLayerGroup);
 
-      // Model configurations with staggered distances along their true vector angle
-      const models = [
-        { name: 'AROME-HD', dir: aromeDir, spd: aromeSpd, gst: aromeGst, color: '#00e676', bg: 'rgba(0, 230, 118, 0.95)', dist: 0.14, dash: '4,3' },
-        { name: 'GFS',      dir: gfsDir,   spd: gfsSpd,   gst: gfsGst,   color: '#ffee58', bg: 'rgba(255, 235, 59, 0.95)', dist: 0.20, dash: null },
-        { name: 'ECMWF',    dir: ecmwfDir, spd: ecmwfSpd, gst: ecmwfGst, color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)', dist: 0.26, dash: null }
+      const rawModels = [
+        { name: 'AROME-HD', dir: aromeDir, spd: aromeSpd, gst: aromeGst, color: '#00e676', bg: 'rgba(0, 230, 118, 0.95)', dash: '4,3' },
+        { name: 'GFS',      dir: gfsDir,   spd: gfsSpd,   gst: gfsGst,   color: '#ffee58', bg: 'rgba(255, 235, 59, 0.95)', dash: null },
+        { name: 'ECMWF',    dir: ecmwfDir, spd: ecmwfSpd, gst: ecmwfGst, color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)', dash: null }
       ];
 
-      models.forEach(m => {
-        // Target endpoint for vector line & badge along exact model bearing
-        const endPt = computeDestinationPoint(lat, lon, m.dir, m.dist);
+      // Base distances for staggering along identical or similar direction vectors
+      const baseDistances = [0.14, 0.22, 0.30]; 
 
-        // 1. Draw dedicated vector ray directly from center dot to badge
+      rawModels.forEach((m, idx) => {
+        // Compute distance along the model's exact forecast bearing
+        const distNM = baseDistances[idx];
+        const endPt = computeDestinationPoint(lat, lon, m.dir, distNM);
+
+        // 1. Draw independent vector ray along the EXACT forecast degree
         L.polyline([[lat, lon], [endPt.lat, endPt.lon]], {
           color: m.color,
           weight: 2.8,
@@ -496,19 +499,18 @@
           dashArray: m.dash
         }).addTo(windRoseLayerGroup);
 
-        // 2. Badge pill anchored smoothly at left-middle edge
+        // 2. Individual badge anchored precisely at the end of its vector
         const pillHTML = `
-          <div class="axis-pill" style="background: ${m.bg};">
+          <div class="ind-pill" style="background: ${m.bg};">
             <span>${m.spd} G:${m.gst}</span>
-            <span class="axis-pill-tag">${m.name}</span>
+            <span class="ind-pill-tag">${m.name}</span>
           </div>
         `;
 
-        // Exact left-middle anchor point alignment
-        let anchorX = 0;
-        let anchorY = 11;
+        // Align anchor depending on heading
+        let anchorX = 0; // Attached at left edge for East headings
         if (m.dir > 180 && m.dir < 360) {
-          anchorX = 120; // Flip anchor to right edge if pointing West
+          anchorX = 120; // Attached at right edge for West headings
         }
 
         L.marker([endPt.lat, endPt.lon], {
@@ -516,7 +518,7 @@
             html: pillHTML,
             className: '',
             iconSize: [120, 22],
-            iconAnchor: [anchorX, anchorY]
+            iconAnchor: [anchorX, 11] // Centered vertically on line tip
           })
         }).addTo(windRoseLayerGroup);
       });
