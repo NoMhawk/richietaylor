@@ -233,8 +233,8 @@
       border: none;
     }
 
-    /* INDEPENDENT BADGE PILL */
-    .ind-pill {
+    /* INLINE ROTATED BADGE PILL */
+    .rotated-pill {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -250,10 +250,12 @@
       white-space: nowrap;
       pointer-events: none;
       height: 22px;
+      width: 120px;
       box-sizing: border-box;
+      transform-origin: left center;
     }
 
-    .ind-pill-tag {
+    .rotated-pill-tag {
       background: #000;
       color: #fff;
       font-size: 8px;
@@ -268,7 +270,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 2.1.0</div>
+    <div class="rev-badge">REV: 2.2.0</div>
   </div>
 
   <div class="dashboard-container">
@@ -464,7 +466,7 @@
       };
     }
 
-    // FULLY INDEPENDENT VECTORS & RADIAL DISTANCE STAGGERING
+    // INDEPENDENT LINE-ROTATED BADGES
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
       windRoseLayerGroup.clearLayers();
 
@@ -483,15 +485,14 @@
         { name: 'ECMWF',    dir: ecmwfDir, spd: ecmwfSpd, gst: ecmwfGst, color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)', dash: null }
       ];
 
-      // Base distances for staggering along identical or similar direction vectors
-      const baseDistances = [0.14, 0.22, 0.30]; 
+      // Base distances along vector line to prevent overlap when directions are identical
+      const baseDistances = [0.10, 0.22, 0.34];
 
       rawModels.forEach((m, idx) => {
-        // Compute distance along the model's exact forecast bearing
         const distNM = baseDistances[idx];
         const endPt = computeDestinationPoint(lat, lon, m.dir, distNM);
 
-        // 1. Draw independent vector ray along the EXACT forecast degree
+        // 1. Draw ray along exact degree direction
         L.polyline([[lat, lon], [endPt.lat, endPt.lon]], {
           color: m.color,
           weight: 2.8,
@@ -499,26 +500,23 @@
           dashArray: m.dash
         }).addTo(windRoseLayerGroup);
 
-        // 2. Individual badge anchored precisely at the end of its vector
+        // 2. Convert bearing angle to CSS rotation (Compass 0deg = Up -> CSS rotation 0deg = Right)
+        let cssRotationAngle = (m.dir - 90 + 360) % 360;
+
+        // Rotate pill HTML to align exactly along line direction
         const pillHTML = `
-          <div class="ind-pill" style="background: ${m.bg};">
+          <div class="rotated-pill" style="background: ${m.bg}; transform: rotate(${cssRotationAngle}deg);">
             <span>${m.spd} G:${m.gst}</span>
-            <span class="ind-pill-tag">${m.name}</span>
+            <span class="rotated-pill-tag">${m.name}</span>
           </div>
         `;
-
-        // Align anchor depending on heading
-        let anchorX = 0; // Attached at left edge for East headings
-        if (m.dir > 180 && m.dir < 360) {
-          anchorX = 120; // Attached at right edge for West headings
-        }
 
         L.marker([endPt.lat, endPt.lon], {
           icon: L.divIcon({
             html: pillHTML,
             className: '',
             iconSize: [120, 22],
-            iconAnchor: [anchorX, 11] // Centered vertically on line tip
+            iconAnchor: [0, 11] // Anchors directly to left-center origin point of rotation
           })
         }).addTo(windRoseLayerGroup);
       });
