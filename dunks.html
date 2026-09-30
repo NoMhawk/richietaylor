@@ -402,7 +402,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 4.4.0</div>
+    <div class="rev-badge">REV: 4.5.0</div>
   </div>
 
   <div class="dashboard-container">
@@ -448,12 +448,12 @@
             </div>
           </div>
 
-          <!-- SMART CIRCUIT SIDE SELECTOR -->
+          <!-- REFINED AUTO RUNWAY-CLEAR CIRCUIT SELECTOR -->
           <div class="control-slider-group">
             <div class="slider-row">
               <span style="color:#ff9800; font-weight:bold;">Landing Circuit:</span>
               <select id="select-circuit-side" onchange="updateManualSpot()" style="background:#131b2e; color:#ff9800; border:1px solid #ff9800; font-size:0.55rem; font-weight:bold; border-radius:2px;">
-                <option value="auto" selected>AUTO (Runway Clear)</option>
+                <option value="auto" selected>AUTO (Away From Rwy)</option>
                 <option value="left">LEFT-HAND CIRCUIT</option>
                 <option value="right">RIGHT-HAND CIRCUIT</option>
               </select>
@@ -814,7 +814,7 @@
         }).addTo(manualLayerGroup);
 
         L.circleMarker([manSpotPt.lat, manSpotPt.lon], {
-          pane: 'topSpotPane', radius: 8, fillColor: '#00d8ff', color: '#ffffff', weight: 2.5, fillOpacity: 1
+          pane: 'topSpotPane', radius: 8, fillColor: '#ff0000', color: '#ffffff', weight: 2.5, fillOpacity: 1
         }).addTo(manualLayerGroup);
 
         document.getElementById('card-runin').innerText = `${Math.round(manualHeading)}° M (MAN)`;
@@ -825,17 +825,16 @@
       }
 
       // ==========================================
-      // SMART CIRCUIT SIDE DETECTION (AUTO RUNWAY CLEAR)
+      // INVERTED SMART CIRCUIT DETECTION (AWAY FROM RUNWAY)
       // ==========================================
       let circuitSide = document.getElementById('select-circuit-side').value; 
       const landingHeading = avgWindDir; 
 
       if (circuitSide === 'auto') {
-        // Dunkeswell main runway orientation runs approximately 040° / 220° magnetic.
-        // We evaluate whether a left or right turn puts the downwind leg further away from the runway centerline.
-        // Simplified heuristic: if landing heading is generally toward northeast/southwest, push downwind to the northwest side.
+        // Since the landing paddock is on the North-West side of the main runway (040/220 axis),
+        // we invert the rule to push the downwind leg outward toward the NW/field side rather than inward over tarmac.
         const runwayAxisDiff = Math.abs((landingHeading - 40 + 360) % 180);
-        circuitSide = runwayAxisDiff < 90 ? 'right' : 'left';
+        circuitSide = runwayAxisDiff < 90 ? 'left' : 'right';
       }
 
       const circuitRad = (landingHeading * Math.PI) / 180;
