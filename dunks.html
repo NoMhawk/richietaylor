@@ -1,4 +1,4 @@
-<!-- REV: 5.9.7 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 5.9.8 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -301,8 +301,8 @@
         height: auto;
       }
       .map-card {
-        height: 70vh;
-        min-height: 450px;
+        height: 480px !important;
+        flex: none !important;
         order: 2;
       }
       .map-info-overlay {
@@ -333,7 +333,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.9.7</div>
+    <div class="rev-badge">REV: 5.9.8</div>
   </div>
 
   <div class="dashboard-container">
@@ -806,6 +806,9 @@
       const roundedDir = Math.round(avgWindDir);
       document.getElementById('ov-winddir').innerText = `${roundedDir}° (${getCompassLetter(roundedDir)})`;
       document.getElementById('overlay-sector-tag').innerText = `SECTOR ${activeRwyData.sectorName}`;
+      
+      // Fix Leaflet sizing bug when container bounds change
+      setTimeout(() => { map.invalidateSize(); }, 250);
     }
 
     updateDashboardMap();
