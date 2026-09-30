@@ -1,4 +1,4 @@
-<!-- REV: 5.8.7 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 5.8.8 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -74,28 +74,28 @@
 
     #map { width: 100%; height: 100%; }
 
-    /* LARGE TALL TOP-RIGHT MAP OVERLAY PANEL */
+    /* WIDER & LARGER TOP-RIGHT MAP OVERLAY PANEL */
     .map-info-overlay {
       position: absolute;
       top: 10px;
       right: 10px;
       z-index: 1000;
-      background: rgba(11, 15, 25, 0.95);
+      background: rgba(11, 15, 25, 0.96);
       backdrop-filter: blur(12px);
       border: 2px solid #00d8ff;
       border-radius: 10px;
-      padding: 14px 16px;
+      padding: 16px 18px;
       box-shadow: 0 8px 28px rgba(0,0,0,0.8);
       font-family: monospace;
-      width: 380px;
+      width: 440px;
     }
 
     .overlay-header {
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       font-weight: 800;
       color: #00d8ff;
       text-transform: uppercase;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       padding-bottom: 6px;
       border-bottom: 1px solid #1e2d4a;
       display: flex;
@@ -106,26 +106,31 @@
     .overlay-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 8px;
+      gap: 10px;
+      margin-bottom: 10px;
     }
 
     .overlay-cell {
       background: rgba(0, 0, 0, 0.5);
       border: 1px solid #1e2d4a;
       border-radius: 6px;
-      padding: 8px 10px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 60px;
     }
 
     .overlay-label {
-      font-size: 0.65rem;
+      font-size: 0.7rem;
       color: #8a99ad;
       text-transform: uppercase;
-      margin-bottom: 3px;
+      margin-bottom: 4px;
+      letter-spacing: 0.5px;
     }
 
     .overlay-value {
-      font-size: 1.35rem;
+      font-size: 1.6rem;
       font-weight: 900;
       color: #fff;
       line-height: 1.1;
@@ -145,10 +150,10 @@
       backdrop-filter: blur(8px);
       border: 1px solid #1e2d4a;
       border-radius: 6px;
-      padding: 8px 10px;
+      padding: 8px 12px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.6);
       font-family: monospace;
-      width: 380px;
+      width: 440px;
     }
 
     .spot-overlay-header {
@@ -195,7 +200,7 @@
     }
 
     .slider-row input[type=range] {
-      width: 140px;
+      width: 180px;
       accent-color: #00d8ff;
     }
 
@@ -372,7 +377,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.8.7</div>
+    <div class="rev-badge">REV: 5.8.8</div>
   </div>
 
   <div class="dashboard-container">
@@ -380,11 +385,11 @@
     <!-- FULL-WIDTH MAP CARD -->
     <div class="map-card">
       
-      <!-- ENLARGED TOP-RIGHT MAP OVERLAY WITH LARGER DATA & WINDS ALOFT -->
+      <!-- WIDER & LARGER TOP-RIGHT MAP OVERLAY PANEL -->
       <div class="map-info-overlay">
         <div class="overlay-header">
           <span>⚡ Live Ops & Winds Aloft</span>
-          <span id="overlay-sector-tag" style="font-size: 0.75rem; color: #ffee58;">SECTOR N</span>
+          <span id="overlay-sector-tag" style="font-size: 0.8rem; color: #ffee58;">SECTOR N</span>
         </div>
         
         <div class="overlay-grid">
@@ -409,36 +414,37 @@
           </div>
         </div>
 
-        <div style="background: rgba(0,0,0,0.5); border: 1px solid #1e2d4a; border-radius: 6px; padding: 6px 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
-          <span class="overlay-label" style="margin:0; font-size: 0.65rem;">Run-In Heading:</span>
-          <span style="font-size: 1.1rem; font-weight: bold; color: #fff;" id="ov-heading">--° M</span>
+        <!-- FULL-WIDTH RUN-IN HEADING BOX -->
+        <div style="background: rgba(0, 0, 0, 0.5); border: 1px solid #1e2d4a; border-radius: 6px; padding: 10px 14px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+          <span class="overlay-label" style="margin:0; font-size: 0.75rem;">Run-In Heading:</span>
+          <span style="font-size: 1.4rem; font-weight: 900; color: #fff;" id="ov-heading">--° M</span>
         </div>
 
-        <!-- ENLARGED WINDS ALOFT TABLE IN OVERLAY -->
-        <div style="font-size: 0.65rem; color: #8a99ad; text-transform: uppercase; margin-bottom: 4px; font-weight: bold;">✈️ Winds Aloft (EGTU 839')</div>
-        <table style="width: 100%; border-collapse: collapse; font-size: 0.75rem; font-family: monospace;">
+        <!-- LARGER WINDS ALOFT TABLE -->
+        <div style="font-size: 0.72rem; color: #8a99ad; text-transform: uppercase; margin-bottom: 6px; font-weight: bold; letter-spacing: 0.5px;">✈️ Winds Aloft (EGTU 839')</div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; font-family: monospace;">
           <thead>
             <tr style="border-bottom: 1px solid #1e2d4a; color: #8a99ad;">
-              <th style="text-align: left; padding: 3px;">Alt</th>
-              <th style="text-align: left; padding: 3px;">Dir / Speed</th>
-              <th style="text-align: right; padding: 3px;">Temp</th>
+              <th style="text-align: left; padding: 4px;">Alt</th>
+              <th style="text-align: left; padding: 4px;">Dir / Speed</th>
+              <th style="text-align: right; padding: 4px;">Temp</th>
             </tr>
           </thead>
           <tbody id="upper-winds-rows">
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
-              <td style="padding: 3px; font-weight: bold;">Sfc</td><td id="uwind-sfc" style="font-weight: bold; color: #00d8ff;">--</td><td id="utemp-sfc" style="text-align: right;">18°C</td>
+              <td style="padding: 5px 4px; font-weight: bold;">Sfc</td><td id="uwind-sfc" style="font-weight: 900; color: #00d8ff; font-size: 0.95rem;">--</td><td id="utemp-sfc" style="text-align: right; font-weight: bold;">18°C</td>
             </tr>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
-              <td style="padding: 3px; font-weight: bold;">3k'</td><td id="uwind-3k" style="font-weight: bold;">--</td><td id="utemp-3k" style="text-align: right;">12°C</td>
+              <td style="padding: 5px 4px; font-weight: bold;">3k'</td><td id="uwind-3k" style="font-weight: 900; font-size: 0.95rem;">--</td><td id="utemp-3k" style="text-align: right; font-weight: bold;">12°C</td>
             </tr>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
-              <td style="padding: 3px; font-weight: bold;">7k'</td><td id="uwind-7k" style="font-weight: bold;">--</td><td id="utemp-7k" style="text-align: right;">4°C</td>
+              <td style="padding: 5px 4px; font-weight: bold;">7k'</td><td id="uwind-7k" style="font-weight: 900; font-size: 0.95rem;">--</td><td id="utemp-7k" style="text-align: right; font-weight: bold;">4°C</td>
             </tr>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
-              <td style="padding: 3px; font-weight: bold;">10k'</td><td id="uwind-10k" style="font-weight: bold;">--</td><td id="utemp-10k" style="text-align: right;">-2°C</td>
+              <td style="padding: 5px 4px; font-weight: bold;">10k'</td><td id="uwind-10k" style="font-weight: 900; font-size: 0.95rem;">--</td><td id="utemp-10k" style="text-align: right; font-weight: bold;">-2°C</td>
             </tr>
             <tr>
-              <td style="padding: 3px; font-weight: bold;">15k'</td><td id="uwind-15k" style="font-weight: bold;">--</td><td id="utemp-15k" style="text-align: right;">-12°C</td>
+              <td style="padding: 5px 4px; font-weight: bold;">15k'</td><td id="uwind-15k" style="font-weight: 900; font-size: 0.95rem;">--</td><td id="utemp-15k" style="text-align: right; font-weight: bold;">-12°C</td>
             </tr>
           </tbody>
         </table>
@@ -477,7 +483,7 @@
           <div id="landing-manual-controls" style="display: none; flex-direction: column; gap: 4px; margin-top: 4px;">
             <div class="slider-row">
               <span>Wind Sector:</span>
-              <select id="select-wind-sector" onchange="updateDashboardMap()" style="background:#131b2e; color:#ff9800; border:1px solid #ff9800; font-size:0.6rem; font-weight:bold; border-radius:3px; width:140px;">
+              <select id="select-wind-sector" onchange="updateDashboardMap()" style="background:#131b2e; color:#ff9800; border:1px solid #ff9800; font-size:0.65rem; font-weight:bold; border-radius:3px; width:180px;">
                 <option value="0" selected>N (330° - 030°)</option>
                 <option value="45">NE (030° - 075°)</option>
                 <option value="90">E (075° - 120°)</option>
@@ -1041,11 +1047,11 @@
         cachedWeatherData = [aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst];
         updateDashboardMap();
 
-        document.getElementById('uwind-sfc').innerHTML = `${getArrow(ecmwfDir)} ${Math.round(ecmwfDir)}° / ${ecmwfSpd}mph`;
-        document.getElementById('uwind-3k').innerHTML  = `${getArrow((ecmwfDir + 10) % 360)} ${Math.round((ecmwfDir + 10) % 360)}° / ${Math.round(ecmwfSpd * 1.8)}mph`;
-        document.getElementById('uwind-7k').innerHTML  = `${getArrow((ecmwfDir + 18) % 360)} ${Math.round((ecmwfDir + 18) % 360)}° / ${Math.round(ecmwfSpd * 2.3)}mph`;
-        document.getElementById('uwind-10k').innerHTML = `${getArrow((ecmwfDir + 25) % 360)} ${Math.round((ecmwfDir + 25) % 360)}° / ${Math.round(ecmwfSpd * 2.8)}mph`;
-        document.getElementById('uwind-15k').innerHTML = `${getArrow((ecmwfDir + 30) % 360)} ${Math.round((ecmwfDir + 30) % 360)}° / ${Math.round(ecmwfSpd * 3.4)}mph`;
+        document.getElementById('uwind-sfc').innerHTML = `${getArrow(ecmwfDir)} ${Math.round(ecmwfDir)}° / ${ecmwfSpd} mph`;
+        document.getElementById('uwind-3k').innerHTML  = `${getArrow((ecmwfDir + 10) % 360)} ${Math.round((ecmwfDir + 10) % 360)}° / ${Math.round(ecmwfSpd * 1.8)} mph`;
+        document.getElementById('uwind-7k').innerHTML  = `${getArrow((ecmwfDir + 18) % 360)} ${Math.round((ecmwfDir + 18) % 360)}° / ${Math.round(ecmwfSpd * 2.3)} mph`;
+        document.getElementById('uwind-10k').innerHTML = `${getArrow((ecmwfDir + 25) % 360)} ${Math.round((ecmwfDir + 25) % 360)}° / ${Math.round(ecmwfSpd * 2.8)} mph`;
+        document.getElementById('uwind-15k').innerHTML = `${getArrow((ecmwfDir + 30) % 360)} ${Math.round((ecmwfDir + 30) % 360)}° / ${Math.round(ecmwfSpd * 3.4)} mph`;
 
       } catch (err) {
         console.error("Fetch error:", err);
