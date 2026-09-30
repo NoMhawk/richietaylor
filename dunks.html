@@ -381,7 +381,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 3.0.17</div>
+    <div class="rev-badge">REV: 3.0.18</div>
   </div>
 
   <div class="dashboard-container">
@@ -577,11 +577,11 @@
     const sdswMarkerHtml = `
       <div class="sdsw-dz-marker">
         <div class="sdsw-dz-dot"></div>
-        <span>SDSW (EGTU)</span>
+        <span>SDSW</span>
       </div>
     `;
     L.marker([lat, lon], {
-      icon: L.divIcon({ html: sdswMarkerHtml, className: '', iconSize: [95, 22], iconAnchor: [47, 11] })
+      icon: L.divIcon({ html: sdswMarkerHtml, className: '', iconSize: [60, 22], iconAnchor: [30, 11] })
     }).addTo(satOverlayMap);
 
     let isManualMode = false;
