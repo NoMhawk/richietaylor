@@ -1,4 +1,4 @@
-<!-- REV: 5.8.1 - SKYDIVE SOUTHWEST OPERATIONS DASHBOARD  -->
+<!-- REV: 5.8.2 - SKYDIVE SOUTHWEST OPERATIONS DASHBOARD -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -281,6 +281,13 @@
       border-right: 1px solid #1e2d4a;
     }
 
+    /* Past hours styling (greyned out / dimmed) */
+    .past-hour-th, .past-hour-cell {
+      opacity: 0.35;
+      filter: grayscale(60%);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
     .wind-badge {
       display: inline-block;
       padding: 1px 3px;
@@ -437,7 +444,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.8.1</div>
+    <div class="rev-badge">REV: 5.8.2</div>
   </div>
 
   <div class="dashboard-container">
@@ -486,7 +493,7 @@
         <!-- COMPACT SPOT & LANDING CONTROLS PANEL -->
         <div class="spot-overlay-card">
           <div class="spot-overlay-header">
-            <span class="spot-overlay-title">⚙️ DZ Override Controls</span>
+            <span class="spot-overlay-title">⚙️️ DZ Override Controls</span>
           </div>
 
           <!-- JUMP-RUN MANUAL CONTROLS -->
@@ -1094,15 +1101,18 @@
           { name: 'AROME', data: arome }
         ];
 
-        let headerHTML = `<th class="model-name-th">Model \\ Time</th>`;
         const nowHour = new Date().getHours();
         let currentIdx = 12;
 
+        let headerHTML = `<th class="model-name-th">Model \\ Time</th>`;
         for (let i = 8; i <= 19; i++) {
           const timeDate = new Date(times[i]);
-          if (timeDate.getHours() === nowHour) currentIdx = i;
+          const hourVal = timeDate.getHours();
+          if (hourVal === nowHour) currentIdx = i;
+          
           const timeStr = timeDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-          headerHTML += `<th>${timeStr}</th>`;
+          const isPast = hourVal < nowHour;
+          headerHTML += `<th class="${isPast ? 'past-hour-th' : ''}">${timeStr}</th>`;
         }
         document.getElementById('header-times-row').innerHTML = headerHTML;
 
@@ -1117,6 +1127,10 @@
               continue;
             }
 
+            const timeDate = new Date(times[i]);
+            const isPast = timeDate.getHours() < nowHour;
+            const cellClass = isPast ? 'past-hour-cell' : '';
+
             const speed = Math.round(dataset.hourly.wind_speed_10m[i] || 0);
             const gust = Math.round(dataset.hourly.wind_gusts_10m ? (dataset.hourly.wind_gusts_10m[i] || 0) : speed);
             const dir = dataset.hourly.wind_direction_10m[i];
@@ -1125,7 +1139,7 @@
             const statusClass = getStatusClass(peak);
 
             rowsHTML += `
-              <td>
+              <td class="${cellClass}">
                 <div class="wind-badge ${statusClass}">
                   ${getArrow(dir)}${speed} <span class="gust-val">G:${gust}</span>
                 </div>
@@ -1137,6 +1151,10 @@
 
         rowsHTML += `<tr><td class="model-name-th" style="color: #00d8ff;">Cloud Base</td>`;
         for (let i = 8; i <= 19; i++) {
+          const timeDate = new Date(times[i]);
+          const isPast = timeDate.getHours() < nowHour;
+          const cellClass = isPast ? 'past-hour-cell' : '';
+
           const temp = ecmwf.hourly.temperature_2m ? ecmwf.hourly.temperature_2m[i] : 18;
           const dew = ecmwf.hourly.dewpoint_2m ? ecmwf.hourly.dewpoint_2m[i] : 11;
           const cover = ecmwf.hourly.cloud_cover ? ecmwf.hourly.cloud_cover[i] : 50;
@@ -1145,7 +1163,7 @@
           const baseStr = (baseAgl !== null && baseAgl < 25000) ? `${baseAgl.toLocaleString()}'` : 'CLR';
 
           rowsHTML += `
-            <td>
+            <td class="${cellClass}">
               <div class="cloud-badge">
                 ${baseStr}
               </div>
