@@ -355,7 +355,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 2.8.7</div>
+    <div class="rev-badge">REV: 2.8.9</div>
   </div>
 
   <div class="dashboard-container">
@@ -517,7 +517,7 @@
 
         <div class="radar-frame-box">
           <iframe 
-            src="https://embed.windy.com/embed2.html?lat=50.7500&lon=-3.5000&width=100%25&height=220&zoom=7&level=surface&overlay=satellite&product=satellite&menu=false&message=false&marker=false&calendar=false&pressure=false&type=map&location=coordinates&detail=false&play=true&metricWind=mph&metricTemp=%C2%B0C" 
+            src="https://embed.windy.com/embed2.html?lat=50.8606&lon=-3.2339&width=100%25&height=220&zoom=8&level=surface&overlay=satellite&product=satellite&menu=false&message=false&marker=true&calendar=false&pressure=false&type=map&location=coordinates&detail=false&play=true&metricWind=mph&metricTemp=%C2%B0C" 
             allowfullscreen>
           </iframe>
         </div>
@@ -622,29 +622,34 @@
       windRoseLayerGroup.clearLayers();
       manualLayerGroup.clearLayers();
 
-      // Airfield Center Marker (Runway Cross Anchor)
+      // Airfield Center Anchor Pin at exact intersection
       L.circleMarker([lat, lon], {
-        radius: 6, fillColor: '#00d8ff', color: '#000', weight: 2, fillOpacity: 1
+        radius: 5, fillColor: '#ffffff', color: '#000000', weight: 1.5, fillOpacity: 1
       }).addTo(windRoseLayerGroup);
 
       const rawModels = [
-        { name: 'AROME-HD', dir: aromeDir, spd: aromeSpd, gst: aromeGst, color: '#00e676', bg: 'rgba(0, 230, 118, 0.95)', dash: '4,3' },
-        { name: 'GFS',      dir: gfsDir,   spd: gfsSpd,   gst: gfsGst,   color: '#ffee58', bg: 'rgba(255, 235, 59, 0.95)', dash: null },
-        { name: 'ECMWF',    dir: ecmwfDir, spd: ecmwfSpd, gst: ecmwfGst, color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)', dash: null }
+        { name: 'AROME-HD', dir: aromeDir, spd: aromeSpd, gst: aromeGst, color: '#00e676', bg: 'rgba(0, 230, 118, 0.95)' },
+        { name: 'GFS',      dir: gfsDir,   spd: gfsSpd,   gst: gfsGst,   color: '#ffee58', bg: 'rgba(255, 235, 59, 0.95)' },
+        { name: 'ECMWF',    dir: ecmwfDir, spd: ecmwfSpd, gst: ecmwfGst, color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)' }
       ];
 
-      // FIXED STACKING LOGIC: All models strictly start at [lat, lon], but stagger outward by increasing length/distance
-      // Base distance is 0.05 NM, each subsequent model adds 0.07 NM so they stack neatly without shifting origin
-      const baseDist = 0.05;
-      const stepDist = 0.07;
+      // TRUE WINDY-STYLE FAN LAYOUT: All lines originate strictly from [lat, lon].
+      // To mimic Windy's fan/spread without breaking the common anchor, each model ray 
+      // goes to a fixed distance, with a slight perpendicular fan nudge applied to the 
+      // pill endpoint coordinate so they fan out neatly side-by-side like the reference image.
+      const rayLengthNM = 0.14;
+      const fanOffsets = [-0.015, 0.0, 0.015]; // Lateral spread offsets in degrees lat/lon
 
       rawModels.forEach((m, idx) => {
-        const distNM = baseDist + (idx * stepDist);
-        const endPt = computeDestinationPoint(lat, lon, m.dir, distNM);
+        const endPt = computeDestinationPoint(lat, lon, m.dir, rayLengthNM);
+        
+        // Apply minor lateral fan offset to the pill marker so they stack/fan side-by-side cleanly
+        const fannedLat = endPt.lat + fanOffsets[idx];
+        const fannedLon = endPt.lon + (fanOffsets[idx] * 1.5);
 
-        // Every model line originates precisely at [lat, lon] (runway intersection)
-        L.polyline([[lat, lon], [endPt.lat, endPt.lon]], {
-          color: m.color, weight: 2.8, opacity: 0.9, dashArray: m.dash
+        // Ray line connects the exact runway center [lat, lon] to this model's fanned endpoint
+        L.polyline([[lat, lon], [fannedLat, fannedLon]], {
+          color: m.color, weight: 2.2, opacity: 0.85
         }).addTo(windRoseLayerGroup);
 
         let cssRotationAngle = (m.dir - 90 + 360) % 360;
@@ -659,7 +664,7 @@
           </div>
         `;
 
-        L.marker([endPt.lat, endPt.lon], {
+        L.marker([fannedLat, fannedLon], {
           icon: L.divIcon({ html: pillHTML, className: '', iconSize: [120, 22], iconAnchor: [0, 11] })
         }).addTo(windRoseLayerGroup);
       });
