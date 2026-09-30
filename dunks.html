@@ -402,7 +402,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 4.3.0</div>
+    <div class="rev-badge">REV: 4.4.0</div>
   </div>
 
   <div class="dashboard-container">
@@ -448,13 +448,14 @@
             </div>
           </div>
 
-          <!-- CIRCUIT PATTERN TOGGLE -->
+          <!-- SMART CIRCUIT SIDE SELECTOR -->
           <div class="control-slider-group">
             <div class="slider-row">
               <span style="color:#ff9800; font-weight:bold;">Landing Circuit:</span>
               <select id="select-circuit-side" onchange="updateManualSpot()" style="background:#131b2e; color:#ff9800; border:1px solid #ff9800; font-size:0.55rem; font-weight:bold; border-radius:2px;">
+                <option value="auto" selected>AUTO (Runway Clear)</option>
                 <option value="left">LEFT-HAND CIRCUIT</option>
-                <option value="right" selected>RIGHT-HAND CIRCUIT</option>
+                <option value="right">RIGHT-HAND CIRCUIT</option>
               </select>
             </div>
           </div>
@@ -824,11 +825,19 @@
       }
 
       // ==========================================
-      // SPLIT LANDING CIRCUIT (J-SHAPE PATTERN)
-      // Extended downwind leg & final approach arrow
+      // SMART CIRCUIT SIDE DETECTION (AUTO RUNWAY CLEAR)
       // ==========================================
-      const circuitSide = document.getElementById('select-circuit-side').value; // 'left' or 'right'
+      let circuitSide = document.getElementById('select-circuit-side').value; 
       const landingHeading = avgWindDir; 
+
+      if (circuitSide === 'auto') {
+        // Dunkeswell main runway orientation runs approximately 040° / 220° magnetic.
+        // We evaluate whether a left or right turn puts the downwind leg further away from the runway centerline.
+        // Simplified heuristic: if landing heading is generally toward northeast/southwest, push downwind to the northwest side.
+        const runwayAxisDiff = Math.abs((landingHeading - 40 + 360) % 180);
+        circuitSide = runwayAxisDiff < 90 ? 'right' : 'left';
+      }
+
       const circuitRad = (landingHeading * Math.PI) / 180;
       const perpRad = circuitRad + (circuitSide === 'right' ? Math.PI / 2 : -Math.PI / 2);
 
@@ -837,7 +846,7 @@
         radius: 6, fillColor: '#ff9800', color: '#ffffff', weight: 2, fillOpacity: 1
       }).addTo(circuitLayerGroup);
 
-      // Final approach arrow pointing into the landing direction
+      // Final approach arrow pointing into landing direction
       let finalArrowAngle = (landingHeading - 90 + 360) % 360;
       L.marker([landingLat, landingLon], {
         icon: L.divIcon({
@@ -858,7 +867,6 @@
         finalStart[1] + (baseDist * Math.sin(perpRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
       ];
 
-      // Lengthened downwind leg (increased from 260m to 420m)
       const downwindLength = 420; 
       const downwindEnd = [
         baseStart[0] + (downwindLength * Math.cos(circuitRad)) / 111320,
@@ -879,7 +887,7 @@
       }).addTo(circuitLayerGroup);
 
       L.marker(downwindEnd, {
-        icon: L.divIcon({ html: `<div class="circuit-label">DOWNWIND</div>`, className: '', iconSize: [52, 16], iconAnchor: [26, 8] })
+        icon: L.divIcon({ html: `<div class="circuit-label">DOWNWIND (${circuitSide.toUpperCase()})</div>`, className: '', iconSize: [110, 16], iconAnchor: [55, 8] })
       }).addTo(circuitLayerGroup);
     }
 
