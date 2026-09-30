@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -355,7 +356,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 3.0.10</div>
+    <div class="rev-badge">REV: 3.0.11</div>
   </div>
 
   <div class="dashboard-container">
@@ -559,6 +560,13 @@
       return 'status-red';
     }
 
+    // Circular mean of compass bearings (handles wrap-around at north)
+    function circularMeanDeg(degs) {
+      const s = degs.reduce((a, d) => a + Math.sin(d * Math.PI / 180), 0);
+      const c = degs.reduce((a, d) => a + Math.cos(d * Math.PI / 180), 0);
+      return (Math.atan2(s, c) * 180 / Math.PI + 360) % 360;
+    }
+
     function computeDestinationPoint(originLat, originLon, bearingDeg, distanceNM) {
       const R = 3440.065;
       const d = distanceNM;
@@ -645,12 +653,12 @@
       rawModels.forEach((m, idx) => {
         const distMeters = baseDistanceMeters + (idx * spreadStepMeters);
         
-        // TRUE UPWIND POSITIONING: Invert the direction vector (-cos / -sin) 
-        // so the vanes project backwards from the center dot into the wind.
+        // UPWIND POSITIONING: wind direction is where the wind comes FROM,
+        // so projecting along that bearing places the vane on the upwind side.
         const rad = (m.dir * Math.PI) / 180;
         
-        const dLat = (-distMeters * Math.cos(rad)) / 111320;
-        const dLon = (-distMeters * Math.sin(rad)) / (111320 * Math.cos(lat * Math.PI / 180));
+        const dLat = (distMeters * Math.cos(rad)) / 111320;
+        const dLon = (distMeters * Math.sin(rad)) / (111320 * Math.cos(lat * Math.PI / 180));
 
         const endLat = lat + dLat;
         const endLon = lon + dLon;
@@ -659,27 +667,37 @@
           color: m.color, weight: 2.2, opacity: 0.85
         }).addTo(windRoseLayerGroup);
 
+        // Rotate the pill along the vane; flip it if the text would be upside down.
+        // Flipped pills are anchored by their right edge so they still extend
+        // outward beyond the end of the vane line, not back across it.
         let cssRotationAngle = (m.dir - 90 + 360) % 360;
+        let flipped = false;
         if (cssRotationAngle > 90 && cssRotationAngle < 270) {
           cssRotationAngle = (cssRotationAngle + 180) % 360;
+          flipped = true;
         }
 
         const pillHTML = `
-          <div class="rotated-pill" style="background: ${m.bg}; transform: rotate(${cssRotationAngle}deg);">
+          <div class="rotated-pill" style="background: ${m.bg}; transform: rotate(${cssRotationAngle}deg); transform-origin: ${flipped ? 'right' : 'left'} center;">
             <span>${m.spd} G:${m.gst}</span>
             <span class="rotated-pill-tag">${m.name}</span>
           </div>
         `;
 
         L.marker([endLat, endLon], {
-          icon: L.divIcon({ html: pillHTML, className: '', iconSize: [120, 22], iconAnchor: [-2, 11] })
+          icon: L.divIcon({
+            html: pillHTML,
+            className: '',
+            iconSize: [120, 22],
+            iconAnchor: flipped ? [122, 11] : [-2, 11]
+          })
         }).addTo(windRoseLayerGroup);
       });
       // ==========================================
       // END: WIND VANE PROJECTION SEGMENT
       // ==========================================
 
-      const avgWindDir = (aromeDir + gfsDir + ecmwfDir) / 3;
+      const avgWindDir = circularMeanDeg([aromeDir, gfsDir, ecmwfDir]);
       const autoRunIn = avgWindDir;
       const avgSpeed = (aromeSpd + gfsSpd + ecmwfSpd) / 3;
       const autoSpotOffset = Math.min(0.28, Math.max(0.12, (avgSpeed / 100) * 1.2));
