@@ -355,7 +355,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 2.8.6</div>
+    <div class="rev-badge">REV: 2.8.7</div>
   </div>
 
   <div class="dashboard-container">
@@ -633,21 +633,17 @@
         { name: 'ECMWF',    dir: ecmwfDir, spd: ecmwfSpd, gst: ecmwfGst, color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)', dash: null }
       ];
 
-      // CONSECUTIVE CHAINED STACKING: All models start strictly at [lat, lon]
-      // Segment length per model is 0.08 NM. They daisy-chain back-to-back if directions align.
-      let currentOriginLat = lat;
-      let currentOriginLon = lon;
-      const segmentLengthNM = 0.08;
+      // FIXED STACKING LOGIC: All models strictly start at [lat, lon], but stagger outward by increasing length/distance
+      // Base distance is 0.05 NM, each subsequent model adds 0.07 NM so they stack neatly without shifting origin
+      const baseDist = 0.05;
+      const stepDist = 0.07;
 
       rawModels.forEach((m, idx) => {
-        const startLat = currentOriginLat;
-        const startLon = currentOriginLon;
-        
-        // Compute end point for this segment from its current origin
-        const endPt = computeDestinationPoint(startLat, startLon, m.dir, segmentLengthNM);
+        const distNM = baseDist + (idx * stepDist);
+        const endPt = computeDestinationPoint(lat, lon, m.dir, distNM);
 
-        // Draw polyline segment strictly anchored to this segment's start and end
-        L.polyline([[startLat, startLon], [endPt.lat, endPt.lon]], {
+        // Every model line originates precisely at [lat, lon] (runway intersection)
+        L.polyline([[lat, lon], [endPt.lat, endPt.lon]], {
           color: m.color, weight: 2.8, opacity: 0.9, dashArray: m.dash
         }).addTo(windRoseLayerGroup);
 
@@ -666,10 +662,6 @@
         L.marker([endPt.lat, endPt.lon], {
           icon: L.divIcon({ html: pillHTML, className: '', iconSize: [120, 22], iconAnchor: [0, 11] })
         }).addTo(windRoseLayerGroup);
-
-        // Advance the origin for the next model in the stack so they daisy-chain outwards
-        currentOriginLat = endPt.lat;
-        currentOriginLon = endPt.lon;
       });
 
       const avgWindDir = (aromeDir + gfsDir + ecmwfDir) / 3;
