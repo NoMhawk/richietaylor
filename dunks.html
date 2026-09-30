@@ -80,11 +80,72 @@
 
     #map { width: 100%; height: 100%; }
 
-    /* DZ CONTROL OVERLAY PANEL */
+    /* LARGE TOP-RIGHT MAP OVERLAY PANEL */
+    .map-info-overlay {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
+      background: rgba(11, 15, 25, 0.92);
+      backdrop-filter: blur(10px);
+      border: 1.5px solid #00d8ff;
+      border-radius: 8px;
+      padding: 12px 14px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.7);
+      font-family: monospace;
+      width: 310px;
+    }
+
+    .overlay-header {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #00d8ff;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #1e2d4a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .overlay-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .overlay-cell {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid #1e2d4a;
+      border-radius: 5px;
+      padding: 6px 8px;
+    }
+
+    .overlay-label {
+      font-size: 0.6rem;
+      color: #8a99ad;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .overlay-value {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: #fff;
+      line-height: 1.1;
+    }
+
+    .overlay-value.accent-orange { color: #ff9800; }
+    .overlay-value.accent-cyan { color: #00d8ff; }
+    .overlay-value.accent-green { color: #00e676; }
+
+    /* DZ CONTROL COLLAPSIBLE / COMPACT CONTROLS BELOW OVERLAY */
     .spot-overlay-card {
       position: absolute;
-      top: 8px;
-      right: 8px;
+      top: 195px;
+      right: 10px;
       z-index: 1000;
       background: rgba(11, 15, 25, 0.94);
       backdrop-filter: blur(8px);
@@ -93,15 +154,15 @@
       padding: 8px 10px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.6);
       font-family: monospace;
-      width: 255px;
+      width: 310px;
     }
 
     .spot-overlay-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 6px;
-      padding-bottom: 4px;
+      margin-bottom: 4px;
+      padding-bottom: 3px;
       border-bottom: 1px solid #1e2d4a;
     }
 
@@ -122,17 +183,6 @@
       padding: 1px 4px;
       cursor: pointer;
     }
-
-    .spot-overlay-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 4px;
-    }
-
-    .spot-val-group { display: flex; flex-direction: column; }
-    .spot-val-label { font-size: 0.5rem; color: #8a99ad; text-transform: uppercase; }
-    .spot-val-num { font-size: 0.75rem; font-weight: 800; color: #fff; }
 
     .control-slider-group {
       display: flex;
@@ -386,7 +436,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.6.4</div>
+    <div class="rev-badge">REV: 5.7.0</div>
   </div>
 
   <div class="dashboard-container">
@@ -394,26 +444,52 @@
     <!-- LEFT STACK: SATELLITE MAP + STREAMLINED TABLE -->
     <div class="segment-1-stack">
       
-      <!-- MAP CARD WITH DZ CONTROL OVERLAY -->
+      <!-- MAP CARD WITH LARGE TOP-RIGHT OVERLAY + CONTROLS -->
       <div class="map-card">
-        <div class="spot-overlay-card">
-          <div class="spot-overlay-header">
-            <span class="spot-overlay-title">🎯 DZ Control Spotting</span>
+        
+        <!-- LARGE TOP-RIGHT MAP OVERLAY -->
+        <div class="map-info-overlay">
+          <div class="overlay-header">
+            <span>⚡ Live Ops Status</span>
+            <span id="overlay-sector-tag" style="font-size: 0.65rem; color: #ffee58;">SECTOR N</span>
           </div>
           
-          <div class="spot-overlay-row">
-            <div class="spot-val-group">
-              <span class="spot-val-label">Run-In Heading</span>
-              <span class="spot-val-num" id="card-runin">--° M</span>
+          <div class="overlay-grid">
+            <div class="overlay-cell">
+              <div class="overlay-label">Pattern Turn</div>
+              <div class="overlay-value accent-orange" id="ov-pattern">--</div>
             </div>
-            <div class="spot-val-group">
-              <span class="spot-val-label">Spot Offset</span>
-              <span class="spot-val-num" id="card-spot-dist">-- NM</span>
+            <div class="overlay-cell">
+              <div class="overlay-label">Avg Wind Spd</div>
+              <div class="overlay-value accent-green" id="ov-windspd">-- mph</div>
             </div>
           </div>
 
+          <div class="overlay-grid">
+            <div class="overlay-cell">
+              <div class="overlay-label">Wind Direction</div>
+              <div class="overlay-value accent-cyan" id="ov-winddir">--°</div>
+            </div>
+            <div class="overlay-cell">
+              <div class="overlay-label">Clear Drop Spot</div>
+              <div class="overlay-value accent-cyan" id="ov-spot">-- NM</div>
+            </div>
+          </div>
+
+          <div style="background: rgba(0,0,0,0.4); border: 1px solid #1e2d4a; border-radius: 5px; padding: 5px 8px; display: flex; justify-content: space-between; align-items: center;">
+            <span class="overlay-label" style="margin:0;">Run-In Heading:</span>
+            <span style="font-size: 0.85rem; font-weight: bold; color: #fff;" id="ov-heading">--° M</span>
+          </div>
+        </div>
+
+        <!-- COMPACT SPOT & LANDING CONTROLS PANEL -->
+        <div class="spot-overlay-card">
+          <div class="spot-overlay-header">
+            <span class="spot-overlay-title">⚙️ DZ Override Controls</span>
+          </div>
+
           <!-- JUMP-RUN MANUAL CONTROLS -->
-          <div class="control-slider-group">
+          <div class="control-slider-group" style="border-top:none; margin-top:0; padding-top:0;">
             <div class="slider-row">
               <span style="color:#00d8ff; font-weight:bold;">Jump-Run Mode:</span>
               <button class="mode-toggle-btn" id="toggle-jump-btn" onclick="toggleJumpMode()">AUTO</button>
@@ -817,8 +893,8 @@
           pane: 'topSpotPane', radius: 8, fillColor: '#00d8ff', color: '#ffffff', weight: 2.5, fillOpacity: 1
         }).addTo(manualJumpLayerGroup);
 
-        document.getElementById('card-runin').innerText = `${Math.round(runInHeading)}° M (MAN)`;
-        document.getElementById('card-spot-dist').innerText = `${spotOffset.toFixed(2)} NM`;
+        document.getElementById('ov-spot').innerText = `${spotOffset.toFixed(2)} NM`;
+        document.getElementById('ov-heading').innerText = `${Math.round(runInHeading)}° M (MAN)`;
       } else {
         const autoSpotPt = computeDestinationPoint(lat, lon, runInHeading, spotOffset);
         const startAutoRun = computeDestinationPoint(lat, lon, (runInHeading + 180) % 360, 0.4);
@@ -840,8 +916,8 @@
           pane: 'topSpotPane', radius: 7, fillColor: '#ff2a2a', color: '#fff', weight: 2.5, fillOpacity: 1
         }).addTo(windRoseLayerGroup);
 
-        document.getElementById('card-runin').innerText = `${Math.round(runInHeading)}° M`;
-        document.getElementById('card-spot-dist').innerText = `${spotOffset.toFixed(2)} NM`;
+        document.getElementById('ov-spot').innerText = `${spotOffset.toFixed(2)} NM`;
+        document.getElementById('ov-heading').innerText = `${Math.round(runInHeading)}° M`;
       }
 
       // ==========================================
@@ -918,6 +994,12 @@
       L.marker(downwindEnd, {
         icon: L.divIcon({ html: `<div class="circuit-label">${turnLabelText}</div>`, className: '', iconSize: [60, 16], iconAnchor: [30, 8] })
       }).addTo(circuitLayerGroup);
+
+      // Populate Top-Right Map Overlay Values
+      document.getElementById('ov-pattern').innerText = turnLabelText;
+      document.getElementById('ov-windspd').innerText = `${Math.round(avgSpeed)} mph`;
+      document.getElementById('ov-winddir').innerText = `${Math.round(avgWindDir)}°`;
+      document.getElementById('overlay-sector-tag').innerText = `SECTOR ${activeSector.name}`;
     }
 
     updateDashboardMap();
