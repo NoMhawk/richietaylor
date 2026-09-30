@@ -241,7 +241,7 @@
     .status-green  { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.4); }
     .status-yellow { background: rgba(255, 235, 59, 0.15); color: #ffee58; border: 1px solid rgba(255, 235, 59, 0.4); }
     .status-orange { background: rgba(255, 152, 0, 0.15);  color: #ffb74d; border: 1px solid rgba(255, 152, 0, 0.4); }
-    .status-red    { background: rgba(255, 82, 82, 0.2);   color: #ff5252; border: 1px solid rgba(255, 82, 82, 0.5); }
+    .status-red    { background: rgba(255, 82, 82, 0.2);    color: #ff5252; border: 1px solid rgba(255, 82, 82, 0.5); }
 
     .cloud-badge {
       display: inline-block;
@@ -386,7 +386,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.6.0</div>
+    <div class="rev-badge">REV: 5.6.1</div>
   </div>
 
   <div class="dashboard-container">
@@ -455,8 +455,8 @@
               <span>Circuit Side:</span>
               <select id="select-circuit-side" onchange="updateDashboardMap()" style="background:#131b2e; color:#ff9800; border:1px solid #ff9800; font-size:0.55rem; font-weight:bold; border-radius:2px;">
                 <option value="auto" selected>AUTO (Away From Rwy)</option>
-                <option value="left">LEFT-HAND</option>
-                <option value="right">RIGHT-HAND</option>
+                <option value="left">LEFT</option>
+                <option value="right">RIGHT</option>
               </select>
             </div>
           </div>
@@ -751,8 +751,8 @@
 
       const rawModels = [
         { name: 'AROME-HD', dir: aromeDir, spd: aromeSpd, gst: aromeGst, color: '#00e676', bg: 'rgba(0, 230, 118, 0.95)' },
-        { name: 'GFS',      dir: gfsDir,    spd: gfsSpd,    gst: gfsGst,    color: '#ffee58', bg: 'rgba(255, 235, 59, 0.95)' },
-        { name: 'ECMWF',    dir: ecmwfDir,  spd: ecmwfSpd,  gst: ecmwfGst,  color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)' }
+        { name: 'GFS',     dir: gfsDir,    spd: gfsSpd,    gst: gfsGst,    color: '#ffee58', bg: 'rgba(255, 235, 59, 0.95)' },
+        { name: 'ECMWF',   dir: ecmwfDir,  spd: ecmwfSpd,  gst: ecmwfGst,  color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)' }
       ];
 
       const currentZoom = map.getZoom();
@@ -853,7 +853,7 @@
       }
 
       // ==========================================
-      // 8-SECTOR LANDING PATTERN ROUTING (PLACEHOLDERS FOR NE, E, SE, S, SW, W, NW READY)
+      // 8-SECTOR LANDING PATTERN ROUTING
       // ==========================================
       let activeSector;
       if (isLandingManual) {
@@ -871,7 +871,7 @@
 
       let circuitSide = document.getElementById('select-circuit-side').value; 
       if (circuitSide === 'auto') {
-        circuitSide = 'right'; 
+        circuitSide = 'left'; 
       }
 
       const activeRwyHdg = activeSector.rwy;
@@ -913,47 +913,11 @@
         color: '#ff9800', weight: 3, dashArray: '5,5', opacity: 0.95
       }).addTo(circuitLayerGroup);
 
-      L.marker(finalStart, {
-        icon: L.divIcon({ html: `<div class="circuit-label">FINAL</div>`, className: '', iconSize: [36, 16], iconAnchor: [18, -4] })
-      }).addTo(circuitLayerGroup);
-
-      L.marker(baseStart, {
-        icon: L.divIcon({ html: `<div class="circuit-label">BASE</div>`, className: '', iconSize: [36, 16], iconAnchor: [18, 8] })
-      }).addTo(circuitLayerGroup);
-
-      // SWITCH BLOCK FOR 8 SECTORS (N is complete; NE through NW ready for custom labels/coords)
-      let labelText = '';
-      switch(activeSector.name) {
-        case 'N':
-          labelText = 'DOWNWIND (LEFT)';
-          break;
-        case 'NE':
-          labelText = 'DOWNWIND (NE / RWY 40°)'; // Placeholder ready to be customized next
-          break;
-        case 'E':
-          labelText = 'DOWNWIND (E / RWY 40°)';
-          break;
-        case 'SE':
-          labelText = 'DOWNWIND (SE / RWY 170°)';
-          break;
-        case 'S':
-          labelText = 'DOWNWIND (S / RWY 170°)';
-          break;
-        case 'SW':
-          labelText = 'DOWNWIND (SW / RWY 220°)';
-          break;
-        case 'W':
-          labelText = 'DOWNWIND (W / RWY 220°)';
-          break;
-        case 'NW':
-          labelText = 'DOWNWIND (NW / RWY 350°)';
-          break;
-        default:
-          labelText = 'DOWNWIND (LEFT)';
-      }
+      // Only display LEFT or RIGHT turn indicator at the end of the downwind leg
+      const turnLabelText = circuitSide.toUpperCase();
 
       L.marker(downwindEnd, {
-        icon: L.divIcon({ html: `<div class="circuit-label">${labelText}</div>`, className: '', iconSize: [160, 16], iconAnchor: [80, 8] })
+        icon: L.divIcon({ html: `<div class="circuit-label">${turnLabelText}</div>`, className: '', iconSize: [60, 16], iconAnchor: [30, 8] })
       }).addTo(circuitLayerGroup);
     }
 
