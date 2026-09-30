@@ -629,8 +629,8 @@
 
       const rawModels = [
         { name: 'AROME-HD', dir: aromeDir, spd: aromeSpd, gst: aromeGst, color: '#00e676', bg: 'rgba(0, 230, 118, 0.95)' },
-        { name: 'GFS',      dir: gfsDir,   spd: gfsSpd,   gst: gfsGst,   color: '#ffee58', bg: 'rgba(255, 235, 59, 0.95)' },
-        { name: 'ECMWF',    dir: ecmwfDir, spd: ecmwfSpd, gst: ecmwfGst, color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)' }
+        { name: 'GFS',      dir: gfsDir,    spd: gfsSpd,    gst: gfsGst,    color: '#ffee58', bg: 'rgba(255, 235, 59, 0.95)' },
+        { name: 'ECMWF',    dir: ecmwfDir,  spd: ecmwfSpd,  gst: ecmwfGst,  color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)' }
       ];
 
       const currentZoom = map.getZoom();
@@ -639,12 +639,15 @@
       const baseDistanceMeters = 35 * zoomScale;
       const spreadStepMeters = 18 * zoomScale;
 
+      // ==========================================
+      // START: WIND VANE PROJECTION SEGMENT
+      // ==========================================
       rawModels.forEach((m, idx) => {
         const distMeters = baseDistanceMeters + (idx * spreadStepMeters);
         
-        // UNIFIED WINDWARD (FROM) DIRECTION: m.dir points where wind comes from. 
-        // Projecting outward along m.dir ensures all models stream onto the SSW (windward) side.
-        const rad = (m.dir * Math.PI) / 180;
+        // Project UPWIND by shifting the angle 180° opposite to where the wind is blowing towards
+        const upwindDir = (m.dir + 180) % 360;
+        const rad = (upwindDir * Math.PI) / 180;
         
         const dLat = (distMeters * Math.cos(rad)) / 111320;
         const dLon = (distMeters * Math.sin(rad)) / (111320 * Math.cos(lat * Math.PI / 180));
@@ -672,6 +675,9 @@
           icon: L.divIcon({ html: pillHTML, className: '', iconSize: [120, 22], iconAnchor: [-2, 11] })
         }).addTo(windRoseLayerGroup);
       });
+      // ==========================================
+      // END: WIND VANE PROJECTION SEGMENT
+      // ==========================================
 
       const avgWindDir = (aromeDir + gfsDir + ecmwfDir) / 3;
       const autoRunIn = avgWindDir;
