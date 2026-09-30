@@ -355,7 +355,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 2.8.1</div>
+    <div class="rev-badge">REV: 2.8.2</div>
   </div>
 
   <div class="dashboard-container">
@@ -622,7 +622,7 @@
       windRoseLayerGroup.clearLayers();
       manualLayerGroup.clearLayers();
 
-      // Airfield Center Marker
+      // Airfield Center Marker (Runway Cross Anchor)
       L.circleMarker([lat, lon], {
         radius: 6, fillColor: '#00d8ff', color: '#000', weight: 2, fillOpacity: 1
       }).addTo(windRoseLayerGroup);
@@ -633,8 +633,8 @@
         { name: 'ECMWF',    dir: ecmwfDir, spd: ecmwfSpd, gst: ecmwfGst, color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)', dash: null }
       ];
 
-      // STACKED RADIAL DISTANCES: preserves true forecast bearing direction while separating overlapping models outward from center
-      const radialDistances = [0.12, 0.22, 0.32];
+      // STACKED RADIAL DISTANCES FROM RUNWAY CENTER: starts at runway center, radiates outward
+      const radialDistances = [0.08, 0.16, 0.24];
 
       rawModels.forEach((m, idx) => {
         const distNM = radialDistances[idx];
@@ -644,10 +644,9 @@
           color: m.color, weight: 2.8, opacity: 0.9, dashArray: m.dash
         }).addTo(windRoseLayerGroup);
 
-        // TRUE VECTOR ROTATION: aligns badge rotation precisely along the true wind direction angle
         let cssRotationAngle = (m.dir - 90 + 360) % 360;
         if (cssRotationAngle > 90 && cssRotationAngle < 270) {
-          cssRotationAngle = (cssRotationAngle + 180) % 360; // Keep text upright & readable
+          cssRotationAngle = (cssRotationAngle + 180) % 360;
         }
 
         const pillHTML = `
