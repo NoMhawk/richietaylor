@@ -355,7 +355,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 2.8.4</div>
+    <div class="rev-badge">REV: 2.8.5</div>
   </div>
 
   <div class="dashboard-container">
@@ -633,14 +633,14 @@
         { name: 'ECMWF',    dir: ecmwfDir, spd: ecmwfSpd, gst: ecmwfGst, color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)', dash: null }
       ];
 
-      // INDEPENDENT RUNWAY-ANCHORED RADIAL STAGGERING
+      // STACKED RADIAL DISTANCES FROM RUNWAY CENTER: Staggering outward along true model bearings
       const radialDistances = [0.06, 0.13, 0.20];
 
       rawModels.forEach((m, idx) => {
         const distNM = radialDistances[idx];
         const endPt = computeDestinationPoint(lat, lon, m.dir, distNM);
 
-        // Every model line starts precisely at [lat, lon] (the runway cross intersection)
+        // FIXED: Polyline explicitly originates from [lat, lon] and terminates at [endPt]
         L.polyline([[lat, lon], [endPt.lat, endPt.lon]], {
           color: m.color, weight: 2.8, opacity: 0.9, dashArray: m.dash
         }).addTo(windRoseLayerGroup);
