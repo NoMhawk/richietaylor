@@ -355,7 +355,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 2.8.0</div>
+    <div class="rev-badge">REV: 2.8.1</div>
   </div>
 
   <div class="dashboard-container">
@@ -579,15 +579,14 @@
       return { lat: (lat2 * 180) / Math.PI, lon: (lon2 * 180) / Math.PI };
     }
 
-    // Accurate aviation ceiling calculation (Agl) based on spread + field elevation + humidity
     function calculateCloudBase(tempC, dewpointC, cloudCoverPct) {
-      if (cloudCoverPct < 20 || dewpointC === undefined || tempC === undefined) return null;
+      if (cloudCoverPct < 25 || dewpointC === undefined || tempC === undefined) return null;
       const spread = tempC - dewpointC;
-      if (spread < 0.3) return 300; // Low fog
+      if (spread < 0.3) return 400;
       
       const baseAGL = Math.round((spread / 2.5) * 1000);
-      if (baseAGL < 1200 && cloudCoverPct < 45) return null; // Suppress false low ceilings
-      return Math.max(800, baseAGL);
+      if (baseAGL < 1500 && cloudCoverPct < 50) return null; 
+      return Math.max(1000, baseAGL);
     }
 
     function toggleSpotMode() {
@@ -634,21 +633,22 @@
         { name: 'ECMWF',    dir: ecmwfDir, spd: ecmwfSpd, gst: ecmwfGst, color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)', dash: null }
       ];
 
-      // PERPENDICULAR FAN-OUT OFFSETS: prevents models with identical directions from stacking
-      // We push AROME slightly left (-15deg), GFS center (0deg), ECMWF slightly right (+15deg)
-      const bearingOffsets = [-15, 0, 15];
-      const baseDistance = 0.22; // Constant radial distance from center
+      // STACKED RADIAL DISTANCES: preserves true forecast bearing direction while separating overlapping models outward from center
+      const radialDistances = [0.12, 0.22, 0.32];
 
       rawModels.forEach((m, idx) => {
-        const adjustedDir = (m.dir + bearingOffsets[idx] + 360) % 360;
-        const endPt = computeDestinationPoint(lat, lon, adjustedDir, baseDistance);
+        const distNM = radialDistances[idx];
+        const endPt = computeDestinationPoint(lat, lon, m.dir, distNM);
 
         L.polyline([[lat, lon], [endPt.lat, endPt.lon]], {
           color: m.color, weight: 2.8, opacity: 0.9, dashArray: m.dash
         }).addTo(windRoseLayerGroup);
 
-        // Rotate badge to match the model's true forecast bearing direction
+        // TRUE VECTOR ROTATION: aligns badge rotation precisely along the true wind direction angle
         let cssRotationAngle = (m.dir - 90 + 360) % 360;
+        if (cssRotationAngle > 90 && cssRotationAngle < 270) {
+          cssRotationAngle = (cssRotationAngle + 180) % 360; // Keep text upright & readable
+        }
 
         const pillHTML = `
           <div class="rotated-pill" style="background: ${m.bg}; transform: rotate(${cssRotationAngle}deg);">
