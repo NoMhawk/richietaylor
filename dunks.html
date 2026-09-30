@@ -377,8 +377,8 @@
 
     .circuit-label {
       background: rgba(11, 15, 25, 0.85);
-      border: 1px solid #00d8ff;
-      color: #00d8ff;
+      border: 1px solid #ff9800;
+      color: #ff9800;
       font-family: monospace;
       font-size: 8px;
       font-weight: bold;
@@ -393,7 +393,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 4.0.0</div>
+    <div class="rev-badge">REV: 4.1.0</div>
   </div>
 
   <div class="dashboard-container">
@@ -442,7 +442,7 @@
           <!-- CIRCUIT PATTERN TOGGLE -->
           <div class="control-slider-group">
             <div class="slider-row">
-              <span style="color:#00d8ff; font-weight:bold;">Landing Circuit:</span>
+              <span style="color:#ff9800; font-weight:bold;">Landing Circuit:</span>
               <select id="select-circuit-side" onchange="updateManualSpot()" style="background:#131b2e; color:#ff9800; border:1px solid #ff9800; font-size:0.55rem; font-weight:bold; border-radius:2px;">
                 <option value="left">LEFT-HAND CIRCUIT</option>
                 <option value="right" selected>RIGHT-HAND CIRCUIT</option>
@@ -583,6 +583,10 @@
     const lon = -3.233961;
     const fieldElevationFt = 839;
 
+    // Dedicated Landing Paddock Coordinates (Offset slightly to the side of the runway/windsock area)
+    const landingLat = 50.859200;
+    const landingLon = -3.237500;
+
     // Main Left Map
     const map = L.map('map', { zoomControl: false }).setView([lat, lon], 15);
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
@@ -595,6 +599,7 @@
     let windRoseLayerGroup = L.layerGroup().addTo(map);
     let manualLayerGroup = L.layerGroup().addTo(map);
     let circuitLayerGroup = L.layerGroup().addTo(map);
+    circuitLayerGroup.addTo(map);
 
     // Right Satellite Overlay Map
     const satOverlayMap = L.map('sat-overlay-map', { zoomControl: false, attributionControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false }).setView([lat, lon], 9);
@@ -690,18 +695,10 @@
       return (Math.atan2(s, c) * 180 / Math.PI + 360) % 360;
     }
 
-    // Helper to project coordinates in meters relative to origin lat/lon
-    function offsetMeters(originLat, originLon, northMeters, eastMeters) {
-      const dLat = northMeters / 111320;
-      const dLon = eastMeters / (111320 * Math.cos(originLat * Math.PI / 180));
-      return [originLat + dLat, originLon + dLon];
-    }
-
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
       windRoseLayerGroup.clearLayers();
       manualLayerGroup.clearLayers();
       circuitLayerGroup.clearLayers();
-      circuitLayerGroup.addTo(map);
 
       // Airfield Center Anchor Pin at exact intersection
       L.circleMarker([lat, lon], {
@@ -818,43 +815,43 @@
       }
 
       // ==========================================
-      // LANDING CIRCUIT (J-SHAPE PATTERN) GENERATOR
+      // SPLIT LANDING CIRCUIT (J-SHAPE PATTERN)
+      // Anchored over the dedicated landing paddock
       // ==========================================
       const circuitSide = document.getElementById('select-circuit-side').value; // 'left' or 'right'
-      const landingHeading = avgWindDir; // land into wind
+      const landingHeading = avgWindDir; 
       const circuitRad = (landingHeading * Math.PI) / 180;
       const perpRad = circuitRad + (circuitSide === 'right' ? Math.PI / 2 : -Math.PI / 2);
 
-      // We construct the circuit relative to [lat, lon] (Target Landing Area)
-      // 1. Final approach into wind from touch-down point
-      const finalStartDist = 180; // meters out on final
-      const touchDown = [lat, lon];
-      const finalStart = [
-        lat - (finalStartDist * Math.cos(circuitRad)) / 111320,
-        lon - (finalStartDist * Math.sin(circuitRad)) / (111320 * Math.cos(lat * Math.PI / 180))
-      ];
-
-      // 2. Base leg turn point (perpendicular offset)
-      const baseDist = 150; // meters sideways
-      const baseStart = [
-        finalStart[0] + (baseDist * Math.cos(perpRad)) / 111320,
-        finalStart[1] + (baseDist * Math.sin(perpRad)) / (111320 * Math.cos(lat * Math.PI / 180))
-      ];
-
-      // 3. Downwind leg parallel to landing heading, extending upwind
-      const downwindLength = 300; // meters
-      const downwindEnd = [
-        baseStart[0] + (downwindLength * Math.cos(circuitRad)) / 111320,
-        baseStart[1] + (downwindLength * Math.sin(circuitRad)) / (111320 * Math.cos(lat * Math.PI / 180))
-      ];
-
-      // Draw Circuit J-Path
-      const circuitCoords = [touchDown, finalStart, baseStart, downwindEnd];
-      L.polyline(circuitCoords, {
-        color: '#ff9800', weight: 3, dashArray: '6,6', opacity: 0.9
+      // Touchdown marker at paddock
+      L.circleMarker([landingLat, landingLon], {
+        radius: 6, fillColor: '#ff9800', color: '#ffffff', weight: 2, fillOpacity: 1
       }).addTo(circuitLayerGroup);
 
-      // Add Circuit Leg Labels
+      const finalStartDist = 160; 
+      const touchDown = [landingLat, landingLon];
+      const finalStart = [
+        landingLat - (finalStartDist * Math.cos(circuitRad)) / 111320,
+        landingLon - (finalStartDist * Math.sin(circuitRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
+      ];
+
+      const baseDist = 130; 
+      const baseStart = [
+        finalStart[0] + (baseDist * Math.cos(perpRad)) / 111320,
+        finalStart[1] + (baseDist * Math.sin(perpRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
+      ];
+
+      const downwindLength = 260; 
+      const downwindEnd = [
+        baseStart[0] + (downwindLength * Math.cos(circuitRad)) / 111320,
+        baseStart[1] + (downwindLength * Math.sin(circuitRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
+      ];
+
+      const circuitCoords = [touchDown, finalStart, baseStart, downwindEnd];
+      L.polyline(circuitCoords, {
+        color: '#ff9800', weight: 3, dashArray: '5,5', opacity: 0.95
+      }).addTo(circuitLayerGroup);
+
       L.marker(finalStart, {
         icon: L.divIcon({ html: `<div class="circuit-label">FINAL</div>`, className: '', iconSize: [36, 16], iconAnchor: [18, -4] })
       }).addTo(circuitLayerGroup);
