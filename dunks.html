@@ -1,4 +1,4 @@
-<!-- REV: 5.9.5 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 5.9.6 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -333,7 +333,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.9.5</div>
+    <div class="rev-badge">REV: 5.9.6</div>
   </div>
 
   <div class="dashboard-container">
@@ -609,17 +609,17 @@
 
     function getDunkeswellRunwayFromWind(avgDir) {
       const norm = (avgDir + 360) % 360;
-      // Map wind direction to 8 sectors, taking into account into-wind runway alignment (Rwy 04 vs Rwy 22)
       const sectorIndex = Math.round(norm / 45) % 8;
       const sectors = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
       const sectorName = sectors[sectorIndex];
 
-      // Into-wind calculation: winds from South/West/North favor landing on Rwy 04 (heading 040 into wind), 
-      // while winds from East/North-East favor landing on Rwy 22 (heading 220 into wind) or reciprocal.
       const rwyHdg = (norm >= 120 && norm <= 300) ? 40 : 220;
       const rwyName = rwyHdg === 40 ? '04' : '22';
 
-      return { name: rwyName, rwy: rwyHdg, sectorName: sectorName };
+      // SE, S, SW sectors assigned RIGHT-hand circuits; others LEFT-hand
+      const turnSide = ['SE', 'S', 'SW'].includes(sectorName) ? 'right' : 'left';
+
+      return { name: rwyName, rwy: rwyHdg, sectorName: sectorName, turnSide: turnSide };
     }
 
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
@@ -746,13 +746,16 @@
         const sectorVal = parseFloat(document.getElementById('select-wind-sector').value);
         const sectorsMap = { 0: 'N', 45: 'NE', 90: 'E', 135: 'SE', 170: 'S', 220: 'SW', 270: 'W', 315: 'NW' };
         const matchedRwy = { 0: 360, 45: 40, 90: 90, 135: 170, 170: 170, 220: 220, 270: 270, 315: 320 };
-        activeRwyData = { name: matchedRwy[sectorVal] === 40 ? '04' : '22', rwy: matchedRwy[sectorVal], sectorName: sectorsMap[sectorVal] };
+        const secName = sectorsMap[sectorVal];
+        const tSide = ['SE', 'S', 'SW'].includes(secName) ? 'right' : 'left';
+        activeRwyData = { name: matchedRwy[sectorVal] === 40 ? '04' : '22', rwy: matchedRwy[sectorVal], sectorName: secName, turnSide: tSide };
       } else {
         activeRwyData = getDunkeswellRunwayFromWind(avgWindDir);
       }
 
       const activeRwyHdg = activeRwyData.rwy;
       const circuitRad = (activeRwyHdg * Math.PI) / 180;
+      const circuitSide = activeRwyData.turnSide;
 
       let activeLandingLat = defaultLandingLat;
       let activeLandingLon = defaultLandingLon;
@@ -780,7 +783,7 @@
         activeLandingLon - (finalLegDist * Math.sin(circuitRad)) / (111320 * Math.cos(activeLandingLat * Math.PI / 180))
       ];
 
-      const perpRad = circuitRad - Math.PI / 2;
+      const perpRad = circuitRad + (circuitSide === 'left' ? -Math.PI / 2 : Math.PI / 2);
       const baseWidth = 140; 
       const baseStart = [
         finalStart[0] + (baseWidth * Math.cos(perpRad)) / 111320,
@@ -799,12 +802,13 @@
         color: '#ff9800', weight: 3, dashArray: '5,5', opacity: 0.95
       }).addTo(circuitLayerGroup);
 
+      const turnLabelText = circuitSide.toUpperCase();
       L.marker(downwindEnd, {
-        icon: L.divIcon({ html: `<div class="circuit-label">LEFT</div>`, className: '', iconSize: [60, 16], iconAnchor: [30, 8] })
+        icon: L.divIcon({ html: `<div class="circuit-label">${turnLabelText}</div>`, className: '', iconSize: [60, 16], iconAnchor: [30, 8] })
       }).addTo(circuitLayerGroup);
 
       // Populate Overlay Values
-      document.getElementById('ov-pattern').innerText = 'LEFT';
+      document.getElementById('ov-pattern').innerText = turnLabelText;
       document.getElementById('ov-windspd').innerText = `${Math.round(avgSpeed)} mph`;
       const roundedDir = Math.round(avgWindDir);
       document.getElementById('ov-winddir').innerText = `${roundedDir}° (${getCompassLetter(roundedDir)})`;
