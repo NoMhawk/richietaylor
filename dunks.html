@@ -355,7 +355,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 2.8.9</div>
+    <div class="rev-badge">REV: 2.9.0</div>
   </div>
 
   <div class="dashboard-container">
@@ -517,7 +517,7 @@
 
         <div class="radar-frame-box">
           <iframe 
-            src="https://embed.windy.com/embed2.html?lat=50.8606&lon=-3.2339&width=100%25&height=220&zoom=8&level=surface&overlay=satellite&product=satellite&menu=false&message=false&marker=true&calendar=false&pressure=false&type=map&location=coordinates&detail=false&play=true&metricWind=mph&metricTemp=%C2%B0C" 
+            src="https://embed.windy.com/embed2.html?lat=50.860619&lon=-3.233961&detailLat=50.860619&detailLon=-3.233961&width=100%25&height=220&zoom=11&level=surface&overlay=satellite&product=satellite&menu=false&message=false&marker=true&calendar=false&pressure=false&type=map&location=coordinates&detail=false&play=true&metricWind=mph&metricTemp=%C2%B0C" 
             allowfullscreen>
           </iframe>
         </div>
@@ -633,21 +633,14 @@
         { name: 'ECMWF',    dir: ecmwfDir, spd: ecmwfSpd, gst: ecmwfGst, color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)' }
       ];
 
-      // TRUE WINDY-STYLE FAN LAYOUT: All lines originate strictly from [lat, lon].
-      // To mimic Windy's fan/spread without breaking the common anchor, each model ray 
-      // goes to a fixed distance, with a slight perpendicular fan nudge applied to the 
-      // pill endpoint coordinate so they fan out neatly side-by-side like the reference image.
       const rayLengthNM = 0.14;
-      const fanOffsets = [-0.015, 0.0, 0.015]; // Lateral spread offsets in degrees lat/lon
+      const fanOffsets = [-0.015, 0.0, 0.015];
 
       rawModels.forEach((m, idx) => {
         const endPt = computeDestinationPoint(lat, lon, m.dir, rayLengthNM);
-        
-        // Apply minor lateral fan offset to the pill marker so they stack/fan side-by-side cleanly
         const fannedLat = endPt.lat + fanOffsets[idx];
         const fannedLon = endPt.lon + (fanOffsets[idx] * 1.5);
 
-        // Ray line connects the exact runway center [lat, lon] to this model's fanned endpoint
         L.polyline([[lat, lon], [fannedLat, fannedLon]], {
           color: m.color, weight: 2.2, opacity: 0.85
         }).addTo(windRoseLayerGroup);
