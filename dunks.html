@@ -1,4 +1,4 @@
-<!-- REV: 5.9.2 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 5.9.3 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,7 +16,7 @@
     html, body {
       width: 100%;
       height: 100vh;
-      overflow: hidden;
+      overflow-x: hidden;
       background: #0b0f19;
       color: #f0f4f8;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -65,6 +65,7 @@
       position: relative;
       width: 100%;
       flex: 1;
+      min-height: 450px;
       border-radius: 8px;
       overflow: hidden;
       border: 1px solid #1e2d4a;
@@ -74,7 +75,7 @@
 
     #map { width: 100%; height: 100%; }
 
-    /* WIDER & LARGER TOP-RIGHT MAP OVERLAY PANEL */
+    /* DESKTOP FLOATING PANEL (TOP-RIGHT OF MAP) */
     .map-info-overlay {
       position: absolute;
       top: 10px;
@@ -142,7 +143,7 @@
     .overlay-value.accent-cyan { color: #00d8ff; }
     .overlay-value.accent-green { color: #00e676; }
 
-    /* DZ CONTROL COLLAPSIBLE / COMPACT CONTROLS BELOW OVERLAY */
+    /* DZ CONTROL PANEL (BOTTOM-RIGHT OF MAP) */
     .spot-overlay-card {
       position: absolute;
       bottom: 10px;
@@ -289,6 +290,42 @@
       border-radius: 3px;
       white-space: nowrap;
     }
+
+    /* MOBILE RESPONSIVE STYLING */
+    @media (max-width: 768px) {
+      html, body {
+        height: auto;
+        overflow-y: auto;
+      }
+      .dashboard-container {
+        height: auto;
+      }
+      .map-card {
+        height: 60vh;
+        min-height: 400px;
+        order: 2;
+      }
+      .map-info-overlay {
+        position: relative !important;
+        top: auto !important;
+        right: auto !important;
+        width: 100% !important;
+        max-height: none !important;
+        margin-bottom: 10px;
+        order: 1;
+      }
+      .spot-overlay-card {
+        position: relative !important;
+        bottom: auto !important;
+        right: auto !important;
+        width: 100% !important;
+        margin-top: 10px;
+        order: 3;
+      }
+      .slider-row input[type=range], .slider-row select {
+        width: 140px !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -296,22 +333,22 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.9.2</div>
+    <div class="rev-badge">REV: 5.9.3</div>
   </div>
 
   <div class="dashboard-container">
     
-    <!-- FULL-WIDTH MAP CARD -->
+    <!-- MAP CARD & OVERLAYS -->
     <div class="map-card">
       
-      <!-- WIDER & LARGER TOP-RIGHT MAP OVERLAY PANEL -->
+      <!-- TOP-RIGHT MAP OVERLAY PANEL (DATA FIRST ON MOBILE) -->
       <div class="map-info-overlay">
         <div class="overlay-header">
           <span>⚡ Live Ops & Winds Aloft</span>
           <span id="overlay-sector-tag" style="font-size: 0.85rem; color: #ffee58;">SECTOR N</span>
         </div>
         
-        <div class="overlay-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 12px;">
+        <div class="overlay-grid">
           <div class="overlay-cell">
             <div class="overlay-label">Pattern Turn</div>
             <div class="overlay-value accent-orange" id="ov-pattern">--</div>
@@ -322,23 +359,21 @@
           </div>
         </div>
 
-        <div class="overlay-grid" style="grid-template-columns: 1fr; margin-bottom: 12px;">
+        <div class="overlay-grid">
           <div class="overlay-cell">
             <div class="overlay-label">Wind Direction</div>
             <div class="overlay-value accent-cyan" id="ov-winddir">--°</div>
           </div>
+          <div class="overlay-cell">
+            <div class="overlay-label">Pattern Wind</div>
+            <div class="overlay-value accent-cyan" id="ov-pattern-wind">--°</div>
+          </div>
         </div>
 
-        <!-- RUN-IN HEADING & DROP SPOT COMBINED BOX -->
-        <div style="background: rgba(0, 0, 0, 0.5); border: 1px solid #1e2d4a; border-radius: 6px; padding: 12px 16px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 6px;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span class="overlay-label" style="margin:0; font-size: 0.8rem;">Run-In Heading:</span>
-            <span style="font-size: 1.5rem; font-weight: 900; color: #fff;" id="ov-heading">--° M</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 6px; font-size: 0.82rem; font-family: monospace;">
-            <span style="color: #8a99ad; text-transform: uppercase;">Drop Offset:</span>
-            <span style="color: #00d8ff; font-weight: bold;" id="ov-drop-detail">--</span>
-          </div>
+        <!-- FULL-WIDTH RUN-IN HEADING & DROP OFFSET BOX -->
+        <div style="background: rgba(0, 0, 0, 0.5); border: 1px solid #1e2d4a; border-radius: 6px; padding: 12px 16px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;">
+          <span class="overlay-label" style="margin:0; font-size: 0.8rem;">Run-In Heading & Drop:</span>
+          <span style="font-size: 1.3rem; font-weight: 900; color: #fff;" id="ov-heading">--</span>
         </div>
 
         <!-- CURRENT HOUR MODEL FORECAST CARD -->
@@ -351,12 +386,12 @@
               <th style="text-align: right; padding: 4px;">Cloud Base</th>
             </tr>
           </thead>
-          <tbody id="current-model-rows">
+          <tbody id="current-model-forecast-rows">
             <tr><td colspan="3" style="padding: 6px; text-align: center; color: #8a99ad;">Loading Forecast...</td></tr>
           </tbody>
         </table>
 
-        <!-- LARGER WINDS ALOFT TABLE -->
+        <!-- WINDS ALOFT TABLE -->
         <div style="font-size: 0.78rem; color: #8a99ad; text-transform: uppercase; margin-bottom: 6px; font-weight: bold; letter-spacing: 0.5px;">✈️ Winds Aloft (EGTU 839')</div>
         <table style="width: 100%; border-collapse: collapse; font-size: 0.95rem; font-family: monospace;">
           <thead>
@@ -386,13 +421,12 @@
         </table>
       </div>
 
-      <!-- COMPACT SPOT & LANDING CONTROLS PANEL (BOTTOM RIGHT OF MAP) -->
+      <!-- COMPACT SPOT & LANDING CONTROLS PANEL -->
       <div class="spot-overlay-card">
         <div class="spot-overlay-header">
           <span class="spot-overlay-title">⚙️ DZ Override Controls</span>
         </div>
 
-        <!-- JUMP-RUN MANUAL CONTROLS -->
         <div class="control-slider-group" style="border-top:none; margin-top:0; padding-top:0;">
           <div class="slider-row">
             <span style="color:#00d8ff; font-weight:bold;">Jump-Run Mode:</span>
@@ -410,7 +444,6 @@
           </div>
         </div>
 
-        <!-- 8-SECTOR LANDING PATTERN MANUAL CONTROLS -->
         <div class="control-slider-group">
           <div class="slider-row">
             <span style="color:#ff9800; font-weight:bold;">Landing Mode:</span>
@@ -455,7 +488,6 @@
     const easterlyLandingLon = -3.237317785882287;
     // ==========================================
 
-    // Zoomed in 1 level (default 16 instead of 15)
     const map = L.map('map', { zoomControl: false }).setView([lat, lon], 16);
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       maxZoom: 19, maxNativeZoom: 18
@@ -662,6 +694,10 @@
       let runInHeading = avgWindDir;
       let spotOffset = Math.min(0.28, Math.max(0.12, (avgSpeed / 100) * 1.2));
 
+      const headingRounded = Math.round(runInHeading);
+      const headingCompass = getCompassLetter(headingRounded);
+      const headingDisplayStr = `${headingRounded}° (${headingCompass}) • ${spotOffset.toFixed(2)} Past`;
+
       if (isJumpManual) {
         runInHeading = parseFloat(document.getElementById('slider-jump-heading').value);
         spotOffset = parseFloat(document.getElementById('slider-jump-dist').value);
@@ -686,10 +722,9 @@
           pane: 'topSpotPane', radius: 8, fillColor: '#00d8ff', color: '#ffffff', weight: 2.5, fillOpacity: 1
         }).addTo(manualJumpLayerGroup);
 
-        const roundedHdg = Math.round(runInHeading);
-        const compassLtr = getCompassLetter(roundedHdg);
-        document.getElementById('ov-heading').innerText = `${roundedHdg}° M (${compassLtr}) MAN`;
-        document.getElementById('ov-drop-detail').innerText = `${spotOffset.toFixed(2)} before`;
+        const manHeadingRounded = Math.round(runInHeading);
+        const manHeadingCompass = getCompassLetter(manHeadingRounded);
+        document.getElementById('ov-heading').innerText = `${manHeadingRounded}° (${manHeadingCompass}) • ${spotOffset.toFixed(2)} Past (MAN)`;
       } else {
         const autoSpotPt = computeDestinationPoint(lat, lon, runInHeading, spotOffset);
         const startAutoRun = computeDestinationPoint(lat, lon, (runInHeading + 180) % 360, 0.4);
@@ -711,10 +746,7 @@
           pane: 'topSpotPane', radius: 7, fillColor: '#ff2a2a', color: '#fff', weight: 2.5, fillOpacity: 1
         }).addTo(windRoseLayerGroup);
 
-        const roundedHdg = Math.round(runInHeading);
-        const compassLtr = getCompassLetter(roundedHdg);
-        document.getElementById('ov-heading').innerText = `${roundedHdg}° M (${compassLtr})`;
-        document.getElementById('ov-drop-detail').innerText = `${spotOffset.toFixed(2)} before`;
+        document.getElementById('ov-heading').innerText = headingDisplayStr;
       }
 
       // ==========================================
@@ -842,6 +874,7 @@
       document.getElementById('ov-windspd').innerText = `${Math.round(avgSpeed)} mph`;
       const roundedDir = Math.round(avgWindDir);
       document.getElementById('ov-winddir').innerText = `${roundedDir}° (${getCompassLetter(roundedDir)})`;
+      document.getElementById('ov-pattern-wind').innerText = `${activeRwyHdg}° (${activeSector.name})`;
       document.getElementById('overlay-sector-tag').innerText = `SECTOR ${activeSector.name}`;
     }
 
@@ -921,7 +954,7 @@
             </tr>
           `;
         });
-        document.getElementById('current-model-rows').innerHTML = currentForecastRowsHTML;
+        document.getElementById('current-model-forecast-rows').innerHTML = currentForecastRowsHTML;
 
         const aromeDir = arome.hourly ? arome.hourly.wind_direction_10m[currentIdx] : 144;
         const aromeSpd = arome.hourly ? Math.round(arome.hourly.wind_speed_10m[currentIdx]) : 18;
