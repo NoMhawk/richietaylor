@@ -1,4 +1,4 @@
-<!-- REV: 5.8.8 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 5.8.9 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -84,14 +84,14 @@
       backdrop-filter: blur(12px);
       border: 2px solid #00d8ff;
       border-radius: 10px;
-      padding: 16px 18px;
+      padding: 16px 20px;
       box-shadow: 0 8px 28px rgba(0,0,0,0.8);
       font-family: monospace;
-      width: 440px;
+      width: 520px;
     }
 
     .overlay-header {
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       font-weight: 800;
       color: #00d8ff;
       text-transform: uppercase;
@@ -106,23 +106,23 @@
     .overlay-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 10px;
+      gap: 12px;
+      margin-bottom: 12px;
     }
 
     .overlay-cell {
       background: rgba(0, 0, 0, 0.5);
       border: 1px solid #1e2d4a;
       border-radius: 6px;
-      padding: 10px 12px;
+      padding: 12px 14px;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      min-height: 60px;
+      min-height: 65px;
     }
 
     .overlay-label {
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       color: #8a99ad;
       text-transform: uppercase;
       margin-bottom: 4px;
@@ -130,7 +130,7 @@
     }
 
     .overlay-value {
-      font-size: 1.6rem;
+      font-size: 1.75rem;
       font-weight: 900;
       color: #fff;
       line-height: 1.1;
@@ -150,10 +150,10 @@
       backdrop-filter: blur(8px);
       border: 1px solid #1e2d4a;
       border-radius: 6px;
-      padding: 8px 12px;
+      padding: 10px 14px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.6);
       font-family: monospace;
-      width: 440px;
+      width: 520px;
     }
 
     .spot-overlay-header {
@@ -166,7 +166,7 @@
     }
 
     .spot-overlay-title {
-      font-size: 0.65rem;
+      font-size: 0.7rem;
       font-weight: 700;
       color: #00d8ff;
       text-transform: uppercase;
@@ -177,18 +177,18 @@
       color: #ffee58;
       border: 1px solid #ffee58;
       border-radius: 3px;
-      font-size: 0.58rem;
+      font-size: 0.6rem;
       font-weight: bold;
-      padding: 2px 6px;
+      padding: 2px 8px;
       cursor: pointer;
     }
 
     .control-slider-group {
       display: flex;
       flex-direction: column;
-      gap: 4px;
-      margin-top: 5px;
-      padding-top: 5px;
+      gap: 5px;
+      margin-top: 6px;
+      padding-top: 6px;
       border-top: 1px dashed rgba(255,255,255,0.1);
     }
 
@@ -196,11 +196,11 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 0.62rem;
+      font-size: 0.68rem;
     }
 
     .slider-row input[type=range] {
-      width: 180px;
+      width: 220px;
       accent-color: #00d8ff;
     }
 
@@ -377,7 +377,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.8.8</div>
+    <div class="rev-badge">REV: 5.8.9</div>
   </div>
 
   <div class="dashboard-container">
@@ -389,7 +389,7 @@
       <div class="map-info-overlay">
         <div class="overlay-header">
           <span>⚡ Live Ops & Winds Aloft</span>
-          <span id="overlay-sector-tag" style="font-size: 0.8rem; color: #ffee58;">SECTOR N</span>
+          <span id="overlay-sector-tag" style="font-size: 0.85rem; color: #ffee58;">SECTOR N</span>
         </div>
         
         <div class="overlay-grid">
@@ -415,36 +415,36 @@
         </div>
 
         <!-- FULL-WIDTH RUN-IN HEADING BOX -->
-        <div style="background: rgba(0, 0, 0, 0.5); border: 1px solid #1e2d4a; border-radius: 6px; padding: 10px 14px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
-          <span class="overlay-label" style="margin:0; font-size: 0.75rem;">Run-In Heading:</span>
-          <span style="font-size: 1.4rem; font-weight: 900; color: #fff;" id="ov-heading">--° M</span>
+        <div style="background: rgba(0, 0, 0, 0.5); border: 1px solid #1e2d4a; border-radius: 6px; padding: 12px 16px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;">
+          <span class="overlay-label" style="margin:0; font-size: 0.8rem;">Run-In Heading:</span>
+          <span style="font-size: 1.6rem; font-weight: 900; color: #fff;" id="ov-heading">--° M</span>
         </div>
 
         <!-- LARGER WINDS ALOFT TABLE -->
-        <div style="font-size: 0.72rem; color: #8a99ad; text-transform: uppercase; margin-bottom: 6px; font-weight: bold; letter-spacing: 0.5px;">✈️ Winds Aloft (EGTU 839')</div>
-        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; font-family: monospace;">
+        <div style="font-size: 0.78rem; color: #8a99ad; text-transform: uppercase; margin-bottom: 6px; font-weight: bold; letter-spacing: 0.5px;">✈️ Winds Aloft (EGTU 839')</div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.95rem; font-family: monospace;">
           <thead>
-            <tr style="border-bottom: 1px solid #1e2d4a; color: #8a99ad;">
-              <th style="text-align: left; padding: 4px;">Alt</th>
-              <th style="text-align: left; padding: 4px;">Dir / Speed</th>
-              <th style="text-align: right; padding: 4px;">Temp</th>
+            <tr style="border-bottom: 1px solid #1e2d4a; color: #8a99ad; font-size: 0.8rem;">
+              <th style="text-align: left; padding: 5px;">Alt</th>
+              <th style="text-align: left; padding: 5px;">Dir / Speed</th>
+              <th style="text-align: right; padding: 5px;">Temp</th>
             </tr>
           </thead>
           <tbody id="upper-winds-rows">
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
-              <td style="padding: 5px 4px; font-weight: bold;">Sfc</td><td id="uwind-sfc" style="font-weight: 900; color: #00d8ff; font-size: 0.95rem;">--</td><td id="utemp-sfc" style="text-align: right; font-weight: bold;">18°C</td>
+              <td style="padding: 6px 5px; font-weight: bold;">Sfc</td><td id="uwind-sfc" style="font-weight: 900; color: #00d8ff; font-size: 1.1rem;">--</td><td id="utemp-sfc" style="text-align: right; font-weight: bold;">18°C</td>
             </tr>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
-              <td style="padding: 5px 4px; font-weight: bold;">3k'</td><td id="uwind-3k" style="font-weight: 900; font-size: 0.95rem;">--</td><td id="utemp-3k" style="text-align: right; font-weight: bold;">12°C</td>
+              <td style="padding: 6px 5px; font-weight: bold;">3k'</td><td id="uwind-3k" style="font-weight: 900; font-size: 1.1rem;">--</td><td id="utemp-3k" style="text-align: right; font-weight: bold;">12°C</td>
             </tr>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
-              <td style="padding: 5px 4px; font-weight: bold;">7k'</td><td id="uwind-7k" style="font-weight: 900; font-size: 0.95rem;">--</td><td id="utemp-7k" style="text-align: right; font-weight: bold;">4°C</td>
+              <td style="padding: 6px 5px; font-weight: bold;">7k'</td><td id="uwind-7k" style="font-weight: 900; font-size: 1.1rem;">--</td><td id="utemp-7k" style="text-align: right; font-weight: bold;">4°C</td>
             </tr>
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
-              <td style="padding: 5px 4px; font-weight: bold;">10k'</td><td id="uwind-10k" style="font-weight: 900; font-size: 0.95rem;">--</td><td id="utemp-10k" style="text-align: right; font-weight: bold;">-2°C</td>
+              <td style="padding: 6px 5px; font-weight: bold;">10k'</td><td id="uwind-10k" style="font-weight: 900; font-size: 1.1rem;">--</td><td id="utemp-10k" style="text-align: right; font-weight: bold;">-2°C</td>
             </tr>
             <tr>
-              <td style="padding: 5px 4px; font-weight: bold;">15k'</td><td id="uwind-15k" style="font-weight: 900; font-size: 0.95rem;">--</td><td id="utemp-15k" style="text-align: right; font-weight: bold;">-12°C</td>
+              <td style="padding: 6px 5px; font-weight: bold;">15k'</td><td id="uwind-15k" style="font-weight: 900; font-size: 1.1rem;">--</td><td id="utemp-15k" style="text-align: right; font-weight: bold;">-12°C</td>
             </tr>
           </tbody>
         </table>
@@ -462,7 +462,7 @@
             <span style="color:#00d8ff; font-weight:bold;">Jump-Run Mode:</span>
             <button class="mode-toggle-btn" id="toggle-jump-btn" onclick="toggleJumpMode()">AUTO</button>
           </div>
-          <div id="jump-manual-controls" style="display: none; flex-direction: column; gap: 4px; margin-top: 4px;">
+          <div id="jump-manual-controls" style="display: none; flex-direction: column; gap: 5px; margin-top: 5px;">
             <div class="slider-row">
               <span>Heading:</span>
               <input type="range" id="slider-jump-heading" min="0" max="359" value="144" oninput="updateDashboardMap()">
@@ -480,10 +480,10 @@
             <span style="color:#ff9800; font-weight:bold;">Landing Mode:</span>
             <button class="mode-toggle-btn" id="toggle-landing-btn" onclick="toggleLandingMode()" style="border-color:#ff9800; color:#ff9800;">AUTO</button>
           </div>
-          <div id="landing-manual-controls" style="display: none; flex-direction: column; gap: 4px; margin-top: 4px;">
+          <div id="landing-manual-controls" style="display: none; flex-direction: column; gap: 5px; margin-top: 5px;">
             <div class="slider-row">
               <span>Wind Sector:</span>
-              <select id="select-wind-sector" onchange="updateDashboardMap()" style="background:#131b2e; color:#ff9800; border:1px solid #ff9800; font-size:0.65rem; font-weight:bold; border-radius:3px; width:180px;">
+              <select id="select-wind-sector" onchange="updateDashboardMap()" style="background:#131b2e; color:#ff9800; border:1px solid #ff9800; font-size:0.7rem; font-weight:bold; border-radius:3px; width:220px;">
                 <option value="0" selected>N (330° - 030°)</option>
                 <option value="45">NE (030° - 075°)</option>
                 <option value="90">E (075° - 120°)</option>
