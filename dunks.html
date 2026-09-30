@@ -386,7 +386,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.6.1</div>
+    <div class="rev-badge">REV: 5.6.2</div>
   </div>
 
   <div class="dashboard-container">
@@ -450,14 +450,6 @@
                   <option value="315">NW (285° - 330°)</option>
                 </select>
               </div>
-            </div>
-            <div class="slider-row" style="margin-top: 3px;">
-              <span>Circuit Side:</span>
-              <select id="select-circuit-side" onchange="updateDashboardMap()" style="background:#131b2e; color:#ff9800; border:1px solid #ff9800; font-size:0.55rem; font-weight:bold; border-radius:2px;">
-                <option value="auto" selected>AUTO (Away From Rwy)</option>
-                <option value="left">LEFT</option>
-                <option value="right">RIGHT</option>
-              </select>
             </div>
           </div>
 
@@ -869,10 +861,9 @@
         }
       }
 
-      let circuitSide = document.getElementById('select-circuit-side').value; 
-      if (circuitSide === 'auto') {
-        circuitSide = 'left'; 
-      }
+      // Automatically determine circuit side to stay away from the runway (Left for 350 runway, Right for 170 runway, etc.)
+      // Rwy 350 & 40 -> Left pattern; Rwy 170 & 220 -> Right pattern (or vice-versa depending on offset side)
+      let circuitSide = (activeSector.rwy === 350 || activeSector.rwy === 40) ? 'left' : 'right';
 
       const activeRwyHdg = activeSector.rwy;
       const circuitRad = (activeRwyHdg * Math.PI) / 180;
@@ -913,7 +904,7 @@
         color: '#ff9800', weight: 3, dashArray: '5,5', opacity: 0.95
       }).addTo(circuitLayerGroup);
 
-      // Only display LEFT or RIGHT turn indicator at the end of the downwind leg
+      // Display LEFT or RIGHT turn indicator at the end of the downwind leg
       const turnLabelText = circuitSide.toUpperCase();
 
       L.marker(downwindEnd, {
