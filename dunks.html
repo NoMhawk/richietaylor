@@ -387,7 +387,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 4.6.0</div>
+    <div class="rev-badge">REV: 4.7.0</div>
   </div>
 
   <div class="dashboard-container">
@@ -433,13 +433,14 @@
             </div>
           </div>
 
-          <!-- MANUAL CIRCUIT SELECTOR -->
+          <!-- FLEXIBLE CIRCUIT SELECTOR (AUTO AWAY FROM RWY + MANUAL OVERRIDES) -->
           <div class="control-slider-group">
             <div class="slider-row">
               <span style="color:#ff9800; font-weight:bold;">Landing Circuit:</span>
               <select id="select-circuit-side" onchange="updateManualSpot()" style="background:#131b2e; color:#ff9800; border:1px solid #ff9800; font-size:0.55rem; font-weight:bold; border-radius:2px;">
+                <option value="auto" selected>AUTO (Away From Rwy)</option>
                 <option value="left">LEFT-HAND CIRCUIT</option>
-                <option value="right" selected>RIGHT-HAND CIRCUIT</option>
+                <option value="right">RIGHT-HAND CIRCUIT</option>
               </select>
             </div>
           </div>
@@ -803,10 +804,16 @@
       }
 
       // ==========================================
-      // MANUAL CIRCUIT SELECTION
+      // CIRCUIT SIDE LOGIC (AUTO AWAY FROM RWY OR MANUAL)
       // ==========================================
-      const circuitSide = document.getElementById('select-circuit-side').value; // 'left' or 'right'
+      let circuitSide = document.getElementById('select-circuit-side').value; 
       const landingHeading = avgWindDir; 
+
+      if (circuitSide === 'auto') {
+        const runwayAxisDiff = Math.abs((landingHeading - 40 + 360) % 180);
+        circuitSide = runwayAxisDiff < 90 ? 'left' : 'right';
+      }
+
       const circuitRad = (landingHeading * Math.PI) / 180;
       const perpRad = circuitRad + (circuitSide === 'right' ? Math.PI / 2 : -Math.PI / 2);
 
