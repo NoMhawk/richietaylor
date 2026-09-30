@@ -359,29 +359,14 @@
       pointer-events: none;
     }
 
-    /* Custom SDSW Dropzone Marker Style */
-    .sdsw-dz-marker {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      background: rgba(11, 15, 25, 0.9);
-      border: 1.5px solid #00d8ff;
-      color: #00d8ff;
-      font-family: monospace;
-      font-size: 9px;
-      font-weight: bold;
-      padding: 2px 6px;
-      border-radius: 4px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.8);
-      white-space: nowrap;
-      pointer-events: none;
-    }
-    .sdsw-dz-dot {
-      width: 6px;
-      height: 6px;
+    /* Clean Satellite Dot Marker Style */
+    .sat-dot-marker {
+      width: 10px;
+      height: 10px;
       background: #00d8ff;
+      border: 2px solid #ffffff;
       border-radius: 50%;
-      box-shadow: 0 0 6px #00d8ff;
+      box-shadow: 0 0 8px #00d8ff;
     }
 
     .circuit-label {
@@ -402,7 +387,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 4.5.0</div>
+    <div class="rev-badge">REV: 4.6.0</div>
   </div>
 
   <div class="dashboard-container">
@@ -448,14 +433,13 @@
             </div>
           </div>
 
-          <!-- REFINED AUTO RUNWAY-CLEAR CIRCUIT SELECTOR -->
+          <!-- MANUAL CIRCUIT SELECTOR -->
           <div class="control-slider-group">
             <div class="slider-row">
               <span style="color:#ff9800; font-weight:bold;">Landing Circuit:</span>
               <select id="select-circuit-side" onchange="updateManualSpot()" style="background:#131b2e; color:#ff9800; border:1px solid #ff9800; font-size:0.55rem; font-weight:bold; border-radius:2px;">
-                <option value="auto" selected>AUTO (Away From Rwy)</option>
                 <option value="left">LEFT-HAND CIRCUIT</option>
-                <option value="right">RIGHT-HAND CIRCUIT</option>
+                <option value="right" selected>RIGHT-HAND CIRCUIT</option>
               </select>
             </div>
           </div>
@@ -572,7 +556,7 @@
       <div class="pane-segment" style="flex: 1;">
         <div class="pane-header">
           <div class="title">🛰 Live Satellite Imagery</div>
-          <div class="subtitle">South West Cloud Cover & SDSW Marker</div>
+          <div class="subtitle">South West Cloud Cover & DZ Marker</div>
         </div>
 
         <div class="radar-frame-box">
@@ -611,17 +595,11 @@
     let circuitLayerGroup = L.layerGroup().addTo(map);
     circuitLayerGroup.addTo(map);
 
-    // Right Satellite Overlay Map
+    // Right Satellite Overlay Map (Clean Dot Marker)
     const satOverlayMap = L.map('sat-overlay-map', { zoomControl: false, attributionControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false }).setView([lat, lon], 9);
     
-    const sdswMarkerHtml = `
-      <div class="sdsw-dz-marker">
-        <div class="sdsw-dz-dot"></div>
-        <span>SDSW</span>
-      </div>
-    `;
     L.marker([lat, lon], {
-      icon: L.divIcon({ html: sdswMarkerHtml, className: '', iconSize: [60, 22], iconAnchor: [30, 11] })
+      icon: L.divIcon({ html: `<div class="sat-dot-marker"></div>`, className: '', iconSize: [12, 12], iconAnchor: [6, 6] })
     }).addTo(satOverlayMap);
 
     let isManualMode = false;
@@ -814,7 +792,7 @@
         }).addTo(manualLayerGroup);
 
         L.circleMarker([manSpotPt.lat, manSpotPt.lon], {
-          pane: 'topSpotPane', radius: 8, fillColor: '#ff0000', color: '#ffffff', weight: 2.5, fillOpacity: 1
+          pane: 'topSpotPane', radius: 8, fillColor: '#00d8ff', color: '#ffffff', weight: 2.5, fillOpacity: 1
         }).addTo(manualLayerGroup);
 
         document.getElementById('card-runin').innerText = `${Math.round(manualHeading)}° M (MAN)`;
@@ -825,18 +803,10 @@
       }
 
       // ==========================================
-      // INVERTED SMART CIRCUIT DETECTION (AWAY FROM RUNWAY)
+      // MANUAL CIRCUIT SELECTION
       // ==========================================
-      let circuitSide = document.getElementById('select-circuit-side').value; 
+      const circuitSide = document.getElementById('select-circuit-side').value; // 'left' or 'right'
       const landingHeading = avgWindDir; 
-
-      if (circuitSide === 'auto') {
-        // Since the landing paddock is on the North-West side of the main runway (040/220 axis),
-        // we invert the rule to push the downwind leg outward toward the NW/field side rather than inward over tarmac.
-        const runwayAxisDiff = Math.abs((landingHeading - 40 + 360) % 180);
-        circuitSide = runwayAxisDiff < 90 ? 'left' : 'right';
-      }
-
       const circuitRad = (landingHeading * Math.PI) / 180;
       const perpRad = circuitRad + (circuitSide === 'right' ? Math.PI / 2 : -Math.PI / 2);
 
