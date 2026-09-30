@@ -86,14 +86,14 @@
       top: 8px;
       right: 8px;
       z-index: 1000;
-      background: rgba(11, 15, 25, 0.92);
+      background: rgba(11, 15, 25, 0.94);
       backdrop-filter: blur(8px);
       border: 1px solid #1e2d4a;
       border-radius: 6px;
       padding: 8px 10px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.6);
       font-family: monospace;
-      width: 250px;
+      width: 255px;
     }
 
     .spot-overlay-header {
@@ -117,9 +117,9 @@
       color: #ffee58;
       border: 1px solid #ffee58;
       border-radius: 3px;
-      font-size: 0.58rem;
+      font-size: 0.55rem;
       font-weight: bold;
-      padding: 1px 5px;
+      padding: 1px 4px;
       cursor: pointer;
     }
 
@@ -132,7 +132,7 @@
 
     .spot-val-group { display: flex; flex-direction: column; }
     .spot-val-label { font-size: 0.5rem; color: #8a99ad; text-transform: uppercase; }
-    .spot-val-num { font-size: 0.8rem; font-weight: 800; color: #fff; }
+    .spot-val-num { font-size: 0.75rem; font-weight: 800; color: #fff; }
 
     .control-slider-group {
       display: flex;
@@ -387,7 +387,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 4.7.0</div>
+    <div class="rev-badge">REV: 4.9.0</div>
   </div>
 
   <div class="dashboard-container">
@@ -400,7 +400,6 @@
         <div class="spot-overlay-card">
           <div class="spot-overlay-header">
             <span class="spot-overlay-title">🎯 DZ Control Spotting</span>
-            <button class="mode-toggle-btn" id="toggle-mode-btn" onclick="toggleSpotMode()">MODE: AUTO</button>
           </div>
           
           <div class="spot-overlay-row">
@@ -414,33 +413,42 @@
             </div>
           </div>
 
-          <!-- MANUAL OVERRIDE & CIRCUIT CONTROLS -->
-          <div class="control-slider-group" id="manual-controls" style="display: none;">
+          <!-- JUMP-RUN MANUAL CONTROLS -->
+          <div class="control-slider-group">
             <div class="slider-row">
-              <span>Heading:</span>
-              <input type="range" id="slider-heading" min="0" max="359" value="144" oninput="updateManualSpot()">
+              <span style="color:#00d8ff; font-weight:bold;">Jump-Run Mode:</span>
+              <button class="mode-toggle-btn" id="toggle-jump-btn" onclick="toggleJumpMode()">AUTO</button>
             </div>
-            <div class="slider-row">
-              <span>Offset:</span>
-              <input type="range" id="slider-dist" min="0.05" max="0.50" step="0.01" value="0.20" oninput="updateManualSpot()">
-            </div>
-            <div class="slider-row" style="margin-top:2px;">
-              <span>Overlay Mode:</span>
-              <select id="select-display-mode" onchange="updateManualSpot()" style="background:#131b2e; color:#fff; border:1px solid #1e2d4a; font-size:0.55rem; border-radius:2px;">
-                <option value="manual">Manual Only</option>
-                <option value="both" selected>Show Both</option>
-              </select>
+            <div id="jump-manual-controls" style="display: none; flex-direction: column; gap: 3px; margin-top: 3px;">
+              <div class="slider-row">
+                <span>Heading:</span>
+                <input type="range" id="slider-jump-heading" min="0" max="359" value="144" oninput="updateDashboardMap()">
+              </div>
+              <div class="slider-row">
+                <span>Offset:</span>
+                <input type="range" id="slider-jump-dist" min="0.05" max="0.50" step="0.01" value="0.20" oninput="updateDashboardMap()">
+              </div>
             </div>
           </div>
 
-          <!-- FLEXIBLE CIRCUIT SELECTOR (AUTO AWAY FROM RWY + MANUAL OVERRIDES) -->
+          <!-- LANDING PATTERN MANUAL CONTROLS -->
           <div class="control-slider-group">
             <div class="slider-row">
-              <span style="color:#ff9800; font-weight:bold;">Landing Circuit:</span>
-              <select id="select-circuit-side" onchange="updateManualSpot()" style="background:#131b2e; color:#ff9800; border:1px solid #ff9800; font-size:0.55rem; font-weight:bold; border-radius:2px;">
+              <span style="color:#ff9800; font-weight:bold;">Landing Mode:</span>
+              <button class="mode-toggle-btn" id="toggle-landing-btn" onclick="toggleLandingMode()" style="border-color:#ff9800; color:#ff9800;">AUTO</button>
+            </div>
+            <div id="landing-manual-controls" style="display: none; flex-direction: column; gap: 3px; margin-top: 3px;">
+              <div class="slider-row">
+                <span>Direction:</span>
+                <input type="range" id="slider-landing-dir" min="0" max="359" value="144" oninput="updateDashboardMap()" style="accent-color: #ff9800;">
+              </div>
+            </div>
+            <div class="slider-row" style="margin-top: 3px;">
+              <span>Circuit Side:</span>
+              <select id="select-circuit-side" onchange="updateDashboardMap()" style="background:#131b2e; color:#ff9800; border:1px solid #ff9800; font-size:0.55rem; font-weight:bold; border-radius:2px;">
                 <option value="auto" selected>AUTO (Away From Rwy)</option>
-                <option value="left">LEFT-HAND CIRCUIT</option>
-                <option value="right">RIGHT-HAND CIRCUIT</option>
+                <option value="left">LEFT-HAND</option>
+                <option value="right">RIGHT-HAND</option>
               </select>
             </div>
           </div>
@@ -592,7 +600,7 @@
     map.getPane('topSpotPane').style.zIndex = 650;
 
     let windRoseLayerGroup = L.layerGroup().addTo(map);
-    let manualLayerGroup = L.layerGroup().addTo(map);
+    let manualJumpLayerGroup = L.layerGroup().addTo(map);
     let circuitLayerGroup = L.layerGroup().addTo(map);
     circuitLayerGroup.addTo(map);
 
@@ -603,7 +611,8 @@
       icon: L.divIcon({ html: `<div class="sat-dot-marker"></div>`, className: '', iconSize: [12, 12], iconAnchor: [6, 6] })
     }).addTo(satOverlayMap);
 
-    let isManualMode = false;
+    let isJumpManual = false;
+    let isLandingManual = false;
     let cachedWeatherData = [144, 18, 30, 144, 20, 30, 144, 18, 33];
 
     function getArrow(deg) {
@@ -649,30 +658,46 @@
       return Math.max(1000, baseAGL);
     }
 
-    function toggleSpotMode() {
-      isManualMode = !isManualMode;
-      const btn = document.getElementById('toggle-mode-btn');
-      const controls = document.getElementById('manual-controls');
+    function toggleJumpMode() {
+      isJumpManual = !isJumpManual;
+      const btn = document.getElementById('toggle-jump-btn');
+      const controls = document.getElementById('jump-manual-controls');
 
-      if (isManualMode) {
-        btn.innerText = "MODE: MANUAL";
+      if (isJumpManual) {
+        btn.innerText = "MANUAL";
         btn.style.borderColor = "#ff5252";
         btn.style.color = "#ff5252";
         controls.style.display = "flex";
       } else {
-        btn.innerText = "MODE: AUTO";
+        btn.innerText = "AUTO";
         btn.style.borderColor = "#ffee58";
         btn.style.color = "#ffee58";
         controls.style.display = "none";
-        manualLayerGroup.clearLayers();
+        manualJumpLayerGroup.clearLayers();
       }
-
-      if (cachedWeatherData) {
-        updateWindRoseOnMap(...cachedWeatherData);
-      }
+      updateDashboardMap();
     }
 
-    function updateManualSpot() {
+    function toggleLandingMode() {
+      isLandingManual = !isLandingManual;
+      const btn = document.getElementById('toggle-landing-btn');
+      const controls = document.getElementById('landing-manual-controls');
+
+      if (isLandingManual) {
+        btn.innerText = "MANUAL";
+        btn.style.borderColor = "#ff5252";
+        btn.style.color = "#ff5252";
+        controls.style.display = "flex";
+      } else {
+        btn.innerText = "AUTO";
+        btn.style.borderColor = "#ff9800";
+        btn.style.color = "#ff9800";
+        controls.style.display = "none";
+      }
+      updateDashboardMap();
+    }
+
+    function updateDashboardMap() {
       if (cachedWeatherData) {
         updateWindRoseOnMap(...cachedWeatherData);
       }
@@ -686,10 +711,10 @@
 
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
       windRoseLayerGroup.clearLayers();
-      manualLayerGroup.clearLayers();
+      manualJumpLayerGroup.clearLayers();
       circuitLayerGroup.clearLayers();
 
-      // Airfield Center Anchor Pin at exact intersection
+      // Airfield Center Anchor Pin
       L.circleMarker([lat, lon], {
         radius: 5, fillColor: '#ffffff', color: '#000000', weight: 1.5, fillOpacity: 1
       }).addTo(windRoseLayerGroup);
@@ -744,22 +769,50 @@
       });
 
       const avgWindDir = circularMeanDeg([aromeDir, gfsDir, ecmwfDir]);
-      const autoRunIn = avgWindDir;
       const avgSpeed = (aromeSpd + gfsSpd + ecmwfSpd) / 3;
-      const autoSpotOffset = Math.min(0.28, Math.max(0.12, (avgSpeed / 100) * 1.2));
 
-      const displayMode = document.getElementById('select-display-mode').value;
+      // ==========================================
+      // JUMP-RUN RENDERING (AUTO or MANUAL)
+      // ==========================================
+      let runInHeading = avgWindDir;
+      let spotOffset = Math.min(0.28, Math.max(0.12, (avgSpeed / 100) * 1.2));
 
-      if (!isManualMode || displayMode === 'both') {
-        const autoSpotPt = computeDestinationPoint(lat, lon, autoRunIn, autoSpotOffset);
-        const startAutoRun = computeDestinationPoint(lat, lon, (autoRunIn + 180) % 360, 0.4);
-        const endAutoRun = computeDestinationPoint(lat, lon, autoRunIn, autoSpotOffset * 1.4);
+      if (isJumpManual) {
+        runInHeading = parseFloat(document.getElementById('slider-jump-heading').value);
+        spotOffset = parseFloat(document.getElementById('slider-jump-dist').value);
+
+        const manSpotPt = computeDestinationPoint(lat, lon, runInHeading, spotOffset);
+        const startManRun = computeDestinationPoint(lat, lon, (runInHeading + 180) % 360, 0.4);
+        const endManRun = computeDestinationPoint(lat, lon, runInHeading, spotOffset * 1.4);
+
+        L.polyline([[startManRun.lat, startManRun.lon], [endManRun.lat, endManRun.lon]], {
+          color: '#00d8ff', weight: 3.5, dashArray: '4,4', opacity: 1
+        }).addTo(manualJumpLayerGroup);
+
+        let manArrowAngle = (runInHeading - 90 + 360) % 360;
+        L.marker([endManRun.lat, endManRun.lon], {
+          icon: L.divIcon({
+            html: `<div class="jumprun-arrow" style="color:#00d8ff; transform: rotate(${manArrowAngle}deg);">▶</div>`,
+            className: '', iconSize: [16, 16], iconAnchor: [8, 8]
+          })
+        }).addTo(manualJumpLayerGroup);
+
+        L.circleMarker([manSpotPt.lat, manSpotPt.lon], {
+          pane: 'topSpotPane', radius: 8, fillColor: '#00d8ff', color: '#ffffff', weight: 2.5, fillOpacity: 1
+        }).addTo(manualJumpLayerGroup);
+
+        document.getElementById('card-runin').innerText = `${Math.round(runInHeading)}° M (MAN)`;
+        document.getElementById('card-spot-dist').innerText = `${spotOffset.toFixed(2)} NM`;
+      } else {
+        const autoSpotPt = computeDestinationPoint(lat, lon, runInHeading, spotOffset);
+        const startAutoRun = computeDestinationPoint(lat, lon, (runInHeading + 180) % 360, 0.4);
+        const endAutoRun = computeDestinationPoint(lat, lon, runInHeading, spotOffset * 1.4);
 
         L.polyline([[startAutoRun.lat, startAutoRun.lon], [endAutoRun.lat, endAutoRun.lon]], {
           color: '#ffffff', weight: 3, dashArray: '5,6', opacity: 0.95
         }).addTo(windRoseLayerGroup);
 
-        let arrowAngle = (autoRunIn - 90 + 360) % 360;
+        let arrowAngle = (runInHeading - 90 + 360) % 360;
         L.marker([endAutoRun.lat, endAutoRun.lon], {
           icon: L.divIcon({
             html: `<div class="jumprun-arrow" style="transform: rotate(${arrowAngle}deg);">▶</div>`,
@@ -770,45 +823,23 @@
         L.circleMarker([autoSpotPt.lat, autoSpotPt.lon], {
           pane: 'topSpotPane', radius: 7, fillColor: '#ff2a2a', color: '#fff', weight: 2.5, fillOpacity: 1
         }).addTo(windRoseLayerGroup);
+
+        document.getElementById('card-runin').innerText = `${Math.round(runInHeading)}° M`;
+        document.getElementById('card-spot-dist').innerText = `${spotOffset.toFixed(2)} NM`;
       }
 
-      if (isManualMode) {
-        const manualHeading = parseFloat(document.getElementById('slider-heading').value);
-        const manualOffset = parseFloat(document.getElementById('slider-dist').value);
-
-        const manSpotPt = computeDestinationPoint(lat, lon, manualHeading, manualOffset);
-        const startManRun = computeDestinationPoint(lat, lon, (manualHeading + 180) % 360, 0.4);
-        const endManRun = computeDestinationPoint(lat, lon, manualHeading, manualOffset * 1.4);
-
-        L.polyline([[startManRun.lat, startManRun.lon], [endManRun.lat, endManRun.lon]], {
-          color: '#00d8ff', weight: 3.5, dashArray: '4,4', opacity: 1
-        }).addTo(manualLayerGroup);
-
-        let manArrowAngle = (manualHeading - 90 + 360) % 360;
-        L.marker([endManRun.lat, endManRun.lon], {
-          icon: L.divIcon({
-            html: `<div class="jumprun-arrow" style="color:#00d8ff; transform: rotate(${manArrowAngle}deg);">▶</div>`,
-            className: '', iconSize: [16, 16], iconAnchor: [8, 8]
-          })
-        }).addTo(manualLayerGroup);
-
-        L.circleMarker([manSpotPt.lat, manSpotPt.lon], {
-          pane: 'topSpotPane', radius: 8, fillColor: '#00d8ff', color: '#ffffff', weight: 2.5, fillOpacity: 1
-        }).addTo(manualLayerGroup);
-
-        document.getElementById('card-runin').innerText = `${Math.round(manualHeading)}° M (MAN)`;
-        document.getElementById('card-spot-dist').innerText = `${manualOffset.toFixed(2)} NM`;
+      // ==========================================
+      // LANDING PATTERN RENDERING (AUTO or MANUAL)
+      // ==========================================
+      let landingHeading = avgWindDir;
+      if (isLandingManual) {
+        landingHeading = parseFloat(document.getElementById('slider-landing-dir').value);
       } else {
-        document.getElementById('card-runin').innerText = `${Math.round(autoRunIn)}° M`;
-        document.getElementById('card-spot-dist').innerText = `${autoSpotOffset.toFixed(2)} NM`;
+        // Keep landing slider synced with forecast when in auto mode
+        document.getElementById('slider-landing-dir').value = Math.round(avgWindDir);
       }
 
-      // ==========================================
-      // CIRCUIT SIDE LOGIC (AUTO AWAY FROM RWY OR MANUAL)
-      // ==========================================
       let circuitSide = document.getElementById('select-circuit-side').value; 
-      const landingHeading = avgWindDir; 
-
       if (circuitSide === 'auto') {
         const runwayAxisDiff = Math.abs((landingHeading - 40 + 360) % 180);
         circuitSide = runwayAxisDiff < 90 ? 'left' : 'right';
@@ -863,14 +894,14 @@
       }).addTo(circuitLayerGroup);
 
       L.marker(downwindEnd, {
-        icon: L.divIcon({ html: `<div class="circuit-label">DOWNWIND (${circuitSide.toUpperCase()})</div>`, className: '', iconSize: [110, 16], iconAnchor: [55, 8] })
+        icon: L.divIcon({ html: `<div class="circuit-label">DOWNWIND (${circuitSide.toUpperCase()}${isLandingManual ? ' - MAN' : ''})</div>`, className: '', iconSize: [140, 16], iconAnchor: [70, 8] })
       }).addTo(circuitLayerGroup);
     }
 
-    updateWindRoseOnMap(...cachedWeatherData);
+    updateDashboardMap();
 
     map.on('zoomend', () => {
-      if (cachedWeatherData) updateWindRoseOnMap(...cachedWeatherData);
+      updateDashboardMap();
     });
 
     async function fetchModelData() {
@@ -972,7 +1003,7 @@
         const ecmwfGst = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_gusts_10m[currentIdx]) : 33;
 
         cachedWeatherData = [aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst];
-        updateWindRoseOnMap(...cachedWeatherData);
+        updateDashboardMap();
 
         document.getElementById('uwind-sfc').innerHTML = `${getArrow(ecmwfDir)} ${Math.round(ecmwfDir)}° / ${ecmwfSpd} mph`;
         document.getElementById('uwind-3k').innerHTML  = `${getArrow((ecmwfDir + 10) % 360)} ${Math.round((ecmwfDir + 10) % 360)}° / ${Math.round(ecmwfSpd * 1.8)} mph`;
