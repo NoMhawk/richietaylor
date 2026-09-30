@@ -1,4 +1,4 @@
-<!-- REV: 5.9.6 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 5.9.7 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -333,7 +333,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.9.6</div>
+    <div class="rev-badge">REV: 5.9.7</div>
   </div>
 
   <div class="dashboard-container">
@@ -359,14 +359,10 @@
           </div>
         </div>
 
-        <div class="overlay-grid">
+        <div class="overlay-grid" style="grid-template-columns: 1fr;">
           <div class="overlay-cell">
             <div class="overlay-label">Wind Direction</div>
             <div class="overlay-value accent-cyan" id="ov-winddir">--°</div>
-          </div>
-          <div class="overlay-cell">
-            <div class="overlay-label">Into-Wind Rwy</div>
-            <div class="overlay-value accent-cyan" id="ov-pattern-wind">--°</div>
           </div>
         </div>
 
@@ -614,12 +610,9 @@
       const sectorName = sectors[sectorIndex];
 
       const rwyHdg = (norm >= 120 && norm <= 300) ? 40 : 220;
-      const rwyName = rwyHdg === 40 ? '04' : '22';
-
-      // SE, S, SW sectors assigned RIGHT-hand circuits; others LEFT-hand
       const turnSide = ['SE', 'S', 'SW'].includes(sectorName) ? 'right' : 'left';
 
-      return { name: rwyName, rwy: rwyHdg, sectorName: sectorName, turnSide: turnSide };
+      return { rwy: rwyHdg, sectorName: sectorName, turnSide: turnSide };
     }
 
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
@@ -748,7 +741,7 @@
         const matchedRwy = { 0: 360, 45: 40, 90: 90, 135: 170, 170: 170, 220: 220, 270: 270, 315: 320 };
         const secName = sectorsMap[sectorVal];
         const tSide = ['SE', 'S', 'SW'].includes(secName) ? 'right' : 'left';
-        activeRwyData = { name: matchedRwy[sectorVal] === 40 ? '04' : '22', rwy: matchedRwy[sectorVal], sectorName: secName, turnSide: tSide };
+        activeRwyData = { rwy: matchedRwy[sectorVal], sectorName: secName, turnSide: tSide };
       } else {
         activeRwyData = getDunkeswellRunwayFromWind(avgWindDir);
       }
@@ -812,7 +805,6 @@
       document.getElementById('ov-windspd').innerText = `${Math.round(avgSpeed)} mph`;
       const roundedDir = Math.round(avgWindDir);
       document.getElementById('ov-winddir').innerText = `${roundedDir}° (${getCompassLetter(roundedDir)})`;
-      document.getElementById('ov-pattern-wind').innerText = `Rwy ${activeRwyData.name} (${activeRwyHdg}°)`;
       document.getElementById('overlay-sector-tag').innerText = `SECTOR ${activeRwyData.sectorName}`;
     }
 
