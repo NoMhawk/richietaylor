@@ -355,7 +355,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 3.0.9</div>
+    <div class="rev-badge">REV: 3.0.10</div>
   </div>
 
   <div class="dashboard-container">
@@ -645,13 +645,12 @@
       rawModels.forEach((m, idx) => {
         const distMeters = baseDistanceMeters + (idx * spreadStepMeters);
         
-        // UPWIND POSITIONING: Project in the OPPOSITE direction of where wind blows (m.dir + 180)
-        // so that the vanes extend outward towards the direction the wind is coming FROM.
-        const upwindHeading = (m.dir + 180) % 360;
-        const rad = (upwindHeading * Math.PI) / 180;
+        // TRUE UPWIND POSITIONING: Invert the direction vector (-cos / -sin) 
+        // so the vanes project backwards from the center dot into the wind.
+        const rad = (m.dir * Math.PI) / 180;
         
-        const dLat = (distMeters * Math.cos(rad)) / 111320;
-        const dLon = (distMeters * Math.sin(rad)) / (111320 * Math.cos(lat * Math.PI / 180));
+        const dLat = (-distMeters * Math.cos(rad)) / 111320;
+        const dLon = (-distMeters * Math.sin(rad)) / (111320 * Math.cos(lat * Math.PI / 180));
 
         const endLat = lat + dLat;
         const endLon = lon + dLon;
@@ -660,7 +659,7 @@
           color: m.color, weight: 2.2, opacity: 0.85
         }).addTo(windRoseLayerGroup);
 
-        let cssRotationAngle = (upwindHeading - 90 + 360) % 360;
+        let cssRotationAngle = (m.dir - 90 + 360) % 360;
         if (cssRotationAngle > 90 && cssRotationAngle < 270) {
           cssRotationAngle = (cssRotationAngle + 180) % 360;
         }
