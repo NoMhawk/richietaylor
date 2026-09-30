@@ -355,7 +355,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 2.9.7</div>
+    <div class="rev-badge">REV: 2.9.8</div>
   </div>
 
   <div class="dashboard-container">
@@ -642,10 +642,8 @@
       rawModels.forEach((m, idx) => {
         const distMeters = baseDistanceMeters + (idx * spreadStepMeters);
         
-        // FLIPPED 180°: Meteorological wind direction points FROM where the wind blows. 
-        // Adding 180 projects the ray outward in the direction the wind is coming FROM, matching Windy.
-        const originBearing = (m.dir + 180) % 360;
-        const rad = (originBearing * Math.PI) / 180;
+        // Corrected projection angle: Point outward in the exact direction the wind blows towards
+        const rad = (m.dir * Math.PI) / 180;
         
         const dLat = (distMeters * Math.cos(rad)) / 111320;
         const dLon = (distMeters * Math.sin(rad)) / (111320 * Math.cos(lat * Math.PI / 180));
@@ -657,7 +655,7 @@
           color: m.color, weight: 2.2, opacity: 0.85
         }).addTo(windRoseLayerGroup);
 
-        let cssRotationAngle = (originBearing - 90 + 360) % 360;
+        let cssRotationAngle = (m.dir - 90 + 360) % 360;
         if (cssRotationAngle > 90 && cssRotationAngle < 270) {
           cssRotationAngle = (cssRotationAngle + 180) % 360;
         }
