@@ -347,6 +347,31 @@
       line-height: 1;
       pointer-events: none;
     }
+
+    /* Custom SDSW Dropzone Marker Style */
+    .sdsw-dz-marker {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(11, 15, 25, 0.9);
+      border: 1.5px solid #00d8ff;
+      color: #00d8ff;
+      font-family: monospace;
+      font-size: 9px;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.8);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .sdsw-dz-dot {
+      width: 6px;
+      height: 6px;
+      background: #00d8ff;
+      border-radius: 50%;
+      box-shadow: 0 0 6px #00d8ff;
+    }
   </style>
 </head>
 <body>
@@ -354,7 +379,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 3.0.13</div>
+    <div class="rev-badge">REV: 3.0.14</div>
   </div>
 
   <div class="dashboard-container">
@@ -519,6 +544,13 @@
             src="https://embed.windy.com/embed2.html?lat=50.860619&lon=-3.233961&detailLat=50.860619&detailLon=-3.233961&width=100%25&height=220&zoom=9&level=surface&overlay=satellite&product=satellite&menu=false&message=false&marker=false&calendar=false&pressure=false&type=map&location=coordinates&detail=false&play=true&metricWind=mph&metricTemp=%C2%B0C" 
             allowfullscreen>
           </iframe>
+          <!-- Custom SDSW Dropzone Marker overlay -->
+          <div style="position: absolute; top: 12px; left: 12px; z-index: 500;">
+            <div class="sdsw-dz-marker">
+              <div class="sdsw-dz-dot"></div>
+              <span>SDSW (EGTU)</span>
+            </div>
+          </div>
         </div>
       </div>
 
