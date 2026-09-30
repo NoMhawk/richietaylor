@@ -1,4 +1,4 @@
-<!-- REV: 5.8.2 - SKYDIVE SOUTHWEST OPERATIONS DASHBOARD -->
+<!-- REV: 5.8.3 - SKYDIVE SOUTHWEST OPERATIONS DASHBOARD -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -444,7 +444,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.8.2</div>
+    <div class="rev-badge">REV: 5.8.3</div>
   </div>
 
   <div class="dashboard-container">
@@ -493,7 +493,7 @@
         <!-- COMPACT SPOT & LANDING CONTROLS PANEL -->
         <div class="spot-overlay-card">
           <div class="spot-overlay-header">
-            <span class="spot-overlay-title">⚙️️ DZ Override Controls</span>
+            <span class="spot-overlay-title">⚙️ DZ Override Controls</span>
           </div>
 
           <!-- JUMP-RUN MANUAL CONTROLS -->
@@ -1005,13 +1005,13 @@
 
       if (activeSector.name === 'E') {
         const perpRad = circuitRad - Math.PI / 2;
-        const extendedBaseWidth = 320; 
+        const extendedBaseWidth = 240; // Shortened base width to keep downwind safely off runways
         baseStart = [
           finalStart[0] + (extendedBaseWidth * Math.cos(perpRad)) / 111320,
           finalStart[1] + (extendedBaseWidth * Math.sin(perpRad)) / (111320 * Math.cos(activeLandingLat * Math.PI / 180))
         ];
 
-        const downwindLength = 380;
+        const downwindLength = 260; // Shortened downwind length
         downwindEnd = [
           baseStart[0] + (downwindLength * Math.cos(circuitRad)) / 111320,
           baseStart[1] + (downwindLength * Math.sin(circuitRad)) / (111320 * Math.cos(activeLandingLat * Math.PI / 180))
