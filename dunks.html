@@ -355,7 +355,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 2.9.1</div>
+    <div class="rev-badge">REV: 2.9.3</div>
   </div>
 
   <div class="dashboard-container">
@@ -518,6 +518,7 @@
         <div class="radar-frame-box">
           <iframe 
             src="https://embed.windy.com/embed2.html?lat=50.860619&lon=-3.233961&detailLat=50.860619&detailLon=-3.233961&width=100%25&height=220&zoom=11&level=surface&overlay=satellite&product=satellite&menu=false&message=false&marker=true&calendar=false&pressure=false&type=map&location=coordinates&detail=false&play=true&metricWind=mph&metricTemp=%C2%B0C" 
+            data-testid="embed-iframe"
             allowfullscreen>
           </iframe>
         </div>
@@ -618,6 +619,7 @@
       }
     }
 
+    // Zoom-independent pixel offset converter using Leaflet's projection container
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
       windRoseLayerGroup.clearLayers();
       manualLayerGroup.clearLayers();
@@ -633,23 +635,22 @@
         { name: 'ECMWF',    dir: ecmwfDir, spd: ecmwfSpd, gst: ecmwfGst, color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)' }
       ];
 
-      // ZOOM-INDEPENDENT PIXEL-TO-METRIC OFFSETS FOR CLEAN WINDY-STYLE FANNING
-      // Using a fixed small meter delta so vanes remain snugly locked right on the runway intersection at any zoom level
-      const baseDistanceMeters = 45;
-      const spreadStepMeters = 18;
+      const centerPoint = map.latLngToLayerPoint([lat, lon]);
+      const basePixelLength = 35;
+      const spreadPixelStep = 22;
 
       rawModels.forEach((m, idx) => {
-        const distMeters = baseDistanceMeters + (idx * spreadStepMeters);
+        const totalPixels = basePixelLength + (idx * spreadPixelStep);
+        const rad = ((m.dir - 90) * Math.PI) / 180; // convert met met-bearing to screen radians
         
-        // Convert bearing & meter offset into lat/lon delta cleanly
-        const rad = (m.dir * Math.PI) / 180;
-        const dLat = (distMeters * Math.cos(rad)) / 111320;
-        const dLon = (distMeters * Math.sin(rad)) / (111320 * Math.cos(lat * Math.PI / 180));
+        // Compute pixel offset from center point
+        const targetX = centerPoint.x + (totalPixels * Math.cos(rad));
+        const targetY = centerPoint.y + (totalPixels * Math.sin(rad));
+        
+        const endLatLng = map.layerPointToLatLng([targetX, targetY]);
 
-        const endLat = lat + dLat;
-        const endLon = lon + dLon;
-
-        L.polyline([[lat, lon], [endLat, endLon]], {
+        // Draw line from center to pill base
+        L.polyline([[lat, lon], [endLatLng.lat, endLatLng.lon]], {
           color: m.color, weight: 2.2, opacity: 0.85
         }).addTo(windRoseLayerGroup);
 
@@ -665,7 +666,7 @@
           </div>
         `;
 
-        L.marker([endLat, endLon], {
+        L.marker([endLatLng.lat, endLatLng.lon], {
           icon: L.divIcon({ html: pillHTML, className: '', iconSize: [120, 22], iconAnchor: [0, 11] })
         }).addTo(windRoseLayerGroup);
       });
@@ -730,6 +731,11 @@
         document.getElementById('card-spot-dist').innerText = `${autoSpotOffset.toFixed(2)} NM`;
       }
     }
+
+    // Re-render layer pixel offsets seamlessly whenever the user zooms the map in or out!
+    map.on('zoomend', () => {
+      if (cachedWeatherData) updateWindRoseOnMap(...cachedWeatherData);
+    });
 
     async function fetchModelData() {
       const surfaceParams = `latitude=${lat}&longitude=${lon}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,temperature_2m,dewpoint_2m,cloud_cover&wind_speed_unit=mph&forecast_days=1`;
