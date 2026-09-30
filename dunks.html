@@ -342,7 +342,7 @@
     }
 
     .jumprun-arrow {
-      color: #ffffff;
+      color: #00d8ff;
       font-size: 16px;
       font-weight: bold;
       text-shadow: 0 0 6px #000;
@@ -393,7 +393,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 4.1.0</div>
+    <div class="rev-badge">REV: 4.2.0</div>
   </div>
 
   <div class="dashboard-container">
@@ -583,9 +583,9 @@
     const lon = -3.233961;
     const fieldElevationFt = 839;
 
-    // Dedicated Landing Paddock Coordinates (Offset slightly to the side of the runway/windsock area)
-    const landingLat = 50.859200;
-    const landingLon = -3.237500;
+    // Dedicated Landing Paddock Coordinates (Updated)
+    const landingLat = 50.86165235645555;
+    const landingLon = -3.2365503955361716;
 
     // Main Left Map
     const map = L.map('map', { zoomControl: false }).setView([lat, lon], 15);
@@ -791,20 +791,21 @@
         const startManRun = computeDestinationPoint(lat, lon, (manualHeading + 180) % 360, 0.4);
         const endManRun = computeDestinationPoint(lat, lon, manualHeading, manualOffset * 1.4);
 
+        // MANUAL JUMP-RUN COLORED ELECTRIC BLUE (#00d8ff)
         L.polyline([[startManRun.lat, startManRun.lon], [endManRun.lat, endManRun.lon]], {
-          color: '#ff9800', weight: 3.5, dashArray: '4,4', opacity: 1
+          color: '#00d8ff', weight: 3.5, dashArray: '4,4', opacity: 1
         }).addTo(manualLayerGroup);
 
         let manArrowAngle = (manualHeading - 90 + 360) % 360;
         L.marker([endManRun.lat, endManRun.lon], {
           icon: L.divIcon({
-            html: `<div class="jumprun-arrow" style="color:#ff9800; transform: rotate(${manArrowAngle}deg);">▶</div>`,
+            html: `<div class="jumprun-arrow" style="color:#00d8ff; transform: rotate(${manArrowAngle}deg);">▶</div>`,
             className: '', iconSize: [16, 16], iconAnchor: [8, 8]
           })
         }).addTo(manualLayerGroup);
 
         L.circleMarker([manSpotPt.lat, manSpotPt.lon], {
-          pane: 'topSpotPane', radius: 8, fillColor: '#ff9800', color: '#ffffff', weight: 2.5, fillOpacity: 1
+          pane: 'topSpotPane', radius: 8, fillColor: '#00d8ff', color: '#ffffff', weight: 2.5, fillOpacity: 1
         }).addTo(manualLayerGroup);
 
         document.getElementById('card-runin').innerText = `${Math.round(manualHeading)}° M (MAN)`;
@@ -816,7 +817,7 @@
 
       // ==========================================
       // SPLIT LANDING CIRCUIT (J-SHAPE PATTERN)
-      // Anchored over the dedicated landing paddock
+      // Anchored over the landing paddock (Orange #ff9800)
       // ==========================================
       const circuitSide = document.getElementById('select-circuit-side').value; // 'left' or 'right'
       const landingHeading = avgWindDir; 
