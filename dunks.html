@@ -387,7 +387,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.3.0</div>
+    <div class="rev-badge">REV: 5.4.0</div>
   </div>
 
   <div class="dashboard-container">
@@ -431,7 +431,7 @@
             </div>
           </div>
 
-          <!-- LANDING PATTERN MANUAL CONTROLS -->
+          <!-- 8-SECTOR LANDING PATTERN MANUAL CONTROLS -->
           <div class="control-slider-group">
             <div class="slider-row">
               <span style="color:#ff9800; font-weight:bold;">Landing Mode:</span>
@@ -439,8 +439,17 @@
             </div>
             <div id="landing-manual-controls" style="display: none; flex-direction: column; gap: 3px; margin-top: 3px;">
               <div class="slider-row">
-                <span>Direction:</span>
-                <input type="range" id="slider-landing-dir" min="0" max="359" value="144" oninput="updateDashboardMap()" style="accent-color: #ff9800;">
+                <span>Wind Sector:</span>
+                <select id="select-wind-sector" onchange="updateDashboardMap()" style="background:#131b2e; color:#ff9800; border:1px solid #ff9800; font-size:0.55rem; font-weight:bold; border-radius:2px; width:110px;">
+                  <option value="0">N (330° - 030°)</option>
+                  <option value="45">NE (030° - 075°)</option>
+                  <option value="90">E (075° - 120°)</option>
+                  <option value="135">SE (120° - 165°)</option>
+                  <option value="170">S (165° - 195°)</option>
+                  <option value="220" selected>SW (195° - 240°)</option>
+                  <option value="270">W (240° - 285°)</option>
+                  <option value="315">NW (285° - 330°)</option>
+                </select>
               </div>
             </div>
             <div class="slider-row" style="margin-top: 3px;">
@@ -709,6 +718,32 @@
       return (Math.atan2(s, c) * 180 / Math.PI + 360) % 360;
     }
 
+    function getRough8Sector(deg) {
+      const normalized = (deg + 360) % 360;
+      const sectors = [
+        { name: 'N', center: 0, rwy: 350 },
+        { name: 'NE', center: 45, rwy: 40 },
+        { name: 'E', center: 90, rwy: 40 },
+        { name: 'SE', center: 135, rwy: 170 },
+        { name: 'S', center: 180, rwy: 170 },
+        { name: 'SW', center: 225, rwy: 220 },
+        { name: 'W', center: 270, rwy: 220 },
+        { name: 'NW', center: 315, rwy: 350 }
+      ];
+
+      let closest = sectors[0];
+      let minDist = 360;
+      sectors.forEach(s => {
+        let dist = Math.abs(normalized - s.center);
+        if (dist > 180) dist = 360 - dist;
+        if (dist < minDist) {
+          minDist = dist;
+          closest = s;
+        }
+      });
+      return closest;
+    }
+
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
       windRoseLayerGroup.clearLayers();
       manualJumpLayerGroup.clearLayers();
@@ -827,35 +862,31 @@
       }
 
       // ==========================================
-      // EXACT RUNWAY-ALIGNED LANDING CIRCUIT LOGIC
+      // 8-SECTOR ROUGH LANDING PATTERN LOGIC
       // ==========================================
-      let landingHeading = avgWindDir;
+      let activeSector;
       if (isLandingManual) {
-        landingHeading = parseFloat(document.getElementById('slider-landing-dir').value);
+        const sectorVal = parseFloat(document.getElementById('select-wind-sector').value);
+        // Find sector matching value
+        const sectorsMap = { 0: 'N', 45: 'NE', 90: 'E', 135: 'SE', 170: 'S', 220: 'SW', 270: 'W', 315: 'NW' };
+        const matchedRwy = { 0: 350, 45: 40, 90: 40, 135: 170, 170: 170, 220: 220, 270: 220, 315: 350 };
+        activeSector = { name: sectorsMap[sectorVal], rwy: matchedRwy[sectorVal] };
       } else {
-        document.getElementById('slider-landing-dir').value = Math.round(avgWindDir);
-      }
-
-      // Snap to exact active runway headings: 040, 170, 220, 350
-      const runwayHeadings = [40, 170, 220, 350];
-      let activeRwyHdg = runwayHeadings[0];
-      let minDiff = 180;
-      runwayHeadings.forEach(rh => {
-        let diff = Math.abs((landingHeading - rh + 540) % 360 - 180);
-        if (diff < minDiff) {
-          minDiff = diff;
-          activeRwyHdg = rh;
+        activeSector = getRough8Sector(avgWindDir);
+        // Sync manual dropdown selector to auto sector for convenience
+        const reverseVal = { 350: 0, 40: 45, 170: 170, 220: 220 };
+        if (reverseVal[activeSector.rwy] !== undefined) {
+          document.getElementById('select-wind-sector').value = reverseVal[activeSector.rwy];
         }
-      });
+      }
 
       let circuitSide = document.getElementById('select-circuit-side').value; 
       if (circuitSide === 'auto') {
         circuitSide = 'right'; // Keeps downwind furthest away on the western grass paddock side
       }
 
-      // Snap landing heading used for drawing straight down the active runway centerline axis
-      const alignedHeading = activeRwyHdg;
-      const circuitRad = (alignedHeading * Math.PI) / 180;
+      const activeRwyHdg = activeSector.rwy;
+      const circuitRad = (activeRwyHdg * Math.PI) / 180;
       const perpRad = circuitRad + (circuitSide === 'right' ? -Math.PI / 2 : Math.PI / 2);
 
       // Touchdown marker at paddock
@@ -863,8 +894,8 @@
         radius: 6, fillColor: '#ff9800', color: '#ffffff', weight: 2, fillOpacity: 1
       }).addTo(circuitLayerGroup);
 
-      // Final approach arrow aligned strictly with runway heading
-      let finalArrowAngle = (alignedHeading - 90 + 360) % 360;
+      // Final approach arrow
+      let finalArrowAngle = (activeRwyHdg - 90 + 360) % 360;
       L.marker([landingLat, landingLon], {
         icon: L.divIcon({
           html: `<div class="circuit-arrow" style="transform: rotate(${finalArrowAngle}deg);">▶</div>`,
@@ -905,7 +936,7 @@
       }).addTo(circuitLayerGroup);
 
       L.marker(downwindEnd, {
-        icon: L.divIcon({ html: `<div class="circuit-label">DOWNWIND (RWY ${activeRwyHdg}°)</div>`, className: '', iconSize: [130, 16], iconAnchor: [65, 8] })
+        icon: L.divIcon({ html: `<div class="circuit-label">DOWNWIND (${activeSector.name} / RWY ${activeRwyHdg}°)</div>`, className: '', iconSize: [150, 16], iconAnchor: [75, 8] })
       }).addTo(circuitLayerGroup);
     }
 
