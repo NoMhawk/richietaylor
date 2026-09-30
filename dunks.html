@@ -1,4 +1,4 @@
-<!-- REV: 5.7.6 - SKYDIVE SOUTHWEST OPERATIONS DASHBOARD -->
+<!-- REV: 5.7.8 - SKYDIVE SOUTHWEST OPERATIONS DASHBOARD -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -437,7 +437,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.7.6</div>
+    <div class="rev-badge">REV: 5.7.8</div>
   </div>
 
   <div class="dashboard-container">
@@ -948,8 +948,8 @@
 
       const sectorTurnDirections = {
         'N': 'left',
-        'NE': 'left', // NE sector explicitly uses a LEFT-hand pattern keeping away from the runway
-        'E': 'right',
+        'NE': 'left',
+        'E': 'left',  // East sector configured as left-hand pattern with extended base to keep downwind off the runway
         'SE': 'right',
         'S': 'right',
         'SW': 'right',
@@ -981,8 +981,24 @@
 
       let baseStart, downwindEnd, circuitCoords, labelPosition;
 
-      if (activeSector.name === 'NE') {
-        // NE sector: LEFT-hand pattern with downwind leg coming from the north positioned further west (away from runway)
+      if (activeSector.name === 'E') {
+        // East sector: Left-hand pattern with a long extended base leg so downwind is safely away from the runway
+        const perpRad = circuitRad - Math.PI / 2; // Left side
+        const extendedBaseWidth = 320; // Long base leg
+        baseStart = [
+          finalStart[0] + (extendedBaseWidth * Math.cos(perpRad)) / 111320,
+          finalStart[1] + (extendedBaseWidth * Math.sin(perpRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
+        ];
+
+        const downwindLength = 380;
+        downwindEnd = [
+          baseStart[0] + (downwindLength * Math.cos(circuitRad)) / 111320,
+          baseStart[1] + (downwindLength * Math.sin(circuitRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
+        ];
+
+        circuitCoords = [[landingLat, landingLon], finalStart, baseStart, downwindEnd];
+        labelPosition = downwindEnd;
+      } else if (activeSector.name === 'NE') {
         const downwindStart = [
           landingLat + (380 * Math.cos(0)) / 111320,
           landingLon - (280 * Math.sin(0.5)) / (111320 * Math.cos(landingLat * Math.PI / 180)) - 0.0018
