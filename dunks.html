@@ -350,6 +350,15 @@
       pointer-events: none;
     }
 
+    .circuit-arrow {
+      color: #ff9800;
+      font-size: 16px;
+      font-weight: bold;
+      text-shadow: 0 0 6px #000;
+      line-height: 1;
+      pointer-events: none;
+    }
+
     /* Custom SDSW Dropzone Marker Style */
     .sdsw-dz-marker {
       display: flex;
@@ -393,7 +402,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 4.2.0</div>
+    <div class="rev-badge">REV: 4.3.0</div>
   </div>
 
   <div class="dashboard-container">
@@ -583,7 +592,7 @@
     const lon = -3.233961;
     const fieldElevationFt = 839;
 
-    // Dedicated Landing Paddock Coordinates (Updated)
+    // Dedicated Landing Paddock Coordinates
     const landingLat = 50.86165235645555;
     const landingLon = -3.2365503955361716;
 
@@ -791,7 +800,6 @@
         const startManRun = computeDestinationPoint(lat, lon, (manualHeading + 180) % 360, 0.4);
         const endManRun = computeDestinationPoint(lat, lon, manualHeading, manualOffset * 1.4);
 
-        // MANUAL JUMP-RUN COLORED ELECTRIC BLUE (#00d8ff)
         L.polyline([[startManRun.lat, startManRun.lon], [endManRun.lat, endManRun.lon]], {
           color: '#00d8ff', weight: 3.5, dashArray: '4,4', opacity: 1
         }).addTo(manualLayerGroup);
@@ -817,7 +825,7 @@
 
       // ==========================================
       // SPLIT LANDING CIRCUIT (J-SHAPE PATTERN)
-      // Anchored over the landing paddock (Orange #ff9800)
+      // Extended downwind leg & final approach arrow
       // ==========================================
       const circuitSide = document.getElementById('select-circuit-side').value; // 'left' or 'right'
       const landingHeading = avgWindDir; 
@@ -829,8 +837,16 @@
         radius: 6, fillColor: '#ff9800', color: '#ffffff', weight: 2, fillOpacity: 1
       }).addTo(circuitLayerGroup);
 
+      // Final approach arrow pointing into the landing direction
+      let finalArrowAngle = (landingHeading - 90 + 360) % 360;
+      L.marker([landingLat, landingLon], {
+        icon: L.divIcon({
+          html: `<div class="circuit-arrow" style="transform: rotate(${finalArrowAngle}deg);">▶</div>`,
+          className: '', iconSize: [16, 16], iconAnchor: [8, 8]
+        })
+      }).addTo(circuitLayerGroup);
+
       const finalStartDist = 160; 
-      const touchDown = [landingLat, landingLon];
       const finalStart = [
         landingLat - (finalStartDist * Math.cos(circuitRad)) / 111320,
         landingLon - (finalStartDist * Math.sin(circuitRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
@@ -842,13 +858,14 @@
         finalStart[1] + (baseDist * Math.sin(perpRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
       ];
 
-      const downwindLength = 260; 
+      // Lengthened downwind leg (increased from 260m to 420m)
+      const downwindLength = 420; 
       const downwindEnd = [
         baseStart[0] + (downwindLength * Math.cos(circuitRad)) / 111320,
         baseStart[1] + (downwindLength * Math.sin(circuitRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
       ];
 
-      const circuitCoords = [touchDown, finalStart, baseStart, downwindEnd];
+      const circuitCoords = [[landingLat, landingLon], finalStart, baseStart, downwindEnd];
       L.polyline(circuitCoords, {
         color: '#ff9800', weight: 3, dashArray: '5,5', opacity: 0.95
       }).addTo(circuitLayerGroup);
