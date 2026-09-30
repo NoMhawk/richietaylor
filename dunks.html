@@ -355,7 +355,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 3.0.4</div>
+    <div class="rev-badge">REV: 3.0.5</div>
   </div>
 
   <div class="dashboard-container">
@@ -642,8 +642,9 @@
       rawModels.forEach((m, idx) => {
         const distMeters = baseDistanceMeters + (idx * spreadStepMeters);
         
-        // WINDWARD SIDE: Project outward toward m.dir (where wind is coming from relative to center, pointing upwind)
-        const rad = (m.dir * Math.PI) / 180;
+        // WINDWARD UPWIND ANCHORING: Projects backward from center [lat, lon] into the wind (m.dir + 180)
+        const windwardBearing = (m.dir + 180) % 360;
+        const rad = (windwardBearing * Math.PI) / 180;
         
         const dLat = (distMeters * Math.cos(rad)) / 111320;
         const dLon = (distMeters * Math.sin(rad)) / (111320 * Math.cos(lat * Math.PI / 180));
@@ -651,11 +652,12 @@
         const endLat = lat + dLat;
         const endLon = lon + dLon;
 
+        // Draw line starting at the center intersection extending upwind
         L.polyline([[lat, lon], [endLat, endLon]], {
           color: m.color, weight: 2.2, opacity: 0.85
         }).addTo(windRoseLayerGroup);
 
-        let cssRotationAngle = (m.dir - 90 + 360) % 360;
+        let cssRotationAngle = (windwardBearing - 90 + 360) % 360;
         if (cssRotationAngle > 90 && cssRotationAngle < 270) {
           cssRotationAngle = (cssRotationAngle + 180) % 360;
         }
