@@ -1,4 +1,4 @@
-<!-- REV: 5.9.4 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 5.9.5 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -333,7 +333,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.9.4</div>
+    <div class="rev-badge">REV: 5.9.5</div>
   </div>
 
   <div class="dashboard-container">
@@ -365,7 +365,7 @@
             <div class="overlay-value accent-cyan" id="ov-winddir">--°</div>
           </div>
           <div class="overlay-cell">
-            <div class="overlay-label">Landing Runway</div>
+            <div class="overlay-label">Into-Wind Rwy</div>
             <div class="overlay-value accent-cyan" id="ov-pattern-wind">--°</div>
           </div>
         </div>
@@ -607,29 +607,19 @@
       return (Math.atan2(s, c) * 180 / Math.PI + 360) % 360;
     }
 
-    function getDunkeswellRunway(avgDir) {
+    function getDunkeswellRunwayFromWind(avgDir) {
       const norm = (avgDir + 360) % 360;
-      // Dunkeswell primary runway alignment is roughly 040° / 220° (Rwy 04 / Rwy 22)
-      // We calculate headwind component for Rwy 04 (heading 40) vs Rwy 22 (heading 220)
-      const rwy04Rad = (40 * Math.PI) / 180;
-      const windRad = (norm * Math.PI) / 180;
-      
-      const headwind04 = Math.cos(windRad - rwy04Rad);
-      
-      if (headwind04 >= 0) {
-        // Into wind favors Rwy 04 (heading 040)
-        return { name: '04', rwy: 40, sectorName: getSectorName(norm) };
-      } else {
-        // Into wind favors Rwy 22 (heading 220)
-        return { name: '22', rwy: 220, sectorName: getSectorName(norm) };
-      }
-    }
-
-    function getSectorName(deg) {
-      const normalized = (deg + 360) % 360;
+      // Map wind direction to 8 sectors, taking into account into-wind runway alignment (Rwy 04 vs Rwy 22)
+      const sectorIndex = Math.round(norm / 45) % 8;
       const sectors = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-      const index = Math.round(normalized / 45) % 8;
-      return sectors[index];
+      const sectorName = sectors[sectorIndex];
+
+      // Into-wind calculation: winds from South/West/North favor landing on Rwy 04 (heading 040 into wind), 
+      // while winds from East/North-East favor landing on Rwy 22 (heading 220 into wind) or reciprocal.
+      const rwyHdg = (norm >= 120 && norm <= 300) ? 40 : 220;
+      const rwyName = rwyHdg === 40 ? '04' : '22';
+
+      return { name: rwyName, rwy: rwyHdg, sectorName: sectorName };
     }
 
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
@@ -749,7 +739,7 @@
       }
 
       // ==========================================
-      // RUNWAY & LANDING PATTERN ROUTing
+      // WIND-DRIVEN LANDING PATTERN & RUNWAY ROUTING
       // ==========================================
       let activeRwyData;
       if (isLandingManual) {
@@ -758,12 +748,11 @@
         const matchedRwy = { 0: 360, 45: 40, 90: 90, 135: 170, 170: 170, 220: 220, 270: 270, 315: 320 };
         activeRwyData = { name: matchedRwy[sectorVal] === 40 ? '04' : '22', rwy: matchedRwy[sectorVal], sectorName: sectorsMap[sectorVal] };
       } else {
-        activeRwyData = getDunkeswellRunway(avgWindDir);
+        activeRwyData = getDunkeswellRunwayFromWind(avgWindDir);
       }
 
       const activeRwyHdg = activeRwyData.rwy;
       const circuitRad = (activeRwyHdg * Math.PI) / 180;
-      const circuitSide = 'left'; // Standard left-hand traffic
 
       let activeLandingLat = defaultLandingLat;
       let activeLandingLon = defaultLandingLon;
