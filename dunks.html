@@ -355,7 +355,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 2.9.0</div>
+    <div class="rev-badge">REV: 2.9.1</div>
   </div>
 
   <div class="dashboard-container">
@@ -633,15 +633,23 @@
         { name: 'ECMWF',    dir: ecmwfDir, spd: ecmwfSpd, gst: ecmwfGst, color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)' }
       ];
 
-      const rayLengthNM = 0.14;
-      const fanOffsets = [-0.015, 0.0, 0.015];
+      // ZOOM-INDEPENDENT PIXEL-TO-METRIC OFFSETS FOR CLEAN WINDY-STYLE FANNING
+      // Using a fixed small meter delta so vanes remain snugly locked right on the runway intersection at any zoom level
+      const baseDistanceMeters = 45;
+      const spreadStepMeters = 18;
 
       rawModels.forEach((m, idx) => {
-        const endPt = computeDestinationPoint(lat, lon, m.dir, rayLengthNM);
-        const fannedLat = endPt.lat + fanOffsets[idx];
-        const fannedLon = endPt.lon + (fanOffsets[idx] * 1.5);
+        const distMeters = baseDistanceMeters + (idx * spreadStepMeters);
+        
+        // Convert bearing & meter offset into lat/lon delta cleanly
+        const rad = (m.dir * Math.PI) / 180;
+        const dLat = (distMeters * Math.cos(rad)) / 111320;
+        const dLon = (distMeters * Math.sin(rad)) / (111320 * Math.cos(lat * Math.PI / 180));
 
-        L.polyline([[lat, lon], [fannedLat, fannedLon]], {
+        const endLat = lat + dLat;
+        const endLon = lon + dLon;
+
+        L.polyline([[lat, lon], [endLat, endLon]], {
           color: m.color, weight: 2.2, opacity: 0.85
         }).addTo(windRoseLayerGroup);
 
@@ -657,7 +665,7 @@
           </div>
         `;
 
-        L.marker([fannedLat, fannedLon], {
+        L.marker([endLat, endLon], {
           icon: L.divIcon({ html: pillHTML, className: '', iconSize: [120, 22], iconAnchor: [0, 11] })
         }).addTo(windRoseLayerGroup);
       });
