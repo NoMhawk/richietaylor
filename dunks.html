@@ -355,7 +355,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 2.9.3</div>
+    <div class="rev-badge">REV: 2.9.5</div>
   </div>
 
   <div class="dashboard-container">
@@ -518,7 +518,6 @@
         <div class="radar-frame-box">
           <iframe 
             src="https://embed.windy.com/embed2.html?lat=50.860619&lon=-3.233961&detailLat=50.860619&detailLon=-3.233961&width=100%25&height=220&zoom=11&level=surface&overlay=satellite&product=satellite&menu=false&message=false&marker=true&calendar=false&pressure=false&type=map&location=coordinates&detail=false&play=true&metricWind=mph&metricTemp=%C2%B0C" 
-            data-testid="embed-iframe"
             allowfullscreen>
           </iframe>
         </div>
@@ -545,7 +544,8 @@
     let manualLayerGroup = L.layerGroup().addTo(map);
 
     let isManualMode = false;
-    let cachedWeatherData = null;
+    // Pre-populate with safe default weather data so the vanes render instantly on load!
+    let cachedWeatherData = [144, 18, 30, 144, 20, 30, 144, 18, 33];
 
     function getArrow(deg) {
       if (deg === undefined || deg === null) return '↑';
@@ -619,7 +619,6 @@
       }
     }
 
-    // Zoom-independent pixel offset converter using Leaflet's projection container
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
       windRoseLayerGroup.clearLayers();
       manualLayerGroup.clearLayers();
@@ -635,22 +634,20 @@
         { name: 'ECMWF',    dir: ecmwfDir, spd: ecmwfSpd, gst: ecmwfGst, color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)' }
       ];
 
-      const centerPoint = map.latLngToLayerPoint([lat, lon]);
-      const basePixelLength = 35;
-      const spreadPixelStep = 22;
+      const baseDistanceMeters = 35;
+      const spreadStepMeters = 18;
 
       rawModels.forEach((m, idx) => {
-        const totalPixels = basePixelLength + (idx * spreadPixelStep);
-        const rad = ((m.dir - 90) * Math.PI) / 180; // convert met met-bearing to screen radians
+        const distMeters = baseDistanceMeters + (idx * spreadStepMeters);
         
-        // Compute pixel offset from center point
-        const targetX = centerPoint.x + (totalPixels * Math.cos(rad));
-        const targetY = centerPoint.y + (totalPixels * Math.sin(rad));
-        
-        const endLatLng = map.layerPointToLatLng([targetX, targetY]);
+        const rad = (m.dir * Math.PI) / 180;
+        const dLat = (distMeters * Math.cos(rad)) / 111320;
+        const dLon = (distMeters * Math.sin(rad)) / (111320 * Math.cos(lat * Math.PI / 180));
 
-        // Draw line from center to pill base
-        L.polyline([[lat, lon], [endLatLng.lat, endLatLng.lon]], {
+        const endLat = lat + dLat;
+        const endLon = lon + dLon;
+
+        L.polyline([[lat, lon], [endLat, endLon]], {
           color: m.color, weight: 2.2, opacity: 0.85
         }).addTo(windRoseLayerGroup);
 
@@ -666,8 +663,8 @@
           </div>
         `;
 
-        L.marker([endLatLng.lat, endLatLng.lon], {
-          icon: L.divIcon({ html: pillHTML, className: '', iconSize: [120, 22], iconAnchor: [0, 11] })
+        L.marker([endLat, endLon], {
+          icon: L.divIcon({ html: pillHTML, className: '', iconSize: [120, 22], iconAnchor: [-2, 11] })
         }).addTo(windRoseLayerGroup);
       });
 
@@ -732,7 +729,9 @@
       }
     }
 
-    // Re-render layer pixel offsets seamlessly whenever the user zooms the map in or out!
+    // Render immediately on load using fallback weather data
+    updateWindRoseOnMap(...cachedWeatherData);
+
     map.on('zoomend', () => {
       if (cachedWeatherData) updateWindRoseOnMap(...cachedWeatherData);
     });
