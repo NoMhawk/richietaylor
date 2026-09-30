@@ -387,7 +387,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.2.0</div>
+    <div class="rev-badge">REV: 5.3.0</div>
   </div>
 
   <div class="dashboard-container">
@@ -827,7 +827,7 @@
       }
 
       // ==========================================
-      // RULE-BASED LANDING CIRCUIT LOGIC (040, 220, 170, 350)
+      // EXACT RUNWAY-ALIGNED LANDING CIRCUIT LOGIC
       // ==========================================
       let landingHeading = avgWindDir;
       if (isLandingManual) {
@@ -836,25 +836,26 @@
         document.getElementById('slider-landing-dir').value = Math.round(avgWindDir);
       }
 
-      // Snap to exact active runway headings: 040, 220, 170, 350
+      // Snap to exact active runway headings: 040, 170, 220, 350
       const runwayHeadings = [40, 170, 220, 350];
-      let bestRwyHdg = runwayHeadings[0];
+      let activeRwyHdg = runwayHeadings[0];
       let minDiff = 180;
       runwayHeadings.forEach(rh => {
         let diff = Math.abs((landingHeading - rh + 540) % 360 - 180);
         if (diff < minDiff) {
           minDiff = diff;
-          bestRwyHdg = rh;
+          activeRwyHdg = rh;
         }
       });
 
       let circuitSide = document.getElementById('select-circuit-side').value; 
       if (circuitSide === 'auto') {
-        // Automatically selects side that keeps downwind furthest away from active tarmac
-        circuitSide = 'right';
+        circuitSide = 'right'; // Keeps downwind furthest away on the western grass paddock side
       }
 
-      const circuitRad = (landingHeading * Math.PI) / 180;
+      // Snap landing heading used for drawing straight down the active runway centerline axis
+      const alignedHeading = activeRwyHdg;
+      const circuitRad = (alignedHeading * Math.PI) / 180;
       const perpRad = circuitRad + (circuitSide === 'right' ? -Math.PI / 2 : Math.PI / 2);
 
       // Touchdown marker at paddock
@@ -862,8 +863,8 @@
         radius: 6, fillColor: '#ff9800', color: '#ffffff', weight: 2, fillOpacity: 1
       }).addTo(circuitLayerGroup);
 
-      // Final approach arrow
-      let finalArrowAngle = (landingHeading - 90 + 360) % 360;
+      // Final approach arrow aligned strictly with runway heading
+      let finalArrowAngle = (alignedHeading - 90 + 360) % 360;
       L.marker([landingLat, landingLon], {
         icon: L.divIcon({
           html: `<div class="circuit-arrow" style="transform: rotate(${finalArrowAngle}deg);">▶</div>`,
@@ -871,32 +872,26 @@
         })
       }).addTo(circuitLayerGroup);
 
-      // Enforcing strict max 90-degree final turn angle & zero runway crossing via dogleg
-      const finalLegDist = 140; 
+      // Strictly aligned rectangular circuit legs with exactly 90-degree turns and zero runway crossing
+      const finalLegDist = 130; 
       const finalStart = [
         landingLat - (finalLegDist * Math.cos(circuitRad)) / 111320,
         landingLon - (finalLegDist * Math.sin(circuitRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
       ];
 
-      const baseWidth = 160; 
+      const baseWidth = 140; 
       const baseStart = [
         finalStart[0] + (baseWidth * Math.cos(perpRad)) / 111320,
         finalStart[1] + (baseWidth * Math.sin(perpRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
       ];
 
-      const downwindLength = 420; 
+      const downwindLength = 400; 
       const downwindEnd = [
         baseStart[0] + (downwindLength * Math.cos(circuitRad)) / 111320,
         baseStart[1] + (downwindLength * Math.sin(circuitRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
       ];
 
-      // Dogleg intermediate point to guarantee no runway crossings
-      const doglegMid = [
-        (finalStart[0] + baseStart[0]) / 2 + (25 * Math.cos(circuitRad)) / 111320,
-        (finalStart[1] + baseStart[1]) / 2 + (25 * Math.sin(circuitRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
-      ];
-
-      const circuitCoords = [[landingLat, landingLon], finalStart, doglegMid, baseStart, downwindEnd];
+      const circuitCoords = [[landingLat, landingLon], finalStart, baseStart, downwindEnd];
       L.polyline(circuitCoords, {
         color: '#ff9800', weight: 3, dashArray: '5,5', opacity: 0.95
       }).addTo(circuitLayerGroup);
@@ -910,7 +905,7 @@
       }).addTo(circuitLayerGroup);
 
       L.marker(downwindEnd, {
-        icon: L.divIcon({ html: `<div class="circuit-label">DOWNWIND (RWY ${bestRwyHdg}°)</div>`, className: '', iconSize: [120, 16], iconAnchor: [60, 8] })
+        icon: L.divIcon({ html: `<div class="circuit-label">DOWNWIND (RWY ${activeRwyHdg}°)</div>`, className: '', iconSize: [130, 16], iconAnchor: [65, 8] })
       }).addTo(circuitLayerGroup);
     }
 
