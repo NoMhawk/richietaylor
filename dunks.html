@@ -355,7 +355,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 3.0.0</div>
+    <div class="rev-badge">REV: 3.0.1</div>
   </div>
 
   <div class="dashboard-container">
@@ -438,7 +438,7 @@
       <!-- COMPACT WINDS ALOFT PROFILE -->
       <div class="pane-segment" style="flex: 0 0 auto;">
         <div class="pane-header">
-          <div class="title">✈️️ Winds Aloft Profile</div>
+          <div class="title">✈️ Winds Aloft Profile</div>
           <div class="subtitle">EGTU (839')</div>
         </div>
 
@@ -642,8 +642,8 @@
       rawModels.forEach((m, idx) => {
         const distMeters = baseDistanceMeters + (idx * spreadStepMeters);
         
-        // Correct vector angle matching meteorological origin
-        const rad = ((m.dir - 90) * Math.PI) / 180;
+        // Correct vector projecting down-wind along the true heading
+        const rad = ((m.dir - 180) * Math.PI) / 180;
         
         const dLat = (distMeters * Math.cos(rad)) / 111320;
         const dLon = (distMeters * Math.sin(rad)) / (111320 * Math.cos(lat * Math.PI / 180));
@@ -655,7 +655,7 @@
           color: m.color, weight: 2.2, opacity: 0.85
         }).addTo(windRoseLayerGroup);
 
-        let cssRotationAngle = (m.dir + 90) % 360;
+        let cssRotationAngle = (m.dir - 270) % 360;
         if (cssRotationAngle > 90 && cssRotationAngle < 270) {
           cssRotationAngle = (cssRotationAngle + 180) % 360;
         }
