@@ -386,7 +386,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.6.2</div>
+    <div class="rev-badge">REV: 5.6.3</div>
   </div>
 
   <div class="dashboard-container">
@@ -430,85 +430,33 @@
             </div>
           </div>
 
-// ==========================================
-      // 8-SECTOR LANDING PATTERN ROUTING
-      // ==========================================
-      let activeSector;
-      if (isLandingManual) {
-        const sectorVal = parseFloat(document.getElementById('select-wind-sector').value);
-        const sectorsMap = { 0: 'N', 45: 'NE', 90: 'E', 135: 'SE', 170: 'S', 220: 'SW', 270: 'W', 315: 'NW' };
-        const matchedRwy = { 0: 350, 45: 40, 90: 40, 135: 170, 170: 170, 220: 220, 270: 220, 315: 350 };
-        activeSector = { name: sectorsMap[sectorVal], rwy: matchedRwy[sectorVal] };
-      } else {
-        activeSector = getRough8Sector(avgWindDir);
-        const reverseVal = { 350: 0, 40: 45, 170: 170, 220: 220 };
-        if (reverseVal[activeSector.rwy] !== undefined) {
-          document.getElementById('select-wind-sector').value = reverseVal[activeSector.rwy];
-        }
-      }
+          <!-- 8-SECTOR LANDING PATTERN MANUAL CONTROLS -->
+          <div class="control-slider-group">
+            <div class="slider-row">
+              <span style="color:#ff9800; font-weight:bold;">Landing Mode:</span>
+              <button class="mode-toggle-btn" id="toggle-landing-btn" onclick="toggleLandingMode()" style="border-color:#ff9800; color:#ff9800;">AUTO</button>
+            </div>
+            <div id="landing-manual-controls" style="display: none; flex-direction: column; gap: 3px; margin-top: 3px;">
+              <div class="slider-row">
+                <span>Wind Sector:</span>
+                <select id="select-wind-sector" onchange="updateDashboardMap()" style="background:#131b2e; color:#ff9800; border:1px solid #ff9800; font-size:0.55rem; font-weight:bold; border-radius:2px; width:110px;">
+                  <option value="0" selected>N (330° - 030°)</option>
+                  <option value="45">NE (030° - 075°)</option>
+                  <option value="90">E (075° - 120°)</option>
+                  <option value="135">SE (120° - 165°)</option>
+                  <option value="170">S (165° - 195°)</option>
+                  <option value="220">SW (195° - 240°)</option>
+                  <option value="270">W (240° - 285°)</option>
+                  <option value="315">NW (285° - 330°)</option>
+                </select>
+              </div>
+            </div>
+          </div>
 
-      // Define whether each sector should use a LEFT or RIGHT pattern to stay clear of obstacles/runways
-      // Adjust these mapping rules as needed for each of the 8 sectors:
-      const sectorTurnDirections = {
-        'N': 'left',
-        'NE': 'left',
-        'E': 'right',
-        'SE': 'right',
-        'S': 'right',
-        'SW': 'right',
-        'W': 'left',
-        'NW': 'left'
-      };
+        </div>
 
-      let circuitSide = sectorTurnDirections[activeSector.name] || 'left';
-
-      const activeRwyHdg = activeSector.rwy;
-      const circuitRad = (activeRwyHdg * Math.PI) / 180;
-      
-      // Invert sign here so 'left' builds cleanly to the correct side of the centerline
-      const perpRad = circuitRad + (circuitSide === 'left' ? -Math.PI / 2 : Math.PI / 2);
-
-      L.circleMarker([landingLat, landingLon], {
-        radius: 6, fillColor: '#ff9800', color: '#ffffff', weight: 2, fillOpacity: 1
-      }).addTo(circuitLayerGroup);
-
-      let finalArrowAngle = (activeRwyHdg - 90 + 360) % 360;
-      L.marker([landingLat, landingLon], {
-        icon: L.divIcon({
-          html: `<div class="circuit-arrow" style="transform: rotate(${finalArrowAngle}deg);">▶</div>`,
-          className: '', iconSize: [16, 16], iconAnchor: [8, 8]
-        })
-      }).addTo(circuitLayerGroup);
-
-      const finalLegDist = 130; 
-      const finalStart = [
-        landingLat - (finalLegDist * Math.cos(circuitRad)) / 111320,
-        landingLon - (finalLegDist * Math.sin(circuitRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
-      ];
-
-      const baseWidth = 140; 
-      const baseStart = [
-        finalStart[0] + (baseWidth * Math.cos(perpRad)) / 111320,
-        finalStart[1] + (baseWidth * Math.sin(perpRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
-      ];
-
-      const downwindLength = 400; 
-      const downwindEnd = [
-        baseStart[0] + (downwindLength * Math.cos(circuitRad)) / 111320,
-        baseStart[1] + (downwindLength * Math.sin(circuitRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
-      ];
-
-      const circuitCoords = [[landingLat, landingLon], finalStart, baseStart, downwindEnd];
-      L.polyline(circuitCoords, {
-        color: '#ff9800', weight: 3, dashArray: '5,5', opacity: 0.95
-      }).addTo(circuitLayerGroup);
-
-      // Display LEFT or RIGHT turn indicator at the end of the downwind leg
-      const turnLabelText = circuitSide.toUpperCase();
-
-      L.marker(downwindEnd, {
-        icon: L.divIcon({ html: `<div class="circuit-label">${turnLabelText}</div>`, className: '', iconSize: [60, 16], iconAnchor: [30, 8] })
-      }).addTo(circuitLayerGroup);
+        <div id="map"></div>
+      </div>
 
       <!-- STREAMLINED MULTI-MODEL & CLOUD BASE TABLE -->
       <div class="multi-table-card">
@@ -913,13 +861,23 @@
         }
       }
 
-      // Automatically determine circuit side to stay away from the runway (Left for 350 runway, Right for 170 runway, etc.)
-      // Rwy 350 & 40 -> Left pattern; Rwy 170 & 220 -> Right pattern (or vice-versa depending on offset side)
-      let circuitSide = (activeSector.rwy === 350 || activeSector.rwy === 40) ? 'left' : 'right';
+      // Mapping rules for each of the 8 sectors to pick left or right turn patterns
+      const sectorTurnDirections = {
+        'N': 'left',
+        'NE': 'left',
+        'E': 'right',
+        'SE': 'right',
+        'S': 'right',
+        'SW': 'right',
+        'W': 'left',
+        'NW': 'left'
+      };
+
+      let circuitSide = sectorTurnDirections[activeSector.name] || 'left';
 
       const activeRwyHdg = activeSector.rwy;
       const circuitRad = (activeRwyHdg * Math.PI) / 180;
-      const perpRad = circuitRad + (circuitSide === 'right' ? -Math.PI / 2 : Math.PI / 2);
+      const perpRad = circuitRad + (circuitSide === 'left' ? -Math.PI / 2 : Math.PI / 2);
 
       L.circleMarker([landingLat, landingLon], {
         radius: 6, fillColor: '#ff9800', color: '#ffffff', weight: 2, fillOpacity: 1
