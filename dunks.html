@@ -359,7 +359,6 @@
       pointer-events: none;
     }
 
-    /* Clean Satellite Dot Marker Style */
     .sat-dot-marker {
       width: 10px;
       height: 10px;
@@ -387,7 +386,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.4.0</div>
+    <div class="rev-badge">REV: 5.6.0</div>
   </div>
 
   <div class="dashboard-container">
@@ -441,12 +440,12 @@
               <div class="slider-row">
                 <span>Wind Sector:</span>
                 <select id="select-wind-sector" onchange="updateDashboardMap()" style="background:#131b2e; color:#ff9800; border:1px solid #ff9800; font-size:0.55rem; font-weight:bold; border-radius:2px; width:110px;">
-                  <option value="0">N (330° - 030°)</option>
+                  <option value="0" selected>N (330° - 030°)</option>
                   <option value="45">NE (030° - 075°)</option>
                   <option value="90">E (075° - 120°)</option>
                   <option value="135">SE (120° - 165°)</option>
                   <option value="170">S (165° - 195°)</option>
-                  <option value="220" selected>SW (195° - 240°)</option>
+                  <option value="220">SW (195° - 240°)</option>
                   <option value="270">W (240° - 285°)</option>
                   <option value="315">NW (285° - 330°)</option>
                 </select>
@@ -595,11 +594,9 @@
     const lon = -3.233961;
     const fieldElevationFt = 839;
 
-    // Dedicated Landing Paddock Coordinates
     const landingLat = 50.86165235645555;
     const landingLon = -3.2365503955361716;
 
-    // Main Left Map
     const map = L.map('map', { zoomControl: false }).setView([lat, lon], 15);
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       maxZoom: 19, maxNativeZoom: 18
@@ -613,7 +610,6 @@
     let circuitLayerGroup = L.layerGroup().addTo(map);
     circuitLayerGroup.addTo(map);
 
-    // Right Satellite Overlay Map (Clean Dot Marker)
     const satOverlayMap = L.map('sat-overlay-map', { zoomControl: false, attributionControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false }).setView([lat, lon], 9);
     
     L.marker([lat, lon], {
@@ -749,7 +745,6 @@
       manualJumpLayerGroup.clearLayers();
       circuitLayerGroup.clearLayers();
 
-      // Airfield Center Anchor Pin
       L.circleMarker([lat, lon], {
         radius: 5, fillColor: '#ffffff', color: '#000000', weight: 1.5, fillOpacity: 1
       }).addTo(windRoseLayerGroup);
@@ -762,7 +757,6 @@
 
       const currentZoom = map.getZoom();
       const zoomScale = Math.pow(2, 15 - currentZoom);
-
       const baseDistanceMeters = 35 * zoomScale;
       const spreadStepMeters = 18 * zoomScale;
 
@@ -795,9 +789,7 @@
 
         L.marker([endLat, endLon], {
           icon: L.divIcon({
-            html: pillHTML,
-            className: '',
-            iconSize: [120, 22],
+            html: pillHTML, className: '', iconSize: [120, 22],
             iconAnchor: flipped ? [120, 11] : [-2, 11]
           })
         }).addTo(windRoseLayerGroup);
@@ -806,7 +798,6 @@
       const avgWindDir = circularMeanDeg([aromeDir, gfsDir, ecmwfDir]);
       const avgSpeed = (aromeSpd + gfsSpd + ecmwfSpd) / 3;
 
-      // JUMP-RUN RENDERING
       let runInHeading = avgWindDir;
       let spotOffset = Math.min(0.28, Math.max(0.12, (avgSpeed / 100) * 1.2));
 
@@ -862,18 +853,16 @@
       }
 
       // ==========================================
-      // 8-SECTOR ROUGH LANDING PATTERN LOGIC
+      // 8-SECTOR LANDING PATTERN ROUTING (PLACEHOLDERS FOR NE, E, SE, S, SW, W, NW READY)
       // ==========================================
       let activeSector;
       if (isLandingManual) {
         const sectorVal = parseFloat(document.getElementById('select-wind-sector').value);
-        // Find sector matching value
         const sectorsMap = { 0: 'N', 45: 'NE', 90: 'E', 135: 'SE', 170: 'S', 220: 'SW', 270: 'W', 315: 'NW' };
         const matchedRwy = { 0: 350, 45: 40, 90: 40, 135: 170, 170: 170, 220: 220, 270: 220, 315: 350 };
         activeSector = { name: sectorsMap[sectorVal], rwy: matchedRwy[sectorVal] };
       } else {
         activeSector = getRough8Sector(avgWindDir);
-        // Sync manual dropdown selector to auto sector for convenience
         const reverseVal = { 350: 0, 40: 45, 170: 170, 220: 220 };
         if (reverseVal[activeSector.rwy] !== undefined) {
           document.getElementById('select-wind-sector').value = reverseVal[activeSector.rwy];
@@ -882,19 +871,17 @@
 
       let circuitSide = document.getElementById('select-circuit-side').value; 
       if (circuitSide === 'auto') {
-        circuitSide = 'right'; // Keeps downwind furthest away on the western grass paddock side
+        circuitSide = 'right'; 
       }
 
       const activeRwyHdg = activeSector.rwy;
       const circuitRad = (activeRwyHdg * Math.PI) / 180;
       const perpRad = circuitRad + (circuitSide === 'right' ? -Math.PI / 2 : Math.PI / 2);
 
-      // Touchdown marker at paddock
       L.circleMarker([landingLat, landingLon], {
         radius: 6, fillColor: '#ff9800', color: '#ffffff', weight: 2, fillOpacity: 1
       }).addTo(circuitLayerGroup);
 
-      // Final approach arrow
       let finalArrowAngle = (activeRwyHdg - 90 + 360) % 360;
       L.marker([landingLat, landingLon], {
         icon: L.divIcon({
@@ -903,7 +890,6 @@
         })
       }).addTo(circuitLayerGroup);
 
-      // Strictly aligned rectangular circuit legs with exactly 90-degree turns and zero runway crossing
       const finalLegDist = 130; 
       const finalStart = [
         landingLat - (finalLegDist * Math.cos(circuitRad)) / 111320,
@@ -935,8 +921,39 @@
         icon: L.divIcon({ html: `<div class="circuit-label">BASE</div>`, className: '', iconSize: [36, 16], iconAnchor: [18, 8] })
       }).addTo(circuitLayerGroup);
 
+      // SWITCH BLOCK FOR 8 SECTORS (N is complete; NE through NW ready for custom labels/coords)
+      let labelText = '';
+      switch(activeSector.name) {
+        case 'N':
+          labelText = 'DOWNWIND (LEFT)';
+          break;
+        case 'NE':
+          labelText = 'DOWNWIND (NE / RWY 40°)'; // Placeholder ready to be customized next
+          break;
+        case 'E':
+          labelText = 'DOWNWIND (E / RWY 40°)';
+          break;
+        case 'SE':
+          labelText = 'DOWNWIND (SE / RWY 170°)';
+          break;
+        case 'S':
+          labelText = 'DOWNWIND (S / RWY 170°)';
+          break;
+        case 'SW':
+          labelText = 'DOWNWIND (SW / RWY 220°)';
+          break;
+        case 'W':
+          labelText = 'DOWNWIND (W / RWY 220°)';
+          break;
+        case 'NW':
+          labelText = 'DOWNWIND (NW / RWY 350°)';
+          break;
+        default:
+          labelText = 'DOWNWIND (LEFT)';
+      }
+
       L.marker(downwindEnd, {
-        icon: L.divIcon({ html: `<div class="circuit-label">DOWNWIND (${activeSector.name} / RWY ${activeRwyHdg}°)</div>`, className: '', iconSize: [150, 16], iconAnchor: [75, 8] })
+        icon: L.divIcon({ html: `<div class="circuit-label">${labelText}</div>`, className: '', iconSize: [160, 16], iconAnchor: [80, 8] })
       }).addTo(circuitLayerGroup);
     }
 
