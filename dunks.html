@@ -355,7 +355,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 3.0.2</div>
+    <div class="rev-badge">REV: 3.0.3</div>
   </div>
 
   <div class="dashboard-container">
@@ -642,9 +642,9 @@
       rawModels.forEach((m, idx) => {
         const distMeters = baseDistanceMeters + (idx * spreadStepMeters);
         
-        // UPWIND OFFSET: Project the vanes in the direction the wind is coming FROM (m.dir + 180)
+        // Correct Anchor-to-Upwind projection: starts at center [lat, lon] and projects outward in the upwind direction
         const upwindBearing = (m.dir + 180) % 360;
-        const rad = ((upwindBearing - 90) * Math.PI) / 180;
+        const rad = (upwindBearing * Math.PI) / 180;
         
         const dLat = (distMeters * Math.cos(rad)) / 111320;
         const dLon = (distMeters * Math.sin(rad)) / (111320 * Math.cos(lat * Math.PI / 180));
@@ -764,7 +764,7 @@
           { name: 'AROME', data: arome }
         ];
 
-        let headerHTML = `<th class="model-name-th">Model \ Time</th>`;
+        let headerHTML = `<th class="model-name-th">Model \\ Time</th>`;
         const nowHour = new Date().getHours();
         let currentIdx = 12;
 
