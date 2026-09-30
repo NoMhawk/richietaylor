@@ -355,7 +355,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 2.8.5</div>
+    <div class="rev-badge">REV: 2.8.6</div>
   </div>
 
   <div class="dashboard-container">
@@ -633,15 +633,21 @@
         { name: 'ECMWF',    dir: ecmwfDir, spd: ecmwfSpd, gst: ecmwfGst, color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)', dash: null }
       ];
 
-      // STACKED RADIAL DISTANCES FROM RUNWAY CENTER: Staggering outward along true model bearings
-      const radialDistances = [0.06, 0.13, 0.20];
+      // CONSECUTIVE CHAINED STACKING: All models start strictly at [lat, lon]
+      // Segment length per model is 0.08 NM. They daisy-chain back-to-back if directions align.
+      let currentOriginLat = lat;
+      let currentOriginLon = lon;
+      const segmentLengthNM = 0.08;
 
       rawModels.forEach((m, idx) => {
-        const distNM = radialDistances[idx];
-        const endPt = computeDestinationPoint(lat, lon, m.dir, distNM);
+        const startLat = currentOriginLat;
+        const startLon = currentOriginLon;
+        
+        // Compute end point for this segment from its current origin
+        const endPt = computeDestinationPoint(startLat, startLon, m.dir, segmentLengthNM);
 
-        // FIXED: Polyline explicitly originates from [lat, lon] and terminates at [endPt]
-        L.polyline([[lat, lon], [endPt.lat, endPt.lon]], {
+        // Draw polyline segment strictly anchored to this segment's start and end
+        L.polyline([[startLat, startLon], [endPt.lat, endPt.lon]], {
           color: m.color, weight: 2.8, opacity: 0.9, dashArray: m.dash
         }).addTo(windRoseLayerGroup);
 
@@ -660,6 +666,10 @@
         L.marker([endPt.lat, endPt.lon], {
           icon: L.divIcon({ html: pillHTML, className: '', iconSize: [120, 22], iconAnchor: [0, 11] })
         }).addTo(windRoseLayerGroup);
+
+        // Advance the origin for the next model in the stack so they daisy-chain outwards
+        currentOriginLat = endPt.lat;
+        currentOriginLon = endPt.lon;
       });
 
       const avgWindDir = (aromeDir + gfsDir + ecmwfDir) / 3;
