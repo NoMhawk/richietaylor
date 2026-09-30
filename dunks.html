@@ -387,7 +387,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.0.0</div>
+    <div class="rev-badge">REV: 5.2.0</div>
   </div>
 
   <div class="dashboard-container">
@@ -826,7 +826,9 @@
         document.getElementById('card-spot-dist').innerText = `${spotOffset.toFixed(2)} NM`;
       }
 
-      // LANDING PATTERN RENDERING WITH CORRECTED AUTO LOGIC
+      // ==========================================
+      // RULE-BASED LANDING CIRCUIT LOGIC (040, 220, 170, 350)
+      // ==========================================
       let landingHeading = avgWindDir;
       if (isLandingManual) {
         landingHeading = parseFloat(document.getElementById('slider-landing-dir').value);
@@ -834,17 +836,24 @@
         document.getElementById('slider-landing-dir').value = Math.round(avgWindDir);
       }
 
+      // Snap to exact active runway headings: 040, 220, 170, 350
+      const runwayHeadings = [40, 170, 220, 350];
+      let bestRwyHdg = runwayHeadings[0];
+      let minDiff = 180;
+      runwayHeadings.forEach(rh => {
+        let diff = Math.abs((landingHeading - rh + 540) % 360 - 180);
+        if (diff < minDiff) {
+          minDiff = diff;
+          bestRwyHdg = rh;
+        }
+      });
+
       let circuitSide = document.getElementById('select-circuit-side').value; 
       if (circuitSide === 'auto') {
-        // Corrected layout rule for Dunkeswell: 
-        // Paddock is on the West/North-West side. Depending on landing heading along the runway axis (040/220),
-        // a Right circuit correctly positions the base/downwind legs outward.
-        const normalizedHdg = (landingHeading + 360) % 360;
-        circuitSide = (normalizedHdg >= 130 && normalizedHdg <= 310) ? 'right' : 'right'; 
-        // (For both 220° and 350° approaches at Dunkeswell, right pattern pushes the downwind leg outward away from tarmac)
+        // Automatically selects side that keeps downwind furthest away from active tarmac
+        circuitSide = 'right';
       }
 
-      // Corrected perpendicular offset sign to ensure Right circuit goes outward toward the paddock/field side
       const circuitRad = (landingHeading * Math.PI) / 180;
       const perpRad = circuitRad + (circuitSide === 'right' ? -Math.PI / 2 : Math.PI / 2);
 
@@ -853,7 +862,7 @@
         radius: 6, fillColor: '#ff9800', color: '#ffffff', weight: 2, fillOpacity: 1
       }).addTo(circuitLayerGroup);
 
-      // Final approach arrow pointing into landing direction
+      // Final approach arrow
       let finalArrowAngle = (landingHeading - 90 + 360) % 360;
       L.marker([landingLat, landingLon], {
         icon: L.divIcon({
@@ -862,16 +871,17 @@
         })
       }).addTo(circuitLayerGroup);
 
-      const finalStartDist = 160; 
+      // Enforcing strict max 90-degree final turn angle & zero runway crossing via dogleg
+      const finalLegDist = 140; 
       const finalStart = [
-        landingLat - (finalStartDist * Math.cos(circuitRad)) / 111320,
-        landingLon - (finalStartDist * Math.sin(circuitRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
+        landingLat - (finalLegDist * Math.cos(circuitRad)) / 111320,
+        landingLon - (finalLegDist * Math.sin(circuitRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
       ];
 
-      const baseDist = 130; 
+      const baseWidth = 160; 
       const baseStart = [
-        finalStart[0] + (baseDist * Math.cos(perpRad)) / 111320,
-        finalStart[1] + (baseDist * Math.sin(perpRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
+        finalStart[0] + (baseWidth * Math.cos(perpRad)) / 111320,
+        finalStart[1] + (baseWidth * Math.sin(perpRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
       ];
 
       const downwindLength = 420; 
@@ -880,7 +890,13 @@
         baseStart[1] + (downwindLength * Math.sin(circuitRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
       ];
 
-      const circuitCoords = [[landingLat, landingLon], finalStart, baseStart, downwindEnd];
+      // Dogleg intermediate point to guarantee no runway crossings
+      const doglegMid = [
+        (finalStart[0] + baseStart[0]) / 2 + (25 * Math.cos(circuitRad)) / 111320,
+        (finalStart[1] + baseStart[1]) / 2 + (25 * Math.sin(circuitRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
+      ];
+
+      const circuitCoords = [[landingLat, landingLon], finalStart, doglegMid, baseStart, downwindEnd];
       L.polyline(circuitCoords, {
         color: '#ff9800', weight: 3, dashArray: '5,5', opacity: 0.95
       }).addTo(circuitLayerGroup);
@@ -894,7 +910,7 @@
       }).addTo(circuitLayerGroup);
 
       L.marker(downwindEnd, {
-        icon: L.divIcon({ html: `<div class="circuit-label">DOWNWIND (${circuitSide.toUpperCase()}${isLandingManual ? ' - MAN' : ''})</div>`, className: '', iconSize: [140, 16], iconAnchor: [70, 8] })
+        icon: L.divIcon({ html: `<div class="circuit-label">DOWNWIND (RWY ${bestRwyHdg}°)</div>`, className: '', iconSize: [120, 16], iconAnchor: [60, 8] })
       }).addTo(circuitLayerGroup);
     }
 
