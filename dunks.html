@@ -93,7 +93,7 @@
       padding: 8px 10px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.6);
       font-family: monospace;
-      width: 240px;
+      width: 250px;
     }
 
     .spot-overlay-header {
@@ -137,7 +137,7 @@
     .control-slider-group {
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 3px;
       margin-top: 4px;
       padding-top: 4px;
       border-top: 1px dashed rgba(255,255,255,0.1);
@@ -374,6 +374,18 @@
       border-radius: 50%;
       box-shadow: 0 0 6px #00d8ff;
     }
+
+    .circuit-label {
+      background: rgba(11, 15, 25, 0.85);
+      border: 1px solid #00d8ff;
+      color: #00d8ff;
+      font-family: monospace;
+      font-size: 8px;
+      font-weight: bold;
+      padding: 1px 4px;
+      border-radius: 3px;
+      white-space: nowrap;
+    }
   </style>
 </head>
 <body>
@@ -381,7 +393,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 3.0.18</div>
+    <div class="rev-badge">REV: 4.0.0</div>
   </div>
 
   <div class="dashboard-container">
@@ -408,7 +420,7 @@
             </div>
           </div>
 
-          <!-- MANUAL OVERRIDE CONTROLS -->
+          <!-- MANUAL OVERRIDE & CIRCUIT CONTROLS -->
           <div class="control-slider-group" id="manual-controls" style="display: none;">
             <div class="slider-row">
               <span>Heading:</span>
@@ -426,6 +438,18 @@
               </select>
             </div>
           </div>
+
+          <!-- CIRCUIT PATTERN TOGGLE -->
+          <div class="control-slider-group">
+            <div class="slider-row">
+              <span style="color:#00d8ff; font-weight:bold;">Landing Circuit:</span>
+              <select id="select-circuit-side" onchange="updateManualSpot()" style="background:#131b2e; color:#ff9800; border:1px solid #ff9800; font-size:0.55rem; font-weight:bold; border-radius:2px;">
+                <option value="left">LEFT-HAND CIRCUIT</option>
+                <option value="right" selected>RIGHT-HAND CIRCUIT</option>
+              </select>
+            </div>
+          </div>
+
         </div>
 
         <div id="map"></div>
@@ -534,7 +558,7 @@
         </div>
       </div>
 
-      <!-- LIVE SATELLITE VIEW (Animated Windy Satellite + Leaflet Marker Overlay) -->
+      <!-- LIVE SATELLITE VIEW -->
       <div class="pane-segment" style="flex: 1;">
         <div class="pane-header">
           <div class="title">🛰 Live Satellite Imagery</div>
@@ -570,8 +594,9 @@
 
     let windRoseLayerGroup = L.layerGroup().addTo(map);
     let manualLayerGroup = L.layerGroup().addTo(map);
+    let circuitLayerGroup = L.layerGroup().addTo(map);
 
-    // Right Satellite Overlay Map (Synchronized zoom/center with the Windy embed)
+    // Right Satellite Overlay Map
     const satOverlayMap = L.map('sat-overlay-map', { zoomControl: false, attributionControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false }).setView([lat, lon], 9);
     
     const sdswMarkerHtml = `
@@ -659,16 +684,24 @@
       }
     }
 
-    // Circular mean helper to prevent wrapping issues near North (e.g. 350° and 10°)
     function circularMeanDeg(degs) {
       const s = degs.reduce((a, d) => a + Math.sin(d * Math.PI / 180), 0);
       const c = degs.reduce((a, d) => a + Math.cos(d * Math.PI / 180), 0);
       return (Math.atan2(s, c) * 180 / Math.PI + 360) % 360;
     }
 
+    // Helper to project coordinates in meters relative to origin lat/lon
+    function offsetMeters(originLat, originLon, northMeters, eastMeters) {
+      const dLat = northMeters / 111320;
+      const dLon = eastMeters / (111320 * Math.cos(originLat * Math.PI / 180));
+      return [originLat + dLat, originLon + dLon];
+    }
+
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
       windRoseLayerGroup.clearLayers();
       manualLayerGroup.clearLayers();
+      circuitLayerGroup.clearLayers();
+      circuitLayerGroup.addTo(map);
 
       // Airfield Center Anchor Pin at exact intersection
       L.circleMarker([lat, lon], {
@@ -687,13 +720,8 @@
       const baseDistanceMeters = 35 * zoomScale;
       const spreadStepMeters = 18 * zoomScale;
 
-      // ==========================================
-      // START: WIND VANE PROJECTION SEGMENT
-      // ==========================================
       rawModels.forEach((m, idx) => {
         const distMeters = baseDistanceMeters + (idx * spreadStepMeters);
-        
-        // Project UPWIND (toward the bearing the wind is coming FROM)
         const rad = (m.dir * Math.PI) / 180;
         const dLat = (distMeters * Math.cos(rad)) / 111320;
         const dLon = (distMeters * Math.sin(rad)) / (111320 * Math.cos(lat * Math.PI / 180));
@@ -728,9 +756,6 @@
           })
         }).addTo(windRoseLayerGroup);
       });
-      // ==========================================
-      // END: WIND VANE PROJECTION SEGMENT
-      // ==========================================
 
       const avgWindDir = circularMeanDeg([aromeDir, gfsDir, ecmwfDir]);
       const autoRunIn = avgWindDir;
@@ -791,6 +816,56 @@
         document.getElementById('card-runin').innerText = `${Math.round(autoRunIn)}° M`;
         document.getElementById('card-spot-dist').innerText = `${autoSpotOffset.toFixed(2)} NM`;
       }
+
+      // ==========================================
+      // LANDING CIRCUIT (J-SHAPE PATTERN) GENERATOR
+      // ==========================================
+      const circuitSide = document.getElementById('select-circuit-side').value; // 'left' or 'right'
+      const landingHeading = avgWindDir; // land into wind
+      const circuitRad = (landingHeading * Math.PI) / 180;
+      const perpRad = circuitRad + (circuitSide === 'right' ? Math.PI / 2 : -Math.PI / 2);
+
+      // We construct the circuit relative to [lat, lon] (Target Landing Area)
+      // 1. Final approach into wind from touch-down point
+      const finalStartDist = 180; // meters out on final
+      const touchDown = [lat, lon];
+      const finalStart = [
+        lat - (finalStartDist * Math.cos(circuitRad)) / 111320,
+        lon - (finalStartDist * Math.sin(circuitRad)) / (111320 * Math.cos(lat * Math.PI / 180))
+      ];
+
+      // 2. Base leg turn point (perpendicular offset)
+      const baseDist = 150; // meters sideways
+      const baseStart = [
+        finalStart[0] + (baseDist * Math.cos(perpRad)) / 111320,
+        finalStart[1] + (baseDist * Math.sin(perpRad)) / (111320 * Math.cos(lat * Math.PI / 180))
+      ];
+
+      // 3. Downwind leg parallel to landing heading, extending upwind
+      const downwindLength = 300; // meters
+      const downwindEnd = [
+        baseStart[0] + (downwindLength * Math.cos(circuitRad)) / 111320,
+        baseStart[1] + (downwindLength * Math.sin(circuitRad)) / (111320 * Math.cos(lat * Math.PI / 180))
+      ];
+
+      // Draw Circuit J-Path
+      const circuitCoords = [touchDown, finalStart, baseStart, downwindEnd];
+      L.polyline(circuitCoords, {
+        color: '#ff9800', weight: 3, dashArray: '6,6', opacity: 0.9
+      }).addTo(circuitLayerGroup);
+
+      // Add Circuit Leg Labels
+      L.marker(finalStart, {
+        icon: L.divIcon({ html: `<div class="circuit-label">FINAL</div>`, className: '', iconSize: [36, 16], iconAnchor: [18, -4] })
+      }).addTo(circuitLayerGroup);
+
+      L.marker(baseStart, {
+        icon: L.divIcon({ html: `<div class="circuit-label">BASE</div>`, className: '', iconSize: [36, 16], iconAnchor: [18, 8] })
+      }).addTo(circuitLayerGroup);
+
+      L.marker(downwindEnd, {
+        icon: L.divIcon({ html: `<div class="circuit-label">DOWNWIND</div>`, className: '', iconSize: [52, 16], iconAnchor: [26, 8] })
+      }).addTo(circuitLayerGroup);
     }
 
     updateWindRoseOnMap(...cachedWeatherData);
@@ -864,7 +939,6 @@
           rowsHTML += `</tr>`;
         });
 
-        // Add Cloud Base Row
         rowsHTML += `<tr><td class="model-name-th" style="color: #00d8ff;">Cloud Base</td>`;
         for (let i = 8; i <= 19; i++) {
           const temp = ecmwf.hourly.temperature_2m ? ecmwf.hourly.temperature_2m[i] : 18;
