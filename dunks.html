@@ -436,7 +436,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.7.2</div>
+    <div class="rev-badge">REV: 5.7.3</div>
   </div>
 
   <div class="dashboard-container">
@@ -947,7 +947,7 @@
 
       const sectorTurnDirections = {
         'N': 'left',
-        'NE': 'left', // Uses Rwy 40° heading, but configured to come downwind from the north
+        'NE': 'left', 
         'E': 'right',
         'SE': 'right',
         'S': 'right',
@@ -981,20 +981,21 @@
       let baseStart, downwindEnd, circuitCoords, labelPosition;
 
       if (activeSector.name === 'NE') {
-        // Special custom routing for NE sector: Downwind leg comes straight from the North down to base leg
+        // Corrected NE routing: Downwind comes straight from North, then base leg connects horizontally across to final start
         const downwindStart = [
-          landingLat + (350 * Math.cos(0)) / 111320,
-          landingLon + (350 * Math.sin(0)) / (111320 * Math.cos(landingLat * Math.PI / 180))
+          landingLat + (380 * Math.cos(0)) / 111320,
+          landingLon + (380 * Math.sin(0)) / (111320 * Math.cos(landingLat * Math.PI / 180))
         ];
-        baseStart = [
+        downwindEnd = [
           finalStart[0],
-          finalStart[1] + (140 * Math.sin(circuitRad - Math.PI/2)) / (111320 * Math.cos(landingLat * Math.PI / 180))
+          landingLon + (380 * Math.sin(0)) / (111320 * Math.cos(landingLat * Math.PI / 180))
         ];
-        downwindEnd = downwindStart;
-        circuitCoords = [[landingLat, landingLon], finalStart, baseStart, downwindEnd];
+        baseStart = finalStart;
+
+        circuitCoords = [[landingLat, landingLon], finalStart, downwindEnd, downwindStart];
         labelPosition = [
-          (baseStart[0] + downwindEnd[0]) / 2,
-          (baseStart[1] + downwindEnd[1]) / 2
+          (downwindStart[0] + downwindEnd[0]) / 2,
+          downwindEnd[1]
         ];
       } else {
         const perpRad = circuitRad + (circuitSide === 'left' ? -Math.PI / 2 : Math.PI / 2);
@@ -1152,8 +1153,8 @@
 
     async function fetchMetar() {
       try {
-        const res = await fetch(`https://metar.vatsim.net/EGTE`);
-        const metarStr = await res.text();
+        const res = `https://metar.vatsim.net/EGTE`;
+        const metarStr = await (await fetch(res)).text();
         if (metarStr && metarStr.trim().length > 0) {
           document.getElementById('raw-metar').innerText = metarStr.trim();
         }
