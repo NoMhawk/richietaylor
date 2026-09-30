@@ -1,4 +1,4 @@
-<!-- REV: 5.7.9 - SKYDIVE SOUTHWEST OPERATIONS DASHBOARD -->
+<!-- REV: 5.8.1 - SKYDIVE SOUTHWEST OPERATIONS DASHBOARD -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -437,7 +437,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.7.9</div>
+    <div class="rev-badge">REV: 5.8.1</div>
   </div>
 
   <div class="dashboard-container">
@@ -663,8 +663,15 @@
     const lon = -3.233961;
     const fieldElevationFt = 839;
 
-    const landingLat = 50.86165235645555;
-    const landingLon = -3.2365503955361716;
+    // ==========================================
+    // LANDING PATTERN CONFIGURATION & COORDINATES
+    // ==========================================
+    const defaultLandingLat = 50.86165235645555;
+    const defaultLandingLon = -3.2365503955361716;
+
+    const easterlyLandingLat = 50.8606900485523;
+    const easterlyLandingLon = -3.237317785882287;
+    // ==========================================
 
     const map = L.map('map', { zoomControl: false }).setView([lat, lon], 15);
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
@@ -796,11 +803,11 @@
       const sectors = [
         { name: 'N', center: 0, rwy: 360 },
         { name: 'NE', center: 45, rwy: 40 },
-        { name: 'E', center: 90, rwy: 90 }, // True East (090°) runway alignment
+        { name: 'E', center: 90, rwy: 90 },
         { name: 'SE', center: 135, rwy: 170 },
         { name: 'S', center: 180, rwy: 170 },
         { name: 'SW', center: 225, rwy: 220 },
-        { name: 'W', center: 270, rwy: 270 }, // True West (270°) runway alignment
+        { name: 'W', center: 270, rwy: 270 },
         { name: 'NW', center: 315, rwy: 360 }
       ];
 
@@ -949,7 +956,7 @@
       const sectorTurnDirections = {
         'N': 'left',
         'NE': 'left',
-        'E': 'left',  // Pure East sector (090° wind): Left-hand pattern facing East (090° landing heading), with extended base to keep downwind off the runway
+        'E': 'left',  
         'SE': 'right',
         'S': 'right',
         'SW': 'right',
@@ -961,12 +968,20 @@
       const activeRwyHdg = activeSector.rwy;
       const circuitRad = (activeRwyHdg * Math.PI) / 180;
 
-      L.circleMarker([landingLat, landingLon], {
+      let activeLandingLat = defaultLandingLat;
+      let activeLandingLon = defaultLandingLon;
+
+      if (activeSector.name === 'E') {
+        activeLandingLat = easterlyLandingLat;
+        activeLandingLon = easterlyLandingLon;
+      }
+
+      L.circleMarker([activeLandingLat, activeLandingLon], {
         radius: 6, fillColor: '#ff9800', color: '#ffffff', weight: 2, fillOpacity: 1
       }).addTo(circuitLayerGroup);
 
       let finalArrowAngle = (activeRwyHdg - 90 + 360) % 360;
-      L.marker([landingLat, landingLon], {
+      L.marker([activeLandingLat, activeLandingLon], {
         icon: L.divIcon({
           html: `<div class="circuit-arrow" style="transform: rotate(${finalArrowAngle}deg);">▶</div>`,
           className: '', iconSize: [16, 16], iconAnchor: [8, 8]
@@ -975,33 +990,32 @@
 
       const finalLegDist = 130; 
       const finalStart = [
-        landingLat - (finalLegDist * Math.cos(circuitRad)) / 111320,
-        landingLon - (finalLegDist * Math.sin(circuitRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
+        activeLandingLat - (finalLegDist * Math.cos(circuitRad)) / 111320,
+        activeLandingLon - (finalLegDist * Math.sin(circuitRad)) / (111320 * Math.cos(activeLandingLat * Math.PI / 180))
       ];
 
       let baseStart, downwindEnd, circuitCoords, labelPosition;
 
       if (activeSector.name === 'E') {
-        // True East sector (090° heading): Left-hand pattern with long extended base leg so downwind is safely away from the runway
-        const perpRad = circuitRad - Math.PI / 2; // Left side relative to 090° heading is North
+        const perpRad = circuitRad - Math.PI / 2;
         const extendedBaseWidth = 320; 
         baseStart = [
           finalStart[0] + (extendedBaseWidth * Math.cos(perpRad)) / 111320,
-          finalStart[1] + (extendedBaseWidth * Math.sin(perpRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
+          finalStart[1] + (extendedBaseWidth * Math.sin(perpRad)) / (111320 * Math.cos(activeLandingLat * Math.PI / 180))
         ];
 
         const downwindLength = 380;
         downwindEnd = [
           baseStart[0] + (downwindLength * Math.cos(circuitRad)) / 111320,
-          baseStart[1] + (downwindLength * Math.sin(circuitRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
+          baseStart[1] + (downwindLength * Math.sin(circuitRad)) / (111320 * Math.cos(activeLandingLat * Math.PI / 180))
         ];
 
-        circuitCoords = [[landingLat, landingLon], finalStart, baseStart, downwindEnd];
+        circuitCoords = [[activeLandingLat, activeLandingLon], finalStart, baseStart, downwindEnd];
         labelPosition = downwindEnd;
       } else if (activeSector.name === 'NE') {
         const downwindStart = [
-          landingLat + (380 * Math.cos(0)) / 111320,
-          landingLon - (280 * Math.sin(0.5)) / (111320 * Math.cos(landingLat * Math.PI / 180)) - 0.0018
+          activeLandingLat + (380 * Math.cos(0)) / 111320,
+          activeLandingLon - (280 * Math.sin(0.5)) / (111320 * Math.cos(activeLandingLat * Math.PI / 180)) - 0.0018
         ];
         downwindEnd = [
           finalStart[0],
@@ -1009,7 +1023,7 @@
         ];
         baseStart = finalStart;
 
-        circuitCoords = [[landingLat, landingLon], finalStart, downwindEnd, downwindStart];
+        circuitCoords = [[activeLandingLat, activeLandingLon], finalStart, downwindEnd, downwindStart];
         labelPosition = [
           (downwindStart[0] + downwindEnd[0]) / 2,
           downwindEnd[1] - 0.0003
@@ -1019,16 +1033,16 @@
         const baseWidth = 140; 
         baseStart = [
           finalStart[0] + (baseWidth * Math.cos(perpRad)) / 111320,
-          finalStart[1] + (baseWidth * Math.sin(perpRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
+          finalStart[1] + (baseWidth * Math.sin(perpRad)) / (111320 * Math.cos(activeLandingLat * Math.PI / 180))
         ];
 
         const downwindLength = 400; 
         downwindEnd = [
           baseStart[0] + (downwindLength * Math.cos(circuitRad)) / 111320,
-          baseStart[1] + (downwindLength * Math.sin(circuitRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
+          baseStart[1] + (downwindLength * Math.sin(circuitRad)) / (111320 * Math.cos(activeLandingLat * Math.PI / 180))
         ];
 
-        circuitCoords = [[landingLat, landingLon], finalStart, baseStart, downwindEnd];
+        circuitCoords = [[activeLandingLat, activeLandingLon], finalStart, baseStart, downwindEnd];
         labelPosition = downwindEnd;
       }
 
