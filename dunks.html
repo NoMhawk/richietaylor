@@ -1,4 +1,4 @@
-<!-- REV: 5.8.9 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 5.9.0 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -88,6 +88,8 @@
       box-shadow: 0 8px 28px rgba(0,0,0,0.8);
       font-family: monospace;
       width: 520px;
+      max-height: calc(100vh - 80px);
+      overflow-y: auto;
     }
 
     .overlay-header {
@@ -204,94 +206,11 @@
       accent-color: #00d8ff;
     }
 
-    .multi-table-card {
-      width: 100%;
-      flex: 0 0 auto;
-      background: #131b2e;
-      border: 1px solid #1e2d4a;
-      border-radius: 8px;
-      padding: 6px 8px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    .table-title {
-      font-size: 0.65rem;
-      font-weight: 700;
-      color: #00d8ff;
-      text-transform: uppercase;
-      margin-bottom: 3px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .legend-bar {
-      display: flex;
-      gap: 6px;
-      font-size: 0.55rem;
-      color: #8a99ad;
-      font-family: monospace;
-    }
-
-    .legend-item { display: flex; align-items: center; gap: 2px; }
-    .legend-box { width: 6px; height: 6px; border-radius: 1px; }
-
-    .table-wrapper {
-      flex: 1;
-      overflow-x: auto;
-      overflow-y: hidden;
-    }
-
-    .multi-table-horizontal {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.62rem;
-      font-family: monospace;
-      text-align: center;
-    }
-
-    .multi-table-horizontal th {
-      padding: 2px 3px;
-      background: rgba(0, 0, 0, 0.4);
-      color: #8a99ad;
-      border-bottom: 1px solid #1e2d4a;
-      border-right: 1px solid rgba(255,255,255,0.04);
-      font-size: 0.58rem;
-    }
-
-    .multi-table-horizontal td {
-      padding: 2px 3px;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-      border-right: 1px solid rgba(255,255,255,0.04);
-    }
-
-    .multi-table-horizontal .model-name-th {
-      position: sticky;
-      left: 0;
-      background: #131b2e;
-      z-index: 3;
-      text-align: left;
-      color: #00d8ff;
-      font-weight: bold;
-      border-right: 1px solid #1e2d4a;
-    }
-
-    /* Past hours styling (greyned out / dimmed) */
-    .past-hour-th, .past-hour-cell {
-      opacity: 0.35;
-      filter: grayscale(60%);
-      background: rgba(255, 255, 255, 0.02);
-    }
-
     .wind-badge {
       display: inline-block;
-      padding: 1px 3px;
+      padding: 2px 5px;
       border-radius: 3px;
       font-weight: bold;
-      min-width: 50px;
     }
 
     .status-green  { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.4); }
@@ -301,7 +220,7 @@
 
     .cloud-badge {
       display: inline-block;
-      padding: 1px 3px;
+      padding: 2px 6px;
       border-radius: 3px;
       font-weight: bold;
       color: #00d8ff;
@@ -309,8 +228,8 @@
       border: 1px solid rgba(0, 216, 255, 0.3);
     }
 
-    .dir-arrow { display: inline-block; font-weight: bold; margin-right: 1px; }
-    .gust-val { font-size: 0.55rem; opacity: 0.85; }
+    .dir-arrow { display: inline-block; font-weight: bold; margin-right: 2px; }
+    .gust-val { font-size: 0.75rem; opacity: 0.85; }
 
     .rotated-pill {
       display: flex;
@@ -377,7 +296,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.8.9</div>
+    <div class="rev-badge">REV: 5.9.0</div>
   </div>
 
   <div class="dashboard-container">
@@ -419,6 +338,21 @@
           <span class="overlay-label" style="margin:0; font-size: 0.8rem;">Run-In Heading:</span>
           <span style="font-size: 1.6rem; font-weight: 900; color: #fff;" id="ov-heading">--° M</span>
         </div>
+
+        <!-- CURRENT HOUR MODEL FORECAST CARD -->
+        <div style="font-size: 0.78rem; color: #8a99ad; text-transform: uppercase; margin-bottom: 6px; font-weight: bold; letter-spacing: 0.5px;">📊 Current Hour Forecast (<span id="current-hour-label">--:--</span>)</div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; font-family: monospace; margin-bottom: 14px;">
+          <thead>
+            <tr style="border-bottom: 1px solid #1e2d4a; color: #8a99ad; font-size: 0.75rem;">
+              <th style="text-align: left; padding: 4px;">Model</th>
+              <th style="text-align: center; padding: 4px;">Wind (Sfc)</th>
+              <th style="text-align: right; padding: 4px;">Cloud Base</th>
+            </tr>
+          </thead>
+          <tbody id="current-model-forecast-rows">
+            <tr><td colspan="3" style="padding: 6px; text-align: center; color: #8a99ad;">Loading Forecast...</td></tr>
+          </tbody>
+        </table>
 
         <!-- LARGER WINDS ALOFT TABLE -->
         <div style="font-size: 0.78rem; color: #8a99ad; text-transform: uppercase; margin-bottom: 6px; font-weight: bold; letter-spacing: 0.5px;">✈️ Winds Aloft (EGTU 839')</div>
@@ -500,31 +434,6 @@
       </div>
 
       <div id="map"></div>
-    </div>
-
-    <!-- STREAMLINED MULTI-MODEL & CLOUD BASE TABLE -->
-    <div class="multi-table-card">
-      <div class="table-title">
-        <span>📊 Hourly Multi-Model Wind Forecast & Cloud Base (Dunkeswell EGTU)</span>
-        <div class="legend-bar">
-          <div class="legend-item"><div class="legend-box" style="background:#00e676;"></div> ≤15</div>
-          <div class="legend-item"><div class="legend-box" style="background:#ffee58;"></div> 16-20</div>
-          <div class="legend-item"><div class="legend-box" style="background:#ffb74d;"></div> 21-25</div>
-          <div class="legend-item"><div class="legend-box" style="background:#ff5252;"></div> >25</div>
-        </div>
-      </div>
-      <div class="table-wrapper">
-        <table class="multi-table-horizontal">
-          <thead>
-            <tr id="header-times-row">
-              <th class="model-name-th">Model \ Time</th>
-            </tr>
-          </thead>
-          <tbody id="multi-model-rows">
-            <tr><td colspan="13" style="padding: 6px; color: #8a99ad;">Fetching Live Forecasts...</td></tr>
-          </tbody>
-        </table>
-      </div>
     </div>
 
   </div>
@@ -962,75 +871,50 @@
         const nowHour = new Date().getHours();
         let currentIdx = 12;
 
-        let headerHTML = `<th class="model-name-th">Model \\ Time</th>`;
-        for (let i = 8; i <= 19; i++) {
+        for (let i = 0; i < times.length; i++) {
           const timeDate = new Date(times[i]);
-          const hourVal = timeDate.getHours();
-          if (hourVal === nowHour) currentIdx = i;
-          
-          const timeStr = timeDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-          const isPast = hourVal < nowHour;
-          headerHTML += `<th class="${isPast ? 'past-hour-th' : ''}">${timeStr}</th>`;
-        }
-        document.getElementById('header-times-row').innerHTML = headerHTML;
-
-        let rowsHTML = '';
-        models.forEach(model => {
-          rowsHTML += `<tr><td class="model-name-th">${model.name}</td>`;
-          
-          for (let i = 8; i <= 19; i++) {
-            const dataset = model.data;
-            if (!dataset || !dataset.hourly) {
-              rowsHTML += `<td>--</td>`;
-              continue;
-            }
-
-            const timeDate = new Date(times[i]);
-            const isPast = timeDate.getHours() < nowHour;
-            const cellClass = isPast ? 'past-hour-cell' : '';
-
-            const speed = Math.round(dataset.hourly.wind_speed_10m[i] || 0);
-            const gust = Math.round(dataset.hourly.wind_gusts_10m ? (dataset.hourly.wind_gusts_10m[i] || 0) : speed);
-            const dir = dataset.hourly.wind_direction_10m[i];
-            
-            const peak = Math.max(speed, gust);
-            const statusClass = getStatusClass(peak);
-
-            rowsHTML += `
-              <td class="${cellClass}">
-                <div class="wind-badge ${statusClass}">
-                  ${getArrow(dir)}${speed} <span class="gust-val">G:${gust}</span>
-                </div>
-              </td>
-            `;
+          if (timeDate.getHours() === nowHour) {
+            currentIdx = i;
+            break;
           }
-          rowsHTML += `</tr>`;
-        });
+        }
 
-        rowsHTML += `<tr><td class="model-name-th" style="color: #00d8ff;">Cloud Base</td>`;
-        for (let i = 8; i <= 19; i++) {
-          const timeDate = new Date(times[i]);
-          const isPast = timeDate.getHours() < nowHour;
-          const cellClass = isPast ? 'past-hour-cell' : '';
+        const sampleTimeDate = new Date(times[currentIdx]);
+        document.getElementById('current-hour-label').innerText = sampleTimeDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-          const temp = ecmwf.hourly.temperature_2m ? ecmwf.hourly.temperature_2m[i] : 18;
-          const dew = ecmwf.hourly.dewpoint_2m ? ecmwf.hourly.dewpoint_2m[i] : 11;
-          const cover = ecmwf.hourly.cloud_cover ? ecmwf.hourly.cloud_cover[i] : 50;
+        let currentForecastRowsHTML = '';
+        models.forEach(model => {
+          const dataset = model.data;
+          if (!dataset || !dataset.hourly) return;
+
+          const speed = Math.round(dataset.hourly.wind_speed_10m[currentIdx] || 0);
+          const gust = Math.round(dataset.hourly.wind_gusts_10m ? (dataset.hourly.wind_gusts_10m[currentIdx] || 0) : speed);
+          const dir = dataset.hourly.wind_direction_10m[currentIdx];
+          const peak = Math.max(speed, gust);
+          const statusClass = getStatusClass(peak);
+
+          const temp = dataset.hourly.temperature_2m ? dataset.hourly.temperature_2m[currentIdx] : 18;
+          const dew = dataset.hourly.dewpoint_2m ? dataset.hourly.dewpoint_2m[currentIdx] : 11;
+          const cover = dataset.hourly.cloud_cover ? dataset.hourly.cloud_cover[currentIdx] : 50;
 
           const baseAgl = calculateCloudBase(temp, dew, cover);
           const baseStr = (baseAgl !== null && baseAgl < 25000) ? `${baseAgl.toLocaleString()}'` : 'CLR';
 
-          rowsHTML += `
-            <td class="${cellClass}">
-              <div class="cloud-badge">
-                ${baseStr}
-              </div>
-            </td>
+          currentForecastRowsHTML += `
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+              <td style="padding: 6px 4px; font-weight: bold; color: #00d8ff;">${model.name}</td>
+              <td style="padding: 6px 4px; text-align: center;">
+                <div class="wind-badge ${statusClass}">
+                  ${getArrow(dir)}${speed} <span class="gust-val">G:${gust}</span>
+                </div>
+              </td>
+              <td style="padding: 6px 4px; text-align: right;">
+                <div class="cloud-badge">${baseStr}</div>
+              </td>
+            </tr>
           `;
-        }
-        rowsHTML += `</tr>`;
-
-        document.getElementById('multi-model-rows').innerHTML = rowsHTML;
+        });
+        document.getElementById('current-model-rows').innerHTML = currentForecastRowsHTML;
 
         const aromeDir = arome.hourly ? arome.hourly.wind_direction_10m[currentIdx] : 144;
         const aromeSpd = arome.hourly ? Math.round(arome.hourly.wind_speed_10m[currentIdx]) : 18;
