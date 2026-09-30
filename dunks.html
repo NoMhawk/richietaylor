@@ -355,7 +355,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 2.8.2</div>
+    <div class="rev-badge">REV: 2.8.4</div>
   </div>
 
   <div class="dashboard-container">
@@ -633,13 +633,14 @@
         { name: 'ECMWF',    dir: ecmwfDir, spd: ecmwfSpd, gst: ecmwfGst, color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)', dash: null }
       ];
 
-      // STACKED RADIAL DISTANCES FROM RUNWAY CENTER: starts at runway center, radiates outward
-      const radialDistances = [0.08, 0.16, 0.24];
+      // INDEPENDENT RUNWAY-ANCHORED RADIAL STAGGERING
+      const radialDistances = [0.06, 0.13, 0.20];
 
       rawModels.forEach((m, idx) => {
         const distNM = radialDistances[idx];
         const endPt = computeDestinationPoint(lat, lon, m.dir, distNM);
 
+        // Every model line starts precisely at [lat, lon] (the runway cross intersection)
         L.polyline([[lat, lon], [endPt.lat, endPt.lon]], {
           color: m.color, weight: 2.8, opacity: 0.9, dashArray: m.dash
         }).addTo(windRoseLayerGroup);
@@ -670,8 +671,8 @@
 
       if (!isManualMode || displayMode === 'both') {
         const autoSpotPt = computeDestinationPoint(lat, lon, autoRunIn, autoSpotOffset);
-        const startAutoRun = computeDestinationPoint(lat, lon, (autoRunIn + 180) % 360, autoSpotOffset * 0.6);
-        const endAutoRun = computeDestinationPoint(lat, lon, autoRunIn, autoSpotOffset * 1.6);
+        const startAutoRun = computeDestinationPoint(lat, lon, (autoRunIn + 180) % 360, 0.4);
+        const endAutoRun = computeDestinationPoint(lat, lon, autoRunIn, autoSpotOffset * 1.4);
 
         L.polyline([[startAutoRun.lat, startAutoRun.lon], [endAutoRun.lat, endAutoRun.lon]], {
           color: '#ffffff', weight: 3, dashArray: '5,6', opacity: 0.95
@@ -695,8 +696,8 @@
         const manualOffset = parseFloat(document.getElementById('slider-dist').value);
 
         const manSpotPt = computeDestinationPoint(lat, lon, manualHeading, manualOffset);
-        const startManRun = computeDestinationPoint(lat, lon, (manualHeading + 180) % 360, manualOffset * 0.6);
-        const endManRun = computeDestinationPoint(lat, lon, manualHeading, manualOffset * 1.6);
+        const startManRun = computeDestinationPoint(lat, lon, (manualHeading + 180) % 360, 0.4);
+        const endManRun = computeDestinationPoint(lat, lon, manualHeading, manualOffset * 1.4);
 
         L.polyline([[startManRun.lat, startManRun.lon], [endManRun.lat, endManRun.lon]], {
           color: '#ff9800', weight: 3.5, dashArray: '4,4', opacity: 1
