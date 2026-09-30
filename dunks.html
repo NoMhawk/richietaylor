@@ -1,4 +1,4 @@
-<!-- REV: 5.7.8 - SKYDIVE SOUTHWEST OPERATIONS DASHBOARD -->
+<!-- REV: 5.7.9 - SKYDIVE SOUTHWEST OPERATIONS DASHBOARD -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -437,7 +437,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.7.8</div>
+    <div class="rev-badge">REV: 5.7.9</div>
   </div>
 
   <div class="dashboard-container">
@@ -796,11 +796,11 @@
       const sectors = [
         { name: 'N', center: 0, rwy: 360 },
         { name: 'NE', center: 45, rwy: 40 },
-        { name: 'E', center: 90, rwy: 40 },
+        { name: 'E', center: 90, rwy: 90 }, // True East (090°) runway alignment
         { name: 'SE', center: 135, rwy: 170 },
         { name: 'S', center: 180, rwy: 170 },
         { name: 'SW', center: 225, rwy: 220 },
-        { name: 'W', center: 270, rwy: 220 },
+        { name: 'W', center: 270, rwy: 270 }, // True West (270°) runway alignment
         { name: 'NW', center: 315, rwy: 360 }
       ];
 
@@ -936,11 +936,11 @@
       if (isLandingManual) {
         const sectorVal = parseFloat(document.getElementById('select-wind-sector').value);
         const sectorsMap = { 0: 'N', 45: 'NE', 90: 'E', 135: 'SE', 170: 'S', 220: 'SW', 270: 'W', 315: 'NW' };
-        const matchedRwy = { 0: 360, 45: 40, 90: 40, 135: 170, 170: 170, 220: 220, 270: 220, 315: 360 };
+        const matchedRwy = { 0: 360, 45: 40, 90: 90, 135: 170, 170: 170, 220: 220, 270: 270, 315: 360 };
         activeSector = { name: sectorsMap[sectorVal], rwy: matchedRwy[sectorVal] };
       } else {
         activeSector = getRough8Sector(avgWindDir);
-        const reverseVal = { 360: 0, 40: 45, 170: 170, 220: 220 };
+        const reverseVal = { 360: 0, 40: 45, 90: 90, 170: 170, 220: 220, 270: 270 };
         if (reverseVal[activeSector.rwy] !== undefined) {
           document.getElementById('select-wind-sector').value = reverseVal[activeSector.rwy];
         }
@@ -949,7 +949,7 @@
       const sectorTurnDirections = {
         'N': 'left',
         'NE': 'left',
-        'E': 'left',  // East sector configured as left-hand pattern with extended base to keep downwind off the runway
+        'E': 'left',  // Pure East sector (090° wind): Left-hand pattern facing East (090° landing heading), with extended base to keep downwind off the runway
         'SE': 'right',
         'S': 'right',
         'SW': 'right',
@@ -982,9 +982,9 @@
       let baseStart, downwindEnd, circuitCoords, labelPosition;
 
       if (activeSector.name === 'E') {
-        // East sector: Left-hand pattern with a long extended base leg so downwind is safely away from the runway
-        const perpRad = circuitRad - Math.PI / 2; // Left side
-        const extendedBaseWidth = 320; // Long base leg
+        // True East sector (090° heading): Left-hand pattern with long extended base leg so downwind is safely away from the runway
+        const perpRad = circuitRad - Math.PI / 2; // Left side relative to 090° heading is North
+        const extendedBaseWidth = 320; 
         baseStart = [
           finalStart[0] + (extendedBaseWidth * Math.cos(perpRad)) / 111320,
           finalStart[1] + (extendedBaseWidth * Math.sin(perpRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
