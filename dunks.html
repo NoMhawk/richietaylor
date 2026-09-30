@@ -1,3 +1,4 @@
+<!-- REV: 5.7.5 - SKYDIVE SOUTHWEST OPERATIONS DASHBOARD -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -436,7 +437,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.7.4</div>
+    <div class="rev-badge">REV: 5.7.5</div>
   </div>
 
   <div class="dashboard-container">
@@ -981,21 +982,21 @@
       let baseStart, downwindEnd, circuitCoords, labelPosition;
 
       if (activeSector.name === 'NE') {
-        // NE sector: Right pattern with downwind leg coming straight from the North, base leg connecting across to final start
+        // NE sector: Downwind leg runs north-to-south on the west side, extending down from the north
         const downwindStart = [
           landingLat + (380 * Math.cos(0)) / 111320,
-          landingLon + (380 * Math.sin(0)) / (111320 * Math.cos(landingLat * Math.PI / 180))
+          landingLon - (130 * Math.sin(0)) / (111320 * Math.cos(landingLat * Math.PI / 180))
         ];
         downwindEnd = [
           finalStart[0],
-          landingLon + (380 * Math.sin(0)) / (111320 * Math.cos(landingLat * Math.PI / 180))
+          downwindStart[1]
         ];
         baseStart = finalStart;
 
         circuitCoords = [[landingLat, landingLon], finalStart, downwindEnd, downwindStart];
         labelPosition = [
           (downwindStart[0] + downwindEnd[0]) / 2,
-          downwindEnd[1]
+          downwindEnd[1] - 0.0002
         ];
       } else {
         const perpRad = circuitRad + (circuitSide === 'left' ? -Math.PI / 2 : Math.PI / 2);
@@ -1144,8 +1145,22 @@
         document.getElementById('uwind-3k').innerHTML  = `${getArrow((ecmwfDir + 10) % 360)} ${Math.round((ecmwfDir + 10) % 360)}° / ${Math.round(ecmwfSpd * 1.8)} mph`;
         document.getElementById('uwind-7k').innerHTML  = `${getArrow((ecmwfDir + 18) % 360)} ${Math.round((ecmwfDir + 18) % 360)}° / ${Math.round(ecmwfSpd * 2.3)} mph`;
         document.getElementById('uwind-10k').innerHTML = `${getArrow((ecmwfDir + 25) % 360)} ${Math.round((ecmwfDir + 25) % 360)}° / ${Math.round(ecmwfSpd * 2.8)} mph`;
-    } catch (e) {
-        console.warn("Update error");
+        document.getElementById('uwind-15k').innerHTML = `${getArrow((ecmwfDir + 30) % 360)} ${Math.round((ecmwfDir + 30) % 360)}° / ${Math.round(ecmwfSpd * 3.4)} mph`;
+
+      } catch (err) {
+        console.error("Fetch error:", err);
+      }
+    }
+
+    async function fetchMetar() {
+      try {
+        const res = await fetch(`https://metar.vatsim.net/EGTE`);
+        const metarStr = await res.text();
+        if (metarStr && metarStr.trim().length > 0) {
+          document.getElementById('raw-metar').innerText = metarStr.trim();
+        }
+      } catch(e) {
+        console.warn("METAR fallback active");
       }
     }
 
