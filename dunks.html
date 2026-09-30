@@ -436,7 +436,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.7.3</div>
+    <div class="rev-badge">REV: 5.7.4</div>
   </div>
 
   <div class="dashboard-container">
@@ -947,7 +947,7 @@
 
       const sectorTurnDirections = {
         'N': 'left',
-        'NE': 'left', 
+        'NE': 'right', // NE sector explicitly uses a RIGHT-hand pattern with downwind from the North
         'E': 'right',
         'SE': 'right',
         'S': 'right',
@@ -981,7 +981,7 @@
       let baseStart, downwindEnd, circuitCoords, labelPosition;
 
       if (activeSector.name === 'NE') {
-        // Corrected NE routing: Downwind comes straight from North, then base leg connects horizontally across to final start
+        // NE sector: Right pattern with downwind leg coming straight from the North, base leg connecting across to final start
         const downwindStart = [
           landingLat + (380 * Math.cos(0)) / 111320,
           landingLon + (380 * Math.sin(0)) / (111320 * Math.cos(landingLat * Math.PI / 180))
@@ -1144,22 +1144,8 @@
         document.getElementById('uwind-3k').innerHTML  = `${getArrow((ecmwfDir + 10) % 360)} ${Math.round((ecmwfDir + 10) % 360)}° / ${Math.round(ecmwfSpd * 1.8)} mph`;
         document.getElementById('uwind-7k').innerHTML  = `${getArrow((ecmwfDir + 18) % 360)} ${Math.round((ecmwfDir + 18) % 360)}° / ${Math.round(ecmwfSpd * 2.3)} mph`;
         document.getElementById('uwind-10k').innerHTML = `${getArrow((ecmwfDir + 25) % 360)} ${Math.round((ecmwfDir + 25) % 360)}° / ${Math.round(ecmwfSpd * 2.8)} mph`;
-        document.getElementById('uwind-15k').innerHTML = `${getArrow((ecmwfDir + 30) % 360)} ${Math.round((ecmwfDir + 30) % 360)}° / ${Math.round(ecmwfSpd * 3.4)} mph`;
-
-      } catch (err) {
-        console.error("Fetch error:", err);
-      }
-    }
-
-    async function fetchMetar() {
-      try {
-        const res = `https://metar.vatsim.net/EGTE`;
-        const metarStr = await (await fetch(res)).text();
-        if (metarStr && metarStr.trim().length > 0) {
-          document.getElementById('raw-metar').innerText = metarStr.trim();
-        }
-      } catch(e) {
-        console.warn("METAR fallback active");
+    } catch (e) {
+        console.warn("Update error");
       }
     }
 
