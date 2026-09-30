@@ -355,7 +355,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 3.0.6</div>
+    <div class="rev-badge">REV: 3.0.7</div>
   </div>
 
   <div class="dashboard-container">
@@ -645,9 +645,8 @@
       rawModels.forEach((m, idx) => {
         const distMeters = baseDistanceMeters + (idx * spreadStepMeters);
         
-        // Project UPWIND by shifting the angle 180° opposite to where the wind is blowing towards
-        const upwindDir = (m.dir + 180) % 360;
-        const rad = (upwindDir * Math.PI) / 180;
+        // Project DOWNWIND along m.dir (where the wind is blowing towards)
+        const rad = (m.dir * Math.PI) / 180;
         
         const dLat = (distMeters * Math.cos(rad)) / 111320;
         const dLon = (distMeters * Math.sin(rad)) / (111320 * Math.cos(lat * Math.PI / 180));
