@@ -93,7 +93,7 @@
       padding: 12px 14px;
       box-shadow: 0 6px 20px rgba(0,0,0,0.7);
       font-family: monospace;
-      width: 310px;
+      width: 325px;
     }
 
     .overlay-header {
@@ -131,7 +131,7 @@
     }
 
     .overlay-value {
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       font-weight: 900;
       color: #fff;
       line-height: 1.1;
@@ -144,7 +144,7 @@
     /* DZ CONTROL COLLAPSIBLE / COMPACT CONTROLS BELOW OVERLAY */
     .spot-overlay-card {
       position: absolute;
-      top: 195px;
+      top: 210px;
       right: 10px;
       z-index: 1000;
       background: rgba(11, 15, 25, 0.94);
@@ -154,7 +154,7 @@
       padding: 8px 10px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.6);
       font-family: monospace;
-      width: 310px;
+      width: 325px;
     }
 
     .spot-overlay-header {
@@ -436,7 +436,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.7.0</div>
+    <div class="rev-badge">REV: 5.7.1</div>
   </div>
 
   <div class="dashboard-container">
@@ -694,6 +694,14 @@
       return `<span class="dir-arrow" style="transform: rotate(${rotateDeg}deg); display: inline-block;">↑</span>`;
     }
 
+    function getCompassLetter(deg) {
+      if (deg === undefined || deg === null) return '--';
+      const normalized = (deg % 360 + 360) % 360;
+      const points = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
+      const index = Math.round((normalized / 22.5)) % 16;
+      return points[index];
+    }
+
     function getStatusClass(val) {
       if (val <= 15) return 'status-green';
       if (val <= 20) return 'status-yellow';
@@ -893,7 +901,7 @@
           pane: 'topSpotPane', radius: 8, fillColor: '#00d8ff', color: '#ffffff', weight: 2.5, fillOpacity: 1
         }).addTo(manualJumpLayerGroup);
 
-        document.getElementById('ov-spot').innerText = `${spotOffset.toFixed(2)} NM`;
+        document.getElementById('ov-spot').innerText = `${spotOffset.toFixed(2)} NM (${Math.round(runInHeading)}°)`;
         document.getElementById('ov-heading').innerText = `${Math.round(runInHeading)}° M (MAN)`;
       } else {
         const autoSpotPt = computeDestinationPoint(lat, lon, runInHeading, spotOffset);
@@ -916,7 +924,7 @@
           pane: 'topSpotPane', radius: 7, fillColor: '#ff2a2a', color: '#fff', weight: 2.5, fillOpacity: 1
         }).addTo(windRoseLayerGroup);
 
-        document.getElementById('ov-spot').innerText = `${spotOffset.toFixed(2)} NM`;
+        document.getElementById('ov-spot').innerText = `${spotOffset.toFixed(2)} NM (${Math.round(runInHeading)}° / ${getCompassLetter(runInHeading)})`;
         document.getElementById('ov-heading').innerText = `${Math.round(runInHeading)}° M`;
       }
 
@@ -995,10 +1003,11 @@
         icon: L.divIcon({ html: `<div class="circuit-label">${turnLabelText}</div>`, className: '', iconSize: [60, 16], iconAnchor: [30, 8] })
       }).addTo(circuitLayerGroup);
 
-      // Populate Top-Right Map Overlay Values
+      // Populate Top-Right Map Overlay Values with Compass Letters
       document.getElementById('ov-pattern').innerText = turnLabelText;
       document.getElementById('ov-windspd').innerText = `${Math.round(avgSpeed)} mph`;
-      document.getElementById('ov-winddir').innerText = `${Math.round(avgWindDir)}°`;
+      const roundedDir = Math.round(avgWindDir);
+      document.getElementById('ov-winddir').innerText = `${roundedDir}° (${getCompassLetter(roundedDir)})`;
       document.getElementById('overlay-sector-tag').innerText = `SECTOR ${activeSector.name}`;
     }
 
@@ -1109,7 +1118,7 @@
         cachedWeatherData = [aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst];
         updateDashboardMap();
 
-        document.getElementById('uwind-sfc').innerHTML = `${getArrow(ecmwfDir)} ${Math.round(ecmwfDir)}° / ${ecmwfSpd} mph`;
+        document.getElementById('uwind-sfc').innerHTML = `${getArrow(ecmwfDir)} ${Math.round(ecmwfDir)}° (${getCompassLetter(ecmwfDir)}) / ${ecmwfSpd} mph`;
         document.getElementById('uwind-3k').innerHTML  = `${getArrow((ecmwfDir + 10) % 360)} ${Math.round((ecmwfDir + 10) % 360)}° / ${Math.round(ecmwfSpd * 1.8)} mph`;
         document.getElementById('uwind-7k').innerHTML  = `${getArrow((ecmwfDir + 18) % 360)} ${Math.round((ecmwfDir + 18) % 360)}° / ${Math.round(ecmwfSpd * 2.3)} mph`;
         document.getElementById('uwind-10k').innerHTML = `${getArrow((ecmwfDir + 25) % 360)} ${Math.round((ecmwfDir + 25) % 360)}° / ${Math.round(ecmwfSpd * 2.8)} mph`;
