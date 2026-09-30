@@ -78,7 +78,7 @@
       background: #131b2e;
     }
 
-    #map, #sat-map { width: 100%; height: 100%; }
+    #map { width: 100%; height: 100%; }
 
     /* DZ CONTROL OVERLAY PANEL */
     .spot-overlay-card {
@@ -308,6 +308,10 @@
       background: #0b0f19;
     }
 
+    .radar-frame-box iframe { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
+    #sat-overlay-map { width: 100%; height: 100%; position: absolute; top: 0; left: 0; background: transparent !important; pointer-events: none; }
+    #sat-overlay-map .leaflet-pane { pointer-events: auto; }
+
     .rotated-pill {
       display: flex;
       align-items: center;
@@ -377,7 +381,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 3.0.16</div>
+    <div class="rev-badge">REV: 3.0.17</div>
   </div>
 
   <div class="dashboard-container">
@@ -521,7 +525,7 @@
           </div>
           <div class="card">
             <div class="card-label">Crosswind</div>
-            <div class="card-value" id="crosswind-val">6mph</div>
+            <div class="card-value" id="crosswind-val">6 mph</div>
           </div>
         </div>
 
@@ -530,15 +534,19 @@
         </div>
       </div>
 
-      <!-- LIVE SATELLITE VIEW (Interactive Leaflet Map with SDSW Marker) -->
+      <!-- LIVE SATELLITE VIEW (Animated Windy Satellite + Leaflet Marker Overlay) -->
       <div class="pane-segment" style="flex: 1;">
         <div class="pane-header">
-          <div class="title">🛰️️ Live Satellite Imagery</div>
-          <div class="subtitle">Dunkeswell Airfield View</div>
+          <div class="title">🛰 Live Satellite Imagery</div>
+          <div class="subtitle">South West Cloud Cover & SDSW Marker</div>
         </div>
 
         <div class="radar-frame-box">
-          <div id="sat-map"></div>
+          <iframe 
+            src="https://embed.windy.com/embed2.html?lat=50.860619&lon=-3.233961&detailLat=50.860619&detailLon=-3.233961&width=100%25&height=220&zoom=9&level=surface&overlay=satellite&product=satellite&menu=false&message=false&marker=false&calendar=false&pressure=false&type=map&location=coordinates&detail=false&play=true&metricWind=mph&metricTemp=%C2%B0C" 
+            allowfullscreen>
+          </iframe>
+          <div id="sat-overlay-map"></div>
         </div>
       </div>
 
@@ -563,13 +571,9 @@
     let windRoseLayerGroup = L.layerGroup().addTo(map);
     let manualLayerGroup = L.layerGroup().addTo(map);
 
-    // Right Satellite Map (Interactive Leaflet so we can place an exact marker on the airfield)
-    const satMap = L.map('sat-map', { zoomControl: false, attributionControl: false }).setView([lat, lon], 14);
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      maxZoom: 19, maxNativeZoom: 18
-    }).addTo(satMap);
-
-    // Add explicit SDSW Dropzone marker right on the airfield on the satellite map
+    // Right Satellite Overlay Map (Synchronized zoom/center with the Windy embed)
+    const satOverlayMap = L.map('sat-overlay-map', { zoomControl: false, attributionControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false }).setView([lat, lon], 9);
+    
     const sdswMarkerHtml = `
       <div class="sdsw-dz-marker">
         <div class="sdsw-dz-dot"></div>
@@ -578,7 +582,7 @@
     `;
     L.marker([lat, lon], {
       icon: L.divIcon({ html: sdswMarkerHtml, className: '', iconSize: [95, 22], iconAnchor: [47, 11] })
-    }).addTo(satMap);
+    }).addTo(satOverlayMap);
 
     let isManualMode = false;
     let cachedWeatherData = [144, 18, 30, 144, 20, 30, 144, 18, 33];
