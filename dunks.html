@@ -386,7 +386,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.6.3</div>
+    <div class="rev-badge">REV: 5.6.4</div>
   </div>
 
   <div class="dashboard-container">
@@ -709,14 +709,14 @@
     function getRough8Sector(deg) {
       const normalized = (deg + 360) % 360;
       const sectors = [
-        { name: 'N', center: 0, rwy: 350 },
+        { name: 'N', center: 0, rwy: 360 },
         { name: 'NE', center: 45, rwy: 40 },
         { name: 'E', center: 90, rwy: 40 },
         { name: 'SE', center: 135, rwy: 170 },
         { name: 'S', center: 180, rwy: 170 },
         { name: 'SW', center: 225, rwy: 220 },
         { name: 'W', center: 270, rwy: 220 },
-        { name: 'NW', center: 315, rwy: 350 }
+        { name: 'NW', center: 315, rwy: 360 }
       ];
 
       let closest = sectors[0];
@@ -851,17 +851,16 @@
       if (isLandingManual) {
         const sectorVal = parseFloat(document.getElementById('select-wind-sector').value);
         const sectorsMap = { 0: 'N', 45: 'NE', 90: 'E', 135: 'SE', 170: 'S', 220: 'SW', 270: 'W', 315: 'NW' };
-        const matchedRwy = { 0: 350, 45: 40, 90: 40, 135: 170, 170: 170, 220: 220, 270: 220, 315: 350 };
+        const matchedRwy = { 0: 360, 45: 40, 90: 40, 135: 170, 170: 170, 220: 220, 270: 220, 315: 360 };
         activeSector = { name: sectorsMap[sectorVal], rwy: matchedRwy[sectorVal] };
       } else {
         activeSector = getRough8Sector(avgWindDir);
-        const reverseVal = { 350: 0, 40: 45, 170: 170, 220: 220 };
+        const reverseVal = { 360: 0, 40: 45, 170: 170, 220: 220 };
         if (reverseVal[activeSector.rwy] !== undefined) {
           document.getElementById('select-wind-sector').value = reverseVal[activeSector.rwy];
         }
       }
 
-      // Mapping rules for each of the 8 sectors to pick left or right turn patterns
       const sectorTurnDirections = {
         'N': 'left',
         'NE': 'left',
@@ -914,7 +913,6 @@
         color: '#ff9800', weight: 3, dashArray: '5,5', opacity: 0.95
       }).addTo(circuitLayerGroup);
 
-      // Display LEFT or RIGHT turn indicator at the end of the downwind leg
       const turnLabelText = circuitSide.toUpperCase();
 
       L.marker(downwindEnd, {
