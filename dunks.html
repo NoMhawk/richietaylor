@@ -355,7 +355,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 3.0.1</div>
+    <div class="rev-badge">REV: 3.0.2</div>
   </div>
 
   <div class="dashboard-container">
@@ -642,8 +642,9 @@
       rawModels.forEach((m, idx) => {
         const distMeters = baseDistanceMeters + (idx * spreadStepMeters);
         
-        // Correct vector projecting down-wind along the true heading
-        const rad = ((m.dir - 180) * Math.PI) / 180;
+        // UPWIND OFFSET: Project the vanes in the direction the wind is coming FROM (m.dir + 180)
+        const upwindBearing = (m.dir + 180) % 360;
+        const rad = ((upwindBearing - 90) * Math.PI) / 180;
         
         const dLat = (distMeters * Math.cos(rad)) / 111320;
         const dLon = (distMeters * Math.sin(rad)) / (111320 * Math.cos(lat * Math.PI / 180));
@@ -655,7 +656,7 @@
           color: m.color, weight: 2.2, opacity: 0.85
         }).addTo(windRoseLayerGroup);
 
-        let cssRotationAngle = (m.dir - 270) % 360;
+        let cssRotationAngle = (upwindBearing - 90 + 360) % 360;
         if (cssRotationAngle > 90 && cssRotationAngle < 270) {
           cssRotationAngle = (cssRotationAngle + 180) % 360;
         }
@@ -763,7 +764,7 @@
           { name: 'AROME', data: arome }
         ];
 
-        let headerHTML = `<th class="model-name-th">Model \\ Time</th>`;
+        let headerHTML = `<th class="model-name-th">Model \ Time</th>`;
         const nowHour = new Date().getHours();
         let currentIdx = 12;
 
