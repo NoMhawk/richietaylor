@@ -355,7 +355,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 2.9.5</div>
+    <div class="rev-badge">REV: 2.9.6</div>
   </div>
 
   <div class="dashboard-container">
@@ -544,7 +544,6 @@
     let manualLayerGroup = L.layerGroup().addTo(map);
 
     let isManualMode = false;
-    // Pre-populate with safe default weather data so the vanes render instantly on load!
     let cachedWeatherData = [144, 18, 30, 144, 20, 30, 144, 18, 33];
 
     function getArrow(deg) {
@@ -634,8 +633,12 @@
         { name: 'ECMWF',    dir: ecmwfDir, spd: ecmwfSpd, gst: ecmwfGst, color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)' }
       ];
 
-      const baseDistanceMeters = 35;
-      const spreadStepMeters = 18;
+      // ZOOM-AWARE SCALING: Factor in current map zoom so offsets scale dynamically without collapsing when zoomed out
+      const currentZoom = map.getZoom();
+      const zoomScale = Math.pow(2, 15 - currentZoom); // Scale relative to zoom level 15
+
+      const baseDistanceMeters = 35 * zoomScale;
+      const spreadStepMeters = 18 * zoomScale;
 
       rawModels.forEach((m, idx) => {
         const distMeters = baseDistanceMeters + (idx * spreadStepMeters);
@@ -729,7 +732,6 @@
       }
     }
 
-    // Render immediately on load using fallback weather data
     updateWindRoseOnMap(...cachedWeatherData);
 
     map.on('zoomend', () => {
