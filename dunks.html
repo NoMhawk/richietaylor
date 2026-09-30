@@ -1,4 +1,4 @@
-<!-- REV: 5.9.1 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 5.9.2 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -296,7 +296,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.9.1</div>
+    <div class="rev-badge">REV: 5.9.2</div>
   </div>
 
   <div class="dashboard-container">
@@ -311,7 +311,7 @@
           <span id="overlay-sector-tag" style="font-size: 0.85rem; color: #ffee58;">SECTOR N</span>
         </div>
         
-        <div class="overlay-grid">
+        <div class="overlay-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 12px;">
           <div class="overlay-cell">
             <div class="overlay-label">Pattern Turn</div>
             <div class="overlay-value accent-orange" id="ov-pattern">--</div>
@@ -322,21 +322,23 @@
           </div>
         </div>
 
-        <div class="overlay-grid">
+        <div class="overlay-grid" style="grid-template-columns: 1fr; margin-bottom: 12px;">
           <div class="overlay-cell">
             <div class="overlay-label">Wind Direction</div>
             <div class="overlay-value accent-cyan" id="ov-winddir">--°</div>
           </div>
-          <div class="overlay-cell">
-            <div class="overlay-label">Clear Drop Spot</div>
-            <div class="overlay-value accent-cyan" id="ov-spot">-- NM</div>
-          </div>
         </div>
 
-        <!-- FULL-WIDTH RUN-IN HEADING BOX -->
-        <div style="background: rgba(0, 0, 0, 0.5); border: 1px solid #1e2d4a; border-radius: 6px; padding: 12px 16px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;">
-          <span class="overlay-label" style="margin:0; font-size: 0.8rem;">Run-In Heading:</span>
-          <span style="font-size: 1.6rem; font-weight: 900; color: #fff;" id="ov-heading">--° M</span>
+        <!-- RUN-IN HEADING & DROP SPOT COMBINED BOX -->
+        <div style="background: rgba(0, 0, 0, 0.5); border: 1px solid #1e2d4a; border-radius: 6px; padding: 12px 16px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 6px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="overlay-label" style="margin:0; font-size: 0.8rem;">Run-In Heading:</span>
+            <span style="font-size: 1.5rem; font-weight: 900; color: #fff;" id="ov-heading">--° M</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 6px; font-size: 0.82rem; font-family: monospace;">
+            <span style="color: #8a99ad; text-transform: uppercase;">Drop Offset:</span>
+            <span style="color: #00d8ff; font-weight: bold;" id="ov-drop-detail">--</span>
+          </div>
         </div>
 
         <!-- CURRENT HOUR MODEL FORECAST CARD -->
@@ -453,7 +455,8 @@
     const easterlyLandingLon = -3.237317785882287;
     // ==========================================
 
-    const map = L.map('map', { zoomControl: false }).setView([lat, lon], 15);
+    // Zoomed in 1 level (default 16 instead of 15)
+    const map = L.map('map', { zoomControl: false }).setView([lat, lon], 16);
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       maxZoom: 19, maxNativeZoom: 18
     }).addTo(map);
@@ -614,7 +617,7 @@
       ];
 
       const currentZoom = map.getZoom();
-      const zoomScale = Math.pow(2, 15 - currentZoom);
+      const zoomScale = Math.pow(2, 16 - currentZoom);
       const baseDistanceMeters = 35 * zoomScale;
       const spreadStepMeters = 18 * zoomScale;
 
@@ -683,8 +686,10 @@
           pane: 'topSpotPane', radius: 8, fillColor: '#00d8ff', color: '#ffffff', weight: 2.5, fillOpacity: 1
         }).addTo(manualJumpLayerGroup);
 
-        document.getElementById('ov-spot').innerText = `${spotOffset.toFixed(2)} NM (${Math.round(runInHeading)}°)`;
-        document.getElementById('ov-heading').innerText = `${Math.round(runInHeading)}° M (MAN)`;
+        const roundedHdg = Math.round(runInHeading);
+        const compassLtr = getCompassLetter(roundedHdg);
+        document.getElementById('ov-heading').innerText = `${roundedHdg}° M (${compassLtr}) MAN`;
+        document.getElementById('ov-drop-detail').innerText = `${spotOffset.toFixed(2)} before`;
       } else {
         const autoSpotPt = computeDestinationPoint(lat, lon, runInHeading, spotOffset);
         const startAutoRun = computeDestinationPoint(lat, lon, (runInHeading + 180) % 360, 0.4);
@@ -706,8 +711,10 @@
           pane: 'topSpotPane', radius: 7, fillColor: '#ff2a2a', color: '#fff', weight: 2.5, fillOpacity: 1
         }).addTo(windRoseLayerGroup);
 
-        document.getElementById('ov-spot').innerText = `${spotOffset.toFixed(2)} NM (${Math.round(runInHeading)}° / ${getCompassLetter(runInHeading)})`;
-        document.getElementById('ov-heading').innerText = `${Math.round(runInHeading)}° M`;
+        const roundedHdg = Math.round(runInHeading);
+        const compassLtr = getCompassLetter(roundedHdg);
+        document.getElementById('ov-heading').innerText = `${roundedHdg}° M (${compassLtr})`;
+        document.getElementById('ov-drop-detail').innerText = `${spotOffset.toFixed(2)} before`;
       }
 
       // ==========================================
