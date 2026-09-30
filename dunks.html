@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -329,7 +328,6 @@
       height: 22px;
       width: 120px;
       box-sizing: border-box;
-      transform-origin: left center;
     }
 
     .rotated-pill-tag {
@@ -356,7 +354,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 3.0.11</div>
+    <div class="rev-badge">REV: 3.0.13</div>
   </div>
 
   <div class="dashboard-container">
@@ -512,13 +510,13 @@
       <!-- LIVE SATELLITE VIEW -->
       <div class="pane-segment" style="flex: 1;">
         <div class="pane-header">
-          <div class="title">🛰️️ Live Satellite Imagery</div>
+          <div class="title">🛰️ Live Satellite Imagery</div>
           <div class="subtitle">South West Cloud Cover</div>
         </div>
 
         <div class="radar-frame-box">
           <iframe 
-            src="https://embed.windy.com/embed2.html?lat=50.860619&lon=-3.233961&detailLat=50.860619&detailLon=-3.233961&width=100%25&height=220&zoom=11&level=surface&overlay=satellite&product=satellite&menu=false&message=false&marker=true&calendar=false&pressure=false&type=map&location=coordinates&detail=false&play=true&metricWind=mph&metricTemp=%C2%B0C" 
+            src="https://embed.windy.com/embed2.html?lat=50.860619&lon=-3.233961&detailLat=50.860619&detailLon=-3.233961&width=100%25&height=220&zoom=9&level=surface&overlay=satellite&product=satellite&menu=false&message=false&marker=false&calendar=false&pressure=false&type=map&location=coordinates&detail=false&play=true&metricWind=mph&metricTemp=%C2%B0C" 
             allowfullscreen>
           </iframe>
         </div>
@@ -558,13 +556,6 @@
       if (val <= 20) return 'status-yellow';
       if (val <= 25) return 'status-orange';
       return 'status-red';
-    }
-
-    // Circular mean of compass bearings (handles wrap-around at north)
-    function circularMeanDeg(degs) {
-      const s = degs.reduce((a, d) => a + Math.sin(d * Math.PI / 180), 0);
-      const c = degs.reduce((a, d) => a + Math.cos(d * Math.PI / 180), 0);
-      return (Math.atan2(s, c) * 180 / Math.PI + 360) % 360;
     }
 
     function computeDestinationPoint(originLat, originLon, bearingDeg, distanceNM) {
@@ -626,6 +617,13 @@
       }
     }
 
+    // Circular mean helper to prevent wrapping issues near North (e.g. 350° and 10°)
+    function circularMeanDeg(degs) {
+      const s = degs.reduce((a, d) => a + Math.sin(d * Math.PI / 180), 0);
+      const c = degs.reduce((a, d) => a + Math.cos(d * Math.PI / 180), 0);
+      return (Math.atan2(s, c) * 180 / Math.PI + 360) % 360;
+    }
+
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
       windRoseLayerGroup.clearLayers();
       manualLayerGroup.clearLayers();
@@ -653,10 +651,8 @@
       rawModels.forEach((m, idx) => {
         const distMeters = baseDistanceMeters + (idx * spreadStepMeters);
         
-        // UPWIND POSITIONING: wind direction is where the wind comes FROM,
-        // so projecting along that bearing places the vane on the upwind side.
+        // Project UPWIND (toward the bearing the wind is coming FROM)
         const rad = (m.dir * Math.PI) / 180;
-        
         const dLat = (distMeters * Math.cos(rad)) / 111320;
         const dLon = (distMeters * Math.sin(rad)) / (111320 * Math.cos(lat * Math.PI / 180));
 
@@ -667,9 +663,6 @@
           color: m.color, weight: 2.2, opacity: 0.85
         }).addTo(windRoseLayerGroup);
 
-        // Rotate the pill along the vane; flip it if the text would be upside down.
-        // Flipped pills are anchored by their right edge so they still extend
-        // outward beyond the end of the vane line, not back across it.
         let cssRotationAngle = (m.dir - 90 + 360) % 360;
         let flipped = false;
         if (cssRotationAngle > 90 && cssRotationAngle < 270) {
@@ -689,7 +682,7 @@
             html: pillHTML,
             className: '',
             iconSize: [120, 22],
-            iconAnchor: flipped ? [122, 11] : [-2, 11]
+            iconAnchor: flipped ? [120, 11] : [-2, 11]
           })
         }).addTo(windRoseLayerGroup);
       });
