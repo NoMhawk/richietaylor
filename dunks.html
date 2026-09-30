@@ -1,9 +1,9 @@
-<!-- REV: 5.8.5 - SKYDIVE SOUTHWEST OPERATIONS DASHBOARD -->
+<!-- REV: 5.8.6 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Skydive Southwest - Dunkeswell Weather Operations</title>
+  <title>Dunkeswell - Operations Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Leaflet CSS & JS -->
@@ -81,20 +81,20 @@
 
     #map { width: 100%; height: 100%; }
 
-    /* LARGE TOP-RIGHT MAP OVERLAY PANEL */
+    /* LARGE TOP-RIGHT MAP OVERLAY PANEL WITH INTEGRATED WINDS ALOFT */
     .map-info-overlay {
       position: absolute;
       top: 10px;
       right: 10px;
       z-index: 1000;
-      background: rgba(11, 15, 25, 0.92);
+      background: rgba(11, 15, 25, 0.94);
       backdrop-filter: blur(10px);
       border: 1.5px solid #00d8ff;
       border-radius: 8px;
-      padding: 12px 14px;
+      padding: 10px 12px;
       box-shadow: 0 6px 20px rgba(0,0,0,0.7);
       font-family: monospace;
-      width: 325px;
+      width: 335px;
     }
 
     .overlay-header {
@@ -102,8 +102,8 @@
       font-weight: 800;
       color: #00d8ff;
       text-transform: uppercase;
-      margin-bottom: 8px;
-      padding-bottom: 5px;
+      margin-bottom: 6px;
+      padding-bottom: 4px;
       border-bottom: 1px solid #1e2d4a;
       display: flex;
       justify-content: space-between;
@@ -113,26 +113,26 @@
     .overlay-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 8px;
+      gap: 6px;
+      margin-bottom: 6px;
     }
 
     .overlay-cell {
       background: rgba(0, 0, 0, 0.4);
       border: 1px solid #1e2d4a;
       border-radius: 5px;
-      padding: 6px 8px;
+      padding: 5px 7px;
     }
 
     .overlay-label {
-      font-size: 0.6rem;
+      font-size: 0.58rem;
       color: #8a99ad;
       text-transform: uppercase;
       margin-bottom: 2px;
     }
 
     .overlay-value {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 900;
       color: #fff;
       line-height: 1.1;
@@ -145,7 +145,7 @@
     /* DZ CONTROL COLLAPSIBLE / COMPACT CONTROLS BELOW OVERLAY */
     .spot-overlay-card {
       position: absolute;
-      top: 210px;
+      top: 295px;
       right: 10px;
       z-index: 1000;
       background: rgba(11, 15, 25, 0.94);
@@ -155,7 +155,7 @@
       padding: 8px 10px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.6);
       font-family: monospace;
-      width: 325px;
+      width: 335px;
     }
 
     .spot-overlay-header {
@@ -355,21 +355,6 @@
       word-break: break-all;
     }
 
-    .radar-frame-box {
-      position: relative;
-      width: 100%;
-      flex: 1;
-      min-height: 180px;
-      border-radius: 6px;
-      overflow: hidden;
-      border: 1px solid #1e2d4a;
-      background: #0b0f19;
-    }
-
-    .radar-frame-box iframe { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
-    #sat-overlay-map { width: 100%; height: 100%; position: absolute; top: 0; left: 0; background: transparent !important; pointer-events: none; }
-    #sat-overlay-map .leaflet-pane { pointer-events: auto; }
-
     .rotated-pill {
       display: flex;
       align-items: center;
@@ -417,15 +402,6 @@
       pointer-events: none;
     }
 
-    .sat-dot-marker {
-      width: 10px;
-      height: 10px;
-      background: #00d8ff;
-      border: 2px solid #ffffff;
-      border-radius: 50%;
-      box-shadow: 0 0 8px #00d8ff;
-    }
-
     .circuit-label {
       background: rgba(11, 15, 25, 0.85);
       border: 1px solid #ff9800;
@@ -444,21 +420,21 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.8.5</div>
+    <div class="rev-badge">REV: 5.8.6</div>
   </div>
 
   <div class="dashboard-container">
     
-    <!-- LEFT STACK: SATELLITE MAP + STREAMLINED TABLE -->
+    <!-- LEFT STACK: MAP & STREAMLINED TABLE -->
     <div class="segment-1-stack">
       
-      <!-- MAP CARD WITH LARGE TOP-RIGHT OVERLAY + CONTROLS -->
+      <!-- MAP CARD WITH LARGE TOP-RIGHT OVERLAY + WINDS ALOFT & CONTROLS -->
       <div class="map-card">
         
-        <!-- LARGE TOP-RIGHT MAP OVERLAY -->
+        <!-- LARGE TOP-RIGHT MAP OVERLAY WITH INTEGRATED WINDS ALOFT -->
         <div class="map-info-overlay">
           <div class="overlay-header">
-            <span>⚡ Live Ops Status</span>
+            <span>⚡ Live Ops & Winds Aloft</span>
             <span id="overlay-sector-tag" style="font-size: 0.65rem; color: #ffee58;">SECTOR N</span>
           </div>
           
@@ -484,10 +460,39 @@
             </div>
           </div>
 
-          <div style="background: rgba(0,0,0,0.4); border: 1px solid #1e2d4a; border-radius: 5px; padding: 5px 8px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="background: rgba(0,0,0,0.4); border: 1px solid #1e2d4a; border-radius: 5px; padding: 4px 6px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
             <span class="overlay-label" style="margin:0;">Run-In Heading:</span>
-            <span style="font-size: 0.85rem; font-weight: bold; color: #fff;" id="ov-heading">--° M</span>
+            <span style="font-size: 0.8rem; font-weight: bold; color: #fff;" id="ov-heading">--° M</span>
           </div>
+
+          <!-- COMPACT WINDS ALOFT TABLE IN OVERLAY -->
+          <div style="font-size: 0.58rem; color: #8a99ad; text-transform: uppercase; margin-bottom: 2px; font-weight: bold;">✈️ Winds Aloft (EGTU 839')</div>
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.58rem; font-family: monospace;">
+            <thead>
+              <tr style="border-bottom: 1px solid #1e2d4a; color: #8a99ad;">
+                <th style="text-align: left; padding: 1px;">Alt</th>
+                <th style="text-align: left; padding: 1px;">Dir / Speed</th>
+                <th style="text-align: right; padding: 1px;">Temp</th>
+              </tr>
+            </thead>
+            <tbody id="upper-winds-rows">
+              <tr style="border-bottom: 1px solid rgba(255,255,255,0.03);">
+                <td style="padding: 1px;">Sfc</td><td id="uwind-sfc">--</td><td id="utemp-sfc" style="text-align: right;">18°C</td>
+              </tr>
+              <tr style="border-bottom: 1px solid rgba(255,255,255,0.03);">
+                <td style="padding: 1px;">3k'</td><td id="uwind-3k">--</td><td id="utemp-3k" style="text-align: right;">12°C</td>
+              </tr>
+              <tr style="border-bottom: 1px solid rgba(255,255,255,0.03);">
+                <td style="padding: 1px;">7k'</td><td id="uwind-7k">--</td><td id="utemp-7k" style="text-align: right;">4°C</td>
+              </tr>
+              <tr style="border-bottom: 1px solid rgba(255,255,255,0.03);">
+                <td style="padding: 1px;">10k'</td><td id="uwind-10k">--</td><td id="utemp-10k" style="text-align: right;">-2°C</td>
+              </tr>
+              <tr>
+                <td style="padding: 1px;">15k'</td><td id="uwind-15k">--</td><td id="utemp-15k" style="text-align: right;">-12°C</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <!-- COMPACT SPOT & LANDING CONTROLS PANEL -->
@@ -569,55 +574,9 @@
 
     </div>
 
-    <!-- RIGHT COLUMN: WINDS ALOFT & SATELLITE -->
+    <!-- RIGHT COLUMN: METAR & SAFETY -->
     <div class="right-column-stack">
       
-      <!-- COMPACT WINDS ALOFT PROFILE -->
-      <div class="pane-segment" style="flex: 0 0 auto;">
-        <div class="pane-header">
-          <div class="title">✈️ Winds Aloft Profile</div>
-          <div class="subtitle">EGTU (839')</div>
-        </div>
-
-        <div class="grid-2">
-          <div class="card">
-            <div class="card-label">Ceiling</div>
-            <div class="card-value">SCT 4,500'</div>
-          </div>
-          <div class="card">
-            <div class="card-label">Density Alt</div>
-            <div class="card-value">1,120 FT</div>
-          </div>
-        </div>
-
-        <table style="width: 100%; border-collapse: collapse; font-size: 0.62rem;">
-          <thead>
-            <tr style="border-bottom: 1px solid #1e2d4a; color: #8a99ad; font-size: 0.55rem; text-transform: uppercase;">
-              <th style="text-align: left; padding: 2px;">Alt</th>
-              <th style="text-align: left; padding: 2px;">Dir / Speed</th>
-              <th style="text-align: left; padding: 2px;">Temp</th>
-            </tr>
-          </thead>
-          <tbody id="upper-winds-rows">
-            <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-              <td style="padding: 2px;">Sfc (839')</td><td id="uwind-sfc">--</td><td id="utemp-sfc">18°C</td>
-            </tr>
-            <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-              <td style="padding: 2px;">FL030 (3k')</td><td id="uwind-3k">--</td><td id="utemp-3k">12°C</td>
-            </tr>
-            <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-              <td style="padding: 2px;">FL070 (7k')</td><td id="uwind-7k">--</td><td id="utemp-7k">4°C</td>
-            </tr>
-            <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-              <td style="padding: 2px;">FL100 (10k')</td><td id="uwind-10k">--</td><td id="utemp-10k">-2°C</td>
-            </tr>
-            <tr style="border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace;">
-              <td style="padding: 2px;">FL150 (15k')</td><td id="uwind-15k">--</td><td id="utemp-15k">-12°C</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
       <!-- METAR & RUNWAY -->
       <div class="pane-segment" style="flex: 0 0 auto;">
         <div class="pane-header">
@@ -642,22 +601,6 @@
 
         <div class="raw-metar-box" id="raw-metar">
           EGTE 281620Z 09011KT 9999 FEW035 18/11 Q1018 NOSIG
-        </div>
-      </div>
-
-      <!-- LIVE SATELLITE VIEW -->
-      <div class="pane-segment" style="flex: 1;">
-        <div class="pane-header">
-          <div class="title">🛰 Live Satellite Imagery</div>
-          <div class="subtitle">South West Cloud Cover & DZ Marker</div>
-        </div>
-
-        <div class="radar-frame-box">
-          <iframe 
-            src="https://embed.windy.com/embed2.html?lat=50.860619&lon=-3.233961&detailLat=50.860619&detailLon=-3.233961&width=100%25&height=220&zoom=9&level=surface&overlay=satellite&product=satellite&menu=false&message=false&marker=false&calendar=false&pressure=false&type=map&location=coordinates&detail=false&play=true&metricWind=mph&metricTemp=%C2%B0C" 
-            allowfullscreen>
-          </iframe>
-          <div id="sat-overlay-map"></div>
         </div>
       </div>
 
@@ -692,12 +635,6 @@
     let manualJumpLayerGroup = L.layerGroup().addTo(map);
     let circuitLayerGroup = L.layerGroup().addTo(map);
     circuitLayerGroup.addTo(map);
-
-    const satOverlayMap = L.map('sat-overlay-map', { zoomControl: false, attributionControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false }).setView([lat, lon], 9);
-    
-    L.marker([lat, lon], {
-      icon: L.divIcon({ html: `<div class="sat-dot-marker"></div>`, className: '', iconSize: [12, 12], iconAnchor: [6, 6] })
-    }).addTo(satOverlayMap);
 
     let isJumpManual = false;
     let isLandingManual = false;
@@ -815,7 +752,7 @@
         { name: 'S', center: 180, rwy: 170 },
         { name: 'SW', center: 225, rwy: 220 },
         { name: 'W', center: 270, rwy: 270 },
-        { name: 'NW', center: 315, rwy: 320 } // NW sector set to into-wind runway alignment (320°)
+        { name: 'NW', center: 315, rwy: 320 }
       ];
 
       let closest = sectors[0];
@@ -968,7 +905,7 @@
         'S': 'right',
         'SW': 'right',
         'W': 'left',
-        'NW': 'left' // NW sector set to left pattern into the 320° runway heading
+        'NW': 'left'
       };
 
       let circuitSide = sectorTurnDirections[activeSector.name] || 'left';
@@ -1189,11 +1126,11 @@
         cachedWeatherData = [aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst];
         updateDashboardMap();
 
-        document.getElementById('uwind-sfc').innerHTML = `${getArrow(ecmwfDir)} ${Math.round(ecmwfDir)}° (${getCompassLetter(ecmwfDir)}) / ${ecmwfSpd} mph`;
-        document.getElementById('uwind-3k').innerHTML  = `${getArrow((ecmwfDir + 10) % 360)} ${Math.round((ecmwfDir + 10) % 360)}° / ${Math.round(ecmwfSpd * 1.8)} mph`;
-        document.getElementById('uwind-7k').innerHTML  = `${getArrow((ecmwfDir + 18) % 360)} ${Math.round((ecmwfDir + 18) % 360)}° / ${Math.round(ecmwfSpd * 2.3)} mph`;
-        document.getElementById('uwind-10k').innerHTML = `${getArrow((ecmwfDir + 25) % 360)} ${Math.round((ecmwfDir + 25) % 360)}° / ${Math.round(ecmwfSpd * 2.8)} mph`;
-        document.getElementById('uwind-15k').innerHTML = `${getArrow((ecmwfDir + 30) % 360)} ${Math.round((ecmwfDir + 30) % 360)}° / ${Math.round(ecmwfSpd * 3.4)} mph`;
+        document.getElementById('uwind-sfc').innerHTML = `${getArrow(ecmwfDir)} ${Math.round(ecmwfDir)}° / ${ecmwfSpd}mph`;
+        document.getElementById('uwind-3k').innerHTML  = `${getArrow((ecmwfDir + 10) % 360)} ${Math.round((ecmwfDir + 10) % 360)}° / ${Math.round(ecmwfSpd * 1.8)}mph`;
+        document.getElementById('uwind-7k').innerHTML  = `${getArrow((ecmwfDir + 18) % 360)} ${Math.round((ecmwfDir + 18) % 360)}° / ${Math.round(ecmwfSpd * 2.3)}mph`;
+        document.getElementById('uwind-10k').innerHTML = `${getArrow((ecmwfDir + 25) % 360)} ${Math.round((ecmwfDir + 25) % 360)}° / ${Math.round(ecmwfSpd * 2.8)}mph`;
+        document.getElementById('uwind-15k').innerHTML = `${getArrow((ecmwfDir + 30) % 360)} ${Math.round((ecmwfDir + 30) % 360)}° / ${Math.round(ecmwfSpd * 3.4)}mph`;
 
       } catch (err) {
         console.error("Fetch error:", err);
