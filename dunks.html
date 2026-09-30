@@ -436,7 +436,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.7.1</div>
+    <div class="rev-badge">REV: 5.7.2</div>
   </div>
 
   <div class="dashboard-container">
@@ -947,7 +947,7 @@
 
       const sectorTurnDirections = {
         'N': 'left',
-        'NE': 'left',
+        'NE': 'left', // Uses Rwy 40° heading, but configured to come downwind from the north
         'E': 'right',
         'SE': 'right',
         'S': 'right',
@@ -957,10 +957,8 @@
       };
 
       let circuitSide = sectorTurnDirections[activeSector.name] || 'left';
-
       const activeRwyHdg = activeSector.rwy;
       const circuitRad = (activeRwyHdg * Math.PI) / 180;
-      const perpRad = circuitRad + (circuitSide === 'left' ? -Math.PI / 2 : Math.PI / 2);
 
       L.circleMarker([landingLat, landingLon], {
         radius: 6, fillColor: '#ff9800', color: '#ffffff', weight: 2, fillOpacity: 1
@@ -980,26 +978,49 @@
         landingLon - (finalLegDist * Math.sin(circuitRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
       ];
 
-      const baseWidth = 140; 
-      const baseStart = [
-        finalStart[0] + (baseWidth * Math.cos(perpRad)) / 111320,
-        finalStart[1] + (baseWidth * Math.sin(perpRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
-      ];
+      let baseStart, downwindEnd, circuitCoords, labelPosition;
 
-      const downwindLength = 400; 
-      const downwindEnd = [
-        baseStart[0] + (downwindLength * Math.cos(circuitRad)) / 111320,
-        baseStart[1] + (downwindLength * Math.sin(circuitRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
-      ];
+      if (activeSector.name === 'NE') {
+        // Special custom routing for NE sector: Downwind leg comes straight from the North down to base leg
+        const downwindStart = [
+          landingLat + (350 * Math.cos(0)) / 111320,
+          landingLon + (350 * Math.sin(0)) / (111320 * Math.cos(landingLat * Math.PI / 180))
+        ];
+        baseStart = [
+          finalStart[0],
+          finalStart[1] + (140 * Math.sin(circuitRad - Math.PI/2)) / (111320 * Math.cos(landingLat * Math.PI / 180))
+        ];
+        downwindEnd = downwindStart;
+        circuitCoords = [[landingLat, landingLon], finalStart, baseStart, downwindEnd];
+        labelPosition = [
+          (baseStart[0] + downwindEnd[0]) / 2,
+          (baseStart[1] + downwindEnd[1]) / 2
+        ];
+      } else {
+        const perpRad = circuitRad + (circuitSide === 'left' ? -Math.PI / 2 : Math.PI / 2);
+        const baseWidth = 140; 
+        baseStart = [
+          finalStart[0] + (baseWidth * Math.cos(perpRad)) / 111320,
+          finalStart[1] + (baseWidth * Math.sin(perpRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
+        ];
 
-      const circuitCoords = [[landingLat, landingLon], finalStart, baseStart, downwindEnd];
+        const downwindLength = 400; 
+        downwindEnd = [
+          baseStart[0] + (downwindLength * Math.cos(circuitRad)) / 111320,
+          baseStart[1] + (downwindLength * Math.sin(circuitRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
+        ];
+
+        circuitCoords = [[landingLat, landingLon], finalStart, baseStart, downwindEnd];
+        labelPosition = downwindEnd;
+      }
+
       L.polyline(circuitCoords, {
         color: '#ff9800', weight: 3, dashArray: '5,5', opacity: 0.95
       }).addTo(circuitLayerGroup);
 
       const turnLabelText = circuitSide.toUpperCase();
 
-      L.marker(downwindEnd, {
+      L.marker(labelPosition, {
         icon: L.divIcon({ html: `<div class="circuit-label">${turnLabelText}</div>`, className: '', iconSize: [60, 16], iconAnchor: [30, 8] })
       }).addTo(circuitLayerGroup);
 
