@@ -1,4 +1,4 @@
-<!-- REV: 6.1.0 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 6.2.0 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,11 +16,11 @@
     html, body {
       width: 100%;
       height: 100vh;
-      overflow-x: hidden;
+      overflow: hidden;
       background: #0b0f19;
       color: #f0f4f8;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      padding: 8px 12px;
+      padding: 6px 10px;
     }
 
     .top-header {
@@ -28,14 +28,14 @@
       justify-content: space-between;
       align-items: center;
       max-width: 100%;
-      margin-bottom: 6px;
-      padding-bottom: 4px;
+      margin-bottom: 4px;
+      padding-bottom: 2px;
       border-bottom: 1px solid #1e2d4a;
-      height: 24px;
+      height: 22px;
     }
 
     .site-title {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 700;
       color: #00d8ff;
       text-transform: uppercase;
@@ -50,25 +50,25 @@
       color: #fff;
       font-weight: 800;
       font-family: monospace;
-      padding: 2px 6px;
+      padding: 1px 6px;
       border-radius: 4px;
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       box-shadow: 0 0 10px rgba(0, 136, 255, 0.4);
     }
 
     .dashboard-container {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
       width: 100%;
-      height: calc(100vh - 42px);
+      height: calc(100vh - 36px);
+      position: relative;
     }
 
     .map-card {
       position: relative;
       width: 100%;
-      flex: 1;
-      min-height: 450px;
+      height: 100%;
       border-radius: 8px;
       overflow: hidden;
       border: 1px solid #1e2d4a;
@@ -78,21 +78,24 @@
 
     #map { width: 100%; height: 100%; z-index: 1; }
 
-    /* REFINED SIDEBAR / FLOATING PANEL (REV 6.1.0) */
+    /* FULL-HEIGHT SIDEBAR (REV 6.2.0) */
     .map-info-overlay {
       position: absolute;
-      top: 10px;
-      right: 10px;
+      top: 0;
+      right: 0;
+      bottom: 0;
       z-index: 1000;
-      background: rgba(11, 15, 25, 0.94);
+      background: rgba(11, 15, 25, 0.96);
       backdrop-filter: blur(16px);
-      border: 1px solid rgba(0, 216, 255, 0.35);
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.85), inset 0 1px 1px rgba(0, 216, 255, 0.2);
+      border-left: 1px solid rgba(0, 216, 255, 0.4);
+      border-radius: 0 8px 8px 0;
+      padding: 14px 16px;
+      box-shadow: -10px 0 40px rgba(0,0,0,0.85);
       font-family: monospace;
-      width: 530px;
-      max-height: calc(100vh - 80px);
+      width: 520px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
       overflow-y: auto;
     }
 
@@ -101,83 +104,86 @@
       font-weight: 800;
       color: #00d8ff;
       text-transform: uppercase;
-      margin-bottom: 12px;
       padding-bottom: 8px;
       border-bottom: 1px solid rgba(30, 45, 74, 0.8);
       display: flex;
       justify-content: space-between;
       align-items: center;
       letter-spacing: 0.8px;
+      flex-shrink: 0;
     }
 
-    /* GRID FOR TOP 2 METRICS (PATTERN TURN & AVG WIND SPD) */
+    /* GRID FOR TOP 2 METRICS */
     .overlay-grid-top {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-      margin-bottom: 8px;
+      margin-top: 8px;
+      flex-shrink: 0;
     }
 
     .overlay-cell {
-      background: linear-gradient(135deg, rgba(20, 30, 50, 0.6) 0%, rgba(10, 15, 25, 0.8) 100%);
+      background: linear-gradient(135deg, rgba(20, 30, 50, 0.7) 0%, rgba(10, 15, 25, 0.9) 100%);
       border: 1px solid rgba(30, 45, 74, 0.9);
       border-radius: 8px;
-      padding: 10px 14px;
+      padding: 12px 14px;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      min-height: 72px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+      min-height: 85px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
     }
 
     .overlay-label {
-      font-size: 0.68rem;
+      font-size: 0.7rem;
       color: #7c8ea6;
       text-transform: uppercase;
-      margin-bottom: 2px;
+      margin-bottom: 4px;
       letter-spacing: 0.6px;
     }
 
     /* MAXIMIZED VALUES FILLING BOXES */
     .overlay-value {
-      font-size: 2.2rem;
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
       font-weight: 900;
       color: #fff;
       line-height: 1.0;
       letter-spacing: -0.5px;
     }
 
-    .overlay-value.accent-orange { color: #ff9800; text-shadow: 0 0 12px rgba(255, 152, 0, 0.3); }
-    .overlay-value.accent-cyan { color: #00d8ff; text-shadow: 0 0 12px rgba(0, 216, 255, 0.3); }
-    .overlay-value.accent-green { color: #00e676; text-shadow: 0 0 12px rgba(0, 230, 118, 0.3); }
+    .overlay-value.accent-orange { color: #ff9800; text-shadow: 0 0 14px rgba(255, 152, 0, 0.4); }
+    .overlay-value.accent-cyan { color: #00d8ff; text-shadow: 0 0 14px rgba(0, 216, 255, 0.4); }
+    .overlay-value.accent-green { color: #00e676; text-shadow: 0 0 14px rgba(0, 230, 118, 0.4); }
 
-    /* SINGLE-LINE ROW FOR WIND DIRECTION & RUN-IN */
+    /* SINGLE-LINE ROWS */
     .single-line-row {
-      background: linear-gradient(135deg, rgba(20, 30, 50, 0.6) 0%, rgba(10, 15, 25, 0.8) 100%);
+      background: linear-gradient(135deg, rgba(20, 30, 50, 0.7) 0%, rgba(10, 15, 25, 0.9) 100%);
       border: 1px solid rgba(30, 45, 74, 0.9);
       border-radius: 8px;
-      padding: 10px 14px;
-      margin-bottom: 8px;
+      padding: 12px 16px;
+      margin-top: 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-shrink: 0;
     }
 
     .single-line-row .overlay-value {
-      font-size: 1.35rem;
+      font-size: clamp(1.4rem, 2.5vw, 2rem);
     }
 
-    /* SECTION DIVIDER HEADERS */
+    /* SECTION HEADERS */
     .section-title {
       font-size: 0.75rem;
       color: #7c8ea6;
       text-transform: uppercase;
-      margin: 14px 0 8px 0;
+      margin: 12px 0 6px 0;
       font-weight: bold;
       letter-spacing: 0.8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-shrink: 0;
     }
 
     /* MODEL FORECAST CARDS GRID */
@@ -185,17 +191,17 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
-      margin-bottom: 12px;
+      flex-shrink: 0;
     }
 
     .model-card-item {
       background: rgba(18, 26, 43, 0.7);
       border: 1px solid rgba(30, 45, 74, 0.9);
       border-radius: 6px;
-      padding: 8px 10px;
+      padding: 10px 12px;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 6px;
     }
 
     .model-card-top {
@@ -215,19 +221,19 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 2px;
     }
 
-    /* WINDS ALOFT TABLE REFINEMENT */
+    /* WINDS ALOFT TABLE */
     .aloft-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.82rem;
+      font-size: 0.85rem;
       font-family: monospace;
-      background: rgba(15, 22, 36, 0.5);
+      background: rgba(15, 22, 36, 0.6);
       border-radius: 8px;
       overflow: hidden;
       border: 1px solid rgba(30, 45, 74, 0.8);
+      flex-shrink: 0;
     }
 
     .aloft-table th {
@@ -241,23 +247,17 @@
     }
 
     .aloft-table td {
-      padding: 7px 10px;
+      padding: 8px 10px;
       border-bottom: 1px solid rgba(30, 45, 74, 0.4);
     }
 
-    .aloft-table tr:last-child td {
-      border-bottom: none;
-    }
+    .aloft-table tr:last-child td { border-bottom: none; }
 
-    .aloft-table tr:hover td {
-      background: rgba(0, 216, 255, 0.04);
-    }
-
-    /* DZ CONTROL PANEL (BOTTOM-RIGHT OF MAP) */
+    /* DZ CONTROL PANEL OVERLAY (BOTTOM-LEFT OF MAP) */
     .spot-overlay-card {
       position: absolute;
-      bottom: 10px;
-      right: 10px;
+      bottom: 12px;
+      left: 12px;
       z-index: 1000;
       background: rgba(11, 15, 25, 0.94);
       backdrop-filter: blur(8px);
@@ -266,7 +266,7 @@
       padding: 10px 14px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.6);
       font-family: monospace;
-      width: 530px;
+      width: 320px;
     }
 
     .spot-overlay-header {
@@ -313,16 +313,16 @@
     }
 
     .slider-row input[type=range] {
-      width: 220px;
+      width: 150px;
       accent-color: #00d8ff;
     }
 
     .wind-badge {
       display: inline-block;
-      padding: 2px 6px;
+      padding: 3px 8px;
       border-radius: 4px;
       font-weight: bold;
-      font-size: 0.78rem;
+      font-size: 0.85rem;
     }
 
     .status-green  { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.4); }
@@ -335,14 +335,14 @@
       padding: 2px 6px;
       border-radius: 4px;
       font-weight: bold;
-      font-size: 0.75rem;
+      font-size: 0.78rem;
       color: #00d8ff;
       background: rgba(0, 216, 255, 0.12);
       border: 1px solid rgba(0, 216, 255, 0.3);
     }
 
     .dir-arrow { display: inline-block; font-weight: bold; margin-right: 2px; }
-    .gust-val { font-size: 0.7rem; opacity: 0.85; }
+    .gust-val { font-size: 0.75rem; opacity: 0.85; }
 
     .rotated-pill {
       display: flex;
@@ -403,33 +403,26 @@
       }
       .map-card {
         height: 480px !important;
-        flex: none !important;
-        order: 2;
-        width: 100% !important;
       }
       .map-info-overlay {
         position: relative !important;
         top: auto !important;
         right: auto !important;
-        left: auto !important;
+        bottom: auto !important;
         width: 100% !important;
-        max-height: none !important;
-        margin-bottom: 0;
-        order: 1;
-        padding: 12px;
+        border-left: none !important;
+        border-radius: 8px !important;
+        margin-bottom: 8px;
       }
       .spot-overlay-card {
         position: relative !important;
         bottom: auto !important;
-        right: auto !important;
         left: auto !important;
         width: 100% !important;
         margin-top: 8px;
-        order: 3;
-        padding: 8px 12px;
       }
       .slider-row input[type=range], .slider-row select {
-        width: 140px !important;
+        width: 180px !important;
       }
     }
   </style>
@@ -440,13 +433,65 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Dunkeswell Weather Operations</span>
-      <span class="rev-badge">REV: 6.1.0</span>
+      <span class="rev-badge">REV: 6.2.0</span>
     </div>
   </div>
 
   <div class="dashboard-container">
     
-    <!-- TOP-RIGHT MAP OVERLAY PANEL (REV 6.1.0) -->
+    <!-- MAP CARD -->
+    <div class="map-card">
+      <div id="map"></div>
+
+      <!-- COMPACT SPOT & LANDING CONTROLS PANEL (BOTTOM-LEFT OF MAP) -->
+      <div class="spot-overlay-card">
+        <div class="spot-overlay-header">
+          <span class="spot-overlay-title">⚙️ DZ Override Controls</span>
+        </div>
+
+        <div class="control-slider-group" style="border-top:none; margin-top:0; padding-top:0;">
+          <div class="slider-row">
+            <span style="color:#00d8ff; font-weight:bold;">Jump-Run Mode:</span>
+            <button class="mode-toggle-btn" id="toggle-jump-btn" onclick="toggleJumpMode()">AUTO</button>
+          </div>
+          <div id="jump-manual-controls" style="display: none; flex-direction: column; gap: 5px; margin-top: 5px;">
+            <div class="slider-row">
+              <span>Heading:</span>
+              <input type="range" id="slider-jump-heading" min="0" max="359" value="144" oninput="updateDashboardMap()">
+            </div>
+            <div class="slider-row">
+              <span>Offset:</span>
+              <input type="range" id="slider-jump-dist" min="0.05" max="0.50" step="0.01" value="0.20" oninput="updateDashboardMap()">
+            </div>
+          </div>
+        </div>
+
+        <div class="control-slider-group">
+          <div class="slider-row">
+            <span style="color:#ff9800; font-weight:bold;">Landing Mode:</span>
+            <button class="mode-toggle-btn" id="toggle-landing-btn" onclick="toggleLandingMode()" style="border-color:#ff9800; color:#ff9800;">AUTO</button>
+          </div>
+          <div id="landing-manual-controls" style="display: none; flex-direction: column; gap: 5px; margin-top: 5px;">
+            <div class="slider-row">
+              <span>Wind Sector:</span>
+              <select id="select-wind-sector" onchange="updateDashboardMap()" style="background:#131b2e; color:#ff9800; border:1px solid #ff9800; font-size:0.7rem; font-weight:bold; border-radius:3px; width:150px;">
+                <option value="0" selected>N (330° - 030°)</option>
+                <option value="45">NE (030° - 075°)</option>
+                <option value="90">E (075° - 120°)</option>
+                <option value="135">SE (120° - 165°)</option>
+                <option value="170">S (165° - 195°)</option>
+                <option value="220">SW (195° - 240°)</option>
+                <option value="270">W (240° - 285°)</option>
+                <option value="315">NW (285° - 330°)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- FULL-HEIGHT SIDEBAR (REV 6.2.0) -->
     <div class="map-info-overlay">
       <div class="overlay-header">
         <span>⚡ Live Ops & Winds Aloft</span>
@@ -474,7 +519,7 @@
       <!-- SINGLE-LINE RUN-IN HEADING & DROP BOX -->
       <div class="single-line-row">
         <span class="overlay-label" style="margin:0;">Run-In & Drop:</span>
-        <span style="font-size: 1.1rem; font-weight: 900; color: #fff;" id="ov-heading">--</span>
+        <span style="font-size: clamp(1rem, 2vw, 1.4rem); font-weight: 900; color: #fff;" id="ov-heading">--</span>
       </div>
 
       <!-- CURRENT HOUR MODEL FORECAST SECTION -->
@@ -525,57 +570,6 @@
           </tr>
         </tbody>
       </table>
-    </div>
-
-    <!-- MAP CARD -->
-    <div class="map-card">
-      <div id="map"></div>
-    </div>
-
-    <!-- COMPACT SPOT & LANDING CONTROLS PANEL -->
-    <div class="spot-overlay-card">
-      <div class="spot-overlay-header">
-        <span class="spot-overlay-title">⚙️ DZ Override Controls</span>
-      </div>
-
-      <div class="control-slider-group" style="border-top:none; margin-top:0; padding-top:0;">
-        <div class="slider-row">
-          <span style="color:#00d8ff; font-weight:bold;">Jump-Run Mode:</span>
-          <button class="mode-toggle-btn" id="toggle-jump-btn" onclick="toggleJumpMode()">AUTO</button>
-        </div>
-        <div id="jump-manual-controls" style="display: none; flex-direction: column; gap: 5px; margin-top: 5px;">
-          <div class="slider-row">
-            <span>Heading:</span>
-            <input type="range" id="slider-jump-heading" min="0" max="359" value="144" oninput="updateDashboardMap()">
-          </div>
-          <div class="slider-row">
-            <span>Offset:</span>
-            <input type="range" id="slider-jump-dist" min="0.05" max="0.50" step="0.01" value="0.20" oninput="updateDashboardMap()">
-          </div>
-        </div>
-      </div>
-
-      <div class="control-slider-group">
-        <div class="slider-row">
-          <span style="color:#ff9800; font-weight:bold;">Landing Mode:</span>
-          <button class="mode-toggle-btn" id="toggle-landing-btn" onclick="toggleLandingMode()" style="border-color:#ff9800; color:#ff9800;">AUTO</button>
-        </div>
-        <div id="landing-manual-controls" style="display: none; flex-direction: column; gap: 5px; margin-top: 5px;">
-          <div class="slider-row">
-            <span>Wind Sector:</span>
-            <select id="select-wind-sector" onchange="updateDashboardMap()" style="background:#131b2e; color:#ff9800; border:1px solid #ff9800; font-size:0.7rem; font-weight:bold; border-radius:3px; width:180px;">
-              <option value="0" selected>N (330° - 030°)</option>
-              <option value="45">NE (030° - 075°)</option>
-              <option value="90">E (075° - 120°)</option>
-              <option value="135">SE (120° - 165°)</option>
-              <option value="170">S (165° - 195°)</option>
-              <option value="220">SW (195° - 240°)</option>
-              <option value="270">W (240° - 285°)</option>
-              <option value="315">NW (285° - 330°)</option>
-            </select>
-          </div>
-        </div>
-      </div>
     </div>
 
   </div>
