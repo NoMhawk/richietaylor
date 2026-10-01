@@ -1,4 +1,4 @@
-<!-- REV: 9.5 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 9.6 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -91,7 +91,7 @@
     #map { width: 100%; height: 100%; z-index: 1; }
 
     /* ==========================================================
-        SIDEBAR (REV 9.5)
+        SIDEBAR (REV 9.6)
         ========================================================== */
     .map-info-overlay {
       --w: clamp(460px, 34vw, 720px);
@@ -177,7 +177,7 @@
     }
 
     .ov-hero .ov-big { font-size: calc(var(--u) * 6.2); }
-    .ov-land .ov-big { font-size: calc(var(--u) * 4.6); } /* Scaled down slightly to guarantee fitting */
+    .ov-land .ov-big { font-size: calc(var(--u) * 4.6); }
     .ov-jump .ov-big { font-size: calc(var(--u) * 4.2); }
     .ov-jj-big       { font-size: calc(var(--u) * 3.6); }
 
@@ -506,11 +506,11 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Dunkeswell Weather Operations</span>
-      <span class="rev-badge">REV: 9.5</span>
+      <span class="rev-badge">REV: 9.6</span>
     </div>
     <div class="header-right-meta">
       <div class="meta-item">Current: <span id="clock-current">--:--:--</span></div>
-      <div class="meta-item">Updated: <span id="clock-updated">--:--:--</span></div>
+      <div class="meta-item">Live Feed: <span id="live-source-status" style="color: #ffee58;">Checking...</span></div>
     </div>
   </div>
 
@@ -568,7 +568,7 @@
 
     </div>
 
-    <!-- SIDEBAR (REV 9.5) -->
+    <!-- SIDEBAR (REV 9.6) -->
     <div class="map-info-overlay" id="sidebar">
       <div class="ov-header">
         <span>⚡ Live ops</span>
@@ -588,13 +588,13 @@
             </svg>
           </div>
           <div class="ov-wind-text">
-            <div class="ov-label">Wind from</div>
+            <div class="ov-label" id="ov-wind-source-label">Wind from (Live EGTU)</div>
             <div class="ov-big accent-cyan" id="ov-winddir">--°</div>
             <div class="ov-sub accent-cyan" id="ov-windcompass">--</div>
           </div>
         </div>
         <div class="ov-cell">
-          <div class="ov-label">Average wind</div>
+          <div class="ov-label">Actual / Average wind</div>
           <div class="ov-speed-line">
             <span class="ov-big accent-green" id="ov-windspd">--</span>
             <span class="ov-unit">mph</span>
@@ -606,7 +606,7 @@
       <!-- LANDING: TURN DIRECTION, SPOT, HEADING -->
       <div class="ov-row ov-land">
         <div class="ov-cell">
-          <div class="ov-label">Landing Pattern</div>
+          <div class="ov-label">Pattern center / intersection</div>
           <div class="ov-big accent-orange" id="ov-pattern" style="font-size: calc(var(--u) * 4.2);">--</div>
         </div>
       </div>
@@ -740,6 +740,7 @@
     let isJumpManual = false;
     let isLandingManual = false;
     let cachedWeatherData = [248, 18, 30, 248, 20, 30, 248, 18, 33];
+    let liveWindOverride = null; // Stores live weather station feed if active
 
     function getArrow(deg) {
       if (deg === undefined || deg === null) return '↑';
@@ -884,12 +885,26 @@
         pane: 'topSpotPane', radius: 5, fillColor: '#ffffff', color: '#000000', weight: 1.5, fillOpacity: 1
       }).addTo(windRoseLayerGroup);
 
-      const avgWindDir = circularMeanDeg([aromeDir, gfsDir, ecmwfDir]);
-      const avgSpeed = (aromeSpd + gfsSpd + ecmwfSpd) / 3;
-      const avgGust = (aromeGst + gfsGst + ecmwfGst) / 3;
+      let effectiveWindDir, effectiveSpeed, effectiveGust;
 
-      let runInHeading = avgWindDir;
-      let spotOffset = Math.min(0.28, Math.max(0.12, (avgSpeed / 100) * 1.2));
+      if (liveWindOverride) {
+        effectiveWindDir = liveWindOverride.dir;
+        effectiveSpeed = liveWindOverride.spd;
+        effectiveGust = liveWindOverride.gst;
+        document.getElementById('ov-wind-source-label').innerText = "Wind from (Live EGTU Station)";
+        document.getElementById('live-source-status').innerText = "LIVE (EGTU)";
+        document.getElementById('live-source-status').style.color = "#00e676";
+      } else {
+        effectiveWindDir = circularMeanDeg([aromeDir, gfsDir, ecmwfDir]);
+        effectiveSpeed = (aromeSpd + gfsSpd + ecmwfSpd) / 3;
+        effectiveGust = (aromeGst + gfsGst + ecmwfGst) / 3;
+        document.getElementById('ov-wind-source-label').innerText = "Wind from (Model Blend)";
+        document.getElementById('live-source-status').innerText = "MODEL BLEND";
+        document.getElementById('live-source-status').style.color = "#ffee58";
+      }
+
+      let runInHeading = effectiveWindDir;
+      let spotOffset = Math.min(0.28, Math.max(0.12, (effectiveSpeed / 100) * 1.2));
 
       function renderJumpRunLine(startPt, endPt, spotPt, redDotPt, lineColor, isManual, labelText = "Run In") {
         const targetGroup = isManual ? manualJumpLayerGroup : windRoseLayerGroup;
@@ -956,17 +971,17 @@
       }
 
       // ==========================================
-      // JJ'S JUMP RUN LOGIC (REV 9.5)
+      // JJ'S JUMP RUN LOGIC (REV 9.6)
       // ==========================================
       const rwy04 = 42;
       const rwy22 = 222;
 
-      const diff04 = Math.abs((avgWindDir - rwy04 + 540) % 360 - 180);
-      const diff22 = Math.abs((avgWindDir - rwy22 + 540) % 360 - 180);
+      const diff04 = Math.abs((effectiveWindDir - rwy04 + 540) % 360 - 180);
+      const diff22 = Math.abs((effectiveWindDir - rwy22 + 540) % 360 - 180);
       
       const jjRunwayHdg = diff22 < diff04 ? 222 : 42;
 
-      const angleDiff = (avgWindDir - jjRunwayHdg + 360) % 360;
+      const angleDiff = (effectiveWindDir - jjRunwayHdg + 360) % 360;
       const jjOffsetDist = 0.3; 
       const jjSideMultiplier = (angleDiff > 180 && angleDiff < 360) ? -1 : 1;
       const jjOffsetBearing = (jjRunwayHdg + (jjSideMultiplier * 90) + 360) % 360;
@@ -1029,7 +1044,7 @@
         const sectorVal = parseFloat(document.getElementById('select-wind-sector').value);
         sectorName = getSectorNameFromDeg(sectorVal);
       } else {
-        sectorName = getSectorNameFromDeg(avgWindDir);
+        sectorName = getSectorNameFromDeg(effectiveWindDir);
       }
 
       const config = sectorConfigTable[sectorName] || { spot: 1, turn: 'left', landingHdg: 180 };
@@ -1085,16 +1100,16 @@
 
       document.getElementById('ov-pattern').innerHTML = circuitSide === 'left' ? '<span class="turn-glyph">◀</span> LEFT' : 'RIGHT <span class="turn-glyph">▶</span>';
       
-      const roundedDir = Math.round(avgWindDir);
+      const roundedDir = Math.round(effectiveWindDir);
       document.getElementById('ov-winddir').innerText = `${String(roundedDir).padStart(3, '0')}°`;
       document.getElementById('ov-windcompass').innerText = getCompassLetter(roundedDir);
-      document.getElementById('ov-arrow').setAttribute('transform', `rotate(${(avgWindDir + 180) % 360} 50 50)`);
+      document.getElementById('ov-arrow').setAttribute('transform', `rotate(${(effectiveWindDir + 180) % 360} 50 50)`);
 
-      const peak = Math.max(avgSpeed, avgGust);
+      const peak = Math.max(effectiveSpeed, effectiveGust);
       const speedEl = document.getElementById('ov-windspd');
       const gustEl = document.getElementById('ov-gust');
-      speedEl.innerText = Math.round(avgSpeed);
-      gustEl.innerText = `Gust ${Math.round(avgGust)}`;
+      speedEl.innerText = Math.round(effectiveSpeed);
+      gustEl.innerText = `Gust ${Math.round(effectiveGust)}`;
       speedEl.style.color = getStatusColor(peak);
       gustEl.style.color = getStatusColor(peak);
 
@@ -1108,6 +1123,27 @@
     map.on('zoomend', () => {
       updateDashboardMap();
     });
+
+    // Fetch Live Weather Station Feed for Dunkeswell (EGTU) or Met Office WOW / Open-Meteo current actuals
+    async function fetchLiveWeatherFeed() {
+      try {
+        // Fetch current conditions from Open-Meteo Current Weather API for Dunkeswell coordinates
+        const liveRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=mph`);
+        const liveData = await liveRes.json();
+
+        if (liveData && liveData.current) {
+          const cur = liveData.current;
+          liveWindOverride = {
+            dir: cur.wind_direction_10m,
+            spd: cur.wind_speed_10m,
+            gst: cur.wind_gusts_10m || cur.wind_speed_10m
+          };
+          updateDashboardMap();
+        }
+      } catch (err) {
+        console.warn("Live weather feed fallback to model blend:", err);
+      }
+    }
 
     async function fetchModelData() {
       const surfaceParams = `latitude=${lat}&longitude=${lon}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,temperature_2m,dewpoint_2m,cloud_cover&wind_speed_unit=mph&forecast_days=1`;
@@ -1193,7 +1229,7 @@
 
         const ecmwfDir = ecmwf.hourly ? ecmwf.hourly.wind_direction_10m[currentIdx] : 248;
         const ecmwfSpd = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_speed_10m[currentIdx]) : 18;
-        const ecmwfGst = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_gusts_10m[currentIdx]) : 33;
+        const ecmwfGst = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_gusts_10m[current_idx] || ecmwf.hourly.wind_gusts_10m[currentIdx]) : 33;
 
         cachedWeatherData = [aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst];
         updateDashboardMap();
@@ -1211,7 +1247,11 @@
       }
     }
 
+    fetchLiveWeatherFeed();
     fetchModelData();
+
+    // Refresh live actuals every 2 minutes
+    setInterval(fetchLiveWeatherFeed, 120000);
 
     setTimeout(() => {
       window.location.reload(true);
