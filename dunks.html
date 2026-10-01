@@ -1,4 +1,4 @@
-<!-- REV: 5.10.8 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 5.10.9 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -332,7 +332,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Dunkeswell Weather Operations</span>
-      <span class="rev-badge">REV: 5.10.8</span>
+      <span class="rev-badge">REV: 5.10.9</span>
     </div>
   </div>
 
@@ -764,7 +764,8 @@
         radius: 6, fillColor: '#ff9800', color: '#ffffff', weight: 2, fillOpacity: 1
       }).addTo(circuitLayerGroup);
 
-      let finalArrowAngle = landingHdg;
+      // Corrected final approach arrow angle pointing into the wind toward landing
+      let finalArrowAngle = (landingHdg - 90 + 360) % 360;
       L.marker([activeLandingLat, activeLandingLon], {
         icon: L.divIcon({
           html: `<div class="circuit-arrow" style="transform: rotate(${finalArrowAngle}deg);">▶</div>`,
