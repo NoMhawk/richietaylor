@@ -1,4 +1,4 @@
-<!-- REV: 5.10.10 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 5.10.11 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -332,7 +332,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Dunkeswell Weather Operations</span>
-      <span class="rev-badge">REV: 5.10.10</span>
+      <span class="rev-badge">REV: 5.10.11</span>
     </div>
   </div>
 
@@ -764,7 +764,6 @@
         radius: 6, fillColor: '#ff9800', color: '#ffffff', weight: 2, fillOpacity: 1
       }).addTo(circuitLayerGroup);
 
-      // 3x scaled landing arrow (48px font size with adjusted anchor)
       let finalArrowAngle = (landingHdg - 90 + 360) % 360;
       L.marker([activeLandingLat, activeLandingLon], {
         icon: L.divIcon({
@@ -798,9 +797,9 @@
         color: '#ff9800', weight: 3, dashArray: '5,5', opacity: 0.95
       }).addTo(circuitLayerGroup);
 
-      // Populate Overlay Values
+      // Populate Overlay Values (Turn direction only)
       const turnLabelText = circuitSide.toUpperCase();
-      document.getElementById('ov-pattern').innerText = `${turnLabelText} (Spot ${config.spot})`;
+      document.getElementById('ov-pattern').innerText = turnLabelText;
       document.getElementById('ov-windspd').innerText = `${Math.round(avgSpeed)} mph`;
       const roundedDir = Math.round(avgWindDir);
       document.getElementById('ov-winddir').innerText = `${roundedDir}° (${getCompassLetter(roundedDir)})`;
