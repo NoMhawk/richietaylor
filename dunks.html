@@ -1,5 +1,6 @@
-<!-- REV: 6.2.0 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+
 <!DOCTYPE html>
+<!-- REV: 6.3.0 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) - distance-readable sidebar -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -78,180 +79,244 @@
 
     #map { width: 100%; height: 100%; z-index: 1; }
 
-    /* FULL-HEIGHT SIDEBAR (REV 6.2.0) */
+    /* ==========================================================
+       SIDEBAR (REV 6.3.0)
+       Everything is sized from --u, a unit that scales with the
+       smaller of screen height and sidebar width, so the layout
+       fills the panel on any monitor and is readable from a distance.
+       ========================================================== */
     .map-info-overlay {
+      --w: clamp(460px, 34vw, 720px);
+      --u: min(1vh, calc(var(--w) / 55));
+
       position: absolute;
       top: 0;
       right: 0;
       bottom: 0;
       z-index: 1000;
-      background: rgba(11, 15, 25, 0.96);
+      width: var(--w);
+      background: rgba(8, 12, 22, 0.97);
       backdrop-filter: blur(16px);
       border-left: 1px solid rgba(0, 216, 255, 0.4);
       border-radius: 0 8px 8px 0;
-      padding: 14px 16px;
+      padding: calc(var(--u) * 1.1) calc(var(--u) * 1.4);
       box-shadow: -10px 0 40px rgba(0,0,0,0.85);
-      font-family: monospace;
-      width: 520px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      gap: calc(var(--u) * 0.9);
       overflow-y: auto;
+      font-variant-numeric: tabular-nums;
     }
 
-    .overlay-header {
-      font-size: 0.9rem;
-      font-weight: 800;
-      color: #00d8ff;
-      text-transform: uppercase;
-      padding-bottom: 8px;
-      border-bottom: 1px solid rgba(30, 45, 74, 0.8);
+    .ov-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      letter-spacing: 0.8px;
-      flex-shrink: 0;
+      flex: 0 0 auto;
+      font-size: calc(var(--u) * 2.3);
+      font-weight: 800;
+      color: #00d8ff;
+      letter-spacing: 0.02em;
     }
 
-    /* GRID FOR TOP 2 METRICS */
-    .overlay-grid-top {
+    #overlay-sector-tag {
+      font-size: calc(var(--u) * 2.1);
+      color: #ffee58;
+      background: rgba(255, 235, 59, 0.1);
+      padding: calc(var(--u) * 0.2) calc(var(--u) * 0.9);
+      border-radius: 6px;
+      border: 1px solid rgba(255, 235, 59, 0.4);
+    }
+
+    /* Rows of big cells. flex-grow values decide how the height is shared. */
+    .ov-row {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 8px;
-      flex-shrink: 0;
+      gap: calc(var(--u) * 0.9);
+      min-height: 0;
     }
+    .ov-hero    { flex: 2.6 1 0; min-height: calc(var(--u) * 12); grid-template-columns: 1.3fr 1fr; }
+    .ov-land    { flex: 1.7 1 0; min-height: calc(var(--u) * 8);  grid-template-columns: 1fr; }
+    .ov-jump    { flex: 1.7 1 0; min-height: calc(var(--u) * 8);  grid-template-columns: 1.3fr 1fr; }
 
-    .overlay-cell {
-      background: linear-gradient(135deg, rgba(20, 30, 50, 0.7) 0%, rgba(10, 15, 25, 0.9) 100%);
-      border: 1px solid rgba(30, 45, 74, 0.9);
-      border-radius: 8px;
-      padding: 12px 14px;
+    .ov-cell {
+      background: linear-gradient(135deg, rgba(22, 32, 54, 0.85) 0%, rgba(10, 15, 26, 0.95) 100%);
+      border: 1px solid rgba(40, 58, 92, 0.95);
+      border-radius: 10px;
+      padding: calc(var(--u) * 0.8) calc(var(--u) * 1.1);
       display: flex;
       flex-direction: column;
       justify-content: center;
-      min-height: 85px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
     }
 
-    .overlay-label {
-      font-size: 0.7rem;
-      color: #7c8ea6;
-      text-transform: uppercase;
-      margin-bottom: 4px;
-      letter-spacing: 0.6px;
+    .ov-label {
+      font-size: calc(var(--u) * 1.6);
+      font-weight: 600;
+      color: #a9b9d0;
+      margin-bottom: calc(var(--u) * 0.3);
+      white-space: nowrap;
     }
 
-    /* MAXIMIZED VALUES FILLING BOXES */
-    .overlay-value {
-      font-size: clamp(1.8rem, 3vw, 2.6rem);
+    .ov-big {
+      font-size: calc(var(--u) * 5.2);
       font-weight: 900;
+      line-height: 1;
       color: #fff;
-      line-height: 1.0;
-      letter-spacing: -0.5px;
+      white-space: nowrap;
+    }
+    .ov-hero .ov-big { font-size: calc(var(--u) * 6.2); }
+    .ov-land .ov-big { font-size: calc(var(--u) * 5.6); }
+    .ov-jump .ov-big { font-size: calc(var(--u) * 4.8); }
+    .turn-glyph { font-size: 0.7em; vertical-align: 0.08em; }
+
+    .ov-sub {
+      font-size: calc(var(--u) * 2.6);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-top: calc(var(--u) * 0.3);
+      white-space: nowrap;
     }
 
-    .overlay-value.accent-orange { color: #ff9800; text-shadow: 0 0 14px rgba(255, 152, 0, 0.4); }
-    .overlay-value.accent-cyan { color: #00d8ff; text-shadow: 0 0 14px rgba(0, 216, 255, 0.4); }
-    .overlay-value.accent-green { color: #00e676; text-shadow: 0 0 14px rgba(0, 230, 118, 0.4); }
+    .accent-orange { color: #ffa726; }
+    .accent-cyan   { color: #00d8ff; }
+    .accent-green  { color: #00e676; }
 
-    /* SINGLE-LINE ROWS */
-    .single-line-row {
-      background: linear-gradient(135deg, rgba(20, 30, 50, 0.7) 0%, rgba(10, 15, 25, 0.9) 100%);
-      border: 1px solid rgba(30, 45, 74, 0.9);
-      border-radius: 8px;
-      padding: 12px 16px;
-      margin-top: 8px;
+    /* Wind direction cell: dial + number */
+    .ov-wind { flex-direction: row; align-items: center; gap: calc(var(--u) * 1.2); }
+    .ov-dial { flex: 0 0 auto; height: 100%; max-height: calc(var(--u) * 8.5); aspect-ratio: 1 / 1; }
+    .ov-dial svg { width: 100%; height: 100%; display: block; }
+    .ov-wind-text { min-width: 0; display: flex; flex-direction: column; }
+
+    /* Speed cell */
+    .ov-speed-line { display: flex; align-items: baseline; gap: calc(var(--u) * 0.6); }
+    .ov-unit { font-size: calc(var(--u) * 2.4); font-weight: 700; color: #a9b9d0; }
+
+    /* SECTIONS */
+    .ov-section {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-shrink: 0;
+      flex-direction: column;
+      min-height: 0;
+      gap: calc(var(--u) * 0.6);
     }
+    .ov-models { flex: 5 1 0; min-height: calc(var(--u) * 22); }
+    .ov-aloft  { flex: 5.6 1 0; min-height: calc(var(--u) * 24); }
 
-    .single-line-row .overlay-value {
-      font-size: clamp(1.4rem, 2.5vw, 2rem);
-    }
-
-    /* SECTION HEADERS */
     .section-title {
-      font-size: 0.75rem;
-      color: #7c8ea6;
-      text-transform: uppercase;
-      margin: 12px 0 6px 0;
-      font-weight: bold;
-      letter-spacing: 0.8px;
+      flex: 0 0 auto;
+      font-size: calc(var(--u) * 1.9);
+      font-weight: 700;
+      color: #a9b9d0;
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      flex-shrink: 0;
+      align-items: baseline;
     }
 
-    /* MODEL FORECAST CARDS GRID */
+    /* MODEL FORECAST CARDS (2 x 2, fill remaining height) */
     .model-forecast-grid {
+      flex: 1 1 0;
+      min-height: 0;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      flex-shrink: 0;
+      grid-template-rows: 1fr 1fr;
+      gap: calc(var(--u) * 0.8);
     }
 
     .model-card-item {
-      background: rgba(18, 26, 43, 0.7);
-      border: 1px solid rgba(30, 45, 74, 0.9);
-      border-radius: 6px;
-      padding: 10px 12px;
+      border-radius: 10px;
+      padding: calc(var(--u) * 0.6) calc(var(--u) * 1);
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      justify-content: space-between;
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
     }
 
     .model-card-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.75rem;
+      gap: calc(var(--u) * 0.5);
     }
 
-    .model-name {
+    .model-name { font-size: calc(var(--u) * 1.9); font-weight: 800; color: #fff; }
+
+    .cloud-badge {
+      font-size: calc(var(--u) * 1.7);
       font-weight: 800;
       color: #00d8ff;
-      letter-spacing: 0.5px;
+      background: rgba(0, 216, 255, 0.12);
+      border: 1px solid rgba(0, 216, 255, 0.35);
+      border-radius: 5px;
+      padding: 0 calc(var(--u) * 0.6);
+      white-space: nowrap;
     }
 
-    .model-card-body {
+    .model-card-wind {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      align-items: baseline;
+      gap: calc(var(--u) * 0.5);
+      white-space: nowrap;
     }
+    .mc-arrow { font-size: calc(var(--u) * 3.6); font-weight: 900; display: inline-block; line-height: 1; }
+    .mc-speed { font-size: calc(var(--u) * 5); font-weight: 900; line-height: 1; }
+    .mc-gust  { font-size: calc(var(--u) * 2.4); font-weight: 800; opacity: 0.9; }
+    .mc-dir   { font-size: calc(var(--u) * 1.8); font-weight: 700; opacity: 0.85; }
 
-    /* WINDS ALOFT TABLE */
-    .aloft-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.85rem;
-      font-family: monospace;
-      background: rgba(15, 22, 36, 0.6);
-      border-radius: 8px;
+    .status-green  { background: rgba(0, 230, 118, 0.14); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.5); }
+    .status-yellow { background: rgba(255, 235, 59, 0.14); color: #ffee58; border: 1px solid rgba(255, 235, 59, 0.5); }
+    .status-orange { background: rgba(255, 152, 0, 0.16);  color: #ffb74d; border: 1px solid rgba(255, 152, 0, 0.55); }
+    .status-red    { background: rgba(255, 82, 82, 0.2);   color: #ff6b6b; border: 1px solid rgba(255, 82, 82, 0.6); }
+
+    /* WINDS ALOFT: five equal rows that share the available height */
+    .aloft-grid {
+      flex: 1 1 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      background: rgba(15, 22, 36, 0.7);
+      border: 1px solid rgba(40, 58, 92, 0.95);
+      border-radius: 10px;
       overflow: hidden;
-      border: 1px solid rgba(30, 45, 74, 0.8);
-      flex-shrink: 0;
     }
 
-    .aloft-table th {
-      background: rgba(25, 35, 55, 0.9);
-      color: #7c8ea6;
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      padding: 6px 10px;
-      letter-spacing: 0.5px;
-      border-bottom: 1px solid rgba(30, 45, 74, 0.9);
+    .aloft-head, .aloft-row {
+      display: grid;
+      grid-template-columns: 0.8fr 2.4fr 1fr;
+      align-items: center;
+      padding: 0 calc(var(--u) * 1.2);
+      column-gap: calc(var(--u) * 0.6);
     }
 
-    .aloft-table td {
-      padding: 8px 10px;
-      border-bottom: 1px solid rgba(30, 45, 74, 0.4);
+    .aloft-head {
+      flex: 0 0 auto;
+      height: calc(var(--u) * 3);
+      background: rgba(28, 40, 64, 0.95);
+      font-size: calc(var(--u) * 1.5);
+      font-weight: 700;
+      color: #a9b9d0;
+    }
+    .aloft-head span:last-child { text-align: right; }
+
+    .aloft-row {
+      flex: 1 1 0;
+      min-height: 0;
+      border-top: 1px solid rgba(40, 58, 92, 0.6);
     }
 
-    .aloft-table tr:last-child td { border-bottom: none; }
+    .aloft-row, .aloft-row * { line-height: 1; }
+    .aloft-alt  { font-size: calc(var(--u) * 3.1); font-weight: 900; color: #fff; }
+    .aloft-wind { display: flex; align-items: baseline; gap: calc(var(--u) * 0.9); color: #00d8ff; white-space: nowrap; min-width: 0; }
+    .aloft-wind .dir-arrow { font-size: calc(var(--u) * 2.8); }
+    .aw-dir { font-size: calc(var(--u) * 2.5); font-weight: 700; color: #cfe6ff; }
+    .aw-spd { font-size: calc(var(--u) * 3.4); font-weight: 900; color: #fff; }
+    .aw-spd small { font-size: calc(var(--u) * 1.6); font-weight: 700; color: #a9b9d0; margin-left: calc(var(--u) * 0.3); }
+    .aloft-row:first-of-type .aw-spd { color: #00d8ff; }
+    .aloft-temp { font-size: calc(var(--u) * 3); font-weight: 800; text-align: right; color: #ffd9a0; }
+
+    .dir-arrow { display: inline-block; font-weight: bold; margin-right: 2px; }
 
     /* DZ CONTROL PANEL OVERLAY (BOTTOM-LEFT OF MAP) */
     .spot-overlay-card {
@@ -317,33 +382,6 @@
       accent-color: #00d8ff;
     }
 
-    .wind-badge {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-weight: bold;
-      font-size: 0.85rem;
-    }
-
-    .status-green  { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.4); }
-    .status-yellow { background: rgba(255, 235, 59, 0.15); color: #ffee58; border: 1px solid rgba(255, 235, 59, 0.4); }
-    .status-orange { background: rgba(255, 152, 0, 0.15);  color: #ffb74d; border: 1px solid rgba(255, 152, 0, 0.4); }
-    .status-red    { background: rgba(255, 82, 82, 0.2);    color: #ff5252; border: 1px solid rgba(255, 82, 82, 0.5); }
-
-    .cloud-badge {
-      display: inline-block;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-weight: bold;
-      font-size: 0.78rem;
-      color: #00d8ff;
-      background: rgba(0, 216, 255, 0.12);
-      border: 1px solid rgba(0, 216, 255, 0.3);
-    }
-
-    .dir-arrow { display: inline-block; font-weight: bold; margin-right: 2px; }
-    .gust-val { font-size: 0.75rem; opacity: 0.85; }
-
     .rotated-pill {
       display: flex;
       align-items: center;
@@ -405,6 +443,8 @@
         height: 480px !important;
       }
       .map-info-overlay {
+        --w: 100vw;
+        --u: min(2.3vw, 10px);
         position: relative !important;
         top: auto !important;
         right: auto !important;
@@ -413,7 +453,15 @@
         border-left: none !important;
         border-radius: 8px !important;
         margin-bottom: 8px;
+        overflow: visible;
       }
+      .ov-row, .ov-section { flex: none; }
+      .ov-hero { min-height: calc(var(--u) * 14); }
+      .ov-land, .ov-jump { min-height: calc(var(--u) * 9); }
+      .ov-models, .ov-aloft { min-height: 0; }
+      .model-forecast-grid { grid-template-rows: none; }
+      .model-card-item { min-height: calc(var(--u) * 12); }
+      .aloft-row { min-height: calc(var(--u) * 6); }
       .spot-overlay-card {
         position: relative !important;
         bottom: auto !important;
@@ -433,7 +481,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Dunkeswell Weather Operations</span>
-      <span class="rev-badge">REV: 6.2.0</span>
+      <span class="rev-badge">REV: 6.3.0</span>
     </div>
   </div>
 
@@ -491,85 +539,110 @@
 
     </div>
 
-    <!-- FULL-HEIGHT SIDEBAR (REV 6.2.0) -->
-    <div class="map-info-overlay">
-      <div class="overlay-header">
-        <span>⚡ Live Ops & Winds Aloft</span>
-        <span id="overlay-sector-tag" style="font-size: 0.8rem; color: #ffee58; background: rgba(255,235,59,0.1); padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(255,235,59,0.3);">SECTOR S</span>
+    <!-- SIDEBAR (REV 6.3.0) -->
+    <div class="map-info-overlay" id="sidebar">
+
+      <div class="ov-header">
+        <span>⚡ Live ops</span>
+        <span id="overlay-sector-tag">Sector S</span>
       </div>
-      
-      <!-- TOP 2 BOXES -->
-      <div class="overlay-grid-top">
-        <div class="overlay-cell">
-          <div class="overlay-label">Pattern Turn</div>
-          <div class="overlay-value accent-orange" id="ov-pattern">--</div>
+
+      <!-- HERO: WIND DIRECTION + SPEED -->
+      <div class="ov-row ov-hero">
+        <div class="ov-cell ov-wind">
+          <div class="ov-dial">
+            <svg viewBox="0 0 100 100" aria-hidden="true">
+              <circle cx="50" cy="50" r="47" fill="rgba(0,216,255,0.06)" stroke="#2c4a6e" stroke-width="3"/>
+              <text x="50" y="15" text-anchor="middle" font-size="12" font-weight="800" fill="#7c8ea6" font-family="sans-serif">N</text>
+              <g id="ov-arrow" transform="rotate(324 50 50)">
+                <polygon points="50,22 72,56 57,56 57,84 43,84 43,56 28,56" fill="#00d8ff"/>
+              </g>
+            </svg>
+          </div>
+          <div class="ov-wind-text">
+            <div class="ov-label">Wind from</div>
+            <div class="ov-big accent-cyan" id="ov-winddir">--°</div>
+            <div class="ov-sub accent-cyan" id="ov-windcompass">--</div>
+          </div>
         </div>
-        <div class="overlay-cell">
-          <div class="overlay-label">Avg Wind Spd</div>
-          <div class="overlay-value accent-green" id="ov-windspd">--</div>
+
+        <div class="ov-cell">
+          <div class="ov-label">Average wind</div>
+          <div class="ov-speed-line">
+            <span class="ov-big accent-green" id="ov-windspd">--</span>
+            <span class="ov-unit">mph</span>
+          </div>
+          <div class="ov-sub accent-green" id="ov-gust">Gust --</div>
         </div>
       </div>
 
-      <!-- SINGLE-LINE WIND DIRECTION BOX -->
-      <div class="single-line-row">
-        <span class="overlay-label" style="margin:0;">Wind Direction:</span>
-        <span class="overlay-value accent-cyan" id="ov-winddir">--°</span>
+      <!-- LANDING: TURN DIRECTION, SPOT, HEADING -->
+      <div class="ov-row ov-land">
+        <div class="ov-cell">
+          <div class="ov-label">Pattern turn</div>
+          <div class="ov-big accent-orange" id="ov-pattern">--</div>
+        </div>
       </div>
 
-      <!-- SINGLE-LINE RUN-IN HEADING & DROP BOX -->
-      <div class="single-line-row">
-        <span class="overlay-label" style="margin:0;">Run-In & Drop:</span>
-        <span style="font-size: clamp(1rem, 2vw, 1.4rem); font-weight: 900; color: #fff;" id="ov-heading">--</span>
+      <!-- JUMP RUN: RUN-IN HEADING + DROP -->
+      <div class="ov-row ov-jump">
+        <div class="ov-cell">
+          <div class="ov-label">Run-in <span id="ov-jump-mode"></span></div>
+          <div class="ov-big" id="ov-heading">--</div>
+        </div>
+        <div class="ov-cell">
+          <div class="ov-label">Drop (NM past)</div>
+          <div class="ov-big" id="ov-drop">--</div>
+        </div>
       </div>
 
       <!-- CURRENT HOUR MODEL FORECAST SECTION -->
-      <div class="section-title">
-        <span>📊 Model Forecast (<span id="current-hour-label" style="color: #00d8ff;">--:--</span>)</span>
-      </div>
-      <div class="model-forecast-grid" id="current-model-forecast-rows">
-        <div style="grid-column: span 2; text-align: center; padding: 10px; color: #7c8ea6;">Loading Forecast...</div>
+      <div class="ov-section ov-models">
+        <div class="section-title">
+          <span>Model forecast</span>
+          <span id="current-hour-label" style="color: #00d8ff;">--:--</span>
+        </div>
+        <div class="model-forecast-grid" id="current-model-forecast-rows">
+          <div style="grid-column: span 2; text-align: center; padding: 10px; color: #7c8ea6;">Loading forecast...</div>
+        </div>
       </div>
 
       <!-- WINDS ALOFT SECTION -->
-      <div class="section-title">
-        <span>✈️ Winds Aloft (EGTU 839')</span>
+      <div class="ov-section ov-aloft">
+        <div class="section-title">
+          <span>Winds aloft</span>
+          <span style="color:#7c8ea6;">EGTU 839'</span>
+        </div>
+        <div class="aloft-grid" id="upper-winds-rows">
+          <div class="aloft-head"><span>Alt</span><span>Direction / speed</span><span>Temp</span></div>
+          <div class="aloft-row">
+            <div class="aloft-alt">Sfc</div>
+            <div class="aloft-wind" id="uwind-sfc">--</div>
+            <div class="aloft-temp" id="utemp-sfc">18°C</div>
+          </div>
+          <div class="aloft-row">
+            <div class="aloft-alt">3k'</div>
+            <div class="aloft-wind" id="uwind-3k">--</div>
+            <div class="aloft-temp" id="utemp-3k">12°C</div>
+          </div>
+          <div class="aloft-row">
+            <div class="aloft-alt">7k'</div>
+            <div class="aloft-wind" id="uwind-7k">--</div>
+            <div class="aloft-temp" id="utemp-7k">4°C</div>
+          </div>
+          <div class="aloft-row">
+            <div class="aloft-alt">10k'</div>
+            <div class="aloft-wind" id="uwind-10k">--</div>
+            <div class="aloft-temp" id="utemp-10k">-2°C</div>
+          </div>
+          <div class="aloft-row">
+            <div class="aloft-alt">15k'</div>
+            <div class="aloft-wind" id="uwind-15k">--</div>
+            <div class="aloft-temp" id="utemp-15k">-12°C</div>
+          </div>
+        </div>
       </div>
-      <table class="aloft-table">
-        <thead>
-          <tr>
-            <th style="text-align: left;">Alt</th>
-            <th style="text-align: left;">Dir / Speed</th>
-            <th style="text-align: right;">Temp</th>
-          </tr>
-        </thead>
-        <tbody id="upper-winds-rows">
-          <tr>
-            <td style="font-weight: bold; color: #fff;">Sfc</td>
-            <td id="uwind-sfc" style="font-weight: 900; color: #00d8ff;">--</td>
-            <td id="utemp-sfc" style="text-align: right; font-weight: bold;">18°C</td>
-          </tr>
-          <tr>
-            <td style="font-weight: bold; color: #fff;">3k'</td>
-            <td id="uwind-3k" style="font-weight: 700;">--</td>
-            <td id="utemp-3k" style="text-align: right; font-weight: bold;">12°C</td>
-          </tr>
-          <tr>
-            <td style="font-weight: bold; color: #fff;">7k'</td>
-            <td id="uwind-7k" style="font-weight: 700;">--</td>
-            <td id="utemp-7k" style="text-align: right; font-weight: bold;">4°C</td>
-          </tr>
-          <tr>
-            <td style="font-weight: bold; color: #fff;">10k'</td>
-            <td id="uwind-10k" style="font-weight: 700;">--</td>
-            <td id="utemp-10k" style="text-align: right; font-weight: bold;">-2°C</td>
-          </tr>
-          <tr>
-            <td style="font-weight: bold; color: #fff;">15k'</td>
-            <td id="uwind-15k" style="font-weight: 700;">--</td>
-            <td id="utemp-15k" style="text-align: right; font-weight: bold;">-12°C</td>
-          </tr>
-        </tbody>
-      </table>
+
     </div>
 
   </div>
@@ -617,6 +690,14 @@
     let circuitLayerGroup = L.layerGroup().addTo(map);
     circuitLayerGroup.addTo(map);
 
+    // Shift the view so the airfield sits in the middle of the visible map, not under the sidebar
+    (function offsetForSidebar() {
+      const sb = document.getElementById('sidebar');
+      if (window.innerWidth > 768 && sb) {
+        map.panBy([sb.offsetWidth / 2, 0], { animate: false });
+      }
+    })();
+
     let isJumpManual = false;
     let isLandingManual = false;
     let cachedWeatherData = [144, 18, 30, 144, 20, 30, 144, 18, 33];
@@ -640,6 +721,19 @@
       if (val <= 20) return 'status-yellow';
       if (val <= 25) return 'status-orange';
       return 'status-red';
+    }
+
+    function getStatusColor(val) {
+      if (val <= 15) return '#00e676';
+      if (val <= 20) return '#ffee58';
+      if (val <= 25) return '#ffb74d';
+      return '#ff6b6b';
+    }
+
+    // One row of the winds-aloft table: arrow, direction, big speed
+    function windAloftHTML(dir, spd) {
+      const d = (dir + 360) % 360;
+      return `${getArrow(d)}<span class="aw-dir">${String(Math.round(d)).padStart(3, '0')}°</span><span class="aw-spd">${spd}<small>mph</small></span>`;
     }
 
     function computeDestinationPoint(originLat, originLon, bearingDeg, distanceNM) {
@@ -730,6 +824,14 @@
       return sectors[sectorIndex];
     }
 
+    // Sidebar: run-in heading and drop
+    function setRunInDisplay(headingDeg, offsetNM, manual) {
+      const h = Math.round(headingDeg);
+      document.getElementById('ov-heading').innerText = `${String(h).padStart(3, '0')}° ${getCompassLetter(h)}`;
+      document.getElementById('ov-drop').innerText = offsetNM.toFixed(2);
+      document.getElementById('ov-jump-mode').innerText = manual ? '(manual)' : '';
+    }
+
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
       windRoseLayerGroup.clearLayers();
       manualJumpLayerGroup.clearLayers();
@@ -787,13 +889,10 @@
 
       const avgWindDir = circularMeanDeg([aromeDir, gfsDir, ecmwfDir]);
       const avgSpeed = (aromeSpd + gfsSpd + ecmwfSpd) / 3;
+      const avgGust = (aromeGst + gfsGst + ecmwfGst) / 3;
 
       let runInHeading = avgWindDir;
       let spotOffset = Math.min(0.28, Math.max(0.12, (avgSpeed / 100) * 1.2));
-
-      const headingRounded = Math.round(runInHeading);
-      const headingCompass = getCompassLetter(headingRounded);
-      const headingDisplayStr = `${headingRounded}° (${headingCompass}) • ${spotOffset.toFixed(2)} Past`;
 
       if (isJumpManual) {
         runInHeading = parseFloat(document.getElementById('slider-jump-heading').value);
@@ -819,9 +918,7 @@
           pane: 'topSpotPane', radius: 8, fillColor: '#00d8ff', color: '#ffffff', weight: 2.5, fillOpacity: 1
         }).addTo(manualJumpLayerGroup);
 
-        const manHeadingRounded = Math.round(runInHeading);
-        const manHeadingCompass = getCompassLetter(manHeadingRounded);
-        document.getElementById('ov-heading').innerText = `${manHeadingRounded}° (${manHeadingCompass}) • ${spotOffset.toFixed(2)} Past (MAN)`;
+        setRunInDisplay(runInHeading, spotOffset, true);
       } else {
         const autoSpotPt = computeDestinationPoint(lat, lon, runInHeading, spotOffset);
         const startAutoRun = computeDestinationPoint(lat, lon, (runInHeading + 180) % 360, 0.4);
@@ -843,7 +940,7 @@
           pane: 'topSpotPane', radius: 7, fillColor: '#ff2a2a', color: '#fff', weight: 2.5, fillOpacity: 1
         }).addTo(windRoseLayerGroup);
 
-        document.getElementById('ov-heading').innerText = headingDisplayStr;
+        setRunInDisplay(runInHeading, spotOffset, false);
       }
 
       // ==========================================
@@ -909,13 +1006,25 @@
         })
       }).addTo(circuitLayerGroup);
 
-      // Populate Overlay Values
-      const turnLabelText = circuitSide.toUpperCase();
-      document.getElementById('ov-pattern').innerText = turnLabelText;
-      document.getElementById('ov-windspd').innerText = `${Math.round(avgSpeed)} mph`;
+      // ==========================================
+      // SIDEBAR VALUES
+      // ==========================================
+      document.getElementById('ov-pattern').innerHTML = circuitSide === 'left' ? '<span class="turn-glyph">◀</span> LEFT' : 'RIGHT <span class="turn-glyph">▶</span>';
+
       const roundedDir = Math.round(avgWindDir);
-      document.getElementById('ov-winddir').innerText = `${roundedDir}° (${getCompassLetter(roundedDir)})`;
-      document.getElementById('overlay-sector-tag').innerText = isLandingManual ? `SECTOR ${sectorName} (MAN)` : `SECTOR ${sectorName}`;
+      document.getElementById('ov-winddir').innerText = `${String(roundedDir).padStart(3, '0')}°`;
+      document.getElementById('ov-windcompass').innerText = getCompassLetter(roundedDir);
+      document.getElementById('ov-arrow').setAttribute('transform', `rotate(${(avgWindDir + 180) % 360} 50 50)`);
+
+      const peak = Math.max(avgSpeed, avgGust);
+      const speedEl = document.getElementById('ov-windspd');
+      const gustEl = document.getElementById('ov-gust');
+      speedEl.innerText = Math.round(avgSpeed);
+      gustEl.innerText = `Gust ${Math.round(avgGust)}`;
+      speedEl.style.color = getStatusColor(peak);
+      gustEl.style.color = getStatusColor(peak);
+
+      document.getElementById('overlay-sector-tag').innerText = isLandingManual ? `Sector ${sectorName} (manual)` : `Sector ${sectorName}`;
       
       setTimeout(() => { map.invalidateSize(); }, 250);
     }
@@ -982,17 +1091,19 @@
           const baseAgl = calculateCloudBase(temp, dew, cover);
           const baseStr = (baseAgl !== null && baseAgl < 25000) ? `${baseAgl.toLocaleString()}'` : 'CLR';
 
+          const dirRounded = Math.round(dir);
           forecastCardsHTML += `
-            <div class="model-card-item">
+            <div class="model-card-item ${statusClass}">
               <div class="model-card-top">
                 <span class="model-name">${model.name}</span>
-                <span class="cloud-badge">${baseStr}</span>
+                <span class="cloud-badge">☁ ${baseStr}</span>
               </div>
-              <div class="model-card-body">
-                <div class="wind-badge ${statusClass}">
-                  ${getArrow(dir)}${speed} <span class="gust-val">G:${gust}</span>
-                </div>
+              <div class="model-card-wind">
+                <span class="mc-arrow" style="transform: rotate(${(dir + 180) % 360}deg);">↑</span>
+                <span class="mc-speed">${speed}</span>
+                <span class="mc-gust">G${gust}</span>
               </div>
+              <div class="mc-dir">${String(dirRounded).padStart(3, '0')}° ${getCompassLetter(dirRounded)}</div>
             </div>
           `;
         });
@@ -1013,11 +1124,11 @@
         cachedWeatherData = [aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst];
         updateDashboardMap();
 
-        document.getElementById('uwind-sfc').innerHTML = `${getArrow(ecmwfDir)} ${Math.round(ecmwfDir)}° / ${ecmwfSpd} mph`;
-        document.getElementById('uwind-3k').innerHTML  = `${getArrow((ecmwfDir + 10) % 360)} ${Math.round((ecmwfDir + 10) % 360)}° / ${Math.round(ecmwfSpd * 1.8)} mph`;
-        document.getElementById('uwind-7k').innerHTML  = `${getArrow((ecmwfDir + 18) % 360)} ${Math.round((ecmwfDir + 18) % 360)}° / ${Math.round(ecmwfSpd * 2.3)} mph`;
-        document.getElementById('uwind-10k').innerHTML = `${getArrow((ecmwfDir + 25) % 360)} ${Math.round((ecmwfDir + 25) % 360)}° / ${Math.round(ecmwfSpd * 2.8)} mph`;
-        document.getElementById('uwind-15k').innerHTML = `${getArrow((ecmwfDir + 30) % 360)} ${Math.round((ecmwfDir + 30) % 360)}° / ${Math.round(ecmwfSpd * 3.4)} mph`;
+        document.getElementById('uwind-sfc').innerHTML = windAloftHTML(ecmwfDir, ecmwfSpd);
+        document.getElementById('uwind-3k').innerHTML  = windAloftHTML(ecmwfDir + 10, Math.round(ecmwfSpd * 1.8));
+        document.getElementById('uwind-7k').innerHTML  = windAloftHTML(ecmwfDir + 18, Math.round(ecmwfSpd * 2.3));
+        document.getElementById('uwind-10k').innerHTML = windAloftHTML(ecmwfDir + 25, Math.round(ecmwfSpd * 2.8));
+        document.getElementById('uwind-15k').innerHTML = windAloftHTML(ecmwfDir + 30, Math.round(ecmwfSpd * 3.4));
 
       } catch (err) {
         console.error("Fetch error:", err);
