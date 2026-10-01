@@ -1,4 +1,4 @@
-<!-- REV: 5.10.2 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 5.10.3 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -340,7 +340,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.10.2</div>
+    <div class="rev-badge">REV: 5.10.3</div>
   </div>
 
   <div class="dashboard-container">
@@ -734,7 +734,7 @@
       }
 
       // ==========================================
-      // SELECT INTENDED LANDING SPOT & INTO-WIND HEADING
+      // SELECT INTENDED LANDING SPOT & CORRECT INTO-WIND CIRCUIT
       // ==========================================
       let sectorData;
       if (isLandingManual) {
@@ -750,13 +750,12 @@
       let activeLandingLat = defaultLandingLat;
       let activeLandingLon = defaultLandingLon;
 
-      // Switch to secondary landing spot for SE, S, SW sectors to avoid crossing runways
       if (['SE', 'S', 'SW'].includes(sectorData.sectorName)) {
         activeLandingLat = easterlyLandingLat;
         activeLandingLon = easterlyLandingLon;
       }
 
-      // Always point landing heading directly into the wind (reciprocal of wind direction)
+      // Into-wind heading (reciprocal of wind direction)
       const landingHdg = (avgWindDir + 180) % 360;
       const circuitRad = (landingHdg * Math.PI) / 180;
       const circuitSide = sectorData.turnSide;
@@ -773,10 +772,11 @@
         })
       }).addTo(circuitLayerGroup);
 
+      // Final leg starts upwind of the landing spot
       const finalLegDist = 120; 
       const finalStart = [
-        activeLandingLat - (finalLegDist * Math.cos(circuitRad)) / 111320,
-        activeLandingLon - (finalLegDist * Math.sin(circuitRad)) / (111320 * Math.cos(activeLandingLat * Math.PI / 180))
+        activeLandingLat + (finalLegDist * Math.cos(circuitRad)) / 111320,
+        activeLandingLon + (finalLegDist * Math.sin(circuitRad)) / (111320 * Math.cos(activeLandingLat * Math.PI / 180))
       ];
 
       const perpRad = circuitRad + (circuitSide === 'left' ? -Math.PI / 2 : Math.PI / 2);
@@ -788,8 +788,8 @@
 
       const downwindLength = 350; 
       const downwindEnd = [
-        baseStart[0] + (downwindLength * Math.cos(circuitRad)) / 111320,
-        baseStart[1] + (downwindLength * Math.sin(circuitRad)) / (111320 * Math.cos(activeLandingLat * Math.PI / 180))
+        baseStart[0] - (downwindLength * Math.cos(circuitRad)) / 111320,
+        baseStart[1] - (downwindLength * Math.sin(circuitRad)) / (111320 * Math.cos(activeLandingLat * Math.PI / 180))
       ];
 
       const circuitCoords = [[activeLandingLat, activeLandingLon], finalStart, baseStart, downwindEnd];
