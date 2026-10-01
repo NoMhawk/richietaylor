@@ -1,4 +1,4 @@
-<!-- REV: 5.10.15 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 5.10.16 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -331,7 +331,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Dunkeswell Weather Operations</span>
-      <span class="rev-badge">REV: 5.10.15</span>
+      <span class="rev-badge">REV: 5.10.16</span>
     </div>
   </div>
 
@@ -756,14 +756,14 @@
       const activeLandingLon = activeSpotObj.lon;
 
       const landingHdg = config.landingHdg;
-      const circuitRad = ((landingHdg - 180) * Math.PI) / 180; // Corrected vector from landing heading into wind
+      const circuitRad = (landingHdg * Math.PI) / 180;
       const circuitSide = config.turn;
 
       L.circleMarker([activeLandingLat, activeLandingLon], {
         radius: 6, fillColor: '#ff9800', color: '#ffffff', weight: 2, fillOpacity: 1
       }).addTo(circuitLayerGroup);
 
-      // Landing arrow points precisely along landing heading
+      // Landing arrow aligned with approach heading
       let finalArrowAngle = (landingHdg - 90 + 360) % 360;
       L.marker([activeLandingLat, activeLandingLon], {
         icon: L.divIcon({
