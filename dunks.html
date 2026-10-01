@@ -1,4 +1,4 @@
-<!-- REV: 5.10.5 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 5.10.6 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -40,6 +40,9 @@
       color: #00d8ff;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .rev-badge {
@@ -339,8 +342,10 @@
 
   <!-- HEADER -->
   <div class="top-header">
-    <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.10.5</div>
+    <div class="site-title">
+      <span>🪂 Dunkeswell Weather Operations</span>
+      <span class="rev-badge">REV: 5.10.6</span>
+    </div>
   </div>
 
   <div class="dashboard-container">
@@ -480,13 +485,13 @@
     const fieldElevationFt = 839;
 
     // ==========================================
-    // TARGET LANDING SPOTS (INTENDED TARGETS)
+    // TARGET LANDING SPOTS (1, 2, 3)
     // ==========================================
-    const defaultLandingLat = 50.86165235645555;
-    const defaultLandingLon = -3.2365503955361716;
-
-    const easterlyLandingLat = 50.8606900485523;
-    const easterlyLandingLon = -3.237317785882287;
+    const landingSpots = {
+      1: { lat: 50.86213665816396, lon: -3.236134214664342 },
+      2: { lat: 50.86142167492862, lon: -3.236862378885844 },
+      3: { lat: 50.86062220133885, lon: -3.2378236026499585 }
+    };
     // ==========================================
 
     // ==========================================
@@ -494,12 +499,12 @@
     // ==========================================
     const sectorConfigTable = {
       'N':  { spot: 1, turn: 'left',  landingHdg: 180 },
-      'NE': { spot: 1, turn: 'left',  landingHdg: 225 },
-      'E':  { spot: 1, turn: 'left',  landingHdg: 270 },
-      'SE': { spot: 2, turn: 'right', landingHdg: 315 },
-      'S':  { spot: 2, turn: 'right', landingHdg: 360 },
+      'NE': { spot: 3, turn: 'left',  landingHdg: 225 },
+      'E':  { spot: 3, turn: 'left',  landingHdg: 270 },
+      'SE': { spot: 1, turn: 'right', landingHdg: 315 },
+      'S':  { spot: 1, turn: 'right', landingHdg: 360 },
       'SW': { spot: 2, turn: 'right', landingHdg: 45  },
-      'W':  { spot: 1, turn: 'left',  landingHdg: 90  },
+      'W':  { spot: 2, turn: 'right', landingHdg: 90  },
       'NW': { spot: 1, turn: 'left',  landingHdg: 135 }
     };
     // ==========================================
@@ -750,20 +755,18 @@
       // APPLY HARDCODED CONFIGURATION LOOKUP
       // ==========================================
       let sectorName;
-      let effectiveWindDir = avgWindDir;
-
       if (isLandingManual) {
         const sectorVal = parseFloat(document.getElementById('select-wind-sector').value);
-        effectiveWindDir = sectorVal;
         sectorName = getSectorNameFromDeg(sectorVal);
       } else {
         sectorName = getSectorNameFromDeg(avgWindDir);
       }
 
-      const config = sectorConfigTable[sectorName] || { spot: 1, turn: 'left', landingHdg: (effectiveWindDir + 180) % 360 };
+      const config = sectorConfigTable[sectorName] || { spot: 1, turn: 'left', landingHdg: 180 };
+      const activeSpotObj = landingSpots[config.spot] || landingSpots[1];
 
-      let activeLandingLat = (config.spot === 2) ? easterlyLandingLat : defaultLandingLat;
-      let activeLandingLon = (config.spot === 2) ? easterlyLandingLon : defaultLandingLon;
+      const activeLandingLat = activeSpotObj.lat;
+      const activeLandingLon = activeSpotObj.lon;
 
       const landingHdg = config.landingHdg;
       const circuitRad = (landingHdg * Math.PI) / 180;
@@ -812,7 +815,7 @@
       }).addTo(circuitLayerGroup);
 
       // Populate Overlay Values
-      document.getElementById('ov-pattern').innerText = turnLabelText;
+      document.getElementById('ov-pattern').innerText = `${turnLabelText} (Spot ${config.spot})`;
       document.getElementById('ov-windspd').innerText = `${Math.round(avgSpeed)} mph`;
       const roundedDir = Math.round(avgWindDir);
       document.getElementById('ov-winddir').innerText = `${roundedDir}° (${getCompassLetter(roundedDir)})`;
