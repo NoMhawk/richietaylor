@@ -1,4 +1,4 @@
-<!-- REV: 8.2.1 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 8.4.0 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,6 +43,20 @@
       gap: 10px;
     }
 
+    .header-right-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: monospace;
+      font-size: 0.72rem;
+      color: #a9b9d0;
+    }
+
+    .meta-item span {
+      color: #00d8ff;
+      font-weight: bold;
+    }
+
     .rev-badge {
       background: #0088ff;
       color: #fff;
@@ -77,7 +91,7 @@
     #map { width: 100%; height: 100%; z-index: 1; }
 
     /* ==========================================================
-        SIDEBAR (REV 8.2.1)
+        SIDEBAR (REV 8.4.0)
         ========================================================== */
     .map-info-overlay {
       --w: clamp(460px, 34vw, 720px);
@@ -488,7 +502,11 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Dunkeswell Weather Operations</span>
-      <span class="rev-badge">REV: 8.2.1</span>
+      <span class="rev-badge">REV: 8.4.0</span>
+    </div>
+    <div class="header-right-meta">
+      <div class="meta-item">Current: <span id="clock-current">--:--:--</span></div>
+      <div class="meta-item">Updated: <span id="clock-updated">--:--:--</span></div>
     </div>
   </div>
 
@@ -546,7 +564,7 @@
 
     </div>
 
-    <!-- SIDEBAR (REV 8.2.1) -->
+    <!-- SIDEBAR (REV 8.4.0) -->
     <div class="map-info-overlay" id="sidebar">
       <div class="ov-header">
         <span>⚡ Live ops</span>
@@ -656,6 +674,18 @@
     const lon = -3.233961;
     const fieldElevationFt = 839;
 
+    // Track last update timestamp
+    let lastUpdatedTime = new Date();
+
+    // Clock update ticker (runs every second)
+    function updateClocks() {
+      const now = new Date();
+      document.getElementById('clock-current').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      document.getElementById('clock-updated').innerText = lastUpdatedTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+    setInterval(updateClocks, 1000);
+    updateClocks();
+
     // ==========================================
     // TARGET LANDING SPOTS (1, 2, 3)
     // ==========================================
@@ -667,7 +697,7 @@
     // ==========================================
 
     // ==========================================
-    // HARDCODED DIRECTION CONFIGURATION TABLE (REV 8.2.1)
+    // HARDCODED DIRECTION CONFIGURATION TABLE (REV 8.4.0)
     // ==========================================
     const sectorConfigTable = {
       'N':  { spot: 1, turn: 'left',  landingHdg: 180 },
@@ -704,8 +734,7 @@
 
     let isJumpManual = false;
     let isLandingManual = false;
-    // TEST OVERRIDE: Set default cached weather to 248° to test the 248° wind behavior directly on load
-    let cachedWeatherData = [248, 18, 30, 248, 20, 30, 248, 18, 33];
+    let cachedWeatherData = [144, 18, 30, 144, 20, 30, 144, 18, 33];
 
     function getArrow(deg) {
       if (deg === undefined || deg === null) return '↑';
@@ -1102,7 +1131,7 @@
         const sampleTimeDate = new Date(times[currentIdx]);
         document.getElementById('current-hour-label').innerText = sampleTimeDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-        let forecastCardsHTML = {};
+        let forecastCardsHTML = '';
         models.forEach(model => {
           const dataset = model.data;
           if (!dataset || !dataset.hourly) return;
@@ -1156,8 +1185,11 @@
         document.getElementById('uwind-sfc').innerHTML = windAloftHTML(ecmwfDir, ecmwfSpd);
         document.getElementById('uwind-3k').innerHTML  = windAloftHTML(ecmwfDir + 10, Math.round(ecmwfSpd * 1.8));
         document.getElementById('uwind-7k').innerHTML  = windAloftHTML(ecmwfDir + 18, Math.round(ecmwfSpd * 2.3));
-        document.getElementById('uwind-10k').innerHTML = windAloftXML = windAloftHTML(ecmwfDir + 25, Math.round(ecmwfSpd * 2.8));
+        document.getElementById('uwind-10k').innerHTML = windAloftHTML(ecmwfDir + 25, Math.round(ecmwfSpd * 2.8));
         document.getElementById('uwind-15k').innerHTML = windAloftHTML(ecmwfDir + 30, Math.round(ecmwfSpd * 3.4));
+
+        // Update last fetched timestamp
+        lastUpdatedTime = new Date();
 
       } catch (err) {
         console.error("Fetch error:", err);
@@ -1165,6 +1197,11 @@
     }
 
     fetchModelData();
+
+    // AUTO-REFRESH PAGE EVERY 5 MINUTES (300,000 milliseconds)
+    setTimeout(() => {
+      window.location.reload(true);
+    }, 300 * 1000);
   </script>
 
 </body>
