@@ -1,4 +1,4 @@
-<!-- REV: 8.1.1 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 8.2.0 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,7 +77,7 @@
     #map { width: 100%; height: 100%; z-index: 1; }
 
     /* ==========================================================
-        SIDEBAR (REV 8.1.1)
+        SIDEBAR (REV 8.2.0)
         ========================================================== */
     .map-info-overlay {
       --w: clamp(460px, 34vw, 720px);
@@ -488,7 +488,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Dunkeswell Weather Operations</span>
-      <span class="rev-badge">REV: 8.1.1</span>
+      <span class="rev-badge">REV: 8.2.0</span>
     </div>
   </div>
 
@@ -530,14 +530,14 @@
             <div class="slider-row">
               <span>Wind Sector:</span>
               <select id="select-wind-sector" onchange="updateDashboardMap()" style="background:#131b2e; color:#ff9800; border:1px solid #ff9800; font-size:0.7rem; font-weight:bold; border-radius:3px; width:150px;">
-                <option value="0" selected>N (330° - 030°)</option>
-                <option value="45">NE (030° - 075°)</option>
-                <option value="90">E (075° - 120°)</option>
-                <option value="135">SE (120° - 165°)</option>
-                <option value="170">S (165° - 195°)</option>
-                <option value="220">SW (195° - 240°)</option>
-                <option value="270">W (240° - 285°)</option>
-                <option value="315">NW (285° - 330°)</option>
+                <option value="0" selected>N (337.5° - 022.5°)</option>
+                <option value="45">NE (022.5° - 067.5°)</option>
+                <option value="90">E (067.5° - 112.5°)</option>
+                <option value="135">SE (112.5° - 157.5°)</option>
+                <option value="180">S (157.5° - 202.5°)</option>
+                <option value="225">SW (202.5° - 247.5°)</option>
+                <option value="270">W (247.5° - 292.5°)</option>
+                <option value="315">NW (292.5° - 337.5°)</option>
               </select>
             </div>
           </div>
@@ -546,7 +546,7 @@
 
     </div>
 
-    <!-- SIDEBAR (REV 8.1.1) -->
+    <!-- SIDEBAR (REV 8.2.0) -->
     <div class="map-info-overlay" id="sidebar">
       <div class="ov-header">
         <span>⚡ Live ops</span>
@@ -667,7 +667,7 @@
     // ==========================================
 
     // ==========================================
-    // HARDCODED DIRECTION CONFIGURATION TABLE (REV 8.1.1)
+    // HARDCODED DIRECTION CONFIGURATION TABLE (REV 8.2)
     // ==========================================
     const sectorConfigTable = {
       'N':  { spot: 1, turn: 'left',  landingHdg: 180 },
@@ -820,11 +820,18 @@
       return (Math.atan2(s, c) * 180 / Math.PI + 360) % 360;
     }
 
+    // PRECISE 45-DEGREE SECTOR BOUNDARIES CENTERED ON CARDINAL/INTERCARDINAL POINTS
     function getSectorNameFromDeg(deg) {
-      const norm = (deg + 360) % 360;
-      const sectorIndex = Math.round(norm / 45) % 8;
-      const sectors = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-      return sectors[sectorIndex];
+      const norm = (deg % 360 + 360) % 360;
+      if (norm >= 337.5 || norm < 22.5) return 'N';
+      if (norm >= 22.5 && norm < 67.5) return 'NE';
+      if (norm >= 67.5 && norm < 112.5) return 'E';
+      if (norm >= 112.5 && norm < 157.5) return 'SE';
+      if (norm >= 157.5 && norm < 202.5) return 'S';
+      if (norm >= 202.5 && norm < 247.5) return 'SW';
+      if (norm >= 247.5 && norm < 292.5) return 'W';
+      if (norm >= 292.5 && norm < 337.5) return 'NW';
+      return 'SW'; // Fallback
     }
 
     function setRunInDisplay(headingDeg, offsetNM, manual) {
