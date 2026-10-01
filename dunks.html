@@ -1,4 +1,4 @@
-<!-- REV: 9.4 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 9.5 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -91,7 +91,7 @@
     #map { width: 100%; height: 100%; z-index: 1; }
 
     /* ==========================================================
-        SIDEBAR (REV 9.4)
+        SIDEBAR (REV 9.5)
         ========================================================== */
     .map-info-overlay {
       --w: clamp(460px, 34vw, 720px);
@@ -177,7 +177,7 @@
     }
 
     .ov-hero .ov-big { font-size: calc(var(--u) * 6.2); }
-    .ov-land .ov-big { font-size: calc(var(--u) * 5.6); }
+    .ov-land .ov-big { font-size: calc(var(--u) * 4.6); } /* Scaled down slightly to guarantee fitting */
     .ov-jump .ov-big { font-size: calc(var(--u) * 4.2); }
     .ov-jj-big       { font-size: calc(var(--u) * 3.6); }
 
@@ -506,7 +506,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Dunkeswell Weather Operations</span>
-      <span class="rev-badge">REV: 9.4</span>
+      <span class="rev-badge">REV: 9.5</span>
     </div>
     <div class="header-right-meta">
       <div class="meta-item">Current: <span id="clock-current">--:--:--</span></div>
@@ -568,7 +568,7 @@
 
     </div>
 
-    <!-- SIDEBAR (REV 9.4) -->
+    <!-- SIDEBAR (REV 9.5) -->
     <div class="map-info-overlay" id="sidebar">
       <div class="ov-header">
         <span>⚡ Live ops</span>
@@ -607,7 +607,7 @@
       <div class="ov-row ov-land">
         <div class="ov-cell">
           <div class="ov-label">Pattern center / intersection</div>
-          <div class="ov-big accent-orange" id="ov-pattern">--</div>
+          <div class="ov-big accent-orange" id="ov-pattern" style="font-size: calc(var(--u) * 4.2);">--</div>
         </div>
       </div>
 
@@ -956,7 +956,7 @@
       }
 
       // ==========================================
-      // JJ'S JUMP RUN LOGIC (REV 9.4 - Shortened Span)
+      // JJ'S JUMP RUN LOGIC (REV 9.5)
       // ==========================================
       const rwy04 = 42;
       const rwy22 = 222;
@@ -1199,7 +1199,7 @@
         updateDashboardMap();
 
         document.getElementById('uwind-sfc').innerHTML = windAloftHTML(ecmwfDir, ecmwfSpd);
-        document.getElementById('uwind-3k').innerHTML  = windAloftHTML(ecmwfDir + 10, Math.round(ecmwfspd * 1.8));
+        document.getElementById('uwind-3k').innerHTML  = windAloftHTML(ecmwfDir + 10, Math.round(ecmwfSpd * 1.8));
         document.getElementById('uwind-7k').innerHTML  = windAloftHTML(ecmwfDir + 18, Math.round(ecmwfSpd * 2.3));
         document.getElementById('uwind-10k').innerHTML = windAloftHTML(ecmwfDir + 25, Math.round(ecmwfSpd * 2.8));
         document.getElementById('uwind-15k').innerHTML = windAloftHTML(ecmwfDir + 30, Math.round(ecmwfSpd * 3.4));
