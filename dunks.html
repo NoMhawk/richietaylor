@@ -1,4 +1,4 @@
-<!-- REV: 5.10.0 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 5.10.1 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -340,7 +340,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.10.0</div>
+    <div class="rev-badge">REV: 5.10.1</div>
   </div>
 
   <div class="dashboard-container">
@@ -478,6 +478,16 @@
     const lat = 50.860619;
     const lon = -3.233961;
     const fieldElevationFt = 839;
+
+    // ==========================================
+    // TARGET LANDING SPOTS (INTENDED TARGETS)
+    // ==========================================
+    const defaultLandingLat = 50.86165235645555;
+    const defaultLandingLon = -3.2365503955361716;
+
+    const easterlyLandingLat = 50.8606900485523;
+    const easterlyLandingLon = -3.237317785882287;
+    // ==========================================
 
     const map = L.map('map', { zoomControl: false }).setView([lat, lon], 16);
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
@@ -724,7 +734,7 @@
       }
 
       // ==========================================
-      // PURE WIND-DRIVEN LANDING PATTERN (AVOIDING RUNWAYS)
+      // SELECT INTENDED LANDING SPOT BASED ON WIND SECTOR
       // ==========================================
       let sectorData;
       if (isLandingManual) {
@@ -737,22 +747,26 @@
         sectorData = getSectorDetails(avgWindDir);
       }
 
-      // Landing heading aligns directly into the wind (reciprocal of wind direction)
-      const landingHdg = (avgWindDir + 180) % 360;
-      const landingRad = (landingHdg * Math.PI) / 180;
+      // Use easterly landing spot for SE, S, SW to avoid crossing runways; default spot for all others
+      let activeLandingLat = defaultLandingLat;
+      let activeLandingLon = defaultLandingLon;
+      let landingHdg = (avgWindDir + 180) % 360; // Into-wind heading
+
+      if (['SE', 'S', 'SW'].includes(sectorData.sectorName)) {
+        activeLandingLat = easterlyLandingLat;
+        activeLandingLon = easterlyLandingLon;
+        landingHdg = 40; // Align circuit neatly along the easterly avoidance profile
+      }
+
+      const circuitRad = (landingHdg * Math.PI) / 180;
       const circuitSide = sectorData.turnSide;
 
-      // Calculate landing threshold offset upwind from the airfield center, keeping it clear of the runways
-      const thresholdOffsetMeters = 160;
-      const landingLat = lat + (thresholdOffsetMeters * Math.cos(landingRad)) / 111320;
-      const landingLon = lon + (thresholdOffsetMeters * Math.sin(landingRad)) / (111320 * Math.cos(lat * Math.PI / 180));
-
-      L.circleMarker([landingLat, landingLon], {
+      L.circleMarker([activeLandingLat, activeLandingLon], {
         radius: 6, fillColor: '#ff9800', color: '#ffffff', weight: 2, fillOpacity: 1
       }).addTo(circuitLayerGroup);
 
       let finalArrowAngle = (landingHdg - 90 + 360) % 360;
-      L.marker([landingLat, landingLon], {
+      L.marker([activeLandingLat, activeLandingLon], {
         icon: L.divIcon({
           html: `<div class="circuit-arrow" style="transform: rotate(${finalArrowAngle}deg);">▶</div>`,
           className: '', iconSize: [16, 16], iconAnchor: [8, 8]
@@ -761,24 +775,24 @@
 
       const finalLegDist = 120; 
       const finalStart = [
-        landingLat - (finalLegDist * Math.cos(landingRad)) / 111320,
-        landingLon - (finalLegDist * Math.sin(landingRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
+        activeLandingLat - (finalLegDist * Math.cos(circuitRad)) / 111320,
+        activeLandingLon - (finalLegDist * Math.sin(circuitRad)) / (111320 * Math.cos(activeLandingLat * Math.PI / 180))
       ];
 
-      const perpRad = landingRad + (circuitSide === 'left' ? -Math.PI / 2 : Math.PI / 2);
+      const perpRad = circuitRad + (circuitSide === 'left' ? -Math.PI / 2 : Math.PI / 2);
       const baseWidth = 140; 
       const baseStart = [
         finalStart[0] + (baseWidth * Math.cos(perpRad)) / 111320,
-        finalStart[1] + (baseWidth * Math.sin(perpRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
+        finalStart[1] + (baseWidth * Math.sin(perpRad)) / (111320 * Math.cos(activeLandingLat * Math.PI / 180))
       ];
 
       const downwindLength = 350; 
       const downwindEnd = [
-        baseStart[0] + (downwindLength * Math.cos(landingRad)) / 111320,
-        baseStart[1] + (downwindLength * Math.sin(landingRad)) / (111320 * Math.cos(landingLat * Math.PI / 180))
+        baseStart[0] + (downwindLength * Math.cos(circuitRad)) / 111320,
+        baseStart[1] + (downwindLength * Math.sin(circuitRad)) / (111320 * Math.cos(activeLandingLat * Math.PI / 180))
       ];
 
-      const circuitCoords = [[landingLat, landingLon], finalStart, baseStart, downwindEnd];
+      const circuitCoords = [[activeLandingLat, activeLandingLon], finalStart, baseStart, downwindEnd];
 
       L.polyline(circuitCoords, {
         color: '#ff9800', weight: 3, dashArray: '5,5', opacity: 0.95
