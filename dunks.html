@@ -1,4 +1,4 @@
-<!-- REV: 8.4.0 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 8.5.0 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -91,7 +91,7 @@
     #map { width: 100%; height: 100%; z-index: 1; }
 
     /* ==========================================================
-        SIDEBAR (REV 8.4.0)
+        SIDEBAR (REV 8.5.0)
         ========================================================== */
     .map-info-overlay {
       --w: clamp(460px, 34vw, 720px);
@@ -502,7 +502,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Dunkeswell Weather Operations</span>
-      <span class="rev-badge">REV: 8.4.0</span>
+      <span class="rev-badge">REV: 8.5.0</span>
     </div>
     <div class="header-right-meta">
       <div class="meta-item">Current: <span id="clock-current">--:--:--</span></div>
@@ -564,7 +564,7 @@
 
     </div>
 
-    <!-- SIDEBAR (REV 8.4.0) -->
+    <!-- SIDEBAR (REV 8.5.0) -->
     <div class="map-info-overlay" id="sidebar">
       <div class="ov-header">
         <span>⚡ Live ops</span>
@@ -670,8 +670,9 @@
   </div>
 
   <script>
-    const lat = 50.860619;
-    const lon = -3.233961;
+    // Updated to official Dunkeswell Aerodrome Reference Point (ARP) center coordinates
+    const lat = 50.860000;
+    const lon = -3.234722;
     const fieldElevationFt = 839;
 
     // Track last update timestamp
@@ -687,17 +688,17 @@
     updateClocks();
 
     // ==========================================
-    // TARGET LANDING SPOTS (1, 2, 3)
+    // TARGET LANDING SPOTS (1, 2, 3) - Shifted relative to ARP
     // ==========================================
     const landingSpots = {
-      1: { lat: 50.86213665816396, lon: -3.236134214664342 },
-      2: { lat: 50.86142167492862, lon: -3.236862378885844 },
-      3: { lat: 50.86062220133885, lon: -3.2378236026499585 }
+      1: { lat: 50.861517, lon: -3.236862 },
+      2: { lat: 50.860802, lon: -3.237590 },
+      3: { lat: 50.860003, lon: -3.238551 }
     };
     // ==========================================
 
     // ==========================================
-    // HARDCODED DIRECTION CONFIGURATION TABLE (REV 8.4.0)
+    // HARDCODED DIRECTION CONFIGURATION TABLE (REV 8.5.0)
     // ==========================================
     const sectorConfigTable = {
       'N':  { spot: 1, turn: 'left',  landingHdg: 180 },
@@ -876,7 +877,7 @@
       manualJumpLayerGroup.clearLayers();
       circuitLayerGroup.clearLayers();
 
-      // Airfield intersection origin (white dot at 0.0)
+      // Airfield center origin marker (ARP)
       L.circleMarker([lat, lon], {
         pane: 'topSpotPane', radius: 5, fillColor: '#ffffff', color: '#000000', weight: 1.5, fillOpacity: 1
       }).addTo(windRoseLayerGroup);
