@@ -1,4 +1,4 @@
-<!-- REV: 5.10.3 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 5.10.4 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -340,7 +340,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.10.3</div>
+    <div class="rev-badge">REV: 5.10.4</div>
   </div>
 
   <div class="dashboard-container">
@@ -734,11 +734,14 @@
       }
 
       // ==========================================
-      // SELECT INTENDED LANDING SPOT & CORRECT INTO-WIND CIRCUIT
+      // SELECT INTENDED LANDING SPOT & CIRCUIT (AUTO vs MANUAL)
       // ==========================================
       let sectorData;
+      let effectiveWindDir = avgWindDir;
+
       if (isLandingManual) {
         const sectorVal = parseFloat(document.getElementById('select-wind-sector').value);
+        effectiveWindDir = sectorVal;
         const sectorsMap = { 0: 'N', 45: 'NE', 90: 'E', 135: 'SE', 170: 'S', 220: 'SW', 270: 'W', 315: 'NW' };
         const secName = sectorsMap[sectorVal];
         const tSide = ['SE', 'S', 'SW'].includes(secName) ? 'right' : 'left';
@@ -756,7 +759,7 @@
       }
 
       // Into-wind heading (reciprocal of wind direction)
-      const landingHdg = (avgWindDir + 180) % 360;
+      const landingHdg = (effectiveWindDir + 180) % 360;
       const circuitRad = (landingHdg * Math.PI) / 180;
       const circuitSide = sectorData.turnSide;
 
@@ -772,7 +775,6 @@
         })
       }).addTo(circuitLayerGroup);
 
-      // Final leg starts upwind of the landing spot
       const finalLegDist = 120; 
       const finalStart = [
         activeLandingLat + (finalLegDist * Math.cos(circuitRad)) / 111320,
@@ -808,7 +810,7 @@
       document.getElementById('ov-windspd').innerText = `${Math.round(avgSpeed)} mph`;
       const roundedDir = Math.round(avgWindDir);
       document.getElementById('ov-winddir').innerText = `${roundedDir}° (${getCompassLetter(roundedDir)})`;
-      document.getElementById('overlay-sector-tag').innerText = `SECTOR ${sectorData.sectorName}`;
+      document.getElementById('overlay-sector-tag').innerText = isLandingManual ? `SECTOR ${sectorData.sectorName} (MAN)` : `SECTOR ${sectorData.sectorName}`;
       
       setTimeout(() => { map.invalidateSize(); }, 250);
     }
