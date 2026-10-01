@@ -1,4 +1,4 @@
-<!-- REV: 5.10.17 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 6.0.0 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -78,73 +78,161 @@
 
     #map { width: 100%; height: 100%; z-index: 1; }
 
-    /* DESKTOP FLOATING PANEL (TOP-RIGHT OF MAP) */
+    /* REFINED SIDEBAR / FLOATING PANEL (REV 6.0.0) */
     .map-info-overlay {
       position: absolute;
       top: 10px;
       right: 10px;
       z-index: 1000;
-      background: rgba(11, 15, 25, 0.96);
-      backdrop-filter: blur(12px);
-      border: 2px solid #00d8ff;
-      border-radius: 10px;
-      padding: 16px 20px;
-      box-shadow: 0 8px 28px rgba(0,0,0,0.8);
+      background: rgba(11, 15, 25, 0.94);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(0, 216, 255, 0.35);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.85), inset 0 1px 1px rgba(0, 216, 255, 0.2);
       font-family: monospace;
-      width: 520px;
+      width: 530px;
       max-height: calc(100vh - 80px);
       overflow-y: auto;
     }
 
     .overlay-header {
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       font-weight: 800;
       color: #00d8ff;
       text-transform: uppercase;
-      margin-bottom: 12px;
-      padding-bottom: 6px;
-      border-bottom: 1px solid #1e2d4a;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(30, 45, 74, 0.8);
       display: flex;
       justify-content: space-between;
       align-items: center;
+      letter-spacing: 0.8px;
     }
 
     .overlay-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 12px;
+      gap: 10px;
+      margin-bottom: 10px;
     }
 
     .overlay-cell {
-      background: rgba(0, 0, 0, 0.5);
-      border: 1px solid #1e2d4a;
-      border-radius: 6px;
-      padding: 12px 14px;
+      background: linear-gradient(135deg, rgba(20, 30, 50, 0.6) 0%, rgba(10, 15, 25, 0.8) 100%);
+      border: 1px solid rgba(30, 45, 74, 0.9);
+      border-radius: 8px;
+      padding: 12px;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      min-height: 65px;
+      min-height: 60px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
     }
 
     .overlay-label {
-      font-size: 0.72rem;
-      color: #8a99ad;
+      font-size: 0.7rem;
+      color: #7c8ea6;
       text-transform: uppercase;
       margin-bottom: 4px;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.6px;
     }
 
     .overlay-value {
-      font-size: 1.75rem;
+      font-size: 1.6rem;
       font-weight: 900;
       color: #fff;
       line-height: 1.1;
     }
 
-    .overlay-value.accent-orange { color: #ff9800; }
-    .overlay-value.accent-cyan { color: #00d8ff; }
-    .overlay-value.accent-green { color: #00e676; }
+    .overlay-value.accent-orange { color: #ff9800; text-shadow: 0 0 12px rgba(255, 152, 0, 0.3); }
+    .overlay-value.accent-cyan { color: #00d8ff; text-shadow: 0 0 12px rgba(0, 216, 255, 0.3); }
+    .overlay-value.accent-green { color: #00e676; text-shadow: 0 0 12px rgba(0, 230, 118, 0.3); }
+
+    /* SECTION DIVIDER HEADERS */
+    .section-title {
+      font-size: 0.75rem;
+      color: #7c8ea6;
+      text-transform: uppercase;
+      margin: 14px 0 8px 0;
+      font-weight: bold;
+      letter-spacing: 0.8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* MODEL FORECAST CARDS GRID */
+    .model-forecast-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .model-card-item {
+      background: rgba(18, 26, 43, 0.7);
+      border: 1px solid rgba(30, 45, 74, 0.9);
+      border-radius: 6px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .model-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+    }
+
+    .model-name {
+      font-weight: 800;
+      color: #00d8ff;
+      letter-spacing: 0.5px;
+    }
+
+    .model-card-body {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2px;
+    }
+
+    /* WINDS ALOFT TABLE REFINEMENT */
+    .aloft-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      font-family: monospace;
+      background: rgba(15, 22, 36, 0.5);
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(30, 45, 74, 0.8);
+    }
+
+    .aloft-table th {
+      background: rgba(25, 35, 55, 0.9);
+      color: #7c8ea6;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      padding: 6px 10px;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid rgba(30, 45, 74, 0.9);
+    }
+
+    .aloft-table td {
+      padding: 7px 10px;
+      border-bottom: 1px solid rgba(30, 45, 74, 0.4);
+    }
+
+    .aloft-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .aloft-table tr:hover td {
+      background: rgba(0, 216, 255, 0.04);
+    }
 
     /* DZ CONTROL PANEL (BOTTOM-RIGHT OF MAP) */
     .spot-overlay-card {
@@ -155,11 +243,11 @@
       background: rgba(11, 15, 25, 0.94);
       backdrop-filter: blur(8px);
       border: 1px solid #1e2d4a;
-      border-radius: 6px;
+      border-radius: 8px;
       padding: 10px 14px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.6);
       font-family: monospace;
-      width: 520px;
+      width: 530px;
     }
 
     .spot-overlay-header {
@@ -212,9 +300,10 @@
 
     .wind-badge {
       display: inline-block;
-      padding: 2px 5px;
-      border-radius: 3px;
+      padding: 2px 6px;
+      border-radius: 4px;
       font-weight: bold;
+      font-size: 0.78rem;
     }
 
     .status-green  { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.4); }
@@ -225,15 +314,16 @@
     .cloud-badge {
       display: inline-block;
       padding: 2px 6px;
-      border-radius: 3px;
+      border-radius: 4px;
       font-weight: bold;
+      font-size: 0.75rem;
       color: #00d8ff;
       background: rgba(0, 216, 255, 0.12);
       border: 1px solid rgba(0, 216, 255, 0.3);
     }
 
     .dir-arrow { display: inline-block; font-weight: bold; margin-right: 2px; }
-    .gust-val { font-size: 0.75rem; opacity: 0.85; }
+    .gust-val { font-size: 0.7rem; opacity: 0.85; }
 
     .rotated-pill {
       display: flex;
@@ -331,17 +421,17 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Dunkeswell Weather Operations</span>
-      <span class="rev-badge">REV: 5.10.17</span>
+      <span class="rev-badge">REV: 6.0.0</span>
     </div>
   </div>
 
   <div class="dashboard-container">
     
-    <!-- TOP-RIGHT MAP OVERLAY PANEL (DATA FIRST ON MOBILE) -->
+    <!-- TOP-RIGHT MAP OVERLAY PANEL (REV 6.0.0 SLEEK SIDEBAR) -->
     <div class="map-info-overlay">
       <div class="overlay-header">
         <span>⚡ Live Ops & Winds Aloft</span>
-        <span id="overlay-sector-tag" style="font-size: 0.85rem; color: #ffee58;">SECTOR S</span>
+        <span id="overlay-sector-tag" style="font-size: 0.8rem; color: #ffee58; background: rgba(255,235,59,0.1); padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(255,235,59,0.3);">SECTOR S</span>
       </div>
       
       <div class="overlay-grid">
@@ -362,52 +452,57 @@
         </div>
       </div>
 
-      <!-- FULL-WIDTH RUN-IN HEADING & DROP OFFSET BOX -->
-      <div style="background: rgba(0, 0, 0, 0.5); border: 1px solid #1e2d4a; border-radius: 6px; padding: 10px 14px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
-        <span class="overlay-label" style="margin:0; font-size: 0.75rem;">Run-In Heading & Drop:</span>
-        <span style="font-size: 1.1rem; font-weight: 900; color: #fff;" id="ov-heading">--</span>
+      <!-- RUN-IN HEADING & DROP OFFSET BOX -->
+      <div style="background: linear-gradient(135deg, rgba(20, 30, 50, 0.6) 0%, rgba(10, 15, 25, 0.8) 100%); border: 1px solid rgba(30, 45, 74, 0.9); border-radius: 8px; padding: 10px 14px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center;">
+        <span class="overlay-label" style="margin:0; font-size: 0.72rem;">Run-In & Drop:</span>
+        <span style="font-size: 1rem; font-weight: 900; color: #fff;" id="ov-heading">--</span>
       </div>
 
-      <!-- CURRENT HOUR MODEL FORECAST CARD -->
-      <div style="font-size: 0.75rem; color: #8a99ad; text-transform: uppercase; margin-bottom: 6px; font-weight: bold; letter-spacing: 0.5px;">📊 Current Hour Forecast (<span id="current-hour-label">--:--</span>)</div>
-      <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem; font-family: monospace; margin-bottom: 12px;">
-        <thead>
-          <tr style="border-bottom: 1px solid #1e2d4a; color: #8a99ad; font-size: 0.72rem;">
-            <th style="text-align: left; padding: 4px;">Model</th>
-            <th style="text-align: center; padding: 4px;">Wind (Sfc)</th>
-            <th style="text-align: right; padding: 4px;">Cloud Base</th>
-          </tr>
-        </thead>
-        <tbody id="current-model-forecast-rows">
-          <tr><td colspan="3" style="padding: 6px; text-align: center; color: #8a99ad;">Loading Forecast...</td></tr>
-        </tbody>
-      </table>
+      <!-- CURRENT HOUR MODEL FORECAST SECTION -->
+      <div class="section-title">
+        <span>📊 Model Forecast (<span id="current-hour-label" style="color: #00d8ff;">--:--</span>)</span>
+      </div>
+      <div class="model-forecast-grid" id="current-model-forecast-rows">
+        <div style="grid-column: span 2; text-align: center; padding: 10px; color: #7c8ea6;">Loading Forecast...</div>
+      </div>
 
-      <!-- WINDS ALOFT TABLE -->
-      <div style="font-size: 0.75rem; color: #8a99ad; text-transform: uppercase; margin-bottom: 6px; font-weight: bold; letter-spacing: 0.5px;">✈️ Winds Aloft (EGTU 839')</div>
-      <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem; font-family: monospace;">
+      <!-- WINDS ALOFT SECTION -->
+      <div class="section-title">
+        <span>✈️ Winds Aloft (EGTU 839')</span>
+      </div>
+      <table class="aloft-table">
         <thead>
-          <tr style="border-bottom: 1px solid #1e2d4a; color: #8a99ad; font-size: 0.75rem;">
-            <th style="text-align: left; padding: 4px;">Alt</th>
-            <th style="text-align: left; padding: 4px;">Dir / Speed</th>
-            <th style="text-align: right; padding: 4px;">Temp</th>
+          <tr>
+            <th style="text-align: left;">Alt</th>
+            <th style="text-align: left;">Dir / Speed</th>
+            <th style="text-align: right;">Temp</th>
           </tr>
         </thead>
         <tbody id="upper-winds-rows">
-          <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
-            <td style="padding: 5px 4px; font-weight: bold;">Sfc</td><td id="uwind-sfc" style="font-weight: 900; color: #00d8ff; font-size: 1rem;">--</td><td id="utemp-sfc" style="text-align: right; font-weight: bold;">18°C</td>
-          </tr>
-          <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
-            <td style="padding: 5px 4px; font-weight: bold;">3k'</td><td id="uwind-3k" style="font-weight: 900; font-size: 1rem;">--</td><td id="utemp-3k" style="text-align: right; font-weight: bold;">12°C</td>
-          </tr>
-          <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
-            <td style="padding: 5px 4px; font-weight: bold;">7k'</td><td id="uwind-7k" style="font-weight: 900; font-size: 1rem;">--</td><td id="utemp-7k" style="text-align: right; font-weight: bold;">4°C</td>
-          </tr>
-          <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
-            <td style="padding: 5px 4px; font-weight: bold;">10k'</td><td id="uwind-10k" style="font-weight: 900; font-size: 1rem;">--</td><td id="utemp-10k" style="text-align: right; font-weight: bold;">-2°C</td>
+          <tr>
+            <td style="font-weight: bold; color: #fff;">Sfc</td>
+            <td id="uwind-sfc" style="font-weight: 900; color: #00d8ff;">--</td>
+            <td id="utemp-sfc" style="text-align: right; font-weight: bold;">18°C</td>
           </tr>
           <tr>
-            <td style="padding: 5px 4px; font-weight: bold;">15k'</td><td id="uwind-15k" style="font-weight: 900; font-size: 1rem;">--</td><td id="utemp-15k" style="text-align: right; font-weight: bold;">-12°C</td>
+            <td style="font-weight: bold; color: #fff;">3k'</td>
+            <td id="uwind-3k" style="font-weight: 700;">--</td>
+            <td id="utemp-3k" style="text-align: right; font-weight: bold;">12°C</td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold; color: #fff;">7k'</td>
+            <td id="uwind-7k" style="font-weight: 700;">--</td>
+            <td id="utemp-7k" style="text-align: right; font-weight: bold;">4°C</td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold; color: #fff;">10k'</td>
+            <td id="uwind-10k" style="font-weight: 700;">--</td>
+            <td id="utemp-10k" style="text-align: right; font-weight: bold;">-2°C</td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold; color: #fff;">15k'</td>
+            <td id="uwind-15k" style="font-weight: 700;">--</td>
+            <td id="utemp-15k" style="text-align: right; font-weight: bold;">-12°C</td>
           </tr>
         </tbody>
       </table>
@@ -421,7 +516,7 @@
     <!-- COMPACT SPOT & LANDING CONTROLS PANEL -->
     <div class="spot-overlay-card">
       <div class="spot-overlay-header">
-        <span class="spot-overlay-title">⚙️️ DZ Override Controls</span>
+        <span class="spot-overlay-title">⚙️ DZ Override Controls</span>
       </div>
 
       <div class="control-slider-group" style="border-top:none; margin-top:0; padding-top:0;">
@@ -788,7 +883,7 @@
         color: '#ff9800', weight: 3, dashArray: '5,5', opacity: 0.95
       }).addTo(circuitLayerGroup);
 
-      // SAFE ARROWHEAD PLACEMENT: Compute heading directly from finalStart to target landing spot
+      // STABLE ARROWHEAD PLACEMENT
       const dLatSpot = activeLandingLat - finalStart[0];
       const dLonSpot = (activeLandingLon - finalStart[1]) * Math.cos(activeLandingLat * Math.PI / 180);
       let spotBearingDeg = (Math.atan2(dLonSpot, dLatSpot) * 180 / Math.PI + 360) % 360;
@@ -801,7 +896,7 @@
         })
       }).addTo(circuitLayerGroup);
 
-      // Populate Overlay Values (Turn direction only)
+      // Populate Overlay Values
       const turnLabelText = circuitSide.toUpperCase();
       document.getElementById('ov-pattern').innerText = turnLabelText;
       document.getElementById('ov-windspd').innerText = `${Math.round(avgSpeed)} mph`;
@@ -856,7 +951,7 @@
         const sampleTimeDate = new Date(times[currentIdx]);
         document.getElementById('current-hour-label').innerText = sampleTimeDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-        let currentForecastRowsHTML = '';
+        let forecastCardsHTML = '';
         models.forEach(model => {
           const dataset = model.data;
           if (!dataset || !dataset.hourly) return;
@@ -874,21 +969,21 @@
           const baseAgl = calculateCloudBase(temp, dew, cover);
           const baseStr = (baseAgl !== null && baseAgl < 25000) ? `${baseAgl.toLocaleString()}'` : 'CLR';
 
-          currentForecastRowsHTML += `
-            <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
-              <td style="padding: 5px 4px; font-weight: bold; color: #00d8ff;">${model.name}</td>
-              <td style="padding: 5px 4px; text-align: center;">
+          forecastCardsHTML += `
+            <div class="model-card-item">
+              <div class="model-card-top">
+                <span class="model-name">${model.name}</span>
+                <span class="cloud-badge">${baseStr}</span>
+              </div>
+              <div class="model-card-body">
                 <div class="wind-badge ${statusClass}">
                   ${getArrow(dir)}${speed} <span class="gust-val">G:${gust}</span>
                 </div>
-              </td>
-              <td style="padding: 5px 4px; text-align: right;">
-                <div class="cloud-badge">${baseStr}</div>
-              </td>
-            </tr>
+              </div>
+            </div>
           `;
         });
-        document.getElementById('current-model-forecast-rows').innerHTML = currentForecastRowsHTML;
+        document.getElementById('current-model-forecast-rows').innerHTML = forecastCardsHTML;
 
         const aromeDir = arome.hourly ? arome.hourly.wind_direction_10m[currentIdx] : 144;
         const aromeSpd = arome.hourly ? Math.round(arome.hourly.wind_speed_10m[currentIdx]) : 18;
