@@ -1,4 +1,4 @@
-<!-- REV: 5.10.1 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 5.10.2 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -340,7 +340,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.10.1</div>
+    <div class="rev-badge">REV: 5.10.2</div>
   </div>
 
   <div class="dashboard-container">
@@ -734,7 +734,7 @@
       }
 
       // ==========================================
-      // SELECT INTENDED LANDING SPOT BASED ON WIND SECTOR
+      // SELECT INTENDED LANDING SPOT & INTO-WIND HEADING
       // ==========================================
       let sectorData;
       if (isLandingManual) {
@@ -747,17 +747,17 @@
         sectorData = getSectorDetails(avgWindDir);
       }
 
-      // Use easterly landing spot for SE, S, SW to avoid crossing runways; default spot for all others
       let activeLandingLat = defaultLandingLat;
       let activeLandingLon = defaultLandingLon;
-      let landingHdg = (avgWindDir + 180) % 360; // Into-wind heading
 
+      // Switch to secondary landing spot for SE, S, SW sectors to avoid crossing runways
       if (['SE', 'S', 'SW'].includes(sectorData.sectorName)) {
         activeLandingLat = easterlyLandingLat;
         activeLandingLon = easterlyLandingLon;
-        landingHdg = 40; // Align circuit neatly along the easterly avoidance profile
       }
 
+      // Always point landing heading directly into the wind (reciprocal of wind direction)
+      const landingHdg = (avgWindDir + 180) % 360;
       const circuitRad = (landingHdg * Math.PI) / 180;
       const circuitSide = sectorData.turnSide;
 
