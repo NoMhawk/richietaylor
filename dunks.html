@@ -1,4 +1,4 @@
-<!-- REV: 9.7 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 9.8 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -91,7 +91,7 @@
     #map { width: 100%; height: 100%; z-index: 1; }
 
     /* ==========================================================
-        SIDEBAR (REV 9.7)
+        SIDEBAR (REV 9.8)
         ========================================================== */
     .map-info-overlay {
       --w: clamp(460px, 34vw, 720px);
@@ -506,7 +506,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Dunkeswell Weather Operations</span>
-      <span class="rev-badge">REV: 9.7</span>
+      <span class="rev-badge">REV: 9.8</span>
     </div>
     <div class="header-right-meta">
       <div class="meta-item">Current: <span id="clock-current">--:--:--</span></div>
@@ -568,7 +568,7 @@
 
     </div>
 
-    <!-- SIDEBAR (REV 9.7) -->
+    <!-- SIDEBAR (REV 9.8) -->
     <div class="map-info-overlay" id="sidebar">
       <div class="ov-header">
         <span>⚡ Live ops</span>
@@ -694,8 +694,10 @@
 
     function updateClocks() {
       const now = new Date();
-      document.getElementById('clock-current').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      document.getElementById('clock-updated').innerText = lastUpdatedTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const elCur = document.getElementById('clock-current');
+      const elUpd = document.getElementById('clock-updated');
+      if (elCur) elCur.innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      if (elUpd) elUpd.innerText = lastUpdatedTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     }
     setInterval(updateClocks, 1000);
     updateClocks();
@@ -740,7 +742,7 @@
     let isJumpManual = false;
     let isLandingManual = false;
     let cachedWeatherData = [248, 18, 30, 248, 20, 30, 248, 18, 33];
-    let liveWindOverride = { dir: 250, spd: 12, gst: 18 }; // Robust default live actuals
+    let liveWindOverride = { dir: 250, spd: 12, gst: 18 };
 
     function getArrow(deg) {
       if (deg === undefined || deg === null) return '↑';
@@ -814,12 +816,12 @@
         btn.innerText = "MANUAL";
         btn.style.borderColor = "#ff5252";
         btn.style.color = "#ff5252";
-        controls.style.display = "flex";
+        if (controls) controls.style.display = "flex";
       } else {
         btn.innerText = "AUTO";
         btn.style.borderColor = "#ffee58";
         btn.style.color = "#ffee58";
-        controls.style.display = "none";
+        if (controls) controls.style.display = "none";
         manualJumpLayerGroup.clearLayers();
       }
       updateDashboardMap();
@@ -834,12 +836,12 @@
         btn.innerText = "MANUAL";
         btn.style.borderColor = "#ff5252";
         btn.style.color = "#ff5252";
-        controls.style.display = "flex";
+        if (controls) controls.style.display = "flex";
       } else {
         btn.innerText = "AUTO";
         btn.style.borderColor = "#ff9800";
         btn.style.color = "#ff9800";
-        controls.style.display = "none";
+        if (controls) controls.style.display = "none";
       }
       updateDashboardMap();
     }
@@ -871,9 +873,12 @@
 
     function setRunInDisplay(headingDeg, offsetNM, manual) {
       const h = Math.round(headingDeg);
-      document.getElementById('ov-heading').innerText = `${String(h).padStart(3, '0')}° ${getCompassLetter(h)}`;
-      document.getElementById('ov-drop').innerText = offsetNM.toFixed(2);
-      document.getElementById('ov-jump-mode').innerText = manual ? '(manual)' : '';
+      const elHdg = document.getElementById('ov-heading');
+      const elDrop = document.getElementById('ov-drop');
+      const elMode = document.getElementById('ov-jump-mode');
+      if (elHdg) elHdg.innerText = `${String(h).padStart(3, '0')}° ${getCompassLetter(h)}`;
+      if (elDrop) elDrop.innerText = offsetNM.toFixed(2);
+      if (elMode) elMode.innerText = manual ? '(manual)' : '';
     }
 
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
@@ -944,8 +949,10 @@
       }
 
       if (isJumpManual) {
-        runInHeading = parseFloat(document.getElementById('slider-jump-heading').value);
-        spotOffset = parseFloat(document.getElementById('slider-jump-dist').value);
+        const sliderHdg = document.getElementById('slider-jump-heading');
+        const sliderDist = document.getElementById('slider-jump-dist');
+        runInHeading = sliderHdg ? parseFloat(sliderHdg.value) : 144;
+        spotOffset = sliderDist ? parseFloat(sliderDist.value) : 0.20;
 
         const manSpotPt = computeDestinationPoint(lat, lon, runInHeading, spotOffset);
         const manRedDotPt = computeDestinationPoint(lat, lon, runInHeading, spotOffset - 0.2);
@@ -965,7 +972,7 @@
       }
 
       // ==========================================
-      // JJ'S JUMP RUN LOGIC (REV 9.7)
+      // JJ'S JUMP RUN LOGIC (REV 9.8)
       // ==========================================
       const rwy04 = 42;
       const rwy22 = 222;
@@ -1027,15 +1034,18 @@
       }).addTo(jjTargetGroup);
 
       const jjSideName = jjSideMultiplier > 0 ? 'Right' : 'Left';
-      document.getElementById('ov-jj-heading').innerText = `${String(jjRunwayHdg).padStart(3, '0')}°`;
-      document.getElementById('ov-jj-offset').innerText = `0.3 ${jjSideName}`;
+      const elJjHdg = document.getElementById('ov-jj-heading');
+      const elJjOff = document.getElementById('ov-jj-offset');
+      if (elJjHdg) elJjHdg.innerText = `${String(jjRunwayHdg).padStart(3, '0')}°`;
+      if (elJjOff) elJjOff.innerText = `0.3 ${jjSideName}`;
 
       // ==========================================
       // LANDING CIRCUIT
       // ==========================================
       let sectorName;
       if (isLandingManual) {
-        const sectorVal = parseFloat(document.getElementById('select-wind-sector').value);
+        const sectorSelect = document.getElementById('select-wind-sector');
+        const sectorVal = sectorSelect ? parseFloat(sectorSelect.value) : 0;
         sectorName = getSectorNameFromDeg(sectorVal);
       } else {
         sectorName = getSectorNameFromDeg(effectiveWindDir);
@@ -1092,22 +1102,35 @@
         })
       }).addTo(circuitLayerGroup);
 
-      document.getElementById('ov-pattern').innerHTML = circuitSide === 'left' ? '<span class="turn-glyph">◀</span> LEFT' : 'RIGHT <span class="turn-glyph">▶</span>';
+      const elPattern = document.getElementById('ov-pattern');
+      if (elPattern) {
+        elPattern.innerHTML = circuitSide === 'left' ? '<span class="turn-glyph">◀</span> LEFT' : 'RIGHT <span class="turn-glyph">▶</span>';
+      }
       
       const roundedDir = Math.round(effectiveWindDir);
-      document.getElementById('ov-winddir').innerText = `${String(roundedDir).padStart(3, '0')}°`;
-      document.getElementById('ov-windcompass').innerText = getCompassLetter(roundedDir);
-      document.getElementById('ov-arrow').setAttribute('transform', `rotate(${(effectiveWindDir + 180) % 360} 50 50)`);
+      const elWindDir = document.getElementById('ov-winddir');
+      const elWindComp = document.getElementById('ov-windcompass');
+      const elOvArrow = document.getElementById('ov-arrow');
+      if (elWindDir) elWindDir.innerText = `${String(roundedDir).padStart(3, '0')}°`;
+      if (elWindComp) elWindComp.innerText = getCompassLetter(roundedDir);
+      if (elOvArrow) elOvArrow.setAttribute('transform', `rotate(${(effectiveWindDir + 180) % 360} 50 50)`);
 
       const peak = Math.max(effectiveSpeed, effectiveGust);
       const speedEl = document.getElementById('ov-windspd');
       const gustEl = document.getElementById('ov-gust');
-      speedEl.innerText = Math.round(effectiveSpeed);
-      gustEl.innerText = `Gust ${Math.round(effectiveGust)}`;
-      speedEl.style.color = getStatusColor(peak);
-      gustEl.style.color = getStatusColor(peak);
+      if (speedEl) {
+        speedEl.innerText = Math.round(effectiveSpeed);
+        speedEl.style.color = getStatusColor(peak);
+      }
+      if (gustEl) {
+        gustEl.innerText = `Gust ${Math.round(effectiveGust)}`;
+        gustEl.style.color = getStatusColor(peak);
+      }
 
-      document.getElementById('overlay-sector-tag').innerText = isLandingManual ? `Sector ${sectorName} (manual)` : `Sector ${sectorName}`;
+      const elSectorTag = document.getElementById('overlay-sector-tag');
+      if (elSectorTag) {
+        elSectorTag.innerText = isLandingManual ? `Sector ${sectorName} (manual)` : `Sector ${sectorName}`;
+      }
       
       setTimeout(() => { map.invalidateSize(); }, 250);
     }
@@ -1118,7 +1141,6 @@
       updateDashboardMap();
     });
 
-    // Fetch live weather data safely with robust error handling
     async function fetchLiveWeatherFeed() {
       try {
         const liveRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=mph`);
@@ -1175,7 +1197,10 @@
         }
 
         const sampleTimeDate = new Date(times[currentIdx]);
-        document.getElementById('current-hour-label').innerText = sampleTimeDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const elHourLabel = document.getElementById('current-hour-label');
+        if (elHourLabel) {
+          elHourLabel.innerText = sampleTimeDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
 
         let forecastCardsHTML = '';
         models.forEach(model => {
@@ -1211,7 +1236,8 @@
             </div>
           `;
         });
-        document.getElementById('current-model-forecast-rows').innerHTML = forecastCardsHTML;
+        const elModelRows = document.getElementById('current-model-forecast-rows');
+        if (elModelRows) elModelRows.innerHTML = forecastCardsHTML;
 
         const aromeDir = arome.hourly ? arome.hourly.wind_direction_10m[currentIdx] : 248;
         const aromeSpd = arome.hourly ? Math.round(arome.hourly.wind_speed_10m[currentIdx]) : 18;
@@ -1228,11 +1254,17 @@
         cachedWeatherData = [aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst];
         updateDashboardMap();
 
-        document.getElementById('uwind-sfc').innerHTML = windAloftHTML(ecmwfDir, ecmwfSpd);
-        document.getElementById('uwind-3k').innerHTML  = windAloftHTML(ecmwfDir + 10, Math.round(ecmwfSpd * 1.8));
-        document.getElementById('uwind-7k').innerHTML  = windAloftHTML(ecmwfDir + 18, Math.round(ecmwfSpd * 2.3));
-        document.getElementById('uwind-10k').innerHTML = windAloftHTML(ecmwfDir + 25, Math.round(ecmwfSpd * 2.8));
-        document.getElementById('uwind-15k').innerHTML = windAloftHTML(ecmwfDir + 30, Math.round(ecmwfSpd * 3.4));
+        const elUwindSfc = document.getElementById('uwind-sfc');
+        const elUwind3k = document.getElementById('uwind-3k');
+        const elUwind7k = document.getElementById('uwind-7k');
+        const elUwind10k = document.getElementById('uwind-10k');
+        const elUwind15k = document.getElementById('uwind-15k');
+
+        if (elUwindSfc) elUwindSfc.innerHTML = windAloftHTML(ecmwfDir, ecmwfSpd);
+        if (elUwind3k)  elUwind3k.innerHTML  = windAloftHTML(ecmwfDir + 10, Math.round(ecmwfSpd * 1.8));
+        if (elUwind7k)  elUwind7k.innerHTML  = windAloftHTML(ecmwfDir + 18, Math.round(ecmwfSpd * 2.3));
+        if (elUwind10k) elUwind10k.innerHTML = windAloftHTML(ecmwfDir + 25, Math.round(ecmwfSpd * 2.8));
+        if (elUwind15k) elUwind15k.innerHTML = windAloftHTML(ecmwfDir + 30, Math.round(ecmwfSpd * 3.4));
 
         lastUpdatedTime = new Date();
 
