@@ -1,16 +1,13 @@
-
+<!-- REV: 7.1.0 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
-<!-- REV: 6.3.0 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) - distance-readable sidebar -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <title>Dunkeswell - Operations Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <!-- Leaflet CSS & JS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     
@@ -80,15 +77,11 @@
     #map { width: 100%; height: 100%; z-index: 1; }
 
     /* ==========================================================
-       SIDEBAR (REV 6.3.0)
-       Everything is sized from --u, a unit that scales with the
-       smaller of screen height and sidebar width, so the layout
-       fills the panel on any monitor and is readable from a distance.
+       SIDEBAR (REV 7.1.0)
        ========================================================== */
     .map-info-overlay {
       --w: clamp(460px, 34vw, 720px);
       --u: min(1vh, calc(var(--w) / 55));
-
       position: absolute;
       top: 0;
       right: 0;
@@ -128,12 +121,12 @@
       border: 1px solid rgba(255, 235, 59, 0.4);
     }
 
-    /* Rows of big cells. flex-grow values decide how the height is shared. */
     .ov-row {
       display: grid;
       gap: calc(var(--u) * 0.9);
       min-height: 0;
     }
+
     .ov-hero    { flex: 2.6 1 0; min-height: calc(var(--u) * 12); grid-template-columns: 1.3fr 1fr; }
     .ov-land    { flex: 1.7 1 0; min-height: calc(var(--u) * 8);  grid-template-columns: 1fr; }
     .ov-jump    { flex: 1.7 1 0; min-height: calc(var(--u) * 8);  grid-template-columns: 1.3fr 1fr; }
@@ -166,9 +159,11 @@
       color: #fff;
       white-space: nowrap;
     }
+
     .ov-hero .ov-big { font-size: calc(var(--u) * 6.2); }
     .ov-land .ov-big { font-size: calc(var(--u) * 5.6); }
     .ov-jump .ov-big { font-size: calc(var(--u) * 4.8); }
+
     .turn-glyph { font-size: 0.7em; vertical-align: 0.08em; }
 
     .ov-sub {
@@ -183,23 +178,21 @@
     .accent-cyan   { color: #00d8ff; }
     .accent-green  { color: #00e676; }
 
-    /* Wind direction cell: dial + number */
     .ov-wind { flex-direction: row; align-items: center; gap: calc(var(--u) * 1.2); }
     .ov-dial { flex: 0 0 auto; height: 100%; max-height: calc(var(--u) * 8.5); aspect-ratio: 1 / 1; }
     .ov-dial svg { width: 100%; height: 100%; display: block; }
     .ov-wind-text { min-width: 0; display: flex; flex-direction: column; }
 
-    /* Speed cell */
     .ov-speed-line { display: flex; align-items: baseline; gap: calc(var(--u) * 0.6); }
     .ov-unit { font-size: calc(var(--u) * 2.4); font-weight: 700; color: #a9b9d0; }
 
-    /* SECTIONS */
     .ov-section {
       display: flex;
       flex-direction: column;
       min-height: 0;
       gap: calc(var(--u) * 0.6);
     }
+
     .ov-models { flex: 5 1 0; min-height: calc(var(--u) * 22); }
     .ov-aloft  { flex: 5.6 1 0; min-height: calc(var(--u) * 24); }
 
@@ -213,7 +206,6 @@
       align-items: baseline;
     }
 
-    /* MODEL FORECAST CARDS (2 x 2, fill remaining height) */
     .model-forecast-grid {
       flex: 1 1 0;
       min-height: 0;
@@ -260,6 +252,7 @@
       gap: calc(var(--u) * 0.5);
       white-space: nowrap;
     }
+
     .mc-arrow { font-size: calc(var(--u) * 3.6); font-weight: 900; display: inline-block; line-height: 1; }
     .mc-speed { font-size: calc(var(--u) * 5); font-weight: 900; line-height: 1; }
     .mc-gust  { font-size: calc(var(--u) * 2.4); font-weight: 800; opacity: 0.9; }
@@ -270,7 +263,6 @@
     .status-orange { background: rgba(255, 152, 0, 0.16);  color: #ffb74d; border: 1px solid rgba(255, 152, 0, 0.55); }
     .status-red    { background: rgba(255, 82, 82, 0.2);   color: #ff6b6b; border: 1px solid rgba(255, 82, 82, 0.6); }
 
-    /* WINDS ALOFT: five equal rows that share the available height */
     .aloft-grid {
       flex: 1 1 0;
       min-height: 0;
@@ -419,6 +411,22 @@
       pointer-events: none;
     }
 
+    /* CUSTOM RUN-IN LINE LABEL */
+    .runin-label-badge {
+      background: rgba(11, 15, 25, 0.85);
+      border: 1px solid rgba(0, 216, 255, 0.5);
+      color: #00d8ff;
+      font-family: monospace;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+      pointer-events: none;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+      letter-spacing: 1px;
+    }
+
     .circuit-arrow {
       color: #ff9800;
       font-size: 24px;
@@ -481,7 +489,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Dunkeswell Weather Operations</span>
-      <span class="rev-badge">REV: 6.3.0</span>
+      <span class="rev-badge">REV: 7.1.0</span>
     </div>
   </div>
 
@@ -539,9 +547,8 @@
 
     </div>
 
-    <!-- SIDEBAR (REV 6.3.0) -->
+    <!-- SIDEBAR (REV 7.1.0) -->
     <div class="map-info-overlay" id="sidebar">
-
       <div class="ov-header">
         <span>⚡ Live ops</span>
         <span id="overlay-sector-tag">Sector S</span>
@@ -565,7 +572,6 @@
             <div class="ov-sub accent-cyan" id="ov-windcompass">--</div>
           </div>
         </div>
-
         <div class="ov-cell">
           <div class="ov-label">Average wind</div>
           <div class="ov-speed-line">
@@ -644,7 +650,6 @@
       </div>
 
     </div>
-
   </div>
 
   <script>
@@ -730,7 +735,6 @@
       return '#ff6b6b';
     }
 
-    // One row of the winds-aloft table: arrow, direction, big speed
     function windAloftHTML(dir, spd) {
       const d = (dir + 360) % 360;
       return `${getArrow(d)}<span class="aw-dir">${String(Math.round(d)).padStart(3, '0')}°</span><span class="aw-spd">${spd}<small>mph</small></span>`;
@@ -824,7 +828,6 @@
       return sectors[sectorIndex];
     }
 
-    // Sidebar: run-in heading and drop
     function setRunInDisplay(headingDeg, offsetNM, manual) {
       const h = Math.round(headingDeg);
       document.getElementById('ov-heading').innerText = `${String(h).padStart(3, '0')}° ${getCompassLetter(h)}`;
@@ -894,6 +897,59 @@
       let runInHeading = avgWindDir;
       let spotOffset = Math.min(0.28, Math.max(0.12, (avgSpeed / 100) * 1.2));
 
+      // Helper function to render line segments with custom -- RUN-IN -- label in the middle
+      function renderJumpRunLine(startPt, endPt, spotPt, lineColor, isManual) {
+        const targetGroup = isManual ? manualJumpLayerGroup : windRoseLayerGroup;
+
+        // Draw segmented lines with a gap in the middle for the RUN-IN label
+        const midLat = (startPt.lat + endPt.lat) / 2;
+        const midLon = (startPt.lon + endPt.lon) / 2;
+        
+        const quarter1Lat = (startPt.lat + midLat) / 2;
+        const quarter1Lon = (startPt.lon + midLon) / 2;
+        const quarter3Lat = (midLat + endPt.lat) / 2;
+        const quarter3Lon = (midLon + endPt.lon) / 2;
+
+        // First segment (dashed)
+        L.polyline([[startPt.lat, startPt.lon], [quarter1Lat, quarter1Lon]], {
+          color: lineColor, weight: 3, dashArray: '4,4', opacity: 0.95
+        }).addTo(targetGroup);
+
+        // Second segment (dashed) leading to arrow
+        L.polyline([[quarter3Lat, quarter3Lon], [endPt.lat, endPt.lon]], {
+          color: lineColor, weight: 3, dashArray: '4,4', opacity: 0.95
+        }).addTo(targetGroup);
+
+        // RUN-IN text badge in the center
+        let textAngle = (runInHeading - 90 + 360) % 360;
+        if (textAngle > 90 && textAngle < 270) {
+          textAngle = (textAngle + 180) % 360;
+        }
+
+        L.marker([midLat, midLon], {
+          icon: L.divIcon({
+            html: `<div class="runin-label-badge" style="transform: rotate(${textAngle}deg);">--- RUN-IN ---</div>`,
+            className: '', iconSize: [110, 20], iconAnchor: [55, 10]
+          })
+        }).addTo(targetGroup);
+
+        // Arrow marker at the end of run
+        let arrowAngle = (runInHeading - 90 + 360) % 360;
+        L.marker([endPt.lat, endPt.lon], {
+          icon: L.divIcon({
+            html: `<div class="jumprun-arrow" style="color: ${isManual ? '#00d8ff' : '#fff'}; transform: rotate(${arrowAngle}deg);">▶</div>`,
+            className: '', iconSize: [24, 24], iconAnchor: [12, 12]
+          })
+        }).addTo(targetGroup);
+
+        // Spot marker
+        L.circleMarker([spotPt.lat, spotPt.lon], {
+          pane: 'topSpotPane', radius: isManual ? 8 : 7, 
+          fillColor: isManual ? '#00d8ff' : '#ff2a2a', 
+          color: '#ffffff', weight: 2.5, fillOpacity: 1
+        }).addTo(targetGroup);
+      }
+
       if (isJumpManual) {
         runInHeading = parseFloat(document.getElementById('slider-jump-heading').value);
         spotOffset = parseFloat(document.getElementById('slider-jump-dist').value);
@@ -902,44 +958,14 @@
         const startManRun = computeDestinationPoint(lat, lon, (runInHeading + 180) % 360, 0.4);
         const endManRun = computeDestinationPoint(lat, lon, runInHeading, spotOffset * 1.4);
 
-        L.polyline([[startManRun.lat, startManRun.lon], [endManRun.lat, endManRun.lon]], {
-          color: '#00d8ff', weight: 3.5, dashArray: '4,4', opacity: 1
-        }).addTo(manualJumpLayerGroup);
-
-        let manArrowAngle = (runInHeading - 90 + 360) % 360;
-        L.marker([endManRun.lat, endManRun.lon], {
-          icon: L.divIcon({
-            html: `<div class="jumprun-arrow" style="color:#00d8ff; transform: rotate(${manArrowAngle}deg);">▶</div>`,
-            className: '', iconSize: [24, 24], iconAnchor: [12, 12]
-          })
-        }).addTo(manualJumpLayerGroup);
-
-        L.circleMarker([manSpotPt.lat, manSpotPt.lon], {
-          pane: 'topSpotPane', radius: 8, fillColor: '#00d8ff', color: '#ffffff', weight: 2.5, fillOpacity: 1
-        }).addTo(manualJumpLayerGroup);
-
+        renderJumpRunLine(startManRun, endManRun, manSpotPt, '#00d8ff', true);
         setRunInDisplay(runInHeading, spotOffset, true);
       } else {
         const autoSpotPt = computeDestinationPoint(lat, lon, runInHeading, spotOffset);
         const startAutoRun = computeDestinationPoint(lat, lon, (runInHeading + 180) % 360, 0.4);
         const endAutoRun = computeDestinationPoint(lat, lon, runInHeading, spotOffset * 1.4);
 
-        L.polyline([[startAutoRun.lat, startAutoRun.lon], [endAutoRun.lat, endAutoRun.lon]], {
-          color: '#ffffff', weight: 3, dashArray: '5,6', opacity: 0.95
-        }).addTo(windRoseLayerGroup);
-
-        let arrowAngle = (runInHeading - 90 + 360) % 360;
-        L.marker([endAutoRun.lat, endAutoRun.lon], {
-          icon: L.divIcon({
-            html: `<div class="jumprun-arrow" style="transform: rotate(${arrowAngle}deg);">▶</div>`,
-            className: '', iconSize: [24, 24], iconAnchor: [12, 12]
-          })
-        }).addTo(windRoseLayerGroup);
-
-        L.circleMarker([autoSpotPt.lat, autoSpotPt.lon], {
-          pane: 'topSpotPane', radius: 7, fillColor: '#ff2a2a', color: '#fff', weight: 2.5, fillOpacity: 1
-        }).addTo(windRoseLayerGroup);
-
+        renderJumpRunLine(startAutoRun, endAutoRun, autoSpotPt, '#ffffff', false);
         setRunInDisplay(runInHeading, spotOffset, false);
       }
 
@@ -993,7 +1019,6 @@
         color: '#ff9800', weight: 3, dashArray: '5,5', opacity: 0.95
       }).addTo(circuitLayerGroup);
 
-      // STABLE ARROWHEAD PLACEMENT
       const dLatSpot = activeLandingLat - finalStart[0];
       const dLonSpot = (activeLandingLon - finalStart[1]) * Math.cos(activeLandingLat * Math.PI / 180);
       let spotBearingDeg = (Math.atan2(dLonSpot, dLatSpot) * 180 / Math.PI + 360) % 360;
@@ -1010,7 +1035,7 @@
       // SIDEBAR VALUES
       // ==========================================
       document.getElementById('ov-pattern').innerHTML = circuitSide === 'left' ? '<span class="turn-glyph">◀</span> LEFT' : 'RIGHT <span class="turn-glyph">▶</span>';
-
+      
       const roundedDir = Math.round(avgWindDir);
       document.getElementById('ov-winddir').innerText = `${String(roundedDir).padStart(3, '0')}°`;
       document.getElementById('ov-windcompass').innerText = getCompassLetter(roundedDir);
