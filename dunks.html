@@ -1,4 +1,4 @@
-<!-- REV: 5.10.16 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 5.10.17 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -331,7 +331,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Dunkeswell Weather Operations</span>
-      <span class="rev-badge">REV: 5.10.16</span>
+      <span class="rev-badge">REV: 5.10.17</span>
     </div>
   </div>
 
@@ -421,7 +421,7 @@
     <!-- COMPACT SPOT & LANDING CONTROLS PANEL -->
     <div class="spot-overlay-card">
       <div class="spot-overlay-header">
-        <span class="spot-overlay-title">⚙️ DZ Override Controls</span>
+        <span class="spot-overlay-title">⚙️️ DZ Override Controls</span>
       </div>
 
       <div class="control-slider-group" style="border-top:none; margin-top:0; padding-top:0;">
@@ -763,15 +763,6 @@
         radius: 6, fillColor: '#ff9800', color: '#ffffff', weight: 2, fillOpacity: 1
       }).addTo(circuitLayerGroup);
 
-      // Landing arrow aligned with approach heading
-      let finalArrowAngle = (landingHdg - 90 + 360) % 360;
-      L.marker([activeLandingLat, activeLandingLon], {
-        icon: L.divIcon({
-          html: `<div class="circuit-arrow" style="transform: rotate(${finalArrowAngle}deg);">▶</div>`,
-          className: '', iconSize: [24, 24], iconAnchor: [12, 12]
-        })
-      }).addTo(circuitLayerGroup);
-
       const finalLegDist = 120; 
       const finalStart = [
         activeLandingLat + (finalLegDist * Math.cos(circuitRad)) / 111320,
@@ -795,6 +786,19 @@
 
       L.polyline(circuitCoords, {
         color: '#ff9800', weight: 3, dashArray: '5,5', opacity: 0.95
+      }).addTo(circuitLayerGroup);
+
+      // SAFE ARROWHEAD PLACEMENT: Compute heading directly from finalStart to target landing spot
+      const dLatSpot = activeLandingLat - finalStart[0];
+      const dLonSpot = (activeLandingLon - finalStart[1]) * Math.cos(activeLandingLat * Math.PI / 180);
+      let spotBearingDeg = (Math.atan2(dLonSpot, dLatSpot) * 180 / Math.PI + 360) % 360;
+      let finalArrowAngle = (spotBearingDeg - 90 + 360) % 360;
+
+      L.marker([activeLandingLat, activeLandingLon], {
+        icon: L.divIcon({
+          html: `<div class="circuit-arrow" style="transform: rotate(${finalArrowAngle}deg);">▶</div>`,
+          className: '', iconSize: [24, 24], iconAnchor: [12, 12]
+        })
       }).addTo(circuitLayerGroup);
 
       // Populate Overlay Values (Turn direction only)
