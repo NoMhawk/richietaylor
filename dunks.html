@@ -1,4 +1,4 @@
-<!-- REV: 9.3 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 9.4 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -91,7 +91,7 @@
     #map { width: 100%; height: 100%; z-index: 1; }
 
     /* ==========================================================
-        SIDEBAR (REV 9.3)
+        SIDEBAR (REV 9.4)
         ========================================================== */
     .map-info-overlay {
       --w: clamp(460px, 34vw, 720px);
@@ -506,7 +506,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Dunkeswell Weather Operations</span>
-      <span class="rev-badge">REV: 9.3</span>
+      <span class="rev-badge">REV: 9.4</span>
     </div>
     <div class="header-right-meta">
       <div class="meta-item">Current: <span id="clock-current">--:--:--</span></div>
@@ -568,7 +568,7 @@
 
     </div>
 
-    <!-- SIDEBAR (REV 9.3) -->
+    <!-- SIDEBAR (REV 9.4) -->
     <div class="map-info-overlay" id="sidebar">
       <div class="ov-header">
         <span>⚡ Live ops</span>
@@ -940,23 +940,23 @@
 
         const manSpotPt = computeDestinationPoint(lat, lon, runInHeading, spotOffset);
         const manRedDotPt = computeDestinationPoint(lat, lon, runInHeading, spotOffset - 0.2);
-        const startManRun = computeDestinationPoint(lat, lon, (runInHeading + 180) % 360, 0.8);
-        const endManRun = computeDestinationPoint(lat, lon, runInHeading, Math.max(0.8, spotOffset + 0.3));
+        const startManRun = computeDestinationPoint(lat, lon, (runInHeading + 180) % 360, 0.45);
+        const endManRun = computeDestinationPoint(lat, lon, runInHeading, Math.max(0.45, spotOffset + 0.15));
 
         renderJumpRunLine(startManRun, endManRun, manSpotPt, manRedDotPt, '#00d8ff', true);
         setRunInDisplay(runInHeading, spotOffset, true);
       } else {
         const autoSpotPt = computeDestinationPoint(lat, lon, runInHeading, spotOffset);
         const autoRedDotPt = computeDestinationPoint(lat, lon, runInHeading, spotOffset - 0.2);
-        const startAutoRun = computeDestinationPoint(lat, lon, (runInHeading + 180) % 360, 0.8);
-        const endAutoRun = computeDestinationPoint(lat, lon, runInHeading, Math.max(0.8, spotOffset + 0.3));
+        const startAutoRun = computeDestinationPoint(lat, lon, (runInHeading + 180) % 360, 0.45);
+        const endAutoRun = computeDestinationPoint(lat, lon, runInHeading, Math.max(0.45, spotOffset + 0.15));
 
         renderJumpRunLine(startAutoRun, endAutoRun, autoSpotPt, autoRedDotPt, '#ffffff', false);
         setRunInDisplay(runInHeading, spotOffset, false);
       }
 
       // ==========================================
-      // JJ'S JUMP RUN LOGIC (REV 9.3)
+      // JJ'S JUMP RUN LOGIC (REV 9.4 - Shortened Span)
       // ==========================================
       const rwy04 = 42;
       const rwy22 = 222;
@@ -974,8 +974,8 @@
       const jjOrigin = computeDestinationPoint(lat, lon, jjOffsetBearing, jjOffsetDist);
       const jjSpotPt = computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, jjRunwayHdg, spotOffset);
       const jjRedDotPt = computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, jjRunwayHdg, spotOffset - 0.2);
-      const jjStartRun = computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, (jjRunwayHdg + 180) % 360, 0.8);
-      const jjEndRun = computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, jjRunwayHdg, Math.max(0.8, spotOffset + 0.3));
+      const jjStartRun = computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, (jjRunwayHdg + 180) % 360, 0.45);
+      const jjEndRun = computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, jjRunwayHdg, Math.max(0.45, spotOffset + 0.15));
 
       const jjTargetGroup = windRoseLayerGroup;
       const jjLabelLat = jjStartRun.lat + 0.10 * (jjEndRun.lat - jjStartRun.lat);
@@ -1176,8 +1176,8 @@
                 <span class="mc-arrow" style="transform: rotate(${(dir + 180) % 360}deg);">↑</span>
                 <span class="mc-speed">${speed}</span>
                 <span class="mc-gust">G${gust}</span>
+                <span class="mc-dir" style="margin-left: auto;">${String(dirRounded).padStart(3, '0')}° ${getCompassLetter(dirRounded)}</span>
               </div>
-              <div class="mc-dir">${String(dirRounded).padStart(3, '0')}° ${getCompassLetter(dirRounded)}</div>
             </div>
           `;
         });
@@ -1199,7 +1199,7 @@
         updateDashboardMap();
 
         document.getElementById('uwind-sfc').innerHTML = windAloftHTML(ecmwfDir, ecmwfSpd);
-        document.getElementById('uwind-3k').innerHTML  = windAloftHTML(ecmwfDir + 10, Math.round(ecmwfSpd * 1.8));
+        document.getElementById('uwind-3k').innerHTML  = windAloftHTML(ecmwfDir + 10, Math.round(ecmwfspd * 1.8));
         document.getElementById('uwind-7k').innerHTML  = windAloftHTML(ecmwfDir + 18, Math.round(ecmwfSpd * 2.3));
         document.getElementById('uwind-10k').innerHTML = windAloftHTML(ecmwfDir + 25, Math.round(ecmwfSpd * 2.8));
         document.getElementById('uwind-15k').innerHTML = windAloftHTML(ecmwfDir + 30, Math.round(ecmwfSpd * 3.4));
