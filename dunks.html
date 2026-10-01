@@ -1,4 +1,4 @@
-<!-- REV: 8.5.0 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 9.0 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -58,14 +58,14 @@
     }
 
     .rev-badge {
-      background: #0088ff;
+      background: #9c27b0;
       color: #fff;
       font-weight: 800;
       font-family: monospace;
       padding: 1px 6px;
       border-radius: 4px;
       font-size: 0.7rem;
-      box-shadow: 0 0 10px rgba(0, 136, 255, 0.4);
+      box-shadow: 0 0 10px rgba(156, 39, 176, 0.4);
     }
 
     .dashboard-container {
@@ -91,7 +91,7 @@
     #map { width: 100%; height: 100%; z-index: 1; }
 
     /* ==========================================================
-        SIDEBAR (REV 8.5.0)
+        SIDEBAR (REV 9.0)
         ========================================================== */
     .map-info-overlay {
       --w: clamp(460px, 34vw, 720px);
@@ -191,6 +191,7 @@
     .accent-orange { color: #ffa726; }
     .accent-cyan    { color: #00d8ff; }
     .accent-green  { color: #00e676; }
+    .accent-purple { color: #e040fb; }
 
     .ov-wind { flex-direction: row; align-items: center; gap: calc(var(--u) * 1.2); }
     .ov-dial { flex: 0 0 auto; height: 100%; max-height: calc(var(--u) * 8.5); aspect-ratio: 1 / 1; }
@@ -502,7 +503,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Dunkeswell Weather Operations</span>
-      <span class="rev-badge">REV: 8.5.0</span>
+      <span class="rev-badge">REV: 9.0</span>
     </div>
     <div class="header-right-meta">
       <div class="meta-item">Current: <span id="clock-current">--:--:--</span></div>
@@ -564,7 +565,7 @@
 
     </div>
 
-    <!-- SIDEBAR (REV 8.5.0) -->
+    <!-- SIDEBAR (REV 9.0) -->
     <div class="map-info-overlay" id="sidebar">
       <div class="ov-header">
         <span>⚡ Live ops</span>
@@ -619,6 +620,18 @@
         </div>
       </div>
 
+      <!-- JJ'S JUMP RUN INFO BOX -->
+      <div class="ov-row ov-jump">
+        <div class="ov-cell" style="background: linear-gradient(135deg, rgba(40, 20, 60, 0.85) 0%, rgba(15, 10, 26, 0.95) 100%); border-color: rgba(224, 64, 251, 0.4);">
+          <div class="ov-label" style="color: #ea80fc;">JJ's Jump Run</div>
+          <div class="ov-big accent-purple" id="ov-jj-heading">--°</div>
+        </div>
+        <div class="ov-cell" style="background: linear-gradient(135deg, rgba(40, 20, 60, 0.85) 0%, rgba(15, 10, 26, 0.95) 100%); border-color: rgba(224, 64, 251, 0.4);">
+          <div class="ov-label" style="color: #ea80fc;">JJ's Offset</div>
+          <div class="ov-big accent-purple" id="ov-jj-offset">-- NM</div>
+        </div>
+      </div>
+
       <!-- CURRENT HOUR MODEL FORECAST SECTION -->
       <div class="ov-section ov-models">
         <div class="section-title">
@@ -670,15 +683,12 @@
   </div>
 
   <script>
-    // Updated to official Dunkeswell Aerodrome Reference Point (ARP) center coordinates
     const lat = 50.860000;
     const lon = -3.234722;
     const fieldElevationFt = 839;
 
-    // Track last update timestamp
     let lastUpdatedTime = new Date();
 
-    // Clock update ticker (runs every second)
     function updateClocks() {
       const now = new Date();
       document.getElementById('clock-current').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -687,19 +697,12 @@
     setInterval(updateClocks, 1000);
     updateClocks();
 
-    // ==========================================
-    // TARGET LANDING SPOTS (1, 2, 3) - Shifted relative to ARP
-    // ==========================================
     const landingSpots = {
       1: { lat: 50.861517, lon: -3.236862 },
       2: { lat: 50.860802, lon: -3.237590 },
       3: { lat: 50.860003, lon: -3.238551 }
     };
-    // ==========================================
 
-    // ==========================================
-    // HARDCODED DIRECTION CONFIGURATION TABLE (REV 8.5.0)
-    // ==========================================
     const sectorConfigTable = {
       'N':  { spot: 1, turn: 'left',  landingHdg: 180 },
       'NE': { spot: 3, turn: 'left',  landingHdg: 225 },
@@ -710,7 +713,6 @@
       'W':  { spot: 2, turn: 'right', landingHdg: 90  },
       'NW': { spot: 1, turn: 'left',  landingHdg: 135 }
     };
-    // ==========================================
 
     const map = L.map('map', { zoomControl: false }).setView([lat, lon], 16);
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
@@ -725,7 +727,6 @@
     let circuitLayerGroup = L.layerGroup().addTo(map);
     circuitLayerGroup.addTo(map);
 
-    // Shift the view so the airfield sits in the middle of the visible map, not under the sidebar
     (function offsetForSidebar() {
       const sb = document.getElementById('sidebar');
       if (window.innerWidth > 768 && sb) {
@@ -735,7 +736,7 @@
 
     let isJumpManual = false;
     let isLandingManual = false;
-    let cachedWeatherData = [144, 18, 30, 144, 20, 30, 144, 18, 33];
+    let cachedWeatherData = [248, 18, 30, 248, 20, 30, 248, 18, 33];
 
     function getArrow(deg) {
       if (deg === undefined || deg === null) return '↑';
@@ -851,7 +852,6 @@
       return (Math.atan2(s, c) * 180 / Math.PI + 360) % 360;
     }
 
-    // PRECISE 45-DEGREE SECTOR BOUNDARIES CENTERED ON CARDINAL/INTERCARDINAL POINTS
     function getSectorNameFromDeg(deg) {
       const norm = (deg % 360 + 360) % 360;
       if (norm >= 337.5 || norm < 22.5) return 'N';
@@ -862,7 +862,7 @@
       if (norm >= 202.5 && norm < 247.5) return 'SW';
       if (norm >= 247.5 && norm < 292.5) return 'W';
       if (norm >= 292.5 && norm < 337.5) return 'NW';
-      return 'SW'; // Fallback
+      return 'SW';
     }
 
     function setRunInDisplay(headingDeg, offsetNM, manual) {
@@ -877,60 +877,9 @@
       manualJumpLayerGroup.clearLayers();
       circuitLayerGroup.clearLayers();
 
-      // Airfield center origin marker (ARP)
       L.circleMarker([lat, lon], {
         pane: 'topSpotPane', radius: 5, fillColor: '#ffffff', color: '#000000', weight: 1.5, fillOpacity: 1
       }).addTo(windRoseLayerGroup);
-
-      const rawModels = [
-        { name: 'AROME-HD', dir: aromeDir, spd: aromeSpd, gst: aromeGst, color: '#00e676', bg: 'rgba(0, 230, 118, 0.95)' },
-        { name: 'GFS',      dir: gfsDir,    spd: gfsSpd,    gst: gfsGst,    color: '#ffee58', bg: 'rgba(255, 235, 59, 0.95)' },
-        { name: 'ECMWF',    dir: ecmwfDir,  spd: ecmwfSpd,  gst: ecmwfGst,  color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)' }
-      ];
-
-      const currentZoom = map.getZoom();
-      const zoomScale = Math.pow(2, 16 - currentZoom);
-      const baseDistanceMeters = 35 * zoomScale;
-      const spreadStepMeters = 18 * zoomScale;
-
-      const showWindVanes = false;
-
-      rawModels.forEach((m, idx) => {
-        if (!showWindVanes) return;
-
-        const distMeters = baseDistanceMeters + (idx * spreadStepMeters);
-        const rad = (m.dir * Math.PI) / 180;
-        const dLat = (distMeters * Math.cos(rad)) / 111320;
-        const dLon = (distMeters * Math.sin(rad)) / (111320 * Math.cos(lat * Math.PI / 180));
-
-        const endLat = lat + dLat;
-        const endLon = lon + dLon;
-
-        L.polyline([[lat, lon], [endLat, endLon]], {
-          color: m.color, weight: 2.2, opacity: 0.85
-        }).addTo(windRoseLayerGroup);
-
-        let cssRotationAngle = (m.dir - 90 + 360) % 360;
-        let flipped = false;
-        if (cssRotationAngle > 90 && cssRotationAngle < 270) {
-          cssRotationAngle = (cssRotationAngle + 180) % 360;
-          flipped = true;
-        }
-
-        const pillHTML = `
-          <div class="rotated-pill" style="background: ${m.bg}; transform: rotate(${cssRotationAngle}deg); transform-origin: ${flipped ? 'right' : 'left'} center;">
-            <span>${m.spd} G:${m.gst}</span>
-            <span class="rotated-pill-tag">${m.name}</span>
-          </div>
-        `;
-
-        L.marker([endLat, endLon], {
-          icon: L.divIcon({
-            html: pillHTML, className: '', iconSize: [120, 22],
-            iconAnchor: flipped ? [120, 11] : [-2, 11]
-          })
-        }).addTo(windRoseLayerGroup);
-      });
 
       const avgWindDir = circularMeanDeg([aromeDir, gfsDir, ecmwfDir]);
       const avgSpeed = (aromeSpd + gfsSpd + ecmwfSpd) / 3;
@@ -939,7 +888,7 @@
       let runInHeading = avgWindDir;
       let spotOffset = Math.min(0.28, Math.max(0.12, (avgSpeed / 100) * 1.2));
 
-      function renderJumpRunLine(startPt, endPt, spotPt, redDotPt, lineColor, isManual) {
+      function renderJumpRunLine(startPt, endPt, spotPt, redDotPt, lineColor, isManual, labelText = "Run In") {
         const targetGroup = isManual ? manualJumpLayerGroup : windRoseLayerGroup;
 
         const labelLat = startPt.lat + 0.10 * (endPt.lat - startPt.lat);
@@ -956,15 +905,15 @@
 
         L.marker([labelLat, labelLon], {
           icon: L.divIcon({
-            html: `<div class="runin-line-text" style="transform: rotate(${textAngle}deg);">Run In</div>`,
-            className: '', iconSize: [50, 20], iconAnchor: [25, 10]
+            html: `<div class="runin-line-text" style="transform: rotate(${textAngle}deg); ${labelText.includes("JJ") ? 'color: #e040fb;' : ''}">${labelText}</div>`,
+            className: '', iconSize: [65, 20], iconAnchor: [32, 10]
           })
         }).addTo(targetGroup);
 
         let arrowAngle = (runInHeading - 90 + 360) % 360;
         L.marker([endPt.lat, endPt.lon], {
           icon: L.divIcon({
-            html: `<div class="jumprun-arrow" style="color: ${isManual ? '#00d8ff' : '#fff'}; transform: rotate(${arrowAngle}deg);">▶</div>`,
+            html: `<div class="jumprun-arrow" style="color: ${isManual ? '#00d8ff' : lineColor}; transform: rotate(${arrowAngle}deg);">▶</div>`,
             className: '', iconSize: [24, 24], iconAnchor: [12, 12]
           })
         }).addTo(targetGroup);
@@ -1004,7 +953,42 @@
       }
 
       // ==========================================
-      // APPLY HARDCODED CONFIGURATION LOOKUP
+      // JJ'S JUMP RUN LOGIC (REV 9.0)
+      // ==========================================
+      // Dunkeswell available runway headings: 04 (approx 42°) and 22 (approx 222°)
+      // Let's define the two magnetic runway reciprocal line bearings: ~42° and ~222°
+      const rwy04 = 42;
+      const rwy22 = 222;
+
+      // Find which runway heading is closest into the wind
+      const diff04 = Math.abs((avgWindDir - rwy04 + 540) % 360 - 180);
+      const diff22 = Math.abs((avgWindDir - rwy22 + 540) % 360 - 180);
+      
+      const jjRunwayHdg = diff22 < diff04 ? 222 : 42;
+
+      // Determine left or right crosswind offset relative to wind direction
+      // Crosswind component vector sign: cross product / sine of angle difference
+      const angleDiff = (avgWindDir - jjRunwayHdg + 360) % 360;
+      const jjOffsetDist = 0.3; // 0.3 NM
+      // If wind comes from right of runway heading, offset left (-1), else right (+1)
+      const jjSideMultiplier = (angleDiff > 180 && angleDiff < 360) ? -1 : 1;
+      const jjOffsetBearing = (jjRunwayHdg + (jjSideMultiplier * 90) + 360) % 360;
+
+      // Calculate parallel offset center origin
+      const jjOrigin = computeDestinationPoint(lat, lon, jjOffsetBearing, jjOffsetDist);
+      const jjSpotPt = computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, jjRunwayHdg, spotOffset);
+      const jjRedDotPt = computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, jjRunwayHdg, spotOffset - 0.2);
+      const jjStartRun = computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, (jjRunwayHdg + 180) % 360, 0.8);
+      const jjEndRun = computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, jjRunwayHdg, Math.max(0.8, spotOffset + 0.3));
+
+      renderJumpRunLine(jjStartRun, jjEndRun, jjSpotPt, jjRedDotPt, '#e040fb', false, "JJ's Run");
+
+      const jjSideName = jjSideMultiplier > 0 ? 'Right' : 'Left';
+      document.getElementById('ov-jj-heading').innerText = `${String(jjRunwayHdg).padStart(3, '0')}°`;
+      document.getElementById('ov-jj-offset').innerText = `${jjOffsetDist.toFixed(1)} NM ${jjSideName}`;
+
+      // ==========================================
+      // LANDING CIRCUIT
       // ==========================================
       let sectorName;
       if (isLandingManual) {
@@ -1065,9 +1049,6 @@
         })
       }).addTo(circuitLayerGroup);
 
-      // ==========================================
-      // SIDEBAR VALUES
-      // ==========================================
       document.getElementById('ov-pattern').innerHTML = circuitSide === 'left' ? '<span class="turn-glyph">◀</span> LEFT' : 'RIGHT <span class="turn-glyph">▶</span>';
       
       const roundedDir = Math.round(avgWindDir);
@@ -1168,15 +1149,15 @@
         });
         document.getElementById('current-model-forecast-rows').innerHTML = forecastCardsHTML;
 
-        const aromeDir = arome.hourly ? arome.hourly.wind_direction_10m[currentIdx] : 144;
+        const aromeDir = arome.hourly ? arome.hourly.wind_direction_10m[currentIdx] : 248;
         const aromeSpd = arome.hourly ? Math.round(arome.hourly.wind_speed_10m[currentIdx]) : 18;
         const aromeGst = arome.hourly ? Math.round(arome.hourly.wind_gusts_10m[currentIdx]) : 30;
 
-        const gfsDir = gfs.hourly ? gfs.hourly.wind_direction_10m[currentIdx] : 144;
+        const gfsDir = gfs.hourly ? gfs.hourly.wind_direction_10m[currentIdx] : 248;
         const gfsSpd = gfs.hourly ? Math.round(gfs.hourly.wind_speed_10m[currentIdx]) : 20;
         const gfsGst = gfs.hourly ? Math.round(gfs.hourly.wind_gusts_10m[currentIdx]) : 30;
 
-        const ecmwfDir = ecmwf.hourly ? ecmwf.hourly.wind_direction_10m[currentIdx] : 144;
+        const ecmwfDir = ecmwf.hourly ? ecmwf.hourly.wind_direction_10m[currentIdx] : 248;
         const ecmwfSpd = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_speed_10m[currentIdx]) : 18;
         const ecmwfGst = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_gusts_10m[currentIdx]) : 33;
 
@@ -1189,7 +1170,6 @@
         document.getElementById('uwind-10k').innerHTML = windAloftHTML(ecmwfDir + 25, Math.round(ecmwfSpd * 2.8));
         document.getElementById('uwind-15k').innerHTML = windAloftHTML(ecmwfDir + 30, Math.round(ecmwfSpd * 3.4));
 
-        // Update last fetched timestamp
         lastUpdatedTime = new Date();
 
       } catch (err) {
@@ -1199,7 +1179,6 @@
 
     fetchModelData();
 
-    // AUTO-REFRESH PAGE EVERY 5 MINUTES (300,000 milliseconds)
     setTimeout(() => {
       window.location.reload(true);
     }, 300 * 1000);
