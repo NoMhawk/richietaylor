@@ -1,4 +1,4 @@
-<!-- REV: 7.6.0 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 7.6.1 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,8 +77,8 @@
     #map { width: 100%; height: 100%; z-index: 1; }
 
     /* ==========================================================
-       SIDEBAR (REV 7.6.0)
-       ========================================================== */
+        SIDEBAR (REV 7.6.1)
+        ========================================================== */
     .map-info-overlay {
       --w: clamp(460px, 34vw, 720px);
       --u: min(1vh, calc(var(--w) / 55));
@@ -175,7 +175,7 @@
     }
 
     .accent-orange { color: #ffa726; }
-    .accent-cyan   { color: #00d8ff; }
+    .accent-cyan    { color: #00d8ff; }
     .accent-green  { color: #00e676; }
 
     .ov-wind { flex-direction: row; align-items: center; gap: calc(var(--u) * 1.2); }
@@ -194,7 +194,7 @@
     }
 
     .ov-models { flex: 5 1 0; min-height: calc(var(--u) * 22); }
-    .ov-aloft  { flex: 5.6 1 0; min-height: calc(var(--u) * 24); }
+    .ov-aloft   { flex: 5.6 1 0; min-height: calc(var(--u) * 24); }
 
     .section-title {
       flex: 0 0 auto;
@@ -488,7 +488,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Dunkeswell Weather Operations</span>
-      <span class="rev-badge">REV: 7.6.0</span>
+      <span class="rev-badge">REV: 7.6.1</span>
     </div>
   </div>
 
@@ -546,7 +546,7 @@
 
     </div>
 
-    <!-- SIDEBAR (REV 7.6.0) -->
+    <!-- SIDEBAR (REV 7.6.1) -->
     <div class="map-info-overlay" id="sidebar">
       <div class="ov-header">
         <span>⚡ Live ops</span>
@@ -845,8 +845,8 @@
 
       const rawModels = [
         { name: 'AROME-HD', dir: aromeDir, spd: aromeSpd, gst: aromeGst, color: '#00e676', bg: 'rgba(0, 230, 118, 0.95)' },
-        { name: 'GFS',     dir: gfsDir,    spd: gfsSpd,    gst: gfsGst,    color: '#ffee58', bg: 'rgba(255, 235, 59, 0.95)' },
-        { name: 'ECMWF',   dir: ecmwfDir,  spd: ecmwfSpd,  gst: ecmwfGst,  color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)' }
+        { name: 'GFS',      dir: gfsDir,    spd: gfsSpd,    gst: gfsGst,    color: '#ffee58', bg: 'rgba(255, 235, 59, 0.95)' },
+        { name: 'ECMWF',    dir: ecmwfDir,  spd: ecmwfSpd,  gst: ecmwfGst,  color: '#00d8ff', bg: 'rgba(0, 216, 255, 0.95)' }
       ];
 
       const currentZoom = map.getZoom();
@@ -896,24 +896,25 @@
       let runInHeading = avgWindDir;
       let spotOffset = Math.min(0.28, Math.max(0.12, (avgSpeed / 100) * 1.2));
 
-      // Render Jump Run with "Run In" positioned precisely at the start/entry point
+      // Render Jump Run with longer line and clear green drop spot in the middle
       function renderJumpRunLine(startPt, endPt, spotPt, lineColor, isManual) {
         const targetGroup = isManual ? manualJumpLayerGroup : windRoseLayerGroup;
 
-        // Place label at 10% along the line (right at the start entry point)
+        // Place label at 10% along the line (near entry point)
         const labelLat = startPt.lat + 0.10 * (endPt.lat - startPt.lat);
         const labelLon = startPt.lon + 0.10 * (endPt.lon - startPt.lon);
         
-        const quarterLat = startPt.lat + 0.5 * (endPt.lat - startPt.lat);
-        const quarterLon = startPt.lon + 0.5 * (endPt.lon - startPt.lon);
+        // Midpoint where the drop spot is located
+        const midLat = startPt.lat + 0.5 * (endPt.lat - startPt.lat);
+        const midLon = startPt.lon + 0.5 * (endPt.lon - startPt.lon);
 
-        // First segment from start to midway
-        L.polyline([[startPt.lat, startPt.lon], [quarterLat, quarterLon]], {
+        // First segment from start to the clear drop spot in the middle
+        L.polyline([[startPt.lat, startPt.lon], [midLat, midLon]], {
           color: lineColor, weight: 3, dashArray: '4,4', opacity: 0.95
         }).addTo(targetGroup);
 
-        // Second segment from midway to drop end
-        L.polyline([[quarterLat, quarterLon], [endPt.lat, endPt.lon]], {
+        // Second segment from the drop spot to the end of run
+        L.polyline([[midLat, midLon], [endPt.lat, endPt.lon]], {
           color: lineColor, weight: 3, dashArray: '4,4', opacity: 0.95
         }).addTo(targetGroup);
 
@@ -922,7 +923,7 @@
           textAngle = (textAngle + 180) % 360;
         }
 
-        // "Run In" label positioned right at the start of the line
+        // "Run In" label positioned near the start of the line
         L.marker([labelLat, labelLon], {
           icon: L.divIcon({
             html: `<div class="runin-line-text" style="transform: rotate(${textAngle}deg);">Run In</div>`,
@@ -939,10 +940,10 @@
           })
         }).addTo(targetGroup);
 
-        // Spot marker
-        L.circleMarker([spotPt.lat, spotPt.lon], {
-          pane: 'topSpotPane', radius: isManual ? 8 : 7, 
-          fillColor: isManual ? '#00d8ff' : '#ff2a2a', 
+        // Clear drop spot marker in the exact middle of the run-in line, colored green
+        L.circleMarker([midLat, midLon], {
+          pane: 'topSpotPane', radius: 8, 
+          fillColor: '#00e676', 
           color: '#ffffff', weight: 2.5, fillOpacity: 1
         }).addTo(targetGroup);
       }
@@ -952,15 +953,17 @@
         spotOffset = parseFloat(document.getElementById('slider-jump-dist').value);
 
         const manSpotPt = computeDestinationPoint(lat, lon, runInHeading, spotOffset);
-        const startManRun = computeDestinationPoint(lat, lon, (runInHeading + 180) % 360, 0.4);
-        const endManRun = computeDestinationPoint(lat, lon, runInHeading, spotOffset * 1.4);
+        // Extended start and end bounds to make the run-in line longer
+        const startManRun = computeDestinationPoint(lat, lon, (runInHeading + 180) % 360, 0.8);
+        const endManRun = computeDestinationPoint(lat, lon, runInHeading, 0.8);
 
         renderJumpRunLine(startManRun, endManRun, manSpotPt, '#00d8ff', true);
         setRunInDisplay(runInHeading, spotOffset, true);
       } else {
         const autoSpotPt = computeDestinationPoint(lat, lon, runInHeading, spotOffset);
-        const startAutoRun = computeDestinationPoint(lat, lon, (runInHeading + 180) % 360, 0.4);
-        const endAutoRun = computeDestinationPoint(lat, lon, runInHeading, spotOffset * 1.4);
+        // Extended start and end bounds to make the run-in line longer
+        const startAutoRun = computeDestinationPoint(lat, lon, (runInHeading + 180) % 360, 0.8);
+        const endAutoRun = computeDestinationPoint(lat, lon, runInHeading, 0.8);
 
         renderJumpRunLine(startAutoRun, endAutoRun, autoSpotPt, '#ffffff', false);
         setRunInDisplay(runInHeading, spotOffset, false);
