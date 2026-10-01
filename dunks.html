@@ -1,4 +1,4 @@
-<!-- REV: 7.1.0 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 7.2.0 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,7 +77,7 @@
     #map { width: 100%; height: 100%; z-index: 1; }
 
     /* ==========================================================
-       SIDEBAR (REV 7.1.0)
+       SIDEBAR (REV 7.2.0)
        ========================================================== */
     .map-info-overlay {
       --w: clamp(460px, 34vw, 720px);
@@ -411,22 +411,6 @@
       pointer-events: none;
     }
 
-    /* CUSTOM RUN-IN LINE LABEL */
-    .runin-label-badge {
-      background: rgba(11, 15, 25, 0.85);
-      border: 1px solid rgba(0, 216, 255, 0.5);
-      color: #00d8ff;
-      font-family: monospace;
-      font-size: 10px;
-      font-weight: 800;
-      padding: 2px 6px;
-      border-radius: 4px;
-      white-space: nowrap;
-      pointer-events: none;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.6);
-      letter-spacing: 1px;
-    }
-
     .circuit-arrow {
       color: #ff9800;
       font-size: 24px;
@@ -434,6 +418,15 @@
       text-shadow: 0 0 6px #000;
       line-height: 1;
       pointer-events: none;
+    }
+
+    /* SVG INLINE TEXT ON PATH STYLING */
+    .runin-svg-text {
+      font-family: monospace;
+      font-size: 11px;
+      font-weight: 900;
+      fill: #ffffff;
+      letter-spacing: 2px;
     }
 
     /* MOBILE RESPONSIVE STYLING */
@@ -489,7 +482,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Dunkeswell Weather Operations</span>
-      <span class="rev-badge">REV: 7.1.0</span>
+      <span class="rev-badge">REV: 7.2.0</span>
     </div>
   </div>
 
@@ -547,7 +540,7 @@
 
     </div>
 
-    <!-- SIDEBAR (REV 7.1.0) -->
+    <!-- SIDEBAR (REV 7.2.0) -->
     <div class="map-info-overlay" id="sidebar">
       <div class="ov-header">
         <span>⚡ Live ops</span>
@@ -897,43 +890,61 @@
       let runInHeading = avgWindDir;
       let spotOffset = Math.min(0.28, Math.max(0.12, (avgSpeed / 100) * 1.2));
 
-      // Helper function to render line segments with custom -- RUN-IN -- label in the middle
+      // Render Jump Run with integrated SVG path text for --- RUN-IN ---
       function renderJumpRunLine(startPt, endPt, spotPt, lineColor, isManual) {
         const targetGroup = isManual ? manualJumpLayerGroup : windRoseLayerGroup;
 
-        // Draw segmented lines with a gap in the middle for the RUN-IN label
-        const midLat = (startPt.lat + endPt.lat) / 2;
-        const midLon = (startPt.lon + endPt.lon) / 2;
-        
-        const quarter1Lat = (startPt.lat + midLat) / 2;
-        const quarter1Lon = (startPt.lon + midLon) / 2;
-        const quarter3Lat = (midLat + endPt.lat) / 2;
-        const quarter3Lon = (midLon + endPt.lon) / 2;
+        // Convert lat/lon points to Leaflet container/layer pixel points for SVG path calculation
+        const startPoint = map.latLngToLayerPoint([startPt.lat, startPt.lon]);
+        const midPoint = map.latLngToLayerPoint([(startPt.lat + endPt.lat) / 2, (startPt.lon + endPt.lon) / 2]);
+        const endPoint = map.latLngToLayerPoint([endPt.lat, endPt.lon]);
 
-        // First segment (dashed)
-        L.polyline([[startPt.lat, startPt.lon], [quarter1Lat, quarter1Lon]], {
-          color: lineColor, weight: 3, dashArray: '4,4', opacity: 0.95
-        }).addTo(targetGroup);
-
-        // Second segment (dashed) leading to arrow
-        L.polyline([[quarter3Lat, quarter3Lon], [endPt.lat, endPt.lon]], {
-          color: lineColor, weight: 3, dashArray: '4,4', opacity: 0.95
-        }).addTo(targetGroup);
-
-        // RUN-IN text badge in the center
+        // Calculate angle to flip text if heading is upside down
         let textAngle = (runInHeading - 90 + 360) % 360;
-        if (textAngle > 90 && textAngle < 270) {
-          textAngle = (textAngle + 180) % 360;
-        }
+        const flipText = textAngle > 90 && textAngle < 270;
+        const finalSvgAngle = flipText ? textAngle + 180 : textAngle;
 
-        L.marker([midLat, midLon], {
+        // We create an SVG overlay div that sits precisely over the line vector
+        const minX = Math.min(startPoint.x, endPoint.x) - 50;
+        const minY = Math.min(startPoint.y, endPoint.y) - 50;
+        const width = Math.abs(endPoint.x - startPoint.x) + 100;
+        const height = Math.abs(endPoint.y - startPoint.y) + 100;
+
+        const p1 = `M ${startPoint.x - minX} ${startPoint.y - minY}`;
+        const pMid = `L ${midPoint.x - minX} ${midPoint.y - minY}`;
+        const p2 = `L ${endPoint.x - minX} ${endPoint.y - minY}`;
+
+        const uniqueId = 'runin-path-' + Math.random().toString(36.substring(2, 7));
+
+        const svgOverlayHtml = `
+          <div style="position: absolute; left: ${minX}px; top: ${minY}px; width: ${width}px; height: ${height}px; pointer-events: none; overflow: visible;">
+            <svg width="${width}" height="${height}" style="overflow: visible;">
+              <defs>
+                <path id="${uniqueId}" d="${p1} ${pMid} ${p2}" fill="none" />
+              </defs>
+              <!-- Outer dashed line with gap in center -->
+              <path d="${p1} ${pMid}" fill="none" stroke="${lineColor}" stroke-width="3" stroke-dasharray="4,4" opacity="0.95" />
+              <path d="${pMid} ${p2}" fill="none" stroke="${lineColor}" stroke-width="3" stroke-dasharray="4,4" opacity="0.95" />
+              <!-- Integrated text directly on the path -->
+              <text dy="-4" class="runin-svg-text" fill="${lineColor}">
+                <textPath href="#${uniqueId}" startOffset="50%" text-anchor="middle">
+                  --- RUN-IN ---
+                </textPath>
+              </text>
+            </svg>
+          </div>
+        `;
+
+        L.marker([(startPt.lat + endPt.lat)/2, (startPt.lon + endPt.lon)/2], {
           icon: L.divIcon({
-            html: `<div class="runin-label-badge" style="transform: rotate(${textAngle}deg);">--- RUN-IN ---</div>`,
-            className: '', iconSize: [110, 20], iconAnchor: [55, 10]
+            html: svgOverlayHtml,
+            className: '',
+            iconSize: [0, 0],
+            iconAnchor: [0, 0]
           })
         }).addTo(targetGroup);
 
-        // Arrow marker at the end of run
+        // Arrow marker at end of run
         let arrowAngle = (runInHeading - 90 + 360) % 360;
         L.marker([endPt.lat, endPt.lon], {
           icon: L.divIcon({
