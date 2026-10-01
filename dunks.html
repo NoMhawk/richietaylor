@@ -1,4 +1,4 @@
-<!-- REV: 5.10.4 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 5.10.5 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -340,7 +340,7 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">🪂 Dunkeswell Weather Operations</div>
-    <div class="rev-badge">REV: 5.10.4</div>
+    <div class="rev-badge">REV: 5.10.5</div>
   </div>
 
   <div class="dashboard-container">
@@ -489,6 +489,21 @@
     const easterlyLandingLon = -3.237317785882287;
     // ==========================================
 
+    // ==========================================
+    // HARDCODED DIRECTION CONFIGURATION TABLE
+    // ==========================================
+    const sectorConfigTable = {
+      'N':  { spot: 1, turn: 'left',  landingHdg: 180 },
+      'NE': { spot: 1, turn: 'left',  landingHdg: 225 },
+      'E':  { spot: 1, turn: 'left',  landingHdg: 270 },
+      'SE': { spot: 2, turn: 'right', landingHdg: 315 },
+      'S':  { spot: 2, turn: 'right', landingHdg: 360 },
+      'SW': { spot: 2, turn: 'right', landingHdg: 45  },
+      'W':  { spot: 1, turn: 'left',  landingHdg: 90  },
+      'NW': { spot: 1, turn: 'left',  landingHdg: 135 }
+    };
+    // ==========================================
+
     const map = L.map('map', { zoomControl: false }).setView([lat, lon], 16);
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       maxZoom: 19, maxNativeZoom: 18
@@ -608,13 +623,11 @@
       return (Math.atan2(s, c) * 180 / Math.PI + 360) % 360;
     }
 
-    function getSectorDetails(avgDir) {
-      const norm = (avgDir + 360) % 360;
+    function getSectorNameFromDeg(deg) {
+      const norm = (deg + 360) % 360;
       const sectorIndex = Math.round(norm / 45) % 8;
       const sectors = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-      const sectorName = sectors[sectorIndex];
-      const turnSide = ['SE', 'S', 'SW'].includes(sectorName) ? 'right' : 'left';
-      return { sectorName, turnSide };
+      return sectors[sectorIndex];
     }
 
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
@@ -734,34 +747,27 @@
       }
 
       // ==========================================
-      // SELECT INTENDED LANDING SPOT & CIRCUIT (AUTO vs MANUAL)
+      // APPLY HARDCODED CONFIGURATION LOOKUP
       // ==========================================
-      let sectorData;
+      let sectorName;
       let effectiveWindDir = avgWindDir;
 
       if (isLandingManual) {
         const sectorVal = parseFloat(document.getElementById('select-wind-sector').value);
         effectiveWindDir = sectorVal;
-        const sectorsMap = { 0: 'N', 45: 'NE', 90: 'E', 135: 'SE', 170: 'S', 220: 'SW', 270: 'W', 315: 'NW' };
-        const secName = sectorsMap[sectorVal];
-        const tSide = ['SE', 'S', 'SW'].includes(secName) ? 'right' : 'left';
-        sectorData = { sectorName: secName, turnSide: tSide };
+        sectorName = getSectorNameFromDeg(sectorVal);
       } else {
-        sectorData = getSectorDetails(avgWindDir);
+        sectorName = getSectorNameFromDeg(avgWindDir);
       }
 
-      let activeLandingLat = defaultLandingLat;
-      let activeLandingLon = defaultLandingLon;
+      const config = sectorConfigTable[sectorName] || { spot: 1, turn: 'left', landingHdg: (effectiveWindDir + 180) % 360 };
 
-      if (['SE', 'S', 'SW'].includes(sectorData.sectorName)) {
-        activeLandingLat = easterlyLandingLat;
-        activeLandingLon = easterlyLandingLon;
-      }
+      let activeLandingLat = (config.spot === 2) ? easterlyLandingLat : defaultLandingLat;
+      let activeLandingLon = (config.spot === 2) ? easterlyLandingLon : defaultLandingLon;
 
-      // Into-wind heading (reciprocal of wind direction)
-      const landingHdg = (effectiveWindDir + 180) % 360;
+      const landingHdg = config.landingHdg;
       const circuitRad = (landingHdg * Math.PI) / 180;
-      const circuitSide = sectorData.turnSide;
+      const circuitSide = config.turn;
 
       L.circleMarker([activeLandingLat, activeLandingLon], {
         radius: 6, fillColor: '#ff9800', color: '#ffffff', weight: 2, fillOpacity: 1
@@ -810,7 +816,7 @@
       document.getElementById('ov-windspd').innerText = `${Math.round(avgSpeed)} mph`;
       const roundedDir = Math.round(avgWindDir);
       document.getElementById('ov-winddir').innerText = `${roundedDir}° (${getCompassLetter(roundedDir)})`;
-      document.getElementById('overlay-sector-tag').innerText = isLandingManual ? `SECTOR ${sectorData.sectorName} (MAN)` : `SECTOR ${sectorData.sectorName}`;
+      document.getElementById('overlay-sector-tag').innerText = isLandingManual ? `SECTOR ${sectorName} (MAN)` : `SECTOR ${sectorName}`;
       
       setTimeout(() => { map.invalidateSize(); }, 250);
     }
