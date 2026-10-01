@@ -1,4 +1,4 @@
-<!-- REV: 5.10.11 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 5.10.12 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -265,17 +265,16 @@
     }
 
     .jumprun-arrow {
-      color: #00d8ff;
-      font-size: 16px;
+      font-size: 32px;
       font-weight: bold;
-      text-shadow: 0 0 6px #000;
+      text-shadow: 0 0 8px #000;
       line-height: 1;
       pointer-events: none;
     }
 
     .circuit-arrow {
       color: #ff9800;
-      font-size: 48px;
+      font-size: 32px;
       font-weight: bold;
       text-shadow: 0 0 8px #000;
       line-height: 1;
@@ -332,7 +331,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Dunkeswell Weather Operations</span>
-      <span class="rev-badge">REV: 5.10.11</span>
+      <span class="rev-badge">REV: 5.10.12</span>
     </div>
   </div>
 
@@ -422,7 +421,7 @@
     <!-- COMPACT SPOT & LANDING CONTROLS PANEL -->
     <div class="spot-overlay-card">
       <div class="spot-overlay-header">
-        <span class="spot-overlay-title">⚙️ DZ Override Controls</span>
+        <span class="spot-overlay-title">⚙️️ DZ Override Controls</span>
       </div>
 
       <div class="control-slider-group" style="border-top:none; margin-top:0; padding-top:0;">
@@ -704,7 +703,7 @@
         L.marker([endManRun.lat, endManRun.lon], {
           icon: L.divIcon({
             html: `<div class="jumprun-arrow" style="color:#00d8ff; transform: rotate(${manArrowAngle}deg);">▶</div>`,
-            className: '', iconSize: [16, 16], iconAnchor: [8, 8]
+            className: '', iconSize: [32, 32], iconAnchor: [16, 16]
           })
         }).addTo(manualJumpLayerGroup);
 
@@ -727,8 +726,8 @@
         let arrowAngle = (runInHeading - 90 + 360) % 360;
         L.marker([endAutoRun.lat, endAutoRun.lon], {
           icon: L.divIcon({
-            html: `<div class="jumprun-arrow" style="transform: rotate(${arrowAngle}deg);">▶</div>`,
-            className: '', iconSize: [16, 16], iconAnchor: [8, 8]
+            html: `<div class="jumprun-arrow" style="color:#00d8ff; transform: rotate(${arrowAngle}deg);">▶</div>`,
+            className: '', iconSize: [32, 32], iconAnchor: [16, 16]
           })
         }).addTo(windRoseLayerGroup);
 
@@ -768,7 +767,7 @@
       L.marker([activeLandingLat, activeLandingLon], {
         icon: L.divIcon({
           html: `<div class="circuit-arrow" style="transform: rotate(${finalArrowAngle}deg);">▶</div>`,
-          className: '', iconSize: [48, 48], iconAnchor: [24, 24]
+          className: '', iconSize: [32, 32], iconAnchor: [16, 16]
         })
       }).addTo(circuitLayerGroup);
 
