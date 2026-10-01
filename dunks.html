@@ -1,4 +1,4 @@
-<!-- REV: 6.0.0 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 6.1.0 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -78,7 +78,7 @@
 
     #map { width: 100%; height: 100%; z-index: 1; }
 
-    /* REFINED SIDEBAR / FLOATING PANEL (REV 6.0.0) */
+    /* REFINED SIDEBAR / FLOATING PANEL (REV 6.1.0) */
     .map-info-overlay {
       position: absolute;
       top: 10px;
@@ -101,7 +101,7 @@
       font-weight: 800;
       color: #00d8ff;
       text-transform: uppercase;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       padding-bottom: 8px;
       border-bottom: 1px solid rgba(30, 45, 74, 0.8);
       display: flex;
@@ -110,43 +110,62 @@
       letter-spacing: 0.8px;
     }
 
-    .overlay-grid {
+    /* GRID FOR TOP 2 METRICS (PATTERN TURN & AVG WIND SPD) */
+    .overlay-grid-top {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .overlay-cell {
       background: linear-gradient(135deg, rgba(20, 30, 50, 0.6) 0%, rgba(10, 15, 25, 0.8) 100%);
       border: 1px solid rgba(30, 45, 74, 0.9);
       border-radius: 8px;
-      padding: 12px;
+      padding: 10px 14px;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      min-height: 60px;
+      min-height: 72px;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
     }
 
     .overlay-label {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       color: #7c8ea6;
       text-transform: uppercase;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
       letter-spacing: 0.6px;
     }
 
+    /* MAXIMIZED VALUES FILLING BOXES */
     .overlay-value {
-      font-size: 1.6rem;
+      font-size: 2.2rem;
       font-weight: 900;
       color: #fff;
-      line-height: 1.1;
+      line-height: 1.0;
+      letter-spacing: -0.5px;
     }
 
     .overlay-value.accent-orange { color: #ff9800; text-shadow: 0 0 12px rgba(255, 152, 0, 0.3); }
     .overlay-value.accent-cyan { color: #00d8ff; text-shadow: 0 0 12px rgba(0, 216, 255, 0.3); }
     .overlay-value.accent-green { color: #00e676; text-shadow: 0 0 12px rgba(0, 230, 118, 0.3); }
+
+    /* SINGLE-LINE ROW FOR WIND DIRECTION & RUN-IN */
+    .single-line-row {
+      background: linear-gradient(135deg, rgba(20, 30, 50, 0.6) 0%, rgba(10, 15, 25, 0.8) 100%);
+      border: 1px solid rgba(30, 45, 74, 0.9);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .single-line-row .overlay-value {
+      font-size: 1.35rem;
+    }
 
     /* SECTION DIVIDER HEADERS */
     .section-title {
@@ -421,41 +440,41 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Dunkeswell Weather Operations</span>
-      <span class="rev-badge">REV: 6.0.0</span>
+      <span class="rev-badge">REV: 6.1.0</span>
     </div>
   </div>
 
   <div class="dashboard-container">
     
-    <!-- TOP-RIGHT MAP OVERLAY PANEL (REV 6.0.0 SLEEK SIDEBAR) -->
+    <!-- TOP-RIGHT MAP OVERLAY PANEL (REV 6.1.0) -->
     <div class="map-info-overlay">
       <div class="overlay-header">
         <span>⚡ Live Ops & Winds Aloft</span>
         <span id="overlay-sector-tag" style="font-size: 0.8rem; color: #ffee58; background: rgba(255,235,59,0.1); padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(255,235,59,0.3);">SECTOR S</span>
       </div>
       
-      <div class="overlay-grid">
+      <!-- TOP 2 BOXES -->
+      <div class="overlay-grid-top">
         <div class="overlay-cell">
           <div class="overlay-label">Pattern Turn</div>
           <div class="overlay-value accent-orange" id="ov-pattern">--</div>
         </div>
         <div class="overlay-cell">
           <div class="overlay-label">Avg Wind Spd</div>
-          <div class="overlay-value accent-green" id="ov-windspd">-- mph</div>
+          <div class="overlay-value accent-green" id="ov-windspd">--</div>
         </div>
       </div>
 
-      <div class="overlay-grid" style="grid-template-columns: 1fr;">
-        <div class="overlay-cell">
-          <div class="overlay-label">Wind Direction</div>
-          <div class="overlay-value accent-cyan" id="ov-winddir">--°</div>
-        </div>
+      <!-- SINGLE-LINE WIND DIRECTION BOX -->
+      <div class="single-line-row">
+        <span class="overlay-label" style="margin:0;">Wind Direction:</span>
+        <span class="overlay-value accent-cyan" id="ov-winddir">--°</span>
       </div>
 
-      <!-- RUN-IN HEADING & DROP OFFSET BOX -->
-      <div style="background: linear-gradient(135deg, rgba(20, 30, 50, 0.6) 0%, rgba(10, 15, 25, 0.8) 100%); border: 1px solid rgba(30, 45, 74, 0.9); border-radius: 8px; padding: 10px 14px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center;">
-        <span class="overlay-label" style="margin:0; font-size: 0.72rem;">Run-In & Drop:</span>
-        <span style="font-size: 1rem; font-weight: 900; color: #fff;" id="ov-heading">--</span>
+      <!-- SINGLE-LINE RUN-IN HEADING & DROP BOX -->
+      <div class="single-line-row">
+        <span class="overlay-label" style="margin:0;">Run-In & Drop:</span>
+        <span style="font-size: 1.1rem; font-weight: 900; color: #fff;" id="ov-heading">--</span>
       </div>
 
       <!-- CURRENT HOUR MODEL FORECAST SECTION -->
