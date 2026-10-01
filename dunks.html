@@ -1,4 +1,4 @@
-<!-- REV: 9.2 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 9.3 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -91,7 +91,7 @@
     #map { width: 100%; height: 100%; z-index: 1; }
 
     /* ==========================================================
-        SIDEBAR (REV 9.2)
+        SIDEBAR (REV 9.3)
         ========================================================== */
     .map-info-overlay {
       --w: clamp(460px, 34vw, 720px);
@@ -235,7 +235,7 @@
 
     .model-card-item {
       border-radius: 10px;
-      padding: calc(var(--u) * 0.6) calc(var(--u) * 1);
+      padding: calc(var(--u) * 0.5) calc(var(--u) * 0.9);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -251,30 +251,30 @@
       gap: calc(var(--u) * 0.5);
     }
 
-    .model-name { font-size: calc(var(--u) * 1.9); font-weight: 800; color: #fff; }
+    .model-name { font-size: calc(var(--u) * 1.7); font-weight: 800; color: #fff; }
 
     .cloud-badge {
-      font-size: calc(var(--u) * 1.7);
+      font-size: calc(var(--u) * 1.5);
       font-weight: 800;
       color: #00d8ff;
       background: rgba(0, 216, 255, 0.12);
       border: 1px solid rgba(0, 216, 255, 0.35);
-      border-radius: 5px;
-      padding: 0 calc(var(--u) * 0.6);
+      border-radius: 4px;
+      padding: 0 calc(var(--u) * 0.5);
       white-space: nowrap;
     }
 
     .model-card-wind {
       display: flex;
       align-items: baseline;
-      gap: calc(var(--u) * 0.5);
+      gap: calc(var(--u) * 0.4);
       white-space: nowrap;
     }
 
-    .mc-arrow { font-size: calc(var(--u) * 3.6); font-weight: 900; display: inline-block; line-height: 1; }
-    .mc-speed { font-size: calc(var(--u) * 5); font-weight: 900; line-height: 1; }
-    .mc-gust  { font-size: calc(var(--u) * 2.4); font-weight: 800; opacity: 0.9; }
-    .mc-dir   { font-size: calc(var(--u) * 1.8); font-weight: 700; opacity: 0.85; }
+    .mc-arrow { font-size: calc(var(--u) * 2.8); font-weight: 900; display: inline-block; line-height: 1; }
+    .mc-speed { font-size: calc(var(--u) * 3.8); font-weight: 900; line-height: 1; }
+    .mc-gust  { font-size: calc(var(--u) * 2.1); font-weight: 800; opacity: 0.9; }
+    .mc-dir   { font-size: calc(var(--u) * 1.7); font-weight: 700; opacity: 0.9; }
 
     .status-green  { background: rgba(0, 230, 118, 0.14); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.5); }
     .status-yellow { background: rgba(255, 235, 59, 0.14); color: #ffee58; border: 1px solid rgba(255, 235, 59, 0.5); }
@@ -506,7 +506,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Dunkeswell Weather Operations</span>
-      <span class="rev-badge">REV: 9.2</span>
+      <span class="rev-badge">REV: 9.3</span>
     </div>
     <div class="header-right-meta">
       <div class="meta-item">Current: <span id="clock-current">--:--:--</span></div>
@@ -568,7 +568,7 @@
 
     </div>
 
-    <!-- SIDEBAR (REV 9.2) -->
+    <!-- SIDEBAR (REV 9.3) -->
     <div class="map-info-overlay" id="sidebar">
       <div class="ov-header">
         <span>⚡ Live ops</span>
@@ -956,7 +956,7 @@
       }
 
       // ==========================================
-      // JJ'S JUMP RUN LOGIC (REV 9.2)
+      // JJ'S JUMP RUN LOGIC (REV 9.3)
       // ==========================================
       const rwy04 = 42;
       const rwy22 = 222;
@@ -977,7 +977,6 @@
       const jjStartRun = computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, (jjRunwayHdg + 180) % 360, 0.8);
       const jjEndRun = computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, jjRunwayHdg, Math.max(0.8, spotOffset + 0.3));
 
-      // Corrected: use jjRunwayHdg for label and arrow angle alignment
       const jjTargetGroup = windRoseLayerGroup;
       const jjLabelLat = jjStartRun.lat + 0.10 * (jjEndRun.lat - jjStartRun.lat);
       const jjLabelLon = jjStartRun.lon + 0.10 * (jjEndRun.lon - jjStartRun.lon);
