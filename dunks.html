@@ -1,4 +1,4 @@
-<!-- REV: 7.6.3 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 7.6.4 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,7 +77,7 @@
     #map { width: 100%; height: 100%; z-index: 1; }
 
     /* ==========================================================
-        SIDEBAR (REV 7.6.3)
+        SIDEBAR (REV 7.6.4)
         ========================================================== */
     .map-info-overlay {
       --w: clamp(460px, 34vw, 720px);
@@ -488,7 +488,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Dunkeswell Weather Operations</span>
-      <span class="rev-badge">REV: 7.6.3</span>
+      <span class="rev-badge">REV: 7.6.4</span>
     </div>
   </div>
 
@@ -546,7 +546,7 @@
 
     </div>
 
-    <!-- SIDEBAR (REV 7.6.3) -->
+    <!-- SIDEBAR (REV 7.6.4) -->
     <div class="map-info-overlay" id="sidebar">
       <div class="ov-header">
         <span>⚡ Live ops</span>
@@ -896,7 +896,7 @@
       let runInHeading = avgWindDir;
       let spotOffset = Math.min(0.28, Math.max(0.12, (avgSpeed / 100) * 1.2));
 
-      // Render Jump Run with longer line, green drop spot at exact offset distance, and red dot equal size 0.2nm before it
+      // Render Jump Run with longer line, green drop spot at exact offset distance, and red dot exactly 0.2nm before it along the run-in heading vector from origin
       function renderJumpRunLine(startPt, endPt, spotPt, redDotPt, lineColor, isManual) {
         const targetGroup = isManual ? manualJumpLayerGroup : windRoseLayerGroup;
 
@@ -931,14 +931,14 @@
           })
         }).addTo(targetGroup);
 
-        // Red dot 0.2nm before the drop spot, matched to same radius (8) and weight (2.5)
+        // Red dot 0.2nm before the green drop spot (calculated as spotOffset - 0.2 from airfield origin)
         L.circleMarker([redDotPt.lat, redDotPt.lon], {
           pane: 'topSpotPane', radius: 8, 
           fillColor: '#ff2a2a', 
           color: '#ffffff', weight: 2.5, fillOpacity: 1
         }).addTo(targetGroup);
 
-        // Green drop spot marker at the exact drop offset distance
+        // Green drop spot marker at the exact drop offset distance from airfield origin
         L.circleMarker([spotPt.lat, spotPt.lon], {
           pane: 'topSpotPane', radius: 8, 
           fillColor: '#00e676', 
@@ -951,7 +951,7 @@
         spotOffset = parseFloat(document.getElementById('slider-jump-dist').value);
 
         const manSpotPt = computeDestinationPoint(lat, lon, runInHeading, spotOffset);
-        const manRedDotPt = computeDestinationPoint(lat, lon, runInHeading, Math.max(0, spotOffset - 0.2));
+        const manRedDotPt = computeDestinationPoint(lat, lon, runInHeading, Math.max(0.05, spotOffset - 0.2));
         const startManRun = computeDestinationPoint(lat, lon, (runInHeading + 180) % 360, 0.8);
         const endManRun = computeDestinationPoint(lat, lon, runInHeading, 0.8);
 
@@ -959,7 +959,7 @@
         setRunInDisplay(runInHeading, spotOffset, true);
       } else {
         const autoSpotPt = computeDestinationPoint(lat, lon, runInHeading, spotOffset);
-        const autoRedDotPt = computeDestinationPoint(lat, lon, runInHeading, Math.max(0, spotOffset - 0.2));
+        const autoRedDotPt = computeDestinationPoint(lat, lon, runInHeading, Math.max(0.05, spotOffset - 0.2));
         const startAutoRun = computeDestinationPoint(lat, lon, (runInHeading + 180) % 360, 0.8);
         const endAutoRun = computeDestinationPoint(lat, lon, runInHeading, 0.8);
 
@@ -1150,7 +1150,7 @@
         document.getElementById('uwind-sfc').innerHTML = windAloftHTML(ecmwfDir, ecmwfSpd);
         document.getElementById('uwind-3k').innerHTML  = windAloftHTML(ecmwfDir + 10, Math.round(ecmwfSpd * 1.8));
         document.getElementById('uwind-7k').innerHTML  = windAloftHTML(ecmwfDir + 18, Math.round(ecmwfSpd * 2.3));
-        Document.getElementById('uwind-10k').innerHTML = windAloftHTML(ecmwfDir + 25, Math.round(ecmwfSpd * 2.8));
+        document.getElementById('uwind-10k').innerHTML = windAloftHTML(ecmwfDir + 25, Math.round(ecmwfSpd * 2.8));
         document.getElementById('uwind-15k').innerHTML = windAloftHTML(ecmwfDir + 30, Math.round(ecmwfSpd * 3.4));
 
       } catch (err) {
