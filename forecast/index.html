@@ -1,10 +1,10 @@
-<!-- REVISION: v1.0.18 -->
+<!-- REVISION: v1.0.19 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skydive Southwest - Onsite Flight Line Forecast (Rev 1.0.18)</title>
+    <title>Skydive Southwest - Onsite Flight Line Forecast (Rev 1.0.19)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -123,7 +123,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v1.0.18",
+            revision: "v1.0.19",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
             longitude: -3.230,
@@ -142,7 +142,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">Skydive Southwest <span class="rev-badge">Rev 1.0.18</span></h1>
+                    <h1 class="logo-title">Skydive Southwest <span class="rev-badge">Rev 1.0.19</span></h1>
                     <p class="logo-sub">Dunkeswell Airfield • Onsite Flight Line Forecast</p>
                 </div>
             </div>
@@ -283,7 +283,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>Skydive Southwest Forecast Dashboard • Dunkeswell Airfield • Rev 1.0.18 • Powered by Open-Meteo API</p>
+        <p>Skydive Southwest Forecast Dashboard • Dunkeswell Airfield • Rev 1.0.19 • Powered by Open-Meteo API</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -381,10 +381,9 @@
         }
 
         function getCustomCloudBands(rawLow, mid, high, visKm, rainProb) {
-            // Dropzone Calibration: If visibility is high and rain risk is 0, models often overcall low cloud cover. Calibrate down to match visual reality.
             let low = rawLow;
             if (visKm >= 10 && rainProb <= 10) {
-                low = Math.round(rawLow * 0.45); // Scale down pessimistic model cloud cover
+                low = Math.round(rawLow * 0.45);
             }
             const c0_5k = Math.min(100, Math.max(10, Math.round(low * 0.85)));
             const c5_10k = Math.min(100, Math.round((low * 0.15) + (mid * 0.4)));
@@ -515,7 +514,6 @@
             let greenHours = 0;
             let totalEvaluated = 0;
 
-            // Get exact current local ISO date-hour string for local time highlighting (e.g. "2026-10-05T12")
             const nowLocalDate = new Date();
             const year = nowLocalDate.getFullYear();
             const month = String(nowLocalDate.getMonth() + 1).padStart(2, '0');
@@ -527,7 +525,7 @@
             hourlyGrid.innerHTML = '';
 
             for (let i = validStart; i < Math.min(validStart + hoursCount, hourly.time.length); i++) {
-                const timeStr = hourly.time[i]; // e.g. "2026-10-05T12:00"
+                const timeStr = hourly.time[i];
                 const timeLabel = new Date(timeStr).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
                 const isCurrentHour = timeStr.startsWith(currentLocalHourStr);
                 
@@ -538,7 +536,6 @@
                 const dew = hourly.dew_point_2m[i];
                 const rain = hourly.precipitation_probability[i];
                 const vis = (hourly.visibility[i] / 1000).toFixed(1);
-                const rawCloud = hourly.cloud_cover[i];
                 
                 const low = hourly.cloud_cover_low[i] || 0;
                 const mid = hourly.cloud_cover_mid[i] || 0;
@@ -765,6 +762,8 @@
             const lw = hourly.cloud_cover_low[midIdx] || 20;
             const md = hourly.cloud_cover_mid[midIdx] || 10;
             const hgh = hourly.cloud_cover_high[midIdx] || 5;
+            const vis = (hourly.visibility[midIdx] / 1000).toFixed(1);
+            const rain = hourly.precipitation_probability[midIdx] || 0;
             const cbPanel = getCustomCloudBands(lw, md, hgh, parseFloat(vis), rain);
             const panelBase = calculateCloudbaseAGL(hourly.temperature_2m[midIdx], hourly.dew_point_2m[midIdx], lw);
 
