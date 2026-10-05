@@ -1,10 +1,10 @@
-<!-- REVISION: v1.0.22 -->
+<!-- REVISION: v1.0.23 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skydive Southwest - Onsite Flight Line Forecast (Rev 1.0.22)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 1.0.23)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -123,7 +123,8 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v1.0.22",
+            revision: "v1.0.23",
+            systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
             longitude: -3.230,
@@ -142,8 +143,8 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">Skydive Southwest <span class="rev-badge">Rev 1.0.22</span></h1>
-                    <p class="logo-sub">Dunkeswell Airfield • Onsite Flight Line Forecast</p>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 1.0.23</span></h1>
+                    <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
             <div class="header-actions">
@@ -286,7 +287,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>Skydive Southwest Forecast Dashboard • Dunkeswell Airfield • Rev 1.0.22 • Powered by Open-Meteo API</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 1.0.23 • Powered by Open-Meteo API</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -334,7 +335,6 @@
         }
 
         function getWeatherIcon(code, rainProb = 0) {
-            // Only show rain/showers if precipitation probability is significant (>= 30%)
             if (rainProb >= 30) {
                 if (code >= 95) return { icon: 'fa-cloud-bolt', color: '#c084fc', label: 'Thunderstorms' };
                 if (code >= 80 && code <= 82) return { icon: 'fa-cloud-showers-heavy', color: '#3b82f6', label: 'Heavy Showers' };
