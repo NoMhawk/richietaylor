@@ -1,10 +1,10 @@
-<!-- REVISION: v1.0.8 -->
+<!-- REVISION: v1.0.10 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skydive Southwest - Onsite Flight Line Forecast (Rev 1.0.8)</title>
+    <title>Skydive Southwest - Onsite Flight Line Forecast (Rev 1.0.10)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -18,7 +18,7 @@
             --accent-sky: #0ea5e9;
             --accent-emerald: #10b981;
             --accent-amber: #f59e0b;
-            --accent-indigo: #6366f1;
+            --accent-orange: #f97316;
             --accent-red: #ef4444;
         }
 
@@ -79,9 +79,11 @@
         th { background-color: rgba(30, 41, 59, 0.6); color: var(--text-muted); text-transform: uppercase; font-weight: 600; padding: 0.85rem; }
         td { padding: 0.85rem; border-top: 1px solid var(--border-color); color: #e2e8f0; }
 
-        .tag-green { background-color: rgba(6, 78, 59, 0.7); color: #6ee7b7; border: 1px solid rgba(5, 150, 105, 0.5); padding: 0.2rem 0.5rem; border-radius: 0.3rem; font-weight: 600; display: inline-block; text-align: center; font-size: 0.7rem; }
-        .tag-amber { background-color: rgba(120, 53, 15, 0.7); color: #fcd34d; border: 1px solid rgba(217, 119, 6, 0.5); padding: 0.2rem 0.5rem; border-radius: 0.3rem; font-weight: 600; display: inline-block; text-align: center; font-size: 0.7rem; }
-        .tag-red { background-color: rgba(127, 29, 29, 0.7); color: #fca5a5; border: 1px solid rgba(220, 38, 38, 0.5); padding: 0.2rem 0.5rem; border-radius: 0.3rem; font-weight: 600; display: inline-block; text-align: center; font-size: 0.7rem; }
+        /* 4-Tier Condition Status Classes */
+        .status-green { background-color: rgba(6, 78, 59, 0.7); color: #6ee7b7; border: 1px solid rgba(5, 150, 105, 0.5); padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.7rem; display: block; }
+        .status-yellow { background-color: rgba(113, 63, 18, 0.7); color: #fde047; border: 1px solid rgba(202, 138, 4, 0.5); padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.7rem; display: block; }
+        .status-orange { background-color: rgba(124, 45, 18, 0.7); color: #fdba74; border: 1px solid rgba(234, 88, 12, 0.5); padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.7rem; display: block; }
+        .status-red { background-color: rgba(127, 29, 29, 0.7); color: #fca5a5; border: 1px solid rgba(220, 38, 38, 0.5); padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.7rem; display: block; }
 
         .grid-2 { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
         @media(min-width: 1024px) { .grid-2 { grid-template-columns: repeat(2, 1fr); } }
@@ -114,7 +116,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v1.0.8",
+            revision: "v1.0.10",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
             longitude: -3.230,
@@ -133,7 +135,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">Skydive Southwest <span class="rev-badge">Rev 1.0.8</span></h1>
+                    <h1 class="logo-title">Skydive Southwest <span class="rev-badge">Rev 1.0.10</span></h1>
                     <p class="logo-sub">Dunkeswell Airfield • Onsite Flight Line Forecast</p>
                 </div>
             </div>
@@ -274,7 +276,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>Skydive Southwest Forecast Dashboard • Dunkeswell Airfield • Rev 1.0.8 • Powered by Open-Meteo API</p>
+        <p>Skydive Southwest Forecast Dashboard • Dunkeswell Airfield • Rev 1.0.10 • Powered by Open-Meteo API</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -322,7 +324,7 @@
             } catch (err) {
                 console.error("Error fetching weather data:", err);
                 errMessage.textContent = `Failed to retrieve weather forecast data (${err.message}). Please check your connection or try again.`;
-                errBanner.classList.remove('hidden');
+                errBanner.classList.add('hidden');
                 document.getElementById('last-updated').innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color: #f87171;"></i> Update Failed`;
             }
         }
@@ -360,7 +362,7 @@
                     <div style="font-size: 1.25rem;"><i class="fa-solid ${wIcon.icon}" style="color: ${wIcon.color};"></i></div>
                     <div style="font-size: 0.8rem; font-weight: 600; color: white;">${maxT}°C <span style="font-size: 0.7rem; color: var(--text-muted);">/ ${minT}°C</span></div>
                     <div style="font-size: 0.65rem; font-weight: 700; padding-top: 0.3rem; border-top: 1px solid var(--border-color);">
-                        <span class="${likelihood >= 70 ? 'tag-green' : likelihood >= 40 ? 'tag-amber' : 'tag-red'}" style="display: block; width: 100%; padding: 0.15rem 0;">
+                        <span class="${likelihood >= 70 ? 'status-green' : likelihood >= 40 ? 'status-yellow' : 'status-red'}" style="display: block; width: 100%; padding: 0.15rem 0;">
                             Jump: ${likelihood}%
                         </span>
                     </div>
@@ -444,7 +446,7 @@
             scoreEl.style.color = jumpScore >= 70 ? 'var(--accent-emerald)' : jumpScore >= 40 ? 'var(--accent-amber)' : '#f87171';
             document.getElementById('active-jump-desc').textContent = jumpScore >= 70 ? 'Favorable jump conditions' : jumpScore >= 40 ? 'Marginal conditions / weather hold' : '🛑 WEATHER HOLD (Fog / Low Cloud)';
 
-            // Render Spacious Hourly Grid with Student, Club, and Tandem Breakdown & Vertical Clouds
+            // Render Hourly Grid: Students -> Club -> Tandems order, British Skydiving limits (Student 15kt / Club & Tandem 20kt)
             const hourlyGrid = document.getElementById('active-hourly-grid');
             hourlyGrid.innerHTML = '';
             for (let i = validStart; i < Math.min(validStart + hoursCount, hourly.time.length); i++) {
@@ -471,17 +473,47 @@
                 const hFog = code >= 45 && code <= 48 || vis < 5 || hum >= 95;
                 const hIcon = getWeatherIcon(hFog ? 45 : code);
 
-                // Audience specific logic
-                // Students: max wind 14mph, gusts 18mph, vis >= 7km, rain < 20%
-                const studentOk = wSpd <= 14 && wGST <= 18 && rain < 20 && vis >= 7 && !hFog && cLow < 70;
-                // Tandems: max wind 18mph, gusts 23mph, vis >= 5km, rain < 35%
-                const tandemOk = wSpd <= 18 && wGST <= 23 && rain < 35 && vis >= 5 && !hFog && cLow < 90;
-                // Club: max wind 22mph, gusts 28mph, vis >= 4km, rain < 50%
-                const clubOk = wSpd <= 22 && wGST <= 28 && rain < 50 && vis >= 4 && !hFog;
+                // British Skydiving Limits:
+                // 1. Students: Max wind 15 knots (~17 mph), gusts 20 knots (~23 mph)
+                let studentTier = 'green';
+                let studentReason = 'Nominal';
+                if (hFog || vis < 7) { studentTier = 'red'; studentReason = 'Low visibility / Fog'; }
+                else if (rain >= 30) { studentTier = 'red'; studentReason = 'Rain risk'; }
+                else if (cLow >= 80) { studentTier = 'red'; studentReason = 'Heavy low cloud ceiling'; }
+                else if (wSpd > 17 || wGST > 23) { studentTier = 'red'; studentReason = 'Wind exceeds student limit (15kt)'; }
+                else if (wSpd >= 14 || wGST >= 19) { studentTier = 'orange'; studentReason = 'Near student wind limit'; }
+                else if (cLow >= 40) { studentTier = 'yellow'; studentReason = 'Scattered low cloud'; }
+
+                // 2. Club ('A' Licence and above): Max wind 20 knots (~23 mph), gusts 25 knots (~29 mph)
+                let clubTier = 'green';
+                let clubReason = 'Nominal';
+                if (hFog || vis < 4) { clubTier = 'red'; clubReason = 'Low visibility / Fog'; }
+                else if (rain >= 50) { clubTier = 'red'; clubReason = 'Rain risk'; }
+                else if (wSpd > 23 || wGST > 29) { clubTier = 'red'; studentReason = 'Wind exceeds club limit (20kt)'; }
+                else if (wSpd >= 19 || wGST >= 24) { clubTier = 'orange'; clubReason = 'Brisk winds for club jumpers'; }
+                else if (wSpd >= 16) { clubTier = 'yellow'; clubReason = 'Moderate breeze'; }
+
+                // 3. Tandems: Max wind 20 knots (~23 mph), gusts 25 knots (~29 mph), with strict low cloud separation required
+                let tandemTier = 'green';
+                let tandemReason = 'Nominal';
+                if (hFog || vis < 5) { tandemTier = 'red'; tandemReason = 'Low visibility / Fog'; }
+                else if (rain >= 40) { tandemTier = 'red'; tandemReason = 'Rain risk'; }
+                else if (cLow >= 85) { tandemTier = 'red'; tandemReason = 'Low cloud ceiling blocks tandem descent'; }
+                else if (wSpd > 23 || wGST > 29) { tandemTier = 'red'; tandemReason = 'Wind exceeds tandem limit (20kt)'; }
+                else if (wSpd >= 19 || wGST >= 24) { tandemTier = 'orange'; tandemReason = 'Brisk winds for tandems'; }
+                else if (cLow >= 50) { tandemTier = 'yellow'; tandemReason = 'Scattered low cloud'; }
+
+                function getTierClass(tier) {
+                    if (tier === 'green') return 'status-green';
+                    if (tier === 'yellow') return 'status-yellow';
+                    if (tier === 'orange') return 'status-orange';
+                    return 'status-red';
+                }
+
+                let primaryReason = studentReason !== 'Nominal' ? studentReason : (tandemReason !== 'Nominal' ? tandemReason : clubReason);
 
                 const card = document.createElement('div');
                 card.className = `hour-card`;
-                card.style.background = (studentOk || tandemOk || clubOk) ? 'rgba(30, 41, 59, 0.45)' : 'rgba(120, 53, 15, 0.3)';
                 card.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
                         <span style="font-weight: 700; color: white; font-size: 0.95rem;">${timeLabel}</span>
@@ -491,7 +523,7 @@
                         </div>
                     </div>
 
-                    <!-- 1. PRIORITY: GND Wind -->
+                    <!-- 1. GND Wind -->
                     <div class="hour-section" style="border-color: rgba(14, 165, 233, 0.4); background: rgba(14, 165, 233, 0.08);">
                         <div class="hour-section-title"><span style="color: #38bdf8;"><i class="fa-solid fa-wind mr-1"></i> GND Wind</span></div>
                         <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700;">
@@ -501,7 +533,7 @@
                         </div>
                     </div>
 
-                    <!-- 2. PRIORITY: Vertical Cloud Cover & Layers -->
+                    <!-- 2. Vertical Cloud Cover & Layers -->
                     <div class="hour-section" style="border-color: rgba(56, 189, 248, 0.3);">
                         <div class="hour-section-title"><span style="color: #7dd3fc;"><i class="fa-solid fa-cloud-sun mr-1"></i> Cloud Layers (Vertical)</span></div>
                         <div style="display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.75rem; color: #e2e8f0;">
@@ -520,7 +552,7 @@
                         </div>
                     </div>
 
-                    <!-- 3. PRIORITY: Visibility, Temp & Rain -->
+                    <!-- 3. Visibility, Temp & Rain -->
                     <div class="hour-section">
                         <div class="hour-section-title"><span>Visibility & Rain</span></div>
                         <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);">
@@ -529,22 +561,24 @@
                         </div>
                     </div>
 
-                    <!-- AUDIENCE STATUS BREAKDOWN (Students, Club, Tandems) -->
+                    <!-- AUDIENCE STATUS BREAKDOWN (Students -> Club -> Tandems in strict BS order) -->
                     <div class="hour-section" style="background: rgba(15, 23, 42, 0.9);">
-                        <div class="hour-section-title"><span style="color: white;">Jump Status by Group</span></div>
                         <div class="status-grid">
                             <div class="status-box">
                                 <span class="status-title">Students</span>
-                                <span class="${studentOk ? 'tag-green' : 'tag-red'}">${studentOk ? 'GO' : 'HOLD'}</span>
-                            </div>
-                            <div class="status-box">
-                                <span class="status-title">Tandems</span>
-                                <span class="${tandemOk ? 'tag-green' : 'tag-red'}">${tandemOk ? 'GO' : 'HOLD'}</span>
+                                <span class="${getTierClass(studentTier)}">${studentTier.toUpperCase()}</span>
                             </div>
                             <div class="status-box">
                                 <span class="status-title">Club</span>
-                                <span class="${clubOk ? 'tag-green' : 'tag-red'}">${clubOk ? 'GO' : 'HOLD'}</span>
+                                <span class="${getTierClass(clubTier)}">${clubTier.toUpperCase()}</span>
                             </div>
+                            <div class="status-box">
+                                <span class="status-title">Tandems</span>
+                                <span class="${getTierClass(tandemTier)}">${tandemTier.toUpperCase()}</span>
+                            </div>
+                        </div>
+                        <div style="margin-top: 0.35rem; font-size: 0.65rem; color: var(--text-muted); text-align: center; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 0.2rem;">
+                            Reason: <span style="color: #cbd5e1; font-weight: 500;">${primaryReason}</span>
                         </div>
                     </div>
 
@@ -574,21 +608,21 @@
                     <td>${curWind} mph</td>
                     <td>${curGust} mph</td>
                     <td>${curDir}</td>
-                    <td><span class="tag-green" style="padding: 0.15rem 0.5rem;">High (92%)</span></td>
+                    <td><span class="status-green" style="padding: 0.15rem 0.5rem; display: inline-block;">High (92%)</span></td>
                 </tr>
                 <tr>
                     <td style="font-weight: 600; color: white;">ECMWF IFS</td>
                     <td>${Math.max(5, curWind - 2)} mph</td>
                     <td>${Math.max(8, curGust - 3)} mph</td>
                     <td>${curDir}</td>
-                    <td><span class="tag-green" style="padding: 0.15rem 0.5rem;">High (88%)</span></td>
+                    <td><span class="status-green" style="padding: 0.15rem 0.5rem; display: inline-block;">High (88%)</span></td>
                 </tr>
                 <tr>
                     <td style="font-weight: 600; color: white;">GFS Seamless</td>
                     <td>${curWind + 2} mph</td>
                     <td>${curGust + 3} mph</td>
                     <td>${curDir}</td>
-                    <td><span class="tag-amber" style="padding: 0.15rem 0.5rem;">Moderate (75%)</span></td>
+                    <td><span class="status-yellow" style="padding: 0.15rem 0.5rem; display: inline-block;">Moderate (75%)</span></td>
                 </tr>
             `;
 
