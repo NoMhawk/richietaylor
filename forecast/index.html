@@ -1,10 +1,10 @@
-<!-- REVISION: v1.0.23 -->
+<!-- REVISION: v1.0.24 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 1.0.23)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 1.0.24)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -115,6 +115,10 @@
         .status-box { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(51, 65, 85, 0.6); border-radius: 0.4rem; padding: 0.35rem 0.2rem; display: flex; flex-direction: column; gap: 0.2rem; }
         .status-title { font-size: 0.6rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
 
+        /* Satellite / Radar Embed Frame */
+        .map-container { position: relative; width: 100%; height: 450px; border-radius: 0.75rem; overflow: hidden; border: 1px solid var(--border-color); background: #000; }
+        .map-container iframe { width: 100%; height: 100%; border: none; }
+
         footer { background-color: var(--bg-card); border-top: 1px solid var(--border-color); margin-top: 3rem; padding: 1.5rem; text-align: center; font-size: 0.75rem; color: var(--text-muted); }
     </style>
 </head>
@@ -123,7 +127,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v1.0.23",
+            revision: "v1.0.24",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -143,7 +147,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 1.0.23</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 1.0.24</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -181,6 +185,27 @@
             </div>
             <div class="selector-grid" id="day-selector-grid">
                 <!-- Populated via JS -->
+            </div>
+        </section>
+
+        <!-- ================= LIVE SATELLITE & RADAR AUTOPLAYBACK LOOP ================= -->
+        <section class="space-y-4">
+            <div class="section-header">
+                <div class="section-title-wrap">
+                    <div class="section-dot" style="background-color: var(--accent-sky);"></div>
+                    <h2 class="section-title">Live Satellite & Radar Loop (Dunkeswell & SW UK)</h2>
+                </div>
+                <span class="section-date">Autoplayback Live Loop</span>
+            </div>
+            <div class="panel" style="padding: 1rem;">
+                <div class="map-container">
+                    <!-- Embedded Windy Live Satellite / Radar View centered on Dunkeswell (lat 50.88, lon -3.23, zoom 9) -->
+                    <iframe src="https://embed.windy.com/embed2.html?lat=50.880&lon=-3.230&detailLat=50.880&detailLon=-3.230&width=650&height=450&zoom=9&level=surface&overlay=radar&product=radar&menu=&message=&marker=true&calendar=now&pressure=true&type=map&location=coordinates&detail=true&metricWind=mph&metricTemp=%C2%B0C" title="RichBot Satellite & Radar Autoplayback"></iframe>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--text-muted); padding-top: 0.25rem;">
+                    <span><i class="fa-solid fa-circle-play text-sky-400 mr-1"></i> Live radar & satellite loop tracking precipitation and cloud movement over Devon & Somerset.</span>
+                    <span>Powered by Windy / Open-Meteo</span>
+                </div>
             </div>
         </section>
 
@@ -287,7 +312,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 1.0.23 • Powered by Open-Meteo API</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 1.0.24 • Powered by Open-Meteo & Windy API</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
