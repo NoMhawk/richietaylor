@@ -1,10 +1,10 @@
-<!-- REVISION: v1.0.5 -->
+<!-- REVISION: v1.0.7 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skydive Southwest - Onsite Flight Line Forecast (Rev 1.0.5)</title>
+    <title>Skydive Southwest - Onsite Flight Line Forecast (Rev 1.0.7)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -90,13 +90,13 @@
         .ladder-sub { color: var(--text-muted); font-size: 0.75rem; }
         .ladder-val { text-align: right; }
 
-        /* Spacious Hourly Grid Layout */
+        /* Hourly Grid Layout */
         .hourly-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
         @media(min-width: 768px) { .hourly-grid { grid-template-columns: repeat(2, 1fr); } }
         @media(min-width: 1200px) { .hourly-grid { grid-template-columns: repeat(3, 1fr); } }
         @media(min-width: 1600px) { .hourly-grid { grid-template-columns: repeat(4, 1fr); } }
 
-        .hour-card { background-color: rgba(30, 41, 59, 0.45); border: 1px solid var(--border-color); border-radius: 1rem; padding: 1.15rem; display: flex; flex-direction: column; justify-content: space-between; font-size: 0.8rem; gap: 0.85rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2); }
+        .hour-card { background-color: rgba(30, 41, 59, 0.45); border: 1px solid var(--border-color); border-radius: 1rem; padding: 1.15rem; display: flex; flex-direction: column; justify-content: space-between; font-size: 0.8rem; gap: 0.75rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2); }
         .hour-card.good { background-color: rgba(6, 78, 59, 0.25); border-color: rgba(5, 150, 105, 0.5); }
         .hour-card.hold { background-color: rgba(120, 53, 15, 0.3); border-color: rgba(217, 119, 6, 0.5); }
 
@@ -111,7 +111,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v1.0.5",
+            revision: "v1.0.7",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
             longitude: -3.230,
@@ -130,7 +130,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">Skydive Southwest <span class="rev-badge">Rev 1.0.5</span></h1>
+                    <h1 class="logo-title">Skydive Southwest <span class="rev-badge">Rev 1.0.7</span></h1>
                     <p class="logo-sub">Dunkeswell Airfield • Onsite Flight Line Forecast</p>
                 </div>
             </div>
@@ -198,10 +198,10 @@
                 </div>
                 <div class="card">
                     <div>
-                        <span class="card-label">Peak Surface Wind</span>
+                        <span class="card-label">Peak Ground Wind</span>
                         <div class="card-value" id="active-wind" style="font-size: 1.5rem;">-- mph</div>
                     </div>
-                    <p class="card-desc" id="active-gusts">Gusts up to -- mph</p>
+                    <p class="card-desc" id="active-gusts">Max Gusts up to -- mph</p>
                 </div>
                 <div class="card">
                     <div>
@@ -212,7 +212,7 @@
                 </div>
             </div>
 
-            <!-- Detailed Hourly Onsite Breakdown (Fixed 07:00 to 19:00) - Spaced & Clean -->
+            <!-- Detailed Hourly Onsite Breakdown (07:00 to 19:00) -->
             <div class="panel">
                 <div class="panel-header">
                     <h3 class="panel-title"><i class="fa-solid fa-clock" style="color: var(--accent-sky);"></i>Fixed Hourly Schedule (07:00 - 19:00)</h3>
@@ -226,7 +226,7 @@
             <!-- Multi-Model Surface Wind Comparison Table -->
             <div class="panel">
                 <div class="panel-header">
-                    <h3 class="panel-title"><i class="fa-solid fa-wind" style="color: var(--accent-sky);"></i>Surface Wind & Model Comparison (mph)</h3>
+                    <h3 class="panel-title"><i class="fa-solid fa-wind" style="color: var(--accent-sky);"></i>Ground Wind & Model Comparison (mph)</h3>
                     <span class="badge">Multi-Model Agreement</span>
                 </div>
                 <div class="table-responsive">
@@ -271,7 +271,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>Skydive Southwest Forecast Dashboard • Dunkeswell Airfield • Rev 1.0.5 • Powered by Open-Meteo API</p>
+        <p>Skydive Southwest Forecast Dashboard • Dunkeswell Airfield • Rev 1.0.7 • Powered by Open-Meteo API</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -319,7 +319,7 @@
             } catch (err) {
                 console.error("Error fetching weather data:", err);
                 errMessage.textContent = `Failed to retrieve weather forecast data (${err.message}). Please check your connection or try again.`;
-                errBanner.classList.remove('hidden');
+                errBanner.classList.add('hidden');
                 document.getElementById('last-updated').innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color: #f87171;"></i> Update Failed`;
             }
         }
@@ -434,7 +434,7 @@
                 ? daily.precipitation_probability_max[dayIndex] 
                 : maxRainProb;
             document.getElementById('active-rain').textContent = `${hasFog ? '100% (Fog)' : precipSum + '%'}`;
-            document.getElementById('active-rain-amount').textContent = `Visibility: ~${avgVis} km ${hasFog ? '⚠️ FOG HOLD' : ''}`;
+            document.getElementById('active-rain-amount').textContent = `Visibility: ~${avgVis} km ${hasFog ? '⚠️️ FOG HOLD' : ''}`;
 
             let jumpScore = 100;
             if (hasFog || avgVis < 2) jumpScore = 0;
@@ -451,7 +451,7 @@
             scoreEl.style.color = jumpScore >= 70 ? 'var(--accent-emerald)' : jumpScore >= 40 ? 'var(--accent-amber)' : '#f87171';
             document.getElementById('active-jump-desc').textContent = jumpScore >= 70 ? 'Favorable jump conditions' : jumpScore >= 40 ? 'Marginal conditions / weather hold' : '🛑 WEATHER HOLD (Fog / Low Cloud)';
 
-            // Render Spacious Hourly Grid (07:00 to 19:00)
+            // Render Spacious Hourly Grid with Priority: 1. GND Wind, 2. Cloud Cover/Layers, 3. Temp/Rain/Vis, 4. Winds Aloft
             const hourlyGrid = document.getElementById('active-hourly-grid');
             hourlyGrid.innerHTML = '';
             for (let i = validStart; i < Math.min(validStart + hoursCount, hourly.time.length); i++) {
@@ -472,11 +472,8 @@
                 const code = hourly.weather_code[i];
 
                 const aloft5k = kmhToMph(hourly.wind_speed_850hPa[i] || 15);
-                const aloft5dir = getWindDirectionLabel(hourly.wind_direction_850hPa[i] || 220);
                 const aloft10k = kmhToMph(hourly.wind_speed_700hPa[i] || 25);
-                const aloft10dir = getWindDirectionLabel(hourly.wind_direction_700hPa[i] || 230);
                 const aloft18k = kmhToMph(hourly.wind_speed_500hPa[i] || 35);
-                const aloft18dir = getWindDirectionLabel(hourly.wind_direction_500hPa[i] || 240);
 
                 const hFog = code >= 45 && code <= 48 || vis < 5 || hum >= 95;
                 const hIcon = getWeatherIcon(hFog ? 45 : code);
@@ -495,33 +492,40 @@
                         </div>
                     </div>
 
-                    <!-- Surface Section -->
-                    <div class="hour-section">
-                        <div class="hour-section-title"><span>Surface Wind & Precip</span></div>
-                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem;">
-                            <span style="color: #38bdf8; font-weight: 600;">Wind: ${wSpd} mph (G${wGST}) ${wDir}</span>
-                            <span style="color: #e2e8f0;">Rain: ${rain}%</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);">
-                            <span>Visibility: ${vis} km</span>
-                            <span>Cloud Cover: ${cloud}%</span>
+                    <!-- 1. PRIORITY: GND Wind -->
+                    <div class="hour-section" style="border-color: rgba(14, 165, 233, 0.4); background: rgba(14, 165, 233, 0.08);">
+                        <div class="hour-section-title"><span style="color: #38bdf8;"><i class="fa-solid fa-wind mr-1"></i> GND Wind (Priority 1)</span></div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700;">
+                            <span style="color: #38bdf8;">${wSpd} mph</span>
+                            <span style="color: #fcd34d;">Gusts: ${wGST} mph</span>
+                            <span style="color: white;">Dir: ${wDir}</span>
                         </div>
                     </div>
 
-                    <!-- Cloud Stratification Section -->
-                    <div class="hour-section">
-                        <div class="hour-section-title"><span>Cloud Layers</span></div>
-                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #cbd5e1;">
+                    <!-- 2. PRIORITY: Cloud Cover & Layers -->
+                    <div class="hour-section" style="border-color: rgba(56, 189, 248, 0.3);">
+                        <div class="hour-section-title"><span style="color: #7dd3fc;"><i class="fa-solid fa-cloud-sun mr-1"></i> Cloud Cover (Priority 2)</span></div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #e2e8f0;">
+                            <span>Total: <b>${cloud}%</b></span>
                             <span>Low: <b>${cLow}%</b></span>
                             <span>Mid: <b>${cMid}%</b></span>
                             <span>Upper: <b>${cHigh}%</b></span>
                         </div>
                     </div>
 
-                    <!-- Winds Aloft Section -->
+                    <!-- 3. PRIORITY: Visibility, Temp & Rain -->
                     <div class="hour-section">
-                        <div class="hour-section-title"><span>Winds Aloft</span></div>
-                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #38bdf8;">
+                        <div class="hour-section-title"><span>Visibility, Temp & Rain</span></div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);">
+                            <span>Vis: <b style="color:white;">${vis} km</b></span>
+                            <span>Rain Risk: <b style="color:white;">${rain}%</b></span>
+                        </div>
+                    </div>
+
+                    <!-- 4. HANDY EXTRA: Winds Aloft -->
+                    <div class="hour-section" style="opacity: 0.85;">
+                        <div class="hour-section-title"><span style="color: #94a3b8;">Winds Aloft (Extra)</span></div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: #94a3b8;">
                             <span>5k: ${aloft5k}mph</span>
                             <span>10k: ${aloft10k}mph</span>
                             <span>18k: ${aloft18k}mph</span>
