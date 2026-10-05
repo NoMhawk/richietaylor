@@ -1,10 +1,10 @@
-<!-- REVISION: v1.0.14 -->
+<!-- REVISION: v1.0.15 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skydive Southwest - Onsite Flight Line Forecast (Rev 1.0.14)</title>
+    <title>Skydive Southwest - Onsite Flight Line Forecast (Rev 1.0.15)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -79,7 +79,13 @@
         th { background-color: rgba(30, 41, 59, 0.6); color: var(--text-muted); text-transform: uppercase; font-weight: 600; padding: 0.85rem; }
         td { padding: 0.85rem; border-top: 1px solid var(--border-color); color: #e2e8f0; }
 
-        /* 4-Tier Condition Status Classes */
+        /* Threshold Color Utilities */
+        .text-green { color: #34d399 !important; }
+        .text-yellow { color: #facc15 !important; }
+        .text-orange { color: #fb923c !important; }
+        .text-red { color: #f87171 !important; }
+
+        /* 4-Tier Condition Status Pill Classes */
         .status-green { background-color: rgba(6, 78, 59, 0.7); color: #6ee7b7; border: 1px solid rgba(5, 150, 105, 0.5); padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.65rem; display: block; text-transform: uppercase; }
         .status-yellow { background-color: rgba(113, 63, 18, 0.7); color: #fde047; border: 1px solid rgba(202, 138, 4, 0.5); padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.65rem; display: block; text-transform: uppercase; }
         .status-orange { background-color: rgba(124, 45, 18, 0.7); color: #fdba74; border: 1px solid rgba(234, 88, 12, 0.5); padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.65rem; display: block; text-transform: uppercase; }
@@ -116,7 +122,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v1.0.14",
+            revision: "v1.0.15",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
             longitude: -3.230,
@@ -135,7 +141,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">Skydive Southwest <span class="rev-badge">Rev 1.0.14</span></h1>
+                    <h1 class="logo-title">Skydive Southwest <span class="rev-badge">Rev 1.0.15</span></h1>
                     <p class="logo-sub">Dunkeswell Airfield • Onsite Flight Line Forecast</p>
                 </div>
             </div>
@@ -253,7 +259,7 @@
             </div>
 
             <!-- Winds Aloft Ladder & Cloud Breakdown -->
-            <div class="grid-2">
+v            <div class="grid-2">
                 <!-- Winds Aloft Ladder -->
                 <div class="panel">
                     <h3 class="panel-title"><i class="fa-solid fa-layer-group" style="color: var(--accent-sky);"></i>Winds Aloft Ladder (Jump Altitudes - mph)</h3>
@@ -276,7 +282,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>Skydive Southwest Forecast Dashboard • Dunkeswell Airfield • Rev 1.0.14 • Powered by Open-Meteo API</p>
+        <p>Skydive Southwest Forecast Dashboard • Dunkeswell Airfield • Rev 1.0.15 • Powered by Open-Meteo API</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -286,6 +292,42 @@
 
         function kmhToMph(kmh) {
             return Math.round(kmh * 0.621371);
+        }
+
+        // Color coding helpers for thresholds
+        function getCloudColorClass(val) {
+            if (val <= 50) return 'text-green';
+            if (val <= 70) return 'text-yellow';
+            if (val <= 95) return 'text-orange';
+            return 'text-red';
+        }
+
+        function getWindColorClass(mph) {
+            if (mph <= 12) return 'text-green';
+            if (mph <= 17) return 'text-yellow';
+            if (mph <= 22) return 'text-orange';
+            return 'text-red';
+        }
+
+        function getVisColorClass(visKm) {
+            if (visKm >= 7) return 'text-green';
+            if (visKm >= 5) return 'text-yellow';
+            if (visKm >= 3) return 'text-orange';
+            return 'text-red';
+        }
+
+        function getRainColorClass(prob) {
+            if (prob <= 20) return 'text-green';
+            if (prob <= 40) return 'text-yellow';
+            if (prob <= 60) return 'text-orange';
+            return 'text-red';
+        }
+
+        function getBaseColorClass(baseFt) {
+            if (baseFt >= 5000) return 'text-green';
+            if (baseFt >= 3500) return 'text-yellow';
+            if (baseFt >= 2000) return 'text-orange';
+            return 'text-red';
         }
 
         function getWeatherIcon(code) {
@@ -541,8 +583,8 @@
                     <div class="hour-section" style="border-color: rgba(14, 165, 233, 0.4); background: rgba(14, 165, 233, 0.08);">
                         <div class="hour-section-title"><span style="color: #38bdf8;"><i class="fa-solid fa-wind mr-1"></i> GND Wind</span></div>
                         <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700;">
-                            <span style="color: #38bdf8;">${wSpd} mph</span>
-                            <span style="color: #fcd34d;">Gusts: ${wGST} mph</span>
+                            <span class="${getWindColorClass(wSpd)}">${wSpd} mph</span>
+                            <span class="${getWindColorClass(wGST)}">Gusts: ${wGST} mph</span>
                             <span style="color: white;">Dir: ${wDir}</span>
                         </div>
                     </div>
@@ -551,23 +593,23 @@
                     <div class="hour-section" style="border-color: rgba(56, 189, 248, 0.3);">
                         <div class="hour-section-title">
                             <span style="color: #7dd3fc;"><i class="fa-solid fa-cloud-sun mr-1"></i> Cloud Layers (AGL)</span>
-                            <span style="color: ${cloudbaseAGL < 3500 ? '#f87171' : '#38bdf8'}; font-weight: 700;">Base: ~${cloudbaseAGL.toLocaleString()} ft</span>
+                            <span class="${getBaseColorClass(cloudbaseAGL)}" style="font-weight: 700;">Base: ~${cloudbaseAGL.toLocaleString()} ft</span>
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.75rem; color: #e2e8f0;">
                             <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 0.1rem;">
-                                <span style="color: var(--text-muted);">Total Cover:</span> <b>${cloud}%</b>
+                                <span style="color: var(--text-muted);">Total Cover:</span> <b class="${getCloudColorClass(cloud)}">${cloud}%</b>
                             </div>
                             <div style="display: flex; justify-content: space-between;">
-                                <span style="color: var(--text-muted);">☁ Low (0-5k ft):</span> <b style="color: #38bdf8;">${cb.c0_5k}%</b>
+                                <span style="color: var(--text-muted);">☁ Low (0-5k ft):</span> <b class="${getCloudColorClass(cb.c0_5k)}">${cb.c0_5k}%</b>
                             </div>
                             <div style="display: flex; justify-content: space-between;">
-                                <span style="color: var(--text-muted);">☁ Mid (5-10k ft):</span> <b>${cb.c5_10k}%</b>
+                                <span style="color: var(--text-muted);">☁ Mid (5-10k ft):</span> <b class="${getCloudColorClass(cb.c5_10k)}">${cb.c5_10k}%</b>
                             </div>
                             <div style="display: flex; justify-content: space-between;">
-                                <span style="color: var(--text-muted);">☁ Upper (10-15k ft):</span> <b>${cb.c10_15k}%</b>
+                                <span style="color: var(--text-muted);">☁ Upper (10-15k ft):</span> <b class="${getCloudColorClass(cb.c10_15k)}">${cb.c10_15k}%</b>
                             </div>
                             <div style="display: flex; justify-content: space-between;">
-                                <span style="color: var(--text-muted);">☁ Top (15k+ ft):</span> <b>${cb.c15k_plus}%</b>
+                                <span style="color: var(--text-muted);">☁ Top (15k+ ft):</span> <b class="${getCloudColorClass(cb.c15k_plus)}">${cb.c15k_plus}%</b>
                             </div>
                         </div>
                     </div>
@@ -576,12 +618,12 @@
                     <div class="hour-section">
                         <div class="hour-section-title"><span>Visibility & Rain</span></div>
                         <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);">
-                            <span>Vis: <b style="color:white;">${vis} km</b></span>
-                            <span>Rain Risk: <b style="color:white;">${rain}%</b></span>
+                            <span>Vis: <b class="${getVisColorClass(parseFloat(vis))}">${vis} km</b></span>
+                            <span>Rain Risk: <b class="${getRainColorClass(rain)}">${rain}%</b></span>
                         </div>
                     </div>
 
-                    <!-- AUDIENCE STATUS BREAKDOWN (Students -> Club -> Tandems with reason labels) -->
+                    <!-- AUDIENCE STATUS BREAKDOWN -->
                     <div class="hour-section" style="background: rgba(15, 23, 42, 0.9);">
                         <div class="status-grid">
                             <div class="status-box">
@@ -606,9 +648,9 @@
                     <div class="hour-section" style="opacity: 0.85;">
                         <div class="hour-section-title"><span style="color: #94a3b8;">Winds Aloft (Extra)</span></div>
                         <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: #94a3b8;">
-                            <span>5k: ${aloft5k}mph</span>
-                            <span>10k: ${aloft10k}mph</span>
-                            <span>18k: ${aloft18k}mph</span>
+                            <span>5k: <b class="${getWindColorClass(aloft5k)}">${aloft5k}mph</b></span>
+                            <span>10k: <b class="${getWindColorClass(aloft10k)}">${aloft10k}mph</b></span>
+                            <span>18k: <b class="${getWindColorClass(aloft18k)}">${aloft18k}mph</b></span>
                         </div>
                     </div>
                 `;
@@ -631,14 +673,15 @@
             const weatherCode = daily.weather_code[dayIndex];
             const weatherInfo = getWeatherIcon(weatherCode);
 
-            document.getElementById('active-temp').textContent = `${Math.round(maxTemp)}°C / ${Math.round(minTemp)}°C`;
+            document.getElementById('active-temp').innerHTML = `<span class="text-green">${Math.round(maxTemp)}°C</span> / <span style="color:var(--text-muted);">${Math.round(minTemp)}°C</span>`;
             const condEl = document.getElementById('active-condition');
-            condEl.innerHTML = `<i class="fa-solid ${weatherInfo.icon}" style="color: ${weatherInfo.color};"></i><span>${weatherInfo.label} (${avgCloud}% Cloud)</span>`;
+            condEl.innerHTML = `<i class="fa-solid ${weatherInfo.icon}" style="color: ${weatherInfo.color};"></i><span>${weatherInfo.label} (<b class="${getCloudColorClass(avgCloud)}">${avgCloud}% Cloud</b>)</span>`;
 
-            document.getElementById('active-wind').textContent = `${maxWind} mph`;
-            document.getElementById('active-gusts').textContent = `Max Gusts up to ${maxGust} mph`;
-            document.getElementById('active-rain').textContent = `${Math.max(...dayRainProbs, 0)}%`;
-            document.getElementById('active-rain-amount').textContent = `Visibility: ~${avgVis} km`;
+            document.getElementById('active-wind').innerHTML = `<span class="${getWindColorClass(maxWind)}">${maxWind} mph</span>`;
+            document.getElementById('active-gusts').innerHTML = `Max Gusts up to <span class="${getWindColorClass(maxGust)}">${maxGust} mph</span>`;
+            const maxRain = Math.max(...dayRainProbs, 0);
+            document.getElementById('active-rain').innerHTML = `<span class="${getRainColorClass(maxRain)}">${maxRain}%</span>`;
+            document.getElementById('active-rain-amount').innerHTML = `Visibility: <span class="${getVisColorClass(parseFloat(avgVis))}">${avgVis} km</span>`;
 
             // Render Model Comparison Table
             const midIdx = validStart + 4;
@@ -650,22 +693,22 @@
             modelTable.innerHTML = `
                 <tr>
                     <td style="font-weight: 600; color: white;">UKMO (UKV)</td>
-                    <td>${curWind} mph</td>
-                    <td>${curGust} mph</td>
+                    <td><span class="${getWindColorClass(curWind)}">${curWind} mph</span></td>
+                    <td><span class="${getWindColorClass(curGust)}">${curGust} mph</span></td>
                     <td>${curDir}</td>
                     <td><span class="status-green" style="padding: 0.15rem 0.5rem; display: inline-block;">High (92%)</span></td>
                 </tr>
                 <tr>
                     <td style="font-weight: 600; color: white;">ECMWF IFS</td>
-                    <td>${Math.max(5, curWind - 2)} mph</td>
-                    <td>${Math.max(8, curGust - 3)} mph</td>
+                    <td><span class="${getWindColorClass(Math.max(5, curWind - 2))}">${Math.max(5, curWind - 2)} mph</span></td>
+                    <td><span class="${getWindColorClass(Math.max(8, curGust - 3))}">${Math.max(8, curGust - 3)} mph</span></td>
                     <td>${curDir}</td>
                     <td><span class="status-green" style="padding: 0.15rem 0.5rem; display: inline-block;">High (88%)</span></td>
                 </tr>
                 <tr>
                     <td style="font-weight: 600; color: white;">GFS Seamless</td>
-                    <td>${curWind + 2} mph</td>
-                    <td>${curGust + 3} mph</td>
+                    <td><span class="${getWindColorClass(curWind + 2)}">${curWind + 2} mph</span></td>
+                    <td><span class="${getWindColorClass(curGust + 3)}">${curGust + 3} mph</span></td>
                     <td>${curDir}</td>
                     <td><span class="status-yellow" style="padding: 0.15rem 0.5rem; display: inline-block;">Moderate (75%)</span></td>
                 </tr>
@@ -683,19 +726,19 @@
             aloftLadder.innerHTML = `
                 <div class="ladder-row">
                     <div><span class="ladder-alt">18,000 ft (500 hPa)</span><span class="ladder-sub">High Altitude</span></div>
-                    <div class="ladder-val"><span style="font-weight: 600; color: var(--accent-sky);">${h500Speed} mph</span> <span style="color: #cbd5e1;">(${h500Dir})</span></div>
+                    <div class="ladder-val"><span class="${getWindColorClass(h500Speed)}" style="font-weight: 600;">${h500Speed} mph</span> <span style="color: #cbd5e1;">(${h500Dir})</span></div>
                 </div>
                 <div class="ladder-row">
                     <div><span class="ladder-alt">10,000 ft (700 hPa)</span><span class="ladder-sub">Jump Altitude</span></div>
-                    <div class="ladder-val"><span style="font-weight: 600; color: var(--accent-sky);">${h700Speed} mph</span> <span style="color: #cbd5e1;">(${h700Dir})</span></div>
+                    <div class="ladder-val"><span class="${getWindColorClass(h700Speed)}" style="font-weight: 600;">${h700Speed} mph</span> <span style="color: #cbd5e1;">(${h700Dir})</span></div>
                 </div>
                 <div class="ladder-row">
                     <div><span class="ladder-alt">5,000 ft (850 hPa)</span><span class="ladder-sub">Lower Jump Alt</span></div>
-                    <div class="ladder-val"><span style="font-weight: 600; color: var(--accent-sky);">${h850Speed} mph</span> <span style="color: #cbd5e1;">(${h850Dir})</span></div>
+                    <div class="ladder-val"><span class="${getWindColorClass(h850Speed)}" style="font-weight: 600;">${h850Speed} mph</span> <span style="color: #cbd5e1;">(${h850Dir})</span></div>
                 </div>
                 <div class="ladder-row">
                     <div><span class="ladder-alt">Surface (10m)</span><span class="ladder-sub">Landing Area</span></div>
-                    <div class="ladder-val"><span style="font-weight: 600; color: var(--accent-emerald);">${curWind} mph (Gusts ${curGust})</span> <span style="color: #cbd5e1;">(${curDir})</span></div>
+                    <div class="ladder-val"><span class="${getWindColorClass(curWind)}" style="font-weight: 600;">${curWind} mph (Gusts ${curGust})</span> <span style="color: #cbd5e1;">(${curDir})</span></div>
                 </div>
             `;
 
@@ -709,19 +752,19 @@
 
             cloudLayers.innerHTML = `
                 <div style="background-color: rgba(30, 41, 59, 0.5); padding: 0.85rem; border-radius: 0.75rem; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;"><span style="font-weight: 700; color: white;"><i class="fa-solid fa-cloud text-sky-300 mr-1"></i> Low Level (0 - 5,000 ft AGL)</span><span style="color: #38bdf8;">${cbPanel.c0_5k}% Cover (Base ~${panelBase.toLocaleString()}ft)</span></div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;"><span style="font-weight: 700; color: white;"><i class="fa-solid fa-cloud text-sky-300 mr-1"></i> Low Level (0 - 5,000 ft AGL)</span><span class="${getCloudColorClass(cbPanel.c0_5k)}">${cbPanel.c0_5k}% Cover (<b class="${getBaseColorClass(panelBase)}">Base ~${panelBase.toLocaleString()}ft</b>)</span></div>
                     <div style="font-size: 0.75rem; color: var(--text-muted);">Cumulus / Surface Base • Critical for Student & Tandem Holds</div>
                 </div>
                 <div style="background-color: rgba(30, 41, 59, 0.5); padding: 0.85rem; border-radius: 0.75rem; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;"><span style="font-weight: 700; color: white;"><i class="fa-solid fa-cloud text-sky-400 mr-1"></i> Mid Level (5,000 - 10,000 ft AGL)</span><span style="color: #38bdf8;">${cbPanel.c5_10k}% Cover</span></div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;"><span style="font-weight: 700; color: white;"><i class="fa-solid fa-cloud text-sky-400 mr-1"></i> Mid Level (5,000 - 10,000 ft AGL)</span><span class="${getCloudColorClass(cbPanel.c5_10k)}">${cbPanel.c5_10k}% Cover</span></div>
                     <div style="font-size: 0.75rem; color: var(--text-muted);">Mid-Air Deployment Zone • Cloud Separation Check</div>
                 </div>
                 <div style="background-color: rgba(30, 41, 59, 0.5); padding: 0.85rem; border-radius: 0.75rem; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;"><span style="font-weight: 700; color: white;"><i class="fa-solid fa-cloud text-indigo-400 mr-1"></i> Upper Level (10,000 - 15,000 ft AGL)</span><span style="color: #38bdf8;">${cbPanel.c10_15k}% Cover</span></div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;"><span style="font-weight: 700; color: white;"><i class="fa-solid fa-cloud text-indigo-400 mr-1"></i> Upper Level (10,000 - 15,000 ft AGL)</span><span class="${getCloudColorClass(cbPanel.c10_15k)}">${cbPanel.c10_15k}% Cover</span></div>
                     <div style="font-size: 0.75rem; color: var(--text-muted);">Exit Altitude Zone • Jump Run Visibility Check</div>
                 </div>
                 <div style="background-color: rgba(30, 41, 59, 0.5); padding: 0.85rem; border-radius: 0.75rem; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;"><span style="font-weight: 700; color: white;"><i class="fa-solid fa-cloud text-blue-300 mr-1"></i> Top Level (15,000 ft+ AGL)</span><span style="color: #38bdf8;">${cbPanel.c15k_plus}% Cover</span></div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;"><span style="font-weight: 700; color: white;"><i class="fa-solid fa-cloud text-blue-300 mr-1"></i> Top Level (15,000 ft+ AGL)</span><span class="${getCloudColorClass(cbPanel.c15k_plus)}">${cbPanel.c15k_plus}% Cover</span></div>
                     <div style="font-size: 0.75rem; color: var(--text-muted);">Above Dropzone Ceiling • Cirrus / High Altitude Cover</div>
                 </div>
             `;
