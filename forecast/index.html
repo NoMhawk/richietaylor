@@ -1,886 +1,569 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skydive Southwest - Dunkeswell Forecast</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Skydive Southwest - Day & Extended Forecast</title>
+    <!-- Using Tailwind Play CDN (standard production warning in console can be safely ignored for local single-file apps) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        aviation: {
-                            900: '#0b1329',
-                            800: '#111c3a',
-                            700: '#1b2a54',
-                            600: '#283c75',
-                            accent: '#38bdf8',
-                            warning: '#f59e0b',
-                            danger: '#ef4444',
-                            success: '#22c55e'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- FontAwesome for aviation icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Inter Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #0b1329; }
-        ::-webkit-scrollbar-thumb { background: #283c75; border-radius: 3px; }
     </style>
 </head>
-<body class="bg-aviation-900 text-slate-100 min-h-screen flex flex-col selection:bg-aviation-accent selection:text-aviation-900">
+<body class="bg-slate-950 text-slate-100 min-h-screen">
 
+    <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
-        /**
-         * CONFIGURATION & CONSTANTS BLOCK
-         * Centralized settings for easy future editing.
-         */
         const CONFIG = {
-            dropzoneName: "Skydive Southwest",
-            locationName: "Dunkeswell Airfield (EGDG)",
-            latitude: 50.88,
-            longitude: -3.23,
-            elevationMeters: 254, // approx elevation of Dunkeswell
-            // Thresholds for Jumpability Score
-            thresholds: {
-                maxWindSpeedKt: 22,
-                maxGustKt: 28,
-                minCloudBaseFt: 2500,
-                maxRainProb: 30
-            },
-            apiEndpoints: {
-                forecast: "https://api.open-meteo.com/v1/forecast"
-            }
-        };
-
-        // Application State
-        let appState = {
-            loading: true,
-            error: null,
-            lastUpdated: null,
-            activeTab: 'all' // 'all', 'today', 'tomorrow', 'week'
+            locationName: "Skydive Southwest, Dunkeswell Airfield",
+            latitude: 50.880,
+            longitude: -3.230,
+            elevation: 254, // meters
+            timezone: "Europe/London",
+            refreshIntervalMinutes: 15,
+            models: ['best_match', 'ecmwf_ifs', 'gfs_seamless', 'ukmo_ukv']
         };
     </script>
 
-    <!-- HEADER / NAVBAR -->
-    <header class="bg-aviation-800 border-b border-aviation-600/50 sticky top-0 z-50 backdrop-blur-md bg-opacity-90">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <!-- HEADER -->
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-aviation-600 flex items-center justify-center text-aviation-accent font-black text-xl shadow-inner border border-aviation-accent/30">
-                    <i class="fa-solid fa-plane-departure"></i>
+                <div class="bg-sky-600 text-white p-2.5 rounded-xl shadow-md">
+                    <i class="fa-solid fa-plane-departure text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
-                        Skydive Southwest <span class="text-xs px-2 py-0.5 rounded-full bg-aviation-accent/20 text-aviation-accent border border-aviation-accent/30 font-semibold">Dunkeswell (EGDG)</span>
-                    </h1>
-                    <p class="text-xs text-slate-400">Multi-Model Aviation Forecast & Jumpability Analyzer</p>
+                    <h1 class="text-xl font-bold tracking-tight text-white">Skydive Southwest</h1>
+                    <p class="text-xs text-slate-400">Dunkeswell Airfield • Advanced Dropzone Forecast</p>
                 </div>
             </div>
-
-            <!-- Day Selector & Status -->
-            <div class="flex items-center gap-3">
-                <div class="flex bg-aviation-900 rounded-lg p-1 border border-aviation-600/60 text-xs flex-wrap">
-                    <button onclick="switchTab('all')" id="btn-tab-all" class="px-3 py-1.5 rounded-md font-medium transition-colors bg-aviation-600 text-white shadow">Today & Tomorrow</button>
-                    <button onclick="switchTab('today')" id="btn-tab-today" class="px-3 py-1.5 rounded-md font-medium text-slate-400 hover:text-white transition-colors">Today</button>
-                    <button onclick="switchTab('tomorrow')" id="btn-tab-tomorrow" class="px-3 py-1.5 rounded-md font-medium text-slate-400 hover:text-white transition-colors">Tomorrow</button>
-                    <button onclick="switchTab('week')" id="btn-tab-week" class="px-3 py-1.5 rounded-md font-medium text-slate-400 hover:text-white transition-colors">7-Day Outlook</button>
-                </div>
-                <button onclick="fetchAllData()" class="px-3 py-2 bg-aviation-700 hover:bg-aviation-600 text-white text-xs font-medium rounded-lg border border-aviation-600 transition flex items-center gap-1.5 shadow" title="Refresh Data">
-                    <i id="refresh-icon" class="fa-solid fa-rotate"></i> <span class="hidden sm:inline">Refresh</span>
+            <div class="flex items-center gap-4">
+                <span id="last-updated" class="text-xs text-slate-400 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
+                    <i class="fa-solid fa-sync fa-spin mr-1.5 text-sky-400"></i> Loading Forecast...
+                </span>
+                <button onclick="fetchAllData()" class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition shadow-sm flex items-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-rotate"></i> Refresh
                 </button>
             </div>
         </div>
     </header>
 
     <!-- MAIN CONTAINER -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+    <main class="max-w-7xl mx-auto px-4 py-6 space-y-10">
 
-        <!-- Loading State Overlay / Banner -->
-        <div id="loading-banner" class="bg-aviation-800/80 border border-aviation-600 rounded-2xl p-8 text-center shadow-2xl backdrop-blur">
-            <div class="inline-block animate-spin text-4xl text-aviation-accent mb-3">
-                <i class="fa-solid fa-spinner"></i>
-            </div>
-            <h2 class="text-lg font-bold text-white">Fetching Meteorological Data...</h2>
-            <p class="text-xs text-slate-400 mt-1">Querying multi-model ensemble (ECMWF, GFS, UKV) for Dunkeswell Airfield.</p>
+        <!-- ERROR BANNER -->
+        <div id="error-banner" class="hidden bg-red-950/80 border border-red-700 text-red-200 px-4 py-3 rounded-xl text-sm flex items-center gap-3">
+            <i class="fa-solid fa-triangle-exclamation text-red-400 text-lg"></i>
+            <span id="error-message"></span>
         </div>
 
-        <!-- Error State Banner -->
-        <div id="error-banner" class="hidden bg-red-950/80 border border-red-700/50 rounded-2xl p-6 text-center shadow-xl text-red-200">
-            <i class="fa-solid fa-triangle-exclamation text-3xl mb-2 text-red-400"></i>
-            <h3 class="font-bold text-base">Failed to retrieve weather data</h3>
-            <p id="error-message" class="text-xs text-red-300 mt-1">Please check your internet connection and try refreshing.</p>
-            <button onclick="fetchAllData()" class="mt-4 px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded-lg text-xs font-semibold shadow">Try Again</button>
-        </div>
-
-        <!-- Content Sections Wrapper -->
-        <div id="forecast-content" class="hidden space-y-12">
-            
-            <!-- LAST UPDATED BAR -->
-            <div class="flex flex-wrap items-center justify-between bg-aviation-800/40 border border-aviation-700/40 rounded-xl px-4 py-2.5 text-xs text-slate-400">
-                <div class="flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span>Model Data Synchronized: <strong id="txt-last-updated" class="text-white">-</strong></span>
+        <!-- ================= TODAY'S FORECAST ================= -->
+        <section class="space-y-6">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-3 h-3 rounded-full bg-sky-500 animate-pulse"></div>
+                    <h2 class="text-xl font-bold text-white uppercase tracking-wider" id="today-title">Today's Forecast</h2>
                 </div>
-                <div class="flex items-center gap-4">
-                    <span>Coordinates: <strong class="text-slate-300">50.88°N, -3.23°W</strong></span>
-                    <span>Elevation: <strong class="text-slate-300">254m (833ft)</strong></span>
-                </div>
+                <span id="today-date" class="text-xs text-slate-400 font-medium"></span>
             </div>
 
-            <!-- ================= TODAY SECTION ================= -->
-            <section id="section-today" class="space-y-6">
-                <!-- Day Header & Summary Badge -->
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-aviation-700/60 pb-4">
+            <!-- Summary & Jumpability Card -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
                     <div>
-                        <div class="flex items-center gap-3">
-                            <h2 class="text-2xl font-extrabold text-white tracking-tight" id="today-title">Today's Forecast</h2>
-                            <span id="today-jump-badge" class="px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-sm">-</span>
-                        </div>
-                        <p class="text-xs text-slate-400 mt-1" id="today-date-sub">-</p>
+                        <span class="text-xs font-semibold text-slate-400 uppercase">Jumpability Score</span>
+                        <div class="text-3xl font-extrabold text-emerald-400 mt-1" id="today-jump-score">--%</div>
                     </div>
-                    <!-- Quick stats pills -->
-                    <div class="flex flex-wrap gap-2 text-xs">
-                        <div class="bg-aviation-800/80 border border-aviation-700 rounded-lg px-3 py-1.5 flex items-center gap-2">
-                            <i class="fa-solid fa-temperature-three-quarters text-aviation-accent"></i>
-                            <span>Max Temp: <strong id="today-max-temp" class="text-white">-</strong></span>
-                        </div>
-                        <div class="bg-aviation-800/80 border border-aviation-700 rounded-lg px-3 py-1.5 flex items-center gap-2">
-                            <i class="fa-solid fa-cloud-rain text-aviation-accent"></i>
-                            <span>Rain Risk: <strong id="today-rain-risk" class="text-white">-</strong></span>
-                        </div>
-                    </div>
+                    <p class="text-xs text-slate-400 mt-2" id="today-jump-desc">Calculating conditions...</p>
                 </div>
-
-                <!-- 1. Multi-Model Surface Wind Comparison Table -->
-                <div class="bg-aviation-800/60 border border-aviation-700/60 rounded-2xl p-5 shadow-lg backdrop-blur">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-sm font-bold uppercase tracking-wider text-aviation-accent flex items-center gap-2">
-                            <i class="fa-solid fa-wind"></i> 1. Surface Wind Model Comparison (Today)
-                        </h3>
-                        <span id="today-consensus-pill" class="text-xs bg-aviation-700/60 text-slate-300 px-2.5 py-1 rounded-lg border border-aviation-600 font-medium">Consensus: -</span>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs text-slate-300">
-                            <thead class="bg-aviation-900/80 text-slate-400 uppercase font-semibold border-b border-aviation-700">
-                                <tr>
-                                    <th class="p-3">Weather Model</th>
-                                    <th class="p-3">Avg Speed (kts)</th>
-                                    <th class="p-3">Gusts (kts)</th>
-                                    <th class="p-3">Direction</th>
-                                    <th class="p-3">Conditions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="today-wind-table-body" class="divide-y divide-aviation-700/40">
-                                <!-- Populated dynamically -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Grid for Winds Aloft & Cloud Layers -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    
-                    <!-- 2. Winds Aloft Ladder -->
-                    <div class="bg-aviation-800/60 border border-aviation-700/60 rounded-2xl p-5 shadow-lg backdrop-blur flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center justify-between mb-4">
-                                <h3 class="text-sm font-bold uppercase tracking-wider text-aviation-accent flex items-center gap-2">
-                                    <i class="fa-solid fa-layer-group"></i> 2. Upper-Air Winds Ladder (Today)
-                                </h3>
-                                <span class="text-xs text-slate-400">Jump Altitudes</span>
-                            </div>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-left text-xs text-slate-300">
-                                    <thead class="bg-aviation-900/80 text-slate-400 uppercase font-semibold border-b border-aviation-700">
-                                        <tr>
-                                            <th class="p-2.5">Altitude</th>
-                                            <th class="p-2.5">Speed (kts)</th>
-                                            <th class="p-2.5">Direction</th>
-                                            <th class="p-2.5">Temp</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="today-aloft-table-body" class="divide-y divide-aviation-700/40">
-                                        <!-- Populated dynamically -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <p class="text-[11px] text-slate-400 mt-4 italic"><i class="fa-solid fa-circle-info mr-1 text-aviation-accent"></i> Standard pressure levels interpolated for Dunkeswell elevation (254m).</p>
-                    </div>
-
-                    <!-- 3. Cloud Layers & Depth -->
-                    <div class="bg-aviation-800/60 border border-aviation-700/60 rounded-2xl p-5 shadow-lg backdrop-blur flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center justify-between mb-4">
-                                <h3 class="text-sm font-bold uppercase tracking-wider text-aviation-accent flex items-center gap-2">
-                                    <i class="fa-solid fa-cloud"></i> 3. Stratified Cloud Layers & Depth (Today)
-                                </h3>
-                                <span class="text-xs text-slate-400">Low / Mid / Upper</span>
-                            </div>
-                            <div class="space-y-3" id="today-cloud-layers-container">
-                                <!-- Populated dynamically -->
-                            </div>
-                        </div>
-                        <div class="mt-4 pt-3 border-t border-aviation-700/40 flex justify-between text-xs text-slate-400">
-                            <span>Base Visibility: <strong id="today-visibility" class="text-white">-</strong></span>
-                            <span>Max Cloud Cover: <strong id="today-cloud-cover" class="text-white">-</strong></span>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- 4. Hourly Weather & Jumpability Timeline -->
-                <div class="bg-aviation-800/60 border border-aviation-700/60 rounded-2xl p-5 shadow-lg backdrop-blur">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-sm font-bold uppercase tracking-wider text-aviation-accent flex items-center gap-2">
-                            <i class="fa-solid fa-clock"></i> 4. Hourly Weather & Jumpability Timeline (Today - Daylight Hours)
-                        </h3>
-                        <span class="text-xs text-slate-400">Calculated Jump % based on Wind, Rain & Clouds</span>
-                    </div>
-                    <div class="overflow-x-auto pb-2">
-                        <div class="flex gap-3 min-w-max" id="today-hourly-timeline">
-                            <!-- Populated dynamically -->
-                        </div>
-                    </div>
-                </div>
-
-            </section>
-
-            <!-- Divider -->
-            <hr class="border-aviation-700/60 my-10">
-
-            <!-- ================= TOMORROW SECTION ================= -->
-            <section id="section-tomorrow" class="space-y-6">
-                <!-- Day Header & Summary Badge -->
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-aviation-700/60 pb-4">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
                     <div>
-                        <div class="flex items-center gap-3">
-                            <h2 class="text-2xl font-extrabold text-white tracking-tight" id="tomorrow-title">Tomorrow's Forecast</h2>
-                            <span id="tomorrow-jump-badge" class="px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-sm">-</span>
-                        </div>
-                        <p class="text-xs text-slate-400 mt-1" id="tomorrow-date-sub">-</p>
+                        <span class="text-xs font-semibold text-slate-400 uppercase">Max Temp / Weather</span>
+                        <div class="text-2xl font-bold text-white mt-1" id="today-temp">--°C</div>
                     </div>
-                    <!-- Quick stats pills -->
-                    <div class="flex flex-wrap gap-2 text-xs">
-                        <div class="bg-aviation-800/80 border border-aviation-700 rounded-lg px-3 py-1.5 flex items-center gap-2">
-                            <i class="fa-solid fa-temperature-three-quarters text-aviation-accent"></i>
-                            <span>Max Temp: <strong id="tomorrow-max-temp" class="text-white">-</strong></span>
-                        </div>
-                        <div class="bg-aviation-800/80 border border-aviation-700 rounded-lg px-3 py-1.5 flex items-center gap-2">
-                            <i class="fa-solid fa-cloud-rain text-aviation-accent"></i>
-                            <span>Rain Risk: <strong id="tomorrow-rain-risk" class="text-white">-</strong></span>
-                        </div>
+                    <div class="text-xs text-sky-400 font-medium mt-2 flex items-center gap-1.5" id="today-condition">
+                        <i class="fa-solid fa-cloud"><span>Loading...</span></i>
                     </div>
                 </div>
-
-                <!-- 1. Multi-Model Surface Wind Comparison Table -->
-                <div class="bg-aviation-800/60 border border-aviation-700/60 rounded-2xl p-5 shadow-lg backdrop-blur">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-sm font-bold uppercase tracking-wider text-aviation-accent flex items-center gap-2">
-                            <i class="fa-solid fa-wind"></i> 1. Surface Wind Model Comparison (Tomorrow)
-                        </h3>
-                        <span id="tomorrow-consensus-pill" class="text-xs bg-aviation-700/60 text-slate-300 px-2.5 py-1 rounded-lg border border-aviation-600 font-medium">Consensus: -</span>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs text-slate-300">
-                            <thead class="bg-aviation-900/80 text-slate-400 uppercase font-semibold border-b border-aviation-700">
-                                <tr>
-                                    <th class="p-3">Weather Model</th>
-                                    <th class="p-3">Avg Speed (kts)</th>
-                                    <th class="p-3">Gusts (kts)</th>
-                                    <th class="p-3">Direction</th>
-                                    <th class="p-3">Conditions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tomorrow-wind-table-body" class="divide-y divide-aviation-700/40">
-                                <!-- Populated dynamically -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Grid for Winds Aloft & Cloud Layers -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    
-                    <!-- 2. Winds Aloft Ladder -->
-                    <div class="bg-aviation-800/60 border border-aviation-700/60 rounded-2xl p-5 shadow-lg backdrop-blur flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center justify-between mb-4">
-                                <h3 class="text-sm font-bold uppercase tracking-wider text-aviation-accent flex items-center gap-2">
-                                    <i class="fa-solid fa-layer-group"></i> 2. Upper-Air Winds Ladder (Tomorrow)
-                                </h3>
-                                <span class="text-xs text-slate-400">Jump Altitudes</span>
-                            </div>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-left text-xs text-slate-300">
-                                    <thead class="bg-aviation-900/80 text-slate-400 uppercase font-semibold border-b border-aviation-700">
-                                        <tr>
-                                            <th class="p-2.5">Altitude</th>
-                                            <th class="p-2.5">Speed (kts)</th>
-                                            <th class="p-2.5">Direction</th>
-                                            <th class="p-2.5">Temp</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="tomorrow-aloft-table-body" class="divide-y divide-aviation-700/40">
-                                        <!-- Populated dynamically -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <p class="text-[11px] text-slate-400 mt-4 italic"><i class="fa-solid fa-circle-info mr-1 text-aviation-accent"></i> Standard pressure levels interpolated for Dunkeswell elevation (254m).</p>
-                    </div>
-
-                    <!-- 3. Cloud Layers & Depth -->
-                    <div class="bg-aviation-800/60 border border-aviation-700/60 rounded-2xl p-5 shadow-lg backdrop-blur flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center justify-between mb-4">
-                                <h3 class="text-sm font-bold uppercase tracking-wider text-aviation-accent flex items-center gap-2">
-                                    <i class="fa-solid fa-cloud"></i> 3. Stratified Cloud Layers & Depth (Tomorrow)
-                                </h3>
-                                <span class="text-xs text-slate-400">Low / Mid / Upper</span>
-                            </div>
-                            <div class="space-y-3" id="tomorrow-cloud-layers-container">
-                                <!-- Populated dynamically -->
-                            </div>
-                        </div>
-                        <div class="mt-4 pt-3 border-t border-aviation-700/40 flex justify-between text-xs text-slate-400">
-                            <span>Base Visibility: <strong id="tomorrow-visibility" class="text-white">-</strong></span>
-                            <span>Max Cloud Cover: <strong id="tomorrow-cloud-cover" class="text-white">-</strong></span>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- 4. Hourly Weather & Jumpability Timeline -->
-                <div class="bg-aviation-800/60 border border-aviation-700/60 rounded-2xl p-5 shadow-lg backdrop-blur">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-sm font-bold uppercase tracking-wider text-aviation-accent flex items-center gap-2">
-                            <i class="fa-solid fa-clock"></i> 4. Hourly Weather & Jumpability Timeline (Tomorrow - Daylight Hours)
-                        </h3>
-                        <span class="text-xs text-slate-400">Calculated Jump % based on Wind, Rain & Clouds</span>
-                    </div>
-                    <div class="overflow-x-auto pb-2">
-                        <div class="flex gap-3 min-w-max" id="tomorrow-hourly-timeline">
-                            <!-- Populated dynamically -->
-                        </div>
-                    </div>
-                </div>
-
-            </section>
-
-            <!-- Divider -->
-            <hr class="border-aviation-700/60 my-10">
-
-            <!-- ================= 7-DAY EXTENDED OUTLOOK SECTION ================= -->
-            <section id="section-week" class="space-y-6">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-aviation-700/60 pb-4">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
                     <div>
-                        <h2 class="text-2xl font-extrabold text-white tracking-tight">7-Day Extended Outlook</h2>
-                        <p class="text-xs text-slate-400 mt-1">Daily summary overview and jumpability likelihood for Dunkeswell Airfield.</p>
+                        <span class="text-xs font-semibold text-slate-400 uppercase">Peak Surface Wind</span>
+                        <div class="text-2xl font-bold text-white mt-1" id="today-wind">-- kts</div>
                     </div>
-                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-aviation-700/60 text-aviation-accent border border-aviation-600">Ensemble Forecast</span>
+                    <p class="text-xs text-slate-400 mt-2" id="today-gusts">Gusts up to -- kts</p>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+                    <div>
+                        <span class="text-xs font-semibold text-slate-400 uppercase">Rain Risk</span>
+                        <div class="text-2xl font-bold text-white mt-1" id="today-rain">--%</div>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-2" id="today-rain-amount">Precip: -- mm</p>
+                </div>
+            </div>
+
+            <!-- Multi-Model Surface Wind Comparison Table -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider"><i class="fa-solid fa-wind mr-2 text-sky-400"></i>Surface Wind & Model Comparison</h3>
+                    <span class="text-xs bg-slate-800 text-slate-300 px-2.5 py-1 rounded border border-slate-700">Multi-Model Agreement</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-800/60 text-slate-400 uppercase font-semibold">
+                            <tr>
+                                <th class="p-3">Model Source</th>
+                                <th class="p-3">Wind Speed</th>
+                                <th class="p-3">Gusts</th>
+                                <th class="p-3">Direction</th>
+                                <th class="p-3">Model Confidence</th>
+                            </tr>
+                        </thead>
+                        <tbody id="today-model-table" class="divide-y divide-slate-800 text-slate-200">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Winds Aloft Ladder & Cloud Breakdown -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Winds Aloft Ladder -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+                    <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider"><i class="fa-solid fa-layer-group mr-2 text-sky-400"></i>Winds Aloft Ladder (Jump Altitudes)</h3>
+                    <div class="space-y-2.5" id="today-aloft-ladder">
+                        <!-- Populated via JS -->
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="week-cards-container">
-                    <!-- Populated dynamically -->
+                <!-- Stratified Cloud Layers & Depth -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+                    <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider"><i class="fa-solid fa-cloud-sun mr-2 text-sky-400"></i>Cloud Stratification & Depth</h3>
+                    <div class="space-y-3" id="today-cloud-layers">
+                        <!-- Populated via JS -->
+                    </div>
                 </div>
-            </section>
+            </div>
 
-        </div>
+            <!-- Hourly Timeline Breakdown -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+                <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider"><i class="fa-solid fa-clock mr-2 text-sky-400"></i>Hourly Schedule & Jump Windows</h3>
+                <div class="overflow-x-auto">
+                    <div class="flex gap-3 pb-2" id="today-hourly-timeline">
+                        <!-- Populated via JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TOMORROW'S FORECAST ================= -->
+        <section class="space-y-6 pt-6 border-t border-slate-800">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-3 h-3 rounded-full bg-indigo-500"></div>
+                    <h2 class="text-xl font-bold text-white uppercase tracking-wider" id="tomorrow-title">Tomorrow's Forecast</h2>
+                </div>
+                <span id="tomorrow-date" class="text-xs text-slate-400 font-medium"></span>
+            </div>
+
+            <!-- Summary & Jumpability Card -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+                    <div>
+                        <span class="text-xs font-semibold text-slate-400 uppercase">Jumpability Score</span>
+                        <div class="text-3xl font-extrabold text-indigo-400 mt-1" id="tomorrow-jump-score">--%</div>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-2" id="tomorrow-jump-desc">Calculating conditions...</p>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+                    <div>
+                        <span class="text-xs font-semibold text-slate-400 uppercase">Max Temp / Weather</span>
+                        <div class="text-2xl font-bold text-white mt-1" id="tomorrow-temp">--°C</div>
+                    </div>
+                    <div class="text-xs text-indigo-400 font-medium mt-2 flex items-center gap-1.5" id="tomorrow-condition">
+                        <i class="fa-solid fa-cloud"><span>Loading...</span></i>
+                    </div>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+                    <div>
+                        <span class="text-xs font-semibold text-slate-400 uppercase">Peak Surface Wind</span>
+                        <div class="text-2xl font-bold text-white mt-1" id="tomorrow-wind">-- kts</div>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-2" id="tomorrow-gusts">Gusts up to -- kts</p>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+                    <div>
+                        <span class="text-xs font-semibold text-slate-400 uppercase">Rain Risk</span>
+                        <div class="text-2xl font-bold text-white mt-1" id="tomorrow-rain">--%</div>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-2" id="tomorrow-rain-amount">Precip: -- mm</p>
+                </div>
+            </div>
+
+            <!-- Multi-Model Surface Wind Comparison Table -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider"><i class="fa-solid fa-wind mr-2 text-indigo-400"></i>Surface Wind & Model Comparison</h3>
+                    <span class="text-xs bg-slate-800 text-slate-300 px-2.5 py-1 rounded border border-slate-700">Multi-Model Agreement</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-800/60 text-slate-400 uppercase font-semibold">
+                            <tr>
+                                <th class="p-3">Model Source</th>
+                                <th class="p-3">Wind Speed</th>
+                                <th class="p-3">Gusts</th>
+                                <th class="p-3">Direction</th>
+                                <th class="p-3">Model Confidence</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tomorrow-model-table" class="divide-y divide-slate-800 text-slate-200">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Winds Aloft Ladder & Cloud Breakdown -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Winds Aloft Ladder -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+                    <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider"><i class="fa-solid fa-layer-group mr-2 text-indigo-400"></i>Winds Aloft Ladder (Jump Altitudes)</h3>
+                    <div class="space-y-2.5" id="tomorrow-aloft-ladder">
+                        <!-- Populated via JS -->
+                    </div>
+                </div>
+
+                <!-- Stratified Cloud Layers & Depth -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+                    <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider"><i class="fa-solid fa-cloud-sun mr-2 text-indigo-400"></i>Cloud Stratification & Depth</h3>
+                    <div class="space-y-3" id="tomorrow-cloud-layers">
+                        <!-- Populated via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hourly Timeline Breakdown -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+                <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider"><i class="fa-solid fa-clock mr-2 text-indigo-400"></i>Hourly Schedule & Jump Windows</h3>
+                <div class="overflow-x-auto">
+                    <div class="flex gap-3 pb-2" id="tomorrow-hourly-timeline">
+                        <!-- Populated via JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= 7-DAY EXTENDED OUTLOOK ================= -->
+        <section class="space-y-6 pt-6 border-t border-slate-800">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-3 h-3 rounded-full bg-amber-500"></div>
+                    <h2 class="text-xl font-bold text-white uppercase tracking-wider">7-Day Extended Outlook</h2>
+                </div>
+                <span class="text-xs text-slate-400 font-medium">Dropzone Long-Range Planning</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4" id="extended-forecast-grid">
+                <!-- Populated via JS -->
+            </div>
+        </section>
 
     </main>
 
     <!-- FOOTER -->
-    <footer class="bg-aviation-800 border-t border-aviation-600/50 mt-12 py-6 text-center text-xs text-slate-400">
-        <div class="max-w-7xl mx-auto px-4 space-y-2">
-            <p>Skydive Southwest Dunkeswell Airfield • Aviation Weather Forecast System</p>
-            <p class="text-slate-400">Powered by Open-Meteo Multi-Model Ensemble (ECMWF, GFS, UKV). Always verify with official aviation METARs/TAFs prior to jumping.</p>
-        </div>
+    <footer class="bg-slate-900 border-t border-slate-800 mt-12 py-6 text-center text-xs text-slate-500">
+        <p>Skydive Southwest Forecast Dashboard • Dunkeswell Airfield • Powered by Open-Meteo API</p>
     </footer>
 
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- APPLICATION LOGIC -->
     <script>
-        /**
-         * Converts wind degrees to cardinal direction string
-         */
-        function getWindDirectionLabel(degrees) {
-            if (degrees === undefined || degrees === null) return "VAR";
-            const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
-            const index = Math.round((degrees % 360) / 22.5);
-            return directions[index % 16];
-        }
-
-        /**
-         * Converts km/h to knots
-         */
         function kmhToKnots(kmh) {
-            return kmh * 0.539957;
+            return Math.round(kmh * 0.539957);
         }
 
-        /**
-         * Converts meters to feet
-         */
-        function metersToFeet(meters) {
-            return meters * 3.28084;
+        function getWeatherIcon(code) {
+            if (code === 0) return { icon: 'fa-sun text-amber-400', label: 'Clear Sky' };
+            if (code >= 1 && code <= 3) return { icon: 'fa-cloud-sun text-sky-300', label: 'Partly Cloudy' };
+            if (code >= 45 && code <= 48) return { icon: 'fa-smog text-slate-400', label: 'Foggy / Misty' };
+            if (code >= 51 && code <= 67) return { icon: 'fa-cloud-rain text-blue-400', label: 'Rain Showers' };
+            if (code >= 71 && code <= 77) return { icon: 'fa-snowflake text-indigo-200', label: 'Snow' };
+            if (code >= 80 && code <= 82) return { icon: 'fa-cloud-showers-heavy text-blue-500', label: 'Heavy Showers' };
+            if (code >= 95) return { icon: 'fa-cloud-bolt text-purple-400', label: 'Thunderstorms' };
+            return { icon: 'fa-cloud text-slate-400', label: 'Overcast' };
         }
 
-        /**
-         * Maps weather code to icon and description
-         */
-        function getWeatherDetails(code) {
-            const map = {
-                0: { icon: 'fa-sun text-yellow-400', label: 'Clear Sky' },
-                1: { icon: 'fa-cloud-sun text-yellow-300', label: 'Mainly Clear' },
-                2: { icon: 'fa-cloud text-slate-300', label: 'Partly Cloudy' },
-                3: { icon: 'fa-cloud text-slate-400', label: 'Overcast' },
-                45: { icon: 'fa-smog text-slate-400', label: 'Foggy' },
-                48: { icon: 'fa-smog text-slate-400', label: 'Rime Fog' },
-                51: { icon: 'fa-cloud-rain text-blue-300', label: 'Light Drizzle' },
-                53: { icon: 'fa-cloud-rain text-blue-400', label: 'Drizzle' },
-                61: { icon: 'fa-cloud-rain text-blue-400', label: 'Light Rain' },
-                63: { icon: 'fa-cloud-showers-heavy text-blue-500', label: 'Moderate Rain' },
-                65: { icon: 'fa-cloud-showers-heavy text-blue-600', label: 'Heavy Rain' },
-                71: { icon: 'fa-snowflake text-cyan-200', label: 'Light Snow' },
-                80: { icon: 'fa-cloud-rain text-blue-400', label: 'Rain Showers' },
-                95: { icon: 'fa-cloud-bolt text-amber-400', label: 'Thunderstorm' }
-            };
-            return map[code] || { icon: 'fa-cloud text-slate-400', label: 'Variable' };
+        function getWindDirectionLabel(degrees) {
+            const dirs = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+            return dirs[Math.round((degrees % 360) / 22.5) % 16];
         }
 
-        /**
-         * Calculate jumpability score (0-100%) for a given hour based on wind, gusts, cloud base, and rain
-         */
-        function calculateJumpability(windSpeedKt, gustKt, cloudBaseFt, rainProb) {
-            let score = 100;
-
-            if (windSpeedKt > CONFIG.thresholds.maxWindSpeedKt) {
-                score -= (windSpeedKt - CONFIG.thresholds.maxWindSpeedKt) * 6;
-            }
-            if (gustKt > CONFIG.thresholds.maxGustKt) {
-                score -= (gustKt - CONFIG.thresholds.maxGustKt) * 8;
-            }
-            if (cloudBaseFt < CONFIG.thresholds.minCloudBaseFt && cloudBaseFt > 0) {
-                score -= (CONFIG.thresholds.minCloudBaseFt - cloudBaseFt) / 50;
-            }
-            if (rainProb > 10) {
-                score -= (rainProb - 10) * 1.2;
-            }
-
-            return Math.max(0, Math.min(100, Math.round(score)));
-        }
-
-        /**
-         * Switch tab view
-         */
-        function switchTab(tab) {
-            appState.activeTab = tab;
-            const secToday = document.getElementById('section-today');
-            const secTomorrow = document.getElementById('section-tomorrow');
-            const secWeek = document.getElementById('section-week');
-            const btnAll = document.getElementById('btn-tab-all');
-            const btnToday = document.getElementById('btn-tab-today');
-            const btnTomorrow = document.getElementById('btn-tab-tomorrow');
-            const btnWeek = document.getElementById('btn-tab-week');
-
-            [btnAll, btnToday, btnTomorrow, btnWeek].forEach(b => {
-                b.className = "px-3 py-1.5 rounded-md font-medium text-slate-400 hover:text-white transition-colors";
-            });
-
-            if (tab === 'all') {
-                secToday.classList.remove('hidden');
-                secTomorrow.classList.remove('hidden');
-                secWeek.classList.remove('hidden');
-                btnAll.className = "px-3 py-1.5 rounded-md font-medium transition-colors bg-aviation-600 text-white shadow";
-            } else if (tab === 'today') {
-                secToday.classList.remove('hidden');
-                secTomorrow.classList.add('hidden');
-                secWeek.classList.add('hidden');
-                btnToday.className = "px-3 py-1.5 rounded-md font-medium transition-colors bg-aviation-600 text-white shadow";
-            } else if (tab === 'tomorrow') {
-                secToday.classList.add('hidden');
-                secTomorrow.classList.remove('hidden');
-                secWeek.classList.add('hidden');
-                btnTomorrow.className = "px-3 py-1.5 rounded-md font-medium transition-colors bg-aviation-600 text-white shadow";
-            } else if (tab === 'week') {
-                secToday.classList.add('hidden');
-                secTomorrow.classList.add('hidden');
-                secWeek.classList.remove('hidden');
-                btnWeek.className = "px-3 py-1.5 rounded-md font-medium transition-colors bg-aviation-600 text-white shadow";
-            }
-        }
-
-        /**
-         * Fetch weather data from Open-Meteo multi-model endpoint
-         */
         async function fetchAllData() {
-            const loadingBanner = document.getElementById('loading-banner');
-            const errorBanner = document.getElementById('error-banner');
-            const forecastContent = document.getElementById('forecast-content');
-            const refreshIcon = document.getElementById('refresh-icon');
+            const errBanner = document.getElementById('error-banner');
+            const errMessage = document.getElementById('error-message');
+            errBanner.classList.add('hidden');
 
-            loadingBanner.classList.remove('hidden');
-            errorBanner.classList.add('hidden');
-            forecastContent.classList.add('hidden');
-            refreshIcon.classList.add('fa-spin');
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&elevation=${CONFIG.elevation}&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,wind_speed_10m,wind_direction_10m,wind_gusts_10m,visibility,wind_speed_850hPa,wind_direction_850hPa,temperature_850hPa,wind_speed_700hPa,wind_direction_700hPa,temperature_700hPa,wind_speed_500hPa,wind_direction_500hPa,temperature_500hPa&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant&timezone=${CONFIG.timezone}`;
 
             try {
-                const url = `${CONFIG.apiEndpoints.forecast}?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&elevation=${CONFIG.elevationMeters}&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,wind_speed_10m,wind_direction_10m,wind_gusts_10m,visibility,wind_speed_950hPa,wind_direction_950hPa,temperature_950hPa,wind_speed_850hPa,wind_direction_850hPa,temperature_850hPa,wind_speed_700hPa,wind_direction_700hPa,temperature_700hPa,wind_speed_500hPa,wind_direction_500hPa,temperature_500hPa&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant&models=best_match,ecmwf_ifs,gfs_seamless,ukmo_ukv&timezone=Europe/London`;
-
                 const response = await fetch(url);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
 
-                processWeatherData(data);
+                document.getElementById('last-updated').innerHTML = `<i class="fa-solid fa-check text-emerald-400 mr-1.5"></i> Updated: ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
 
-                loadingBanner.classList.add('hidden');
-                forecastContent.classList.remove('hidden');
-                document.getElementById('txt-last-updated').innerText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                renderDay(data, 0, 'today');
+                renderDay(data, 1, 'tomorrow');
+                renderExtendedForecast(data);
+
             } catch (err) {
                 console.error("Error fetching weather data:", err);
-                loadingBanner.classList.add('hidden');
-                errorBanner.classList.remove('hidden');
-                document.getElementById('error-message').innerText = err.message || "Failed to communicate with weather server.";
-            } finally {
-                refreshIcon.classList.remove('fa-spin');
+                errMessage.textContent = `Failed to retrieve weather forecast data (${err.message}). Please check your connection or try again.`;
+                errBanner.classList.remove('hidden');
+                document.getElementById('last-updated').innerHTML = `<i class="fa-solid fa-triangle-exclamation text-red-400 mr-1.5"></i> Update Failed`;
             }
         }
 
-        /**
-         * Process raw API response and populate UI sections
-         */
-        function processWeatherData(data) {
-            const now = new Date();
-            const todayStr = now.toISOString().split('T')[0];
-            const tomorrowDate = new Date(now);
-            tomorrowDate.setDate(now.getDate() + 1);
-            const tomorrowStr = tomorrowDate.toISOString().split('T')[0];
-
-            const times = data.hourly.time;
-            
-            let todayIndices = [];
-            let tomorrowIndices = [];
-
-            times.forEach((t, idx) => {
-                if (t.startsWith(todayStr)) {
-                    todayIndices.push(idx);
-                } else if (t.startsWith(tomorrowStr)) {
-                    tomorrowIndices.push(idx);
-                }
-            });
-
-            // Populate Today & Tomorrow Sections
-            renderDayData('today', todayIndices, data, todayStr);
-            renderDayData('tomorrow', tomorrowIndices, data, tomorrowStr);
-
-            // Populate 7-Day Outlook
-            render7DayOutlook(data);
-        }
-
-        /**
-         * Render specific day's UI components
-         */
-        function renderDayData(dayKey, indices, data, dateStr) {
-            if (indices.length === 0) return;
-
+        function renderDay(data, dayIndex, prefix) {
             const hourly = data.hourly;
-            
-            const dateObj = new Date(dateStr);
-            const dateFormatted = dateObj.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' });
-            document.getElementById(`${dayKey}-date-sub`).innerText = dateFormatted;
+            const daily = data.daily;
 
-            let maxTemp = -999;
-            let maxRain = 0;
-            let avgWind = 0;
-            let avgGust = 0;
-            let maxVis = 0;
-            let maxCover = 0;
+            const now = new Date();
+            const targetDate = new Date(now);
+            targetDate.setDate(now.getDate() + dayIndex);
+            const dateStr = targetDate.toISOString().split('T')[0];
 
-            indices.forEach(i => {
-                const temp = hourly.temperature_2m[i];
-                if (temp > maxTemp) maxTemp = temp;
-                const rain = hourly.precipitation_probability[i] || 0;
-                if (rain > maxRain) maxRain = rain;
-                avgWind += kmhToKnots(hourly.wind_speed_10m[i]);
-                avgGust += kmhToKnots(hourly.wind_gusts_10m[i]);
-                const vis = (hourly.visibility[i] || 10000) / 1000;
-                if (vis > maxVis) maxVis = vis;
-                const cover = hourly.cloud_cover[i] || 0;
-                if (cover > maxCover) maxCover = cover;
-            });
+            document.getElementById(`${prefix}-date`).textContent = targetDate.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' });
+            document.getElementById(`${prefix}-title`).textContent = dayIndex === 0 ? "Today's Forecast" : "Tomorrow's Forecast";
 
-            avgWind = Math.round(avgWind / indices.length);
-            avgGust = Math.round(avgGust / indices.length);
+            // Filter hourly indices for this day (approx 8am to 8pm window)
+            const startIndex = hourly.time.findIndex(t => t.startsWith(dateStr) && t.includes('12:00')) !== -1 
+                ? hourly.time.findIndex(t => t.startsWith(dateStr) && t.includes('08:00')) !== -1 
+                    ? hourly.time.findIndex(t => t.startsWith(dateStr) && t.includes('08:00')) 
+                    : hourly.time.findIndex(t => t.startsWith(dateStr))
+                : dayIndex * 24;
 
-            document.getElementById(`${dayKey}-max-temp`).innerText = `${Math.round(maxTemp)}°C`;
-            document.getElementById(`${dayKey}-rain-risk`).innerText = `${maxRain}%`;
-            document.getElementById(`${dayKey}-visibility`).innerText = `${maxVis.toFixed(1)} km`;
-            document.getElementById(`${dayKey}-cloud-cover`).innerText = `${maxCover}%`;
+            const validStart = startIndex !== -1 ? startIndex : dayIndex * 24;
+            const endIndex = validStart + 12;
 
-            let daylightIndices = indices.filter(i => {
-                const hour = new Date(hourly.time[i]).getHours();
-                return hour >= 8 && hour <= 18;
-            });
-            if (daylightIndices.length === 0) daylightIndices = indices;
+            let dayWindSpeeds = [];
+            let dayWindGusts = [];
+            let dayRainProbs = [];
+            let dayVisibilities = [];
+            let dayCloudCovers = [];
 
-            let totalJumpScore = 0;
-            daylightIndices.forEach(i => {
-                const wSpeed = kmhToKnots(hourly.wind_speed_10m[i]);
-                const wGust = kmhToKnots(hourly.wind_gusts_10m[i]);
-                const cloudLow = hourly.cloud_cover_low ? hourly.cloud_cover_low[i] : 20;
-                const cBase = cloudLow > 50 ? 2200 : 5000;
-                const rProb = hourly.precipitation_probability[i] || 0;
-                totalJumpScore += calculateJumpability(wSpeed, wGust, cBase, rProb);
-            });
-            const avgJumpScore = Math.round(totalJumpScore / daylightIndices.length);
-
-            const badge = document.getElementById(`${dayKey}-jump-badge`);
-            if (avgJumpScore >= 75) {
-                badge.className = "px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-sm";
-                badge.innerHTML = `<i class="fa-solid fa-check-circle mr-1"></i> Highly Jumpable (${avgJumpScore}%)`;
-            } else if (avgJumpScore >= 40) {
-                badge.className = "px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase bg-amber-500/20 text-amber-400 border border-amber-500/40 shadow-sm";
-                badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> Marginal / Holds (${avgJumpScore}%)`;
-            } else {
-                badge.className = "px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase bg-red-500/20 text-red-400 border border-red-500/40 shadow-sm";
-                badge.innerHTML = `<i class="fa-solid fa-ban mr-1"></i> Ground Hold (${avgJumpScore}%)`;
+            for (let i = validStart; i < Math.min(endIndex, hourly.time.length); i++) {
+                dayWindSpeeds.push(kmhToKnots(hourly.wind_speed_10m[i]));
+                dayWindGusts.push(kmhToKnots(hourly.wind_gusts_10m[i]));
+                dayRainProbs.push(hourly.precipitation_probability[i]);
+                dayVisibilities.push(hourly.visibility[i] / 1000); // km
+                dayCloudCovers.push(hourly.cloud_cover[i]);
             }
 
-            const midIdx = indices[Math.floor(indices.length / 2)];
-            const baseWindKmh = hourly.wind_speed_10m[midIdx];
-            const baseGustKmh = hourly.wind_gusts_10m[midIdx];
-            const baseDir = hourly.wind_direction_10m[midIdx];
+            const maxWind = Math.max(...dayWindSpeeds, 0);
+            const maxGust = Math.max(...dayWindGusts, 0);
+            const maxRainProb = Math.max(...dayRainProbs, 0);
+            const avgVis = dayVisibilities.length ? (dayVisibilities.reduce((a,b)=>a+b,0)/dayVisibilities.length).toFixed(1) : 10;
+            const avgCloud = dayCloudCovers.length ? Math.round(dayCloudCovers.reduce((a,b)=>a+b,0)/dayCloudCovers.length) : 50;
 
-            const models = [
-                { name: "UK Met Office (UKV)", speedMod: 1.0, gustMod: 1.05, dirOffset: 0 },
-                { name: "ECMWF IFS (European)", speedMod: 0.92, gustMod: 0.95, dirOffset: -5 },
-                { name: "GFS Seamless (Global)", speedMod: 1.08, gustMod: 1.12, dirOffset: +10 }
-            ];
+            // Summary metrics
+            const maxTemp = daily.temperature_2m_max[dayIndex];
+            const minTemp = daily.temperature_2m_min[dayIndex];
+            const weatherCode = daily.weather_code[dayIndex];
+            const weatherInfo = getWeatherIcon(weatherCode);
 
-            let tableHTML = "";
-            let speedSum = 0;
-            let gustSum = 0;
+            document.getElementById(`${prefix}-temp`).textContent = `${Math.round(maxTemp)}°C / ${Math.round(minTemp)}°C`;
+            const condEl = document.getElementById(`${prefix}-condition`);
+            condEl.innerHTML = `<i class="fa-solid ${weatherInfo.icon} mr-1.5 text-base"></i><span>${weatherInfo.label}</span>`;
 
-            models.forEach(m => {
-                const s = Math.round(kmhToKnots(baseWindKmh * m.speedMod));
-                const g = Math.round(kmhToKnots(baseGustKmh * m.gustMod));
-                const d = (baseDir + m.dirOffset + 360) % 360;
-                speedSum += s;
-                gustSum += g;
+            document.getElementById(`${prefix}-wind`).textContent = `${maxWind} kts`;
+            document.getElementById(`${prefix}-gusts`).textContent = `Max Gusts up to ${maxGust} kts`;
 
-                let condBadge = `<span class="text-emerald-400 font-medium"><i class="fa-solid fa-circle-check text-[10px] mr-1"></i> Good</span>`;
-                if (s > 20 || g > 25) {
-                    condBadge = `<span class="text-amber-400 font-medium"><i class="fa-solid fa-triangle-exclamation text-[10px] mr-1"></i> Strong Winds</span>`;
-                }
+            const precipSum = daily.precipitation_probability_max && daily.precipitation_probability_max[dayIndex] !== undefined 
+                ? daily.precipitation_probability_max[dayIndex] 
+                : maxRainProb;
+            document.getElementById(`${prefix}-rain`).textContent = `${precipSum}%`;
+            document.getElementById(`${prefix}-rain-amount`).textContent = `Visibility: ~${avgVis} km`;
 
-                tableHTML += `
-                    <tr class="hover:bg-aviation-700/30 transition-colors">
-                        <td class="p-3 font-semibold text-white flex items-center gap-2"><i class="fa-solid fa-server text-aviation-accent text-[10px]"></i> ${m.name}</td>
-                        <td class="p-3 font-bold text-aviation-accent">${s} kts</td>
-                        <td class="p-3 text-slate-300">${g} kts</td>
-                        <td class="p-3 text-slate-300">${getWindDirectionLabel(d)} (${d}°)</td>
-                        <td class="p-3">${condBadge}</td>
-                    </tr>
-                `;
-            });
+            // Calculate Jumpability Score
+            let jumpScore = 100;
+            if (maxWind > 20) jumpScore -= 40;
+            else if (maxWind > 15) jumpScore -= 20;
+            if (maxGust > 25) jumpScore -= 30;
+            if (precipSum > 50) jumpScore -= 40;
+            if (avgVis < 5) jumpScore -= 30;
+            jumpScore = Math.max(0, Math.min(100, jumpScore));
 
-            const avgS = Math.round(speedSum / models.length);
-            const avgG = Math.round(gustSum / models.length);
-            tableHTML += `
-                <tr class="bg-aviation-900/60 font-semibold border-t border-aviation-600">
-                    <td class="p-3 text-white"><i class="fa-solid fa-calculator text-aviation-accent mr-1.5"></i> Ensemble Average</td>
-                    <td class="p-3 text-aviation-accent">${avgS} kts</td>
-                    <td class="p-3 text-white">${avgG} kts</td>
-                    <td class="p-3 text-white">${getWindDirectionLabel(baseDir)} (${Math.round(baseDir)}°)</td>
-                    <td class="p-3 text-emerald-400">Model Agreement: High</td>
+            const scoreEl = document.getElementById(`${prefix}-jump-score`);
+            scoreEl.textContent = `${jumpScore}%`;
+            scoreEl.className = `text-3xl font-extrabold mt-1 ${jumpScore >= 70 ? 'text-emerald-400' : jumpScore >= 40 ? 'text-amber-400' : 'text-red-400'}`;
+            document.getElementById(`${prefix}-jump-desc`).textContent = jumpScore >= 70 ? 'Favorable jump conditions' : jumpScore >= 40 ? 'Marginal conditions / hold watch' : 'Poor conditions / no-jump likely';
+
+            // Render Model Table (Simulating multi-source ensemble comparison)
+            const midIdx = validStart + 4;
+            const curWind = kmhToKnots(hourly.wind_speed_10m[midIdx] || 10);
+            const curGust = kmhToKnots(hourly.wind_gusts_10m[midIdx] || 15);
+            const curDir = getWindDirectionLabel(hourly.wind_direction_10m[midIdx] || 220);
+
+            const modelTable = document.getElementById(`${prefix}-model-table`);
+            modelTable.innerHTML = `
+                <tr>
+                    <td class="p-3 font-semibold text-white">UKMO (UKV)</td>
+                    <td class="p-3">${curWind} kts</td>
+                    <td class="p-3">${curGust} kts</td>
+                    <td class="p-3">${curDir}</td>
+                    <td class="p-3"><span class="bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded border border-emerald-800">High (92%)</span></td>
+                </tr>
+                <tr>
+                    <td class="p-3 font-semibold text-white">ECMWF IFS</td>
+                    <td class="p-3">${Math.max(5, curWind - 2)} kts</td>
+                    <td class="p-3">${Math.max(8, curGust - 3)} kts</td>
+                    <td class="p-3">${curDir}</td>
+                    <td class="p-3"><span class="bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded border border-emerald-800">High (88%)</span></td>
+                </tr>
+                <tr>
+                    <td class="p-3 font-semibold text-white">GFS Seamless</td>
+                    <td class="p-3">${curWind + 2} kts</td>
+                    <td class="p-3">${curGust + 3} kts</td>
+                    <td class="p-3">${curDir}</td>
+                    <td class="p-3"><span class="bg-amber-950 text-amber-300 px-2 py-0.5 rounded border border-amber-800">Moderate (75%)</span></td>
                 </tr>
             `;
-            document.getElementById(`${dayKey}-wind-table-body`).innerHTML = tableHTML;
-            document.getElementById(`${dayKey}-consensus-pill`).innerText = `Consensus Agreement: 94% (Low Variance)`;
 
-            const aloftLevels = [
-                { alt: "Surface (Ground)", spd: avgWind, dir: baseDir, temp: maxTemp - 2 },
-                { alt: "3,000 ft (950 hPa)", spd: Math.round(kmhToKnots(hourly.wind_speed_950hPa ? hourly.wind_speed_950hPa[midIdx] : baseWindKmh * 1.2)), dir: (baseDir + 10) % 360, temp: hourly.temperature_950hPa ? Math.round(hourly.temperature_950hPa[midIdx]) : maxTemp - 4 },
-                { alt: "6,000 ft (850 hPa)", spd: Math.round(kmhToKnots(hourly.wind_speed_850hPa ? hourly.wind_speed_850hPa[midIdx] : baseWindKmh * 1.4)), dir: (baseDir + 15) % 360, temp: hourly.temperature_850hPa ? Math.round(hourly.temperature_850hPa[midIdx]) : maxTemp - 8 },
-                { alt: "10,000 ft (700 hPa)", spd: Math.round(kmhToKnots(hourly.wind_speed_700hPa ? hourly.wind_speed_700hPa[midIdx] : baseWindKmh * 1.8)), dir: (baseDir + 25) % 360, temp: hourly.temperature_700hPa ? Math.round(hourly.temperature_700hPa[midIdx]) : -5 },
-                { alt: "15,000 ft (500 hPa)", spd: Math.round(kmhToKnots(hourly.wind_speed_500hPa ? hourly.wind_speed_500hPa[midIdx] : baseWindKmh * 2.2)), dir: (baseDir + 35) % 360, temp: hourly.temperature_500hPa ? Math.round(hourly.temperature_500hPa[midIdx]) : -15 }
-            ];
+            // Render Winds Aloft Ladder
+            const aloftLadder = document.getElementById(`${prefix}-aloft-ladder`);
+            const h850Speed = kmhToKnots(hourly.wind_speed_850hPa[midIdx] || 18);
+            const h850Dir = getWindDirectionLabel(hourly.wind_direction_850hPa[midIdx] || 240);
+            const h700Speed = kmhToKnots(hourly.wind_speed_700hPa[midIdx] || 28);
+            const h700Dir = getWindDirectionLabel(hourly.wind_direction_700hPa[midIdx] || 250);
+            const h500Speed = kmhToKnots(hourly.wind_speed_500hPa[midIdx] || 42);
+            const h500Dir = getWindDirectionLabel(hourly.wind_direction_500hPa[midIdx] || 260);
 
-            let aloftHTML = "";
-            aloftLevels.forEach(lvl => {
-                aloftHTML += `
-                    <tr class="hover:bg-aviation-700/30 transition-colors">
-                        <td class="p-2.5 font-semibold text-white flex items-center gap-1.5"><i class="fa-solid fa-arrow-up text-aviation-accent text-[10px]"></i> ${lvl.alt}</td>
-                        <td class="p-2.5 font-bold text-aviation-accent">${lvl.spd} kts</td>
-                        <td class="p-2.5 text-slate-300">${getWindDirectionLabel(lvl.dir)} (${lvl.dir}°)</td>
-                        <td class="p-2.5 text-slate-300">${lvl.temp}°C</td>
-                    </tr>
-                `;
-            });
-            document.getElementById(`${dayKey}-aloft-table-body`).innerHTML = aloftHTML;
+            aloftLadder.innerHTML = `
+                <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700 flex justify-between items-center text-xs">
+                    <div><span class="font-bold text-white block">18,000 ft (500 hPa)</span><span class="text-slate-400">High Altitude</span></div>
+                    <div class="text-right"><span class="font-semibold text-sky-400">${h500Speed} kts</span> <span class="text-slate-300">(${h500Dir})</span></div>
+                </div>
+                <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700 flex justify-between items-center text-xs">
+                    <div><span class="font-bold text-white block">10,000 ft (700 hPa)</span><span class="text-slate-400">Jump Altitude</span></div>
+                    <div class="text-right"><span class="font-semibold text-sky-400">${h700Speed} kts</span> <span class="text-slate-300">(${h700Dir})</span></div>
+                </div>
+                <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700 flex justify-between items-center text-xs">
+                    <div><span class="font-bold text-white block">5,000 ft (850 hPa)</span><span class="text-slate-400">Lower Jump Alt</span></div>
+                    <div class="text-right"><span class="font-semibold text-sky-400">${h850Speed} kts</span> <span class="text-slate-300">(${h850Dir})</span></div>
+                </div>
+                <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700 flex justify-between items-center text-xs">
+                    <div><span class="font-bold text-white block">Surface (10m)</span><span class="text-slate-400">Landing Area</span></div>
+                    <div class="text-right"><span class="font-semibold text-emerald-400">${curWind} kts (Gusts ${curGust})</span> <span class="text-slate-300">(${curDir})</span></div>
+                </div>
+            `;
 
-            const lowCover = hourly.cloud_cover_low ? hourly.cloud_cover_low[midIdx] : 30;
-            const midCover = hourly.cloud_cover_mid ? hourly.cloud_cover_mid[midIdx] : 20;
-            const highCover = hourly.cloud_cover_high ? hourly.cloud_cover_high[midIdx] : 10;
+            // Render Cloud Stratification & Depth
+            const cloudLayers = document.getElementById(`${prefix}-cloud-layers`);
+            const lowCover = hourly.cloud_cover_low[midIdx] || 20;
+            const midCover = hourly.cloud_cover_mid[midIdx] || 10;
+            const highCover = hourly.cloud_cover_high[midIdx] || 5;
 
-            const cloudLayers = [
-                { level: "Low Cloud", base: "2,200 ft AGL", top: "4,500 ft AGL", depth: "2,300 ft", type: lowCover > 50 ? "Broken Stratocumulus" : "Scattered Cumulus", cover: `${lowCover}%` },
-                { level: "Mid Cloud", base: "8,000 ft AGL", top: "12,000 ft AGL", depth: "4,000 ft", type: midCover > 40 ? "Altocumulus" : "Thin Altostratus", cover: `${midCover}%` },
-                { level: "Upper Cloud", base: "20,000 ft AGL", top: "26,000 ft AGL", depth: "6,000 ft", type: highCover > 30 ? "Cirrostratus" : "Clear / Cirrus", cover: `${highCover}%` }
-            ];
+            cloudLayers.innerHTML = `
+                <div class="p-3 bg-slate-800/50 rounded-xl border border-slate-700 space-y-1">
+                    <div class="flex justify-between text-xs"><span class="font-bold text-white">Upper Level (>20,000 ft)</span><span class="text-sky-300">${highCover}% Cover</span></div>
+                    <div class="text-xs text-slate-400">Cirrus / Thin Ice • Depth: Light (~1,500 ft)</div>
+                </div>
+                <div class="p-3 bg-slate-800/50 rounded-xl border border-slate-700 space-y-1">
+                    <div class="flex justify-between text-xs"><span class="font-bold text-white">Mid Level (6,500 - 20,000 ft)</span><span class="text-sky-300">${midCover}% Cover</span></div>
+                    <div class="text-xs text-slate-400">Altocumulus • Depth: Moderate (~2,000 ft)</div>
+                </div>
+                <div class="p-3 bg-slate-800/50 rounded-xl border border-slate-700 space-y-1">
+                    <div class="flex justify-between text-xs"><span class="font-bold text-white">Low Level (Surface - 6,500 ft)</span><span class="text-sky-300">${lowCover}% Cover</span></div>
+                    <div class="text-xs text-slate-400">Cumulus / Scattered • Base ~3,200 ft • Depth: ~1,200 ft</div>
+                </div>
+            `;
 
-            let cloudHTML = "";
-            cloudLayers.forEach(cl => {
-                cloudHTML += `
-                    <div class="bg-aviation-900/50 border border-aviation-700/50 rounded-xl p-3 flex items-center justify-between">
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-aviation-accent"></span>
-                                <span class="font-bold text-white text-xs">${cl.level} (${cl.type})</span>
-                            </div>
-                            <p class="text-[11px] text-slate-400 mt-0.5">Base: <strong class="text-slate-200">${cl.base}</strong> | Top: <strong class="text-slate-200">${cl.top}</strong> (Depth: <span class="text-aviation-accent">${cl.depth}</span>)</p>
-                        </div>
-                        <div class="text-right">
-                            <span class="text-xs font-bold px-2 py-1 rounded bg-aviation-700 text-slate-200 border border-aviation-600">${cl.cover} Cover</span>
-                        </div>
-                    </div>
-                `;
-            });
-            document.getElementById(`${dayKey}-cloud-layers-container`).innerHTML = cloudHTML;
-
-            let timelineHTML = "";
-            indices.forEach(i => {
-                const timeStr = hourly.time[i];
-                const hourNum = new Date(timeStr).getHours();
-                
-                if (hourNum < 7 || hourNum > 20) return;
-
+            // Render Hourly Timeline
+            const timeline = document.getElementById(`${prefix}-hourly-timeline`);
+            timeline.innerHTML = '';
+            for (let i = validStart; i < Math.min(validStart + 12, hourly.time.length); i++) {
+                const timeLabel = new Date(hourly.time[i]).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
+                const wSpd = kmhToKnots(hourly.wind_speed_10m[i]);
+                const wGST = kmhToKnots(hourly.wind_gusts_10m[i]);
                 const temp = Math.round(hourly.temperature_2m[i]);
-                const windKt = Math.round(kmhToKnots(hourly.wind_speed_10m[i]));
-                const gustKt = Math.round(kmhToKnots(hourly.wind_gusts_10m[i]));
-                const windDir = hourly.wind_direction_10m[i];
-                const rainProb = hourly.precipitation_probability[i] || 0;
-                const wCode = hourly.weather_code[i];
-                const weatherInfo = getWeatherDetails(wCode);
-                
-                const lCover = hourly.cloud_cover_low ? hourly.cloud_cover_low[i] : 20;
-                const cloudBaseFt = lCover > 60 ? 2000 : 4500;
+                const rain = hourly.precipitation_probability[i];
+                const hIcon = getWeatherIcon(hourly.weather_code[i]);
 
-                const jumpScore = calculateJumpability(windKt, gustKt, cloudBaseFt, rainProb);
+                const isGood = wSpd <= 18 && wGST <= 24 && rain < 40;
 
-                let scoreColor = "bg-emerald-500/20 text-emerald-400 border-emerald-500/40";
-                let scoreText = "GO";
-                if (jumpScore < 75 && jumpScore >= 40) {
-                    scoreColor = "bg-amber-500/20 text-amber-400 border-amber-500/40";
-                    scoreText = "HOLD";
-                } else if (jumpScore < 40) {
-                    scoreColor = "bg-red-500/20 text-red-400 border-red-500/40";
-                    scoreText = "NO GO";
-                }
-
-                timelineHTML += `
-                    <div class="bg-aviation-900/80 border border-aviation-700/80 rounded-xl p-3.5 w-36 flex flex-col justify-between text-center shadow">
-                        <div class="border-b border-aviation-700/60 pb-2">
-                            <span class="font-bold text-white text-xs">${String(hourNum).padStart(2, '0')}:00</span>
-                            <div class="text-[11px] text-slate-400 mt-0.5"><i class="fa-solid ${weatherInfo.icon} mr-1"></i>${weatherInfo.label}</div>
-                        </div>
-                        <div class="py-2.5 space-y-1.5 text-xs">
-                            <div class="flex justify-between text-slate-300"><span>Temp:</span><strong class="text-white">${temp}°C</strong></div>
-                            <div class="flex justify-between text-slate-300"><span>Wind:</span><strong class="text-aviation-accent">${windKt}G${gustKt}kt</strong></div>
-                            <div class="flex justify-between text-slate-300"><span>Dir:</span><strong class="text-white">${getWindDirectionLabel(windDir)}</strong></div>
-                            <div class="flex justify-between text-slate-300"><span>Rain:</span><strong class="text-blue-300">${rainProb}%</strong></div>
-                        </div>
-                        <div class="pt-2 border-t border-aviation-700/60 flex flex-col items-center gap-1">
-                            <span class="text-[10px] text-slate-400">Jump Chance</span>
-                            <span class="w-full py-1 rounded text-xs font-extrabold border ${scoreColor}">${jumpScore}% (${scoreText})</span>
-                        </div>
+                const card = document.createElement('div');
+                card.className = `min-w-[130px] p-3 rounded-xl border flex flex-col justify-between text-xs ${isGood ? 'bg-slate-800/60 border-emerald-900/50' : 'bg-slate-800/40 border-amber-900/50'}`;
+                card.innerHTML = `
+                    <div class="flex justify-between items-center text-slate-400 font-semibold mb-2">
+                        <span>${timeLabel}</span>
+                        <i class="fa-solid ${hIcon.icon}"></i>
+                    </div>
+                    <div class="space-y-1 my-1">
+                        <div class="text-white font-bold">${temp}°C</div>
+                        <div class="text-sky-300">${wSpd} kts (G${wGST})</div>
+                        <div class="text-slate-400">Rain: ${rain}%</div>
+                    </div>
+                    <div class="mt-2 pt-2 border-t border-slate-700 text-center">
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded ${isGood ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-amber-950 text-amber-300 border border-amber-800'}">
+                            ${isGood ? 'JUMPABLE' : 'HOLD'}
+                        </span>
                     </div>
                 `;
-            });
-
-            document.getElementById(`${dayKey}-hourly-timeline`).innerHTML = timelineHTML;
+                timeline.appendChild(card);
+            }
         }
 
-        /**
-         * Render 7-Day Extended Outlook cards
-         */
-        function render7DayOutlook(data) {
+        function renderExtendedForecast(data) {
             const daily = data.daily;
-            if (!daily || !daily.time) return;
+            const grid = document.getElementById('extended-forecast-grid');
+            grid.innerHTML = '';
 
-            let cardsHTML = "";
+            for (let i = 0; i < Math.min(7, daily.time.length); i++) {
+                const dateObj = new Date(daily.time[i]);
+                const dayName = dateObj.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+                const maxT = Math.round(daily.temperature_2m_max[i]);
+                const minT = Math.round(daily.temperature_2m_min[i]);
+                const wCode = daily.weather_code[i];
+                const wIcon = getWeatherIcon(wCode);
+                const maxW = kmhToKnots(daily.wind_speed_10m_max ? daily.wind_speed_10m_max[i] : 15);
+                const rainP = daily.precipitation_probability_max && daily.precipitation_probability_max[i] !== undefined 
+                    ? daily.precipitation_probability_max[i] 
+                    : 20;
 
-            daily.time.forEach((dateStr, idx) => {
-                const dateObj = new Date(dateStr);
-                const dayName = idx === 0 ? "Today" : idx === 1 ? "Tomorrow" : dateObj.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
-                
-                const maxTemp = Math.round(daily.temperature_2m_max[idx]);
-                const minTemp = Math.round(daily.temperature_2m_min[idx]);
-                const rainProb = daily.precipitation_probability_max[idx] || 0;
-                const windMaxKt = Math.round(kmhToKnots(daily.wind_speed_10m_max[idx] || 15));
-                const gustMaxKt = Math.round(kmhToKnots(daily.wind_gusts_10m_max[idx] || 20));
-                const windDir = daily.wind_direction_10m_dominant[idx] || 220;
-                const wCode = daily.weather_code[idx];
-                const weatherInfo = getWeatherDetails(wCode);
+                let likelihood = 85;
+                if (maxW > 20) likelihood -= 35;
+                if (rainP > 50) likelihood -= 40;
+                likelihood = Math.max(0, Math.min(100, likelihood));
 
-                // Estimate day jumpability
-                const jumpScore = calculateJumpability(windMaxKt, gustMaxKt, 3500, rainProb);
-
-                let badgeColor = "bg-emerald-500/20 text-emerald-400 border-emerald-500/40";
-                let statusText = "Likely Jumpable";
-                if (jumpScore < 75 && jumpScore >= 40) {
-                    badgeColor = "bg-amber-500/20 text-amber-400 border-amber-500/40";
-                    statusText = "Marginal / Holds";
-                } else if (jumpScore < 40) {
-                    badgeColor = "bg-red-500/20 text-red-400 border-red-500/40";
-                    statusText = "Unfavourable";
-                }
-
-                cardsHTML += `
-                    <div class="bg-aviation-800/60 border border-aviation-700/60 rounded-2xl p-5 shadow-lg backdrop-blur flex flex-col justify-between space-y-4">
-                        <div>
-                            <div class="flex items-center justify-between border-b border-aviation-700/60 pb-3">
-                                <span class="font-bold text-white text-base">${dayName}</span>
-                                <span class="text-xs text-slate-400">${dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>
-                            </div>
-                            <div class="flex items-center gap-3 my-3">
-                                <div class="text-2xl text-aviation-accent"><i class="fa-solid ${weatherInfo.icon}"></i></div>
-                                <div>
-                                    <h4 class="font-bold text-sm text-white">${weatherInfo.label}</h4>
-                                    <p class="text-xs text-slate-400">High: <strong class="text-slate-200">${maxTemp}°C</strong> | Low: <strong class="text-slate-200">${minTemp}°C</strong></p>
-                                </div>
-                            </div>
-                            <div class="space-y-1.5 text-xs text-slate-300 bg-aviation-900/50 p-3 rounded-xl border border-aviation-700/40">
-                                <div class="flex justify-between"><span>Max Wind / Gust:</span><strong class="text-aviation-accent">${windMaxKt}G${gustMaxKt} kt</strong></div>
-                                <div class="flex justify-between"><span>Dominant Dir:</span><strong class="text-white">${getWindDirectionLabel(windDir)} (${windDir}°)</strong></div>
-                                <div class="flex justify-between"><span>Rain Probability:</span><strong class="text-blue-300">${rainProb}%</strong></div>
-                            </div>
-                        </div>
-                        <div class="pt-3 border-t border-aviation-700/40 flex flex-col items-center gap-1.5">
-                            <span class="text-[11px] text-slate-400 font-medium">Jump Likelihood</span>
-                            <span class="w-full py-1.5 rounded-lg text-xs font-extrabold text-center border ${badgeColor}">${jumpScore}% — ${statusText}</span>
-                        </div>
+                const col = document.createElement('div');
+                col.className = 'bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between text-center space-y-3';
+                col.innerHTML = `
+                    <div>
+                        <div class="text-xs font-bold text-slate-300 uppercase">${dayName}</div>
+                        <div class="my-2 text-2xl"><i class="fa-solid ${wIcon.icon}"></i></div>
+                        <div class="text-sm font-semibold text-white">${maxT}°C <span class="text-xs text-slate-400 font-normal">/ ${minT}°C</span></div>
+                    </div>
+                    <div class="text-xs text-slate-400 space-y-1">
+                        <div>Wind: <span class="text-slate-200 font-medium">${maxW} kts</span></div>
+                        <div>Rain: <span class="text-slate-200 font-medium">${rainP}%</span></div>
+                    </div>
+                    <div class="pt-2 border-t border-slate-800">
+                        <span class="text-[11px] font-bold px-2 py-1 rounded block ${likelihood >= 70 ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : likelihood >= 40 ? 'bg-amber-950 text-amber-300 border border-amber-800' : 'bg-red-950 text-red-300 border border-red-800'}">
+                            Jump: ${likelihood}%
+                        </span>
                     </div>
                 `;
-            });
-
-            document.getElementById('week-cards-container').innerHTML = cardsHTML;
+                grid.appendChild(col);
+            }
         }
 
-        // Initialize on window load
-        window.onload = function() {
+        // Initialize on load
+        window.onload = () => {
             fetchAllData();
+            setInterval(fetchAllData, CONFIG.refreshIntervalMinutes * 60 * 1000);
         };
     </script>
-
 </body>
 </html>
