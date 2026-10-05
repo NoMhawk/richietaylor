@@ -1,10 +1,10 @@
-<!-- REVISION: v1.0.11 -->
+<!-- REVISION: v1.0.14 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skydive Southwest - Onsite Flight Line Forecast (Rev 1.0.11)</title>
+    <title>Skydive Southwest - Onsite Flight Line Forecast (Rev 1.0.14)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -80,10 +80,10 @@
         td { padding: 0.85rem; border-top: 1px solid var(--border-color); color: #e2e8f0; }
 
         /* 4-Tier Condition Status Classes */
-        .status-green { background-color: rgba(6, 78, 59, 0.7); color: #6ee7b7; border: 1px solid rgba(5, 150, 105, 0.5); padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.7rem; display: block; }
-        .status-yellow { background-color: rgba(113, 63, 18, 0.7); color: #fde047; border: 1px solid rgba(202, 138, 4, 0.5); padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.7rem; display: block; }
-        .status-orange { background-color: rgba(124, 45, 18, 0.7); color: #fdba74; border: 1px solid rgba(234, 88, 12, 0.5); padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.7rem; display: block; }
-        .status-red { background-color: rgba(127, 29, 29, 0.7); color: #fca5a5; border: 1px solid rgba(220, 38, 38, 0.5); padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.7rem; display: block; }
+        .status-green { background-color: rgba(6, 78, 59, 0.7); color: #6ee7b7; border: 1px solid rgba(5, 150, 105, 0.5); padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.65rem; display: block; text-transform: uppercase; }
+        .status-yellow { background-color: rgba(113, 63, 18, 0.7); color: #fde047; border: 1px solid rgba(202, 138, 4, 0.5); padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.65rem; display: block; text-transform: uppercase; }
+        .status-orange { background-color: rgba(124, 45, 18, 0.7); color: #fdba74; border: 1px solid rgba(234, 88, 12, 0.5); padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.65rem; display: block; text-transform: uppercase; }
+        .status-red { background-color: rgba(127, 29, 29, 0.7); color: #fca5a5; border: 1px solid rgba(220, 38, 38, 0.5); padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.65rem; display: block; text-transform: uppercase; }
 
         .grid-2 { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
         @media(min-width: 1024px) { .grid-2 { grid-template-columns: repeat(2, 1fr); } }
@@ -116,7 +116,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v1.0.11",
+            revision: "v1.0.14",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
             longitude: -3.230,
@@ -135,7 +135,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">Skydive Southwest <span class="rev-badge">Rev 1.0.11</span></h1>
+                    <h1 class="logo-title">Skydive Southwest <span class="rev-badge">Rev 1.0.14</span></h1>
                     <p class="logo-sub">Dunkeswell Airfield • Onsite Flight Line Forecast</p>
                 </div>
             </div>
@@ -262,9 +262,9 @@
                     </div>
                 </div>
 
-                <!-- Stratified Cloud Layers & Depth -->
+                <!-- Stratified Cloud Layers & Depth (0-15k+ AGL) -->
                 <div class="panel">
-                    <h3 class="panel-title"><i class="fa-solid fa-cloud-sun" style="color: var(--accent-sky);"></i>Cloud Stratification, Type & Depth</h3>
+                    <h3 class="panel-title"><i class="fa-solid fa-cloud-sun" style="color: var(--accent-sky);"></i>Cloud Stratification (0 - 15k+ ft AGL)</h3>
                     <div style="display: flex; flex-direction: column; gap: 0.85rem;" id="active-cloud-layers">
                         <!-- Populated via JS -->
                     </div>
@@ -276,7 +276,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>Skydive Southwest Forecast Dashboard • Dunkeswell Airfield • Rev 1.0.11 • Powered by Open-Meteo API</p>
+        <p>Skydive Southwest Forecast Dashboard • Dunkeswell Airfield • Rev 1.0.14 • Powered by Open-Meteo API</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -309,7 +309,7 @@
             const errMessage = document.getElementById('error-message');
             errBanner.classList.add('hidden');
 
-            const url = `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&elevation=${CONFIG.elevation}&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,wind_speed_10m,wind_direction_10m,wind_gusts_10m,visibility,wind_speed_850hPa,wind_direction_850hPa,temperature_850hPa,wind_speed_700hPa,wind_direction_700hPa,temperature_700hPa,wind_speed_500hPa,wind_direction_500hPa,temperature_500hPa&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant&timezone=${CONFIG.timezone}`;
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&elevation=${CONFIG.elevation}&hourly=temperature_2m,dew_point_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,wind_speed_10m,wind_direction_10m,wind_gusts_10m,visibility,wind_speed_850hPa,wind_direction_850hPa,temperature_850hPa,wind_speed_700hPa,wind_direction_700hPa,temperature_700hPa,wind_speed_500hPa,wind_direction_500hPa,temperature_500hPa&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant&timezone=${CONFIG.timezone}`;
 
             try {
                 const response = await fetch(url);
@@ -329,33 +329,51 @@
             }
         }
 
-        function getStudentTier(wSpd, wGST, rain, vis, cLow, hFog) {
-            if (hFog || vis < 7) return { tier: 'red', reason: 'Low visibility / Fog' };
-            if (rain >= 30) return { tier: 'red', reason: 'Rain risk' };
-            if (cLow >= 85) return { tier: 'red', reason: 'Heavy low cloud ceiling' };
-            if (wSpd > 17 || wGST > 23) return { tier: 'red', reason: 'Wind exceeds student limit (15kt)' };
-            if (wSpd >= 14 || wGST >= 19) return { tier: 'orange', reason: 'Near student wind limit' };
-            if (cLow >= 50) return { tier: 'yellow', reason: 'Scattered low cloud' };
-            return { tier: 'green', reason: 'Nominal' };
+        function calculateCloudbaseAGL(temp, dewPoint, lowCover) {
+            if (lowCover < 15) return 12000;
+            const spread = Math.max(0.1, temp - dewPoint);
+            let baseFt = Math.round((spread / 2.5) * 1000);
+            if (baseFt < 200) baseFt = 200;
+            if (baseFt > 12000) baseFt = 12000;
+            return baseFt;
         }
 
-        function getClubTier(wSpd, wGST, rain, vis, cLow, hFog) {
-            if (hFog || vis < 4) return { tier: 'red', reason: 'Low visibility / Fog' };
-            if (rain >= 50) return { tier: 'red', reason: 'Rain risk' };
-            if (wSpd > 23 || wGST > 29) return { tier: 'red', reason: 'Wind exceeds club limit (20kt)' };
-            if (wSpd >= 19 || wGST >= 24) return { tier: 'orange', reason: 'Brisk winds for club jumpers' };
-            if (wSpd >= 16) return { tier: 'yellow', reason: 'Moderate breeze' };
-            return { tier: 'green', reason: 'Nominal' };
+        function getCustomCloudBands(low, mid, high) {
+            const c0_5k = Math.min(100, Math.round(low * 0.9));
+            const c5_10k = Math.min(100, Math.round((low * 0.2) + (mid * 0.5)));
+            const c10_15k = Math.min(100, Math.round(mid * 0.7));
+            const c15k_plus = Math.min(100, Math.round(high));
+            return { c0_5k, c5_10k, c10_15k, c15k_plus };
         }
 
-        function getTandemTier(wSpd, wGST, rain, vis, cLow, hFog) {
-            if (hFog || vis < 5) return { tier: 'red', reason: 'Low visibility / Fog' };
-            if (rain >= 40) return { tier: 'red', reason: 'Rain risk' };
-            if (cLow >= 90) return { tier: 'red', reason: 'Low cloud ceiling blocks tandem descent' };
-            if (wSpd > 23 || wGST > 29) return { tier: 'red', reason: 'Wind exceeds tandem limit (20kt)' };
-            if (wSpd >= 19 || wGST >= 24) return { tier: 'orange', reason: 'Brisk winds for tandems' };
-            if (cLow >= 60) return { tier: 'yellow', reason: 'Scattered low cloud' };
-            return { tier: 'green', reason: 'Nominal' };
+        function getStudentTier(wSpd, wGST, rain, vis, c0_5k, baseFt, hFog) {
+            if (hFog || vis < 7) return { tier: 'red', label: 'Fog / Vis', reason: 'Low visibility / Fog' };
+            if (rain >= 30) return { tier: 'red', label: 'Rain', reason: 'Rain risk' };
+            if (baseFt < 3000 && c0_5k >= 60) return { tier: 'red', label: 'Cloud', reason: `Low cloudbase (${baseFt} ft AGL)` };
+            if (wSpd > 17 || wGST > 23) return { tier: 'red', label: 'Wind', reason: 'Wind exceeds student limit (15kt)' };
+            if (wSpd >= 14 || wGST >= 19) return { tier: 'orange', label: 'Wind', reason: 'Near student wind limit' };
+            if (baseFt < 4500 && c0_5k >= 40) return { tier: 'yellow', label: 'Cloud', reason: `Low ceiling (${baseFt} ft)` };
+            return { tier: 'green', label: 'Nominal', reason: 'Nominal' };
+        }
+
+        function getClubTier(wSpd, wGST, rain, vis, c0_5k, baseFt, hFog) {
+            if (hFog || vis < 4) return { tier: 'red', label: 'Fog / Vis', reason: 'Low visibility / Fog' };
+            if (rain >= 50) return { tier: 'red', label: 'Rain', reason: 'Rain risk' };
+            if (baseFt < 2000 && c0_5k >= 80) return { tier: 'red', label: 'Cloud', reason: `Cloudbase too low (${baseFt} ft)` };
+            if (wSpd > 23 || wGST > 29) return { tier: 'red', label: 'Wind', reason: 'Wind exceeds club limit (20kt)' };
+            if (wSpd >= 19 || wGST >= 24) return { tier: 'orange', label: 'Wind', reason: 'Brisk winds for club jumpers' };
+            if (wSpd >= 16) return { tier: 'yellow', label: 'Wind', reason: 'Moderate breeze' };
+            return { tier: 'green', label: 'Nominal', reason: 'Nominal' };
+        }
+
+        function getTandemTier(wSpd, wGST, rain, vis, c0_5k, baseFt, hFog) {
+            if (hFog || vis < 5) return { tier: 'red', label: 'Fog / Vis', reason: 'Low visibility / Fog' };
+            if (rain >= 40) return { tier: 'red', label: 'Rain', reason: 'Rain risk' };
+            if (baseFt < 3500 && c0_5k >= 70) return { tier: 'red', label: 'Cloud', reason: `Low ceiling blocks tandems (${baseFt} ft)` };
+            if (wSpd > 23 || wGST > 29) return { tier: 'red', label: 'Wind', reason: 'Wind exceeds tandem limit (20kt)' };
+            if (wSpd >= 19 || wGST >= 24) return { tier: 'orange', label: 'Wind', reason: 'Brisk winds for tandems' };
+            if (baseFt < 5000 && c0_5k >= 50) return { tier: 'yellow', label: 'Cloud', reason: `Scattered low cloud (${baseFt} ft)` };
+            return { tier: 'green', label: 'Nominal', reason: 'Nominal' };
         }
 
         function renderDaySelector() {
@@ -372,7 +390,6 @@
                 const wCode = daily.weather_code[i];
                 const wIcon = getWeatherIcon(wCode);
 
-                // Calculate day score based on hourly evaluations between 07:00 and 19:00
                 const targetDateStr = dateObj.toISOString().split('T')[0];
                 let dayStart = hourly.time.findIndex(t => t.startsWith(targetDateStr) && t.includes('07:00'));
                 if (dayStart === -1) dayStart = i * 24;
@@ -385,12 +402,18 @@
                     const wg = kmhToMph(hourly.wind_gusts_10m[h]);
                     const rn = hourly.precipitation_probability[h];
                     const vs = hourly.visibility[h] / 1000;
-                    const cl = hourly.cloud_cover_low[h] || 0;
+                    const lw = hourly.cloud_cover_low[h] || 0;
+                    const md = hourly.cloud_cover_mid[h] || 0;
+                    const hgh = hourly.cloud_cover_high[h] || 0;
+                    const cb = getCustomCloudBands(lw, md, hgh);
+                    const tp = hourly.temperature_2m[h];
+                    const dp = hourly.dew_point_2m[h];
+                    const base = calculateCloudbaseAGL(tp, dp, lw);
                     const hm = hourly.relative_humidity_2m[h];
                     const cd = hourly.weather_code[h];
                     const fg = cd >= 45 && cd <= 48 || vs < 5 || hm >= 95;
 
-                    const tStat = getTandemTier(ws, wg, rn, vs, cl, fg);
+                    const tStat = getTandemTier(ws, wg, rn, vs, cb.c0_5k, base, fg);
                     if (tStat.tier === 'green') greenHoursCount++;
                     evaluatedHours++;
                 }
@@ -456,12 +479,17 @@
                 const wGST = kmhToMph(hourly.wind_gusts_10m[i]);
                 const wDir = getWindDirectionLabel(hourly.wind_direction_10m[i]);
                 const temp = Math.round(hourly.temperature_2m[i]);
+                const dew = hourly.dew_point_2m[i];
                 const rain = hourly.precipitation_probability[i];
                 const vis = (hourly.visibility[i] / 1000).toFixed(1);
                 const cloud = hourly.cloud_cover[i];
-                const cLow = hourly.cloud_cover_low[i] || 0;
-                const cMid = hourly.cloud_cover_mid[i] || 0;
-                const cHigh = hourly.cloud_cover_high[i] || 0;
+                
+                const low = hourly.cloud_cover_low[i] || 0;
+                const mid = hourly.cloud_cover_mid[i] || 0;
+                const high = hourly.cloud_cover_high[i] || 0;
+                const cb = getCustomCloudBands(low, mid, high);
+                const cloudbaseAGL = calculateCloudbaseAGL(hourly.temperature_2m[i], dew, low);
+
                 const hum = hourly.relative_humidity_2m[i];
                 const code = hourly.weather_code[i];
 
@@ -480,9 +508,9 @@
                 const hFog = code >= 45 && code <= 48 || vis < 5 || hum >= 95;
                 const hIcon = getWeatherIcon(hFog ? 45 : code);
 
-                const studentStat = getStudentTier(wSpd, wGST, rain, parseFloat(vis), cLow, hFog);
-                const clubStat = getClubTier(wSpd, wGST, rain, parseFloat(vis), cLow, hFog);
-                const tandemStat = getTandemTier(wSpd, wGST, rain, parseFloat(vis), cLow, hFog);
+                const studentStat = getStudentTier(wSpd, wGST, rain, parseFloat(vis), cb.c0_5k, cloudbaseAGL, hFog);
+                const clubStat = getClubTier(wSpd, wGST, rain, parseFloat(vis), cb.c0_5k, cloudbaseAGL, hFog);
+                const tandemStat = getTandemTier(wSpd, wGST, rain, parseFloat(vis), cb.c0_5k, cloudbaseAGL, hFog);
 
                 if (tandemStat.tier === 'green' && studentStat.tier === 'green') {
                     greenHours++;
@@ -519,21 +547,27 @@
                         </div>
                     </div>
 
-                    <!-- 2. Vertical Cloud Cover & Layers -->
+                    <!-- 2. Vertical Cloud Cover & Lowest Cloudbase AGL -->
                     <div class="hour-section" style="border-color: rgba(56, 189, 248, 0.3);">
-                        <div class="hour-section-title"><span style="color: #7dd3fc;"><i class="fa-solid fa-cloud-sun mr-1"></i> Cloud Layers (Vertical)</span></div>
+                        <div class="hour-section-title">
+                            <span style="color: #7dd3fc;"><i class="fa-solid fa-cloud-sun mr-1"></i> Cloud Layers (AGL)</span>
+                            <span style="color: ${cloudbaseAGL < 3500 ? '#f87171' : '#38bdf8'}; font-weight: 700;">Base: ~${cloudbaseAGL.toLocaleString()} ft</span>
+                        </div>
                         <div style="display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.75rem; color: #e2e8f0;">
                             <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 0.1rem;">
                                 <span style="color: var(--text-muted);">Total Cover:</span> <b>${cloud}%</b>
                             </div>
                             <div style="display: flex; justify-content: space-between;">
-                                <span style="color: var(--text-muted);">☁ Upper (>20k ft):</span> <b>${cHigh}%</b>
+                                <span style="color: var(--text-muted);">☁ Low (0-5k ft):</span> <b style="color: #38bdf8;">${cb.c0_5k}%</b>
                             </div>
                             <div style="display: flex; justify-content: space-between;">
-                                <span style="color: var(--text-muted);">☁ Mid (6.5k-20k ft):</span> <b>${cMid}%</b>
+                                <span style="color: var(--text-muted);">☁ Mid (5-10k ft):</span> <b>${cb.c5_10k}%</b>
                             </div>
                             <div style="display: flex; justify-content: space-between;">
-                                <span style="color: var(--text-muted);">☁ Low (Surface-6.5k ft):</span> <b style="color: #38bdf8;">${cLow}%</b>
+                                <span style="color: var(--text-muted);">☁ Upper (10-15k ft):</span> <b>${cb.c10_15k}%</b>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-muted);">☁ Top (15k+ ft):</span> <b>${cb.c15k_plus}%</b>
                             </div>
                         </div>
                     </div>
@@ -547,20 +581,20 @@
                         </div>
                     </div>
 
-                    <!-- AUDIENCE STATUS BREAKDOWN (Students -> Club -> Tandems) -->
+                    <!-- AUDIENCE STATUS BREAKDOWN (Students -> Club -> Tandems with reason labels) -->
                     <div class="hour-section" style="background: rgba(15, 23, 42, 0.9);">
                         <div class="status-grid">
                             <div class="status-box">
                                 <span class="status-title">Students</span>
-                                <span class="${getTierClass(studentStat.tier)}">${studentStat.tier.toUpperCase()}</span>
+                                <span class="${getTierClass(studentStat.tier)}">${studentStat.label}</span>
                             </div>
                             <div class="status-box">
                                 <span class="status-title">Club</span>
-                                <span class="${getTierClass(clubStat.tier)}">${clubStat.tier.toUpperCase()}</span>
+                                <span class="${getTierClass(clubStat.tier)}">${clubStat.label}</span>
                             </div>
                             <div class="status-box">
                                 <span class="status-title">Tandems</span>
-                                <span class="${getTierClass(tandemStat.tier)}">${tandemStat.tier.toUpperCase()}</span>
+                                <span class="${getTierClass(tandemStat.tier)}">${tandemStat.label}</span>
                             </div>
                         </div>
                         <div style="margin-top: 0.35rem; font-size: 0.65rem; color: var(--text-muted); text-align: center; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 0.2rem;">
@@ -581,7 +615,6 @@
                 hourlyGrid.appendChild(card);
             }
 
-            // Sync top summary score with actual hourly green ratio
             const jumpScore = totalEvaluated > 0 ? Math.round((greenHours / totalEvaluated) * 100) : 85;
             const scoreEl = document.getElementById('active-jump-score');
             scoreEl.textContent = `${jumpScore}%`;
@@ -666,24 +699,30 @@
                 </div>
             `;
 
-            // Render Cloud Stratification & Depth
+            // Render Stratified Cloud Layers Panel (0-15k+ AGL)
             const cloudLayers = document.getElementById('active-cloud-layers');
-            const lowCover = hourly.cloud_cover_low[midIdx] || 20;
-            const midCover = hourly.cloud_cover_mid[midIdx] || 10;
-            const highCover = hourly.cloud_cover_high[midIdx] || 5;
+            const lw = hourly.cloud_cover_low[midIdx] || 20;
+            const md = hourly.cloud_cover_mid[midIdx] || 10;
+            const hgh = hourly.cloud_cover_high[midIdx] || 5;
+            const cbPanel = getCustomCloudBands(lw, md, hgh);
+            const panelBase = calculateCloudbaseAGL(hourly.temperature_2m[midIdx], hourly.dew_point_2m[midIdx], lw);
 
             cloudLayers.innerHTML = `
                 <div style="background-color: rgba(30, 41, 59, 0.5); padding: 0.85rem; border-radius: 0.75rem; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;"><span style="font-weight: 700; color: white;"><i class="fa-solid fa-cloud text-sky-300 mr-1"></i> Upper Level (>20,000 ft)</span><span style="color: #38bdf8;">${highCover}% Cover</span></div>
-                    <div style="font-size: 0.75rem; color: var(--text-muted);">Cirrus / Thin Ice • Depth: Light (~1,500 ft)</div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;"><span style="font-weight: 700; color: white;"><i class="fa-solid fa-cloud text-sky-300 mr-1"></i> Low Level (0 - 5,000 ft AGL)</span><span style="color: #38bdf8;">${cbPanel.c0_5k}% Cover (Base ~${panelBase.toLocaleString()}ft)</span></div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Cumulus / Surface Base • Critical for Student & Tandem Holds</div>
                 </div>
                 <div style="background-color: rgba(30, 41, 59, 0.5); padding: 0.85rem; border-radius: 0.75rem; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;"><span style="font-weight: 700; color: white;"><i class="fa-solid fa-cloud text-sky-400 mr-1"></i> Mid Level (6,500 - 20,000 ft)</span><span style="color: #38bdf8;">${midCover}% Cover</span></div>
-                    <div style="font-size: 0.75rem; color: var(--text-muted);">Altocumulus • Depth: Moderate (~2,000 ft)</div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;"><span style="font-weight: 700; color: white;"><i class="fa-solid fa-cloud text-sky-400 mr-1"></i> Mid Level (5,000 - 10,000 ft AGL)</span><span style="color: #38bdf8;">${cbPanel.c5_10k}% Cover</span></div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Mid-Air Deployment Zone • Cloud Separation Check</div>
                 </div>
                 <div style="background-color: rgba(30, 41, 59, 0.5); padding: 0.85rem; border-radius: 0.75rem; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;"><span style="font-weight: 700; color: white;"><i class="fa-solid fa-cloud-showers-heavy text-blue-400 mr-1"></i> Low Level / Plateau Fog</span><span style="color: #38bdf8;">${lowCover}% Cover</span></div>
-                    <div style="font-size: 0.75rem; color: var(--text-muted);">Cumulus / Scattered • Base ~3,200 ft</div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;"><span style="font-weight: 700; color: white;"><i class="fa-solid fa-cloud text-indigo-400 mr-1"></i> Upper Level (10,000 - 15,000 ft AGL)</span><span style="color: #38bdf8;">${cbPanel.c10_15k}% Cover</span></div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Exit Altitude Zone • Jump Run Visibility Check</div>
+                </div>
+                <div style="background-color: rgba(30, 41, 59, 0.5); padding: 0.85rem; border-radius: 0.75rem; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.25rem;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;"><span style="font-weight: 700; color: white;"><i class="fa-solid fa-cloud text-blue-300 mr-1"></i> Top Level (15,000 ft+ AGL)</span><span style="color: #38bdf8;">${cbPanel.c15k_plus}% Cover</span></div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Above Dropzone Ceiling • Cirrus / High Altitude Cover</div>
                 </div>
             `;
         }
