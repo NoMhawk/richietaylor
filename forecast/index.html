@@ -1,10 +1,10 @@
-<!-- REVISION: v1.0.21 -->
+<!-- REVISION: v1.0.22 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skydive Southwest - Onsite Flight Line Forecast (Rev 1.0.21)</title>
+    <title>Skydive Southwest - Onsite Flight Line Forecast (Rev 1.0.22)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -123,13 +123,13 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v1.0.21",
+            revision: "v1.0.22",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
             longitude: -3.230,
             elevation: 254,
             timezone: "Europe/London",
-            refreshIntervalMinutes: 5, // Set to auto-refresh every 5 minutes
+            refreshIntervalMinutes: 5,
             models: ['best_match', 'ecmwf_ifs', 'gfs_seamless', 'ukmo_ukv']
         };
     </script>
@@ -142,7 +142,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">Skydive Southwest <span class="rev-badge">Rev 1.0.21</span></h1>
+                    <h1 class="logo-title">Skydive Southwest <span class="rev-badge">Rev 1.0.22</span></h1>
                     <p class="logo-sub">Dunkeswell Airfield • Onsite Flight Line Forecast</p>
                 </div>
             </div>
@@ -286,7 +286,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>Skydive Southwest Forecast Dashboard • Dunkeswell Airfield • Rev 1.0.21 • Powered by Open-Meteo API</p>
+        <p>Skydive Southwest Forecast Dashboard • Dunkeswell Airfield • Rev 1.0.22 • Powered by Open-Meteo API</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -333,14 +333,17 @@
             return 'text-red';
         }
 
-        function getWeatherIcon(code) {
+        function getWeatherIcon(code, rainProb = 0) {
+            // Only show rain/showers if precipitation probability is significant (>= 30%)
+            if (rainProb >= 30) {
+                if (code >= 95) return { icon: 'fa-cloud-bolt', color: '#c084fc', label: 'Thunderstorms' };
+                if (code >= 80 && code <= 82) return { icon: 'fa-cloud-showers-heavy', color: '#3b82f6', label: 'Heavy Showers' };
+                return { icon: 'fa-cloud-rain', color: '#60a5fa', label: 'Rain Showers' };
+            }
             if (code === 0) return { icon: 'fa-sun', color: '#f59e0b', label: 'Clear Sky' };
             if (code >= 1 && code <= 3) return { icon: 'fa-cloud-sun', color: '#38bdf8', label: 'Partly Cloudy' };
             if (code >= 45 && code <= 48) return { icon: 'fa-smog', color: '#94a3b8', label: 'Fog / Mist' };
-            if (code >= 51 && code <= 67) return { icon: 'fa-cloud-rain', color: '#60a5fa', label: 'Rain Showers' };
             if (code >= 71 && code <= 77) return { icon: 'fa-snowflake', color: '#c7d2fe', label: 'Snow' };
-            if (code >= 80 && code <= 82) return { icon: 'fa-cloud-showers-heavy', color: '#3b82f6', label: 'Heavy Showers' };
-            if (code >= 95) return { icon: 'fa-cloud-bolt', color: '#c084fc', label: 'Thunderstorms' };
             return { icon: 'fa-cloud', color: '#94a3b8', label: 'Overcast' };
         }
 
@@ -455,7 +458,8 @@
                 const maxT = Math.round(daily.temperature_2m_max[i]);
                 const minT = Math.round(daily.temperature_2m_min[i]);
                 const wCode = daily.weather_code[i];
-                const wIcon = getWeatherIcon(wCode);
+                const maxRainProb = daily.precipitation_probability_max ? daily.precipitation_probability_max[i] : 0;
+                const wIcon = getWeatherIcon(wCode, maxRainProb);
 
                 const targetDateStr = dateObj.toISOString().split('T')[0];
                 let dayStart = hourly.time.findIndex(t => t.startsWith(targetDateStr) && t.includes('07:00'));
@@ -581,7 +585,7 @@
                 const aloft18k = kmhToMph(hourly.wind_speed_500hPa[i] || 35);
 
                 const hFog = code >= 45 && code <= 48 || vis < 5 || hum >= 95;
-                const hIcon = getWeatherIcon(hFog ? 45 : code);
+                const hIcon = getWeatherIcon(hFog ? 45 : code, rain);
 
                 const studentStat = getStudentTier(wSpd, wGST, rain, parseFloat(vis), cb.c0_5k, cloudbaseAGL, hFog);
                 const clubStat = getClubTier(wSpd, wGST, rain, parseFloat(vis), cb.c0_5k, cloudbaseAGL, hFog);
@@ -707,7 +711,8 @@
             const maxTemp = daily.temperature_2m_max[dayIndex];
             const minTemp = daily.temperature_2m_min[dayIndex];
             const weatherCode = daily.weather_code[dayIndex];
-            const weatherInfo = getWeatherIcon(weatherCode);
+            const maxRainProb = daily.precipitation_probability_max ? daily.precipitation_probability_max[dayIndex] : 0;
+            const weatherInfo = getWeatherIcon(weatherCode, maxRainProb);
 
             document.getElementById('active-temp').innerHTML = `<span class="text-green">${Math.round(maxTemp)}°C</span> / <span style="color:var(--text-muted);">${Math.round(minTemp)}°C</span>`;
             const condEl = document.getElementById('active-condition');
