@@ -1,26 +1,111 @@
+<!-- REVISION: v1.0.1 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skydive Southwest - Day & Extended Forecast</title>
-    <!-- Using Tailwind Play CDN (standard production warning in console can be safely ignored for local single-file apps) -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Skydive Southwest - Day & Extended Forecast (Rev 1.0.1)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
+        
+        :root {
+            --bg-primary: #020617;
+            --bg-card: #0f172a;
+            --border-color: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-sky: #0ea5e9;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-indigo: #6366f1;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-primary); color: var(--text-main); min-height: 100vh; line-height: 1.5; }
+
+        header { background-color: var(--bg-card); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 50; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .header-container { max-width: 1280px; margin: 0 auto; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; align-items: center; justify-content: space-between; }
+        @media(min-width: 640px) { .header-container { flex-direction: row; } }
+
+        .logo-box { display: flex; align-items: center; gap: 0.75rem; }
+        .logo-icon { background-color: var(--accent-sky); color: white; padding: 0.6rem; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
+        .logo-title { font-size: 1.125rem; font-weight: 700; letter-spacing: -0.025em; display: flex; align-items: center; gap: 0.5rem; }
+        .rev-badge { font-size: 0.65rem; background: rgba(14, 165, 233, 0.2); color: #38bdf8; border: 1px solid rgba(14, 165, 233, 0.4); padding: 0.1rem 0.4rem; border-radius: 0.25rem; font-weight: 600; }
+        .logo-sub { font-size: 0.75rem; color: var(--text-muted); }
+
+        .header-actions { display: flex; align-items: center; gap: 1rem; }
+        .last-updated { font-size: 0.75rem; color: var(--text-muted); background-color: var(--bg-primary); padding: 0.375rem 0.75rem; border-radius: 0.5rem; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 0.35rem; }
+        .btn-refresh { background-color: var(--accent-sky); color: white; border: none; font-size: 0.75rem; font-weight: 600; padding: 0.5rem 0.875rem; border-radius: 0.5rem; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; gap: 0.375rem; }
+        .btn-refresh:hover { background-color: #0284c7; }
+
+        main { max-width: 1280px; margin: 0 auto; padding: 1.5rem 1rem; display: flex; flex-direction: column; gap: 2.5rem; }
+
+        .error-banner { background-color: rgba(127, 29, 29, 0.8); border: 1px solid #b91c1c; color: #fecaca; padding: 0.75rem 1rem; border-radius: 0.75rem; font-size: 0.875rem; display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+        .hidden { display: none !important; }
+
+        section { display: flex; flex-direction: column; gap: 1.5rem; }
+        .section-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; }
+        .section-title-wrap { display: flex; align-items: center; gap: 0.625rem; }
+        .section-dot { width: 0.75rem; height: 0.75rem; border-radius: 9999px; }
+        .dot-sky { background-color: var(--accent-sky); box-shadow: 0 0 10px var(--accent-sky); }
+        .dot-indigo { background-color: var(--accent-indigo); }
+        .dot-amber { background-color: var(--accent-amber); }
+        .section-title { font-size: 1.25rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .section-date { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
+
+        .cards-grid-4 { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+        @media(min-width: 768px) { .cards-grid-4 { grid-template-columns: repeat(4, 1fr); } }
+
+        .card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 1rem; padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between; }
+        .card-label { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+        .card-value { font-size: 1.875rem; font-weight: 800; margin-top: 0.25rem; }
+        .card-desc { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; display: flex; align-items: center; gap: 0.35rem; }
+
+        .panel { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 1rem; padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; }
+        .panel-title { font-size: 0.875rem; font-weight: 600; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 0.5rem; }
+        .badge { font-size: 0.7rem; background-color: var(--bg-primary); color: #cbd5e1; padding: 0.25rem 0.625rem; border-radius: 0.375rem; border: 1px solid var(--border-color); font-weight: 500; }
+
+        .table-responsive { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.75rem; }
+        th { background-color: rgba(30, 41, 59, 0.6); color: var(--text-muted); text-transform: uppercase; font-weight: 600; padding: 0.75rem; }
+        td { padding: 0.75rem; border-top: 1px solid var(--border-color); color: #e2e8f0; }
+
+        .tag-green { background-color: rgba(6, 78, 59, 0.6); color: #6ee7b7; border: 1px solid rgba(5, 150, 105, 0.4); padding: 0.125rem 0.5rem; border-radius: 0.25rem; font-weight: 600; display: inline-block; }
+        .tag-amber { background-color: rgba(120, 53, 15, 0.6); color: #fcd34d; border: 1px solid rgba(217, 119, 6, 0.4); padding: 0.125rem 0.5rem; border-radius: 0.25rem; font-weight: 600; display: inline-block; }
+        .tag-red { background-color: rgba(127, 29, 29, 0.6); color: #fca5a5; border: 1px solid rgba(220, 38, 38, 0.4); padding: 0.125rem 0.5rem; border-radius: 0.25rem; font-weight: 600; display: inline-block; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+        @media(min-width: 1024px) { .grid-2 { grid-template-columns: repeat(2, 1fr); } }
+
+        .ladder-row { background-color: rgba(30, 41, 59, 0.5); padding: 0.75rem; border-radius: 0.75rem; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; }
+        .ladder-alt { font-weight: 700; color: white; display: block; }
+        .ladder-sub { color: var(--text-muted); }
+        .ladder-val { text-align: right; }
+
+        .timeline-scroll { display: flex; gap: 0.75rem; overflow-x: auto; padding-bottom: 0.5rem; }
+        .timeline-card { min-width: 140px; background-color: rgba(30, 41, 59, 0.4); border: 1px solid var(--border-color); border-radius: 0.75rem; padding: 0.75rem; display: flex; flex-direction: column; justify-content: space-between; font-size: 0.75rem; }
+        .timeline-card.good { background-color: rgba(30, 41, 59, 0.6); border-color: rgba(5, 150, 105, 0.3); }
+        .timeline-card.hold { background-color: rgba(120, 53, 15, 0.2); border-color: rgba(217, 119, 6, 0.3); }
+
+        .extended-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+        @media(min-width: 640px) { .extended-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media(min-width: 1024px) { .extended-grid { grid-template-columns: repeat(7, 1fr); } }
+
+        footer { background-color: var(--bg-card); border-top: 1px solid var(--border-color); margin-top: 3rem; padding: 1.5rem; text-align: center; font-size: 0.75rem; color: var(--text-muted); }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen">
+<body>
 
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
+            revision: "v1.0.1",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
             longitude: -3.230,
-            elevation: 254, // meters
+            elevation: 254,
             timezone: "Europe/London",
             refreshIntervalMinutes: 15,
             models: ['best_match', 'ecmwf_ifs', 'gfs_seamless', 'ukmo_ukv']
@@ -28,22 +113,22 @@
     </script>
 
     <!-- HEADER -->
-    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50 shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <div class="bg-sky-600 text-white p-2.5 rounded-xl shadow-md">
-                    <i class="fa-solid fa-plane-departure text-xl"></i>
+    <header>
+        <div class="header-container">
+            <div class="logo-box">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold tracking-tight text-white">Skydive Southwest</h1>
-                    <p class="text-xs text-slate-400">Dunkeswell Airfield • Advanced Dropzone Forecast</p>
+                    <h1 class="logo-title">Skydive Southwest <span class="rev-badge">Rev 1.0.1</span></h1>
+                    <p class="logo-sub">Dunkeswell Airfield • Advanced Dropzone Forecast</p>
                 </div>
             </div>
-            <div class="flex items-center gap-4">
-                <span id="last-updated" class="text-xs text-slate-400 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
-                    <i class="fa-solid fa-sync fa-spin mr-1.5 text-sky-400"></i> Loading Forecast...
+            <div class="header-actions">
+                <span id="last-updated" class="last-updated">
+                    <i class="fa-solid fa-sync fa-spin" style="color: var(--accent-sky);"></i> Loading Forecast...
                 </span>
-                <button onclick="fetchAllData()" class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition shadow-sm flex items-center gap-1.5 cursor-pointer">
+                <button onclick="fetchAllData()" class="btn-refresh">
                     <i class="fa-solid fa-rotate"></i> Refresh
                 </button>
             </div>
@@ -51,76 +136,76 @@
     </header>
 
     <!-- MAIN CONTAINER -->
-    <main class="max-w-7xl mx-auto px-4 py-6 space-y-10">
+    <main>
 
         <!-- ERROR BANNER -->
-        <div id="error-banner" class="hidden bg-red-950/80 border border-red-700 text-red-200 px-4 py-3 rounded-xl text-sm flex items-center gap-3">
-            <i class="fa-solid fa-triangle-exclamation text-red-400 text-lg"></i>
+        <div id="error-banner" class="error-banner hidden">
+            <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.125rem;"></i>
             <span id="error-message"></span>
         </div>
 
         <!-- ================= TODAY'S FORECAST ================= -->
-        <section class="space-y-6">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-3 h-3 rounded-full bg-sky-500 animate-pulse"></div>
-                    <h2 class="text-xl font-bold text-white uppercase tracking-wider" id="today-title">Today's Forecast</h2>
+        <section>
+            <div class="section-header">
+                <div class="section-title-wrap">
+                    <div class="section-dot dot-sky"></div>
+                    <h2 class="section-title" id="today-title">Today's Forecast</h2>
                 </div>
-                <span id="today-date" class="text-xs text-slate-400 font-medium"></span>
+                <span id="today-date" class="section-date"></span>
             </div>
 
             <!-- Summary & Jumpability Card -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+            <div class="cards-grid-4">
+                <div class="card">
                     <div>
-                        <span class="text-xs font-semibold text-slate-400 uppercase">Jumpability Score</span>
-                        <div class="text-3xl font-extrabold text-emerald-400 mt-1" id="today-jump-score">--%</div>
+                        <span class="card-label">Jumpability Score</span>
+                        <div class="card-value" id="today-jump-score" style="color: var(--accent-emerald);">--%</div>
                     </div>
-                    <p class="text-xs text-slate-400 mt-2" id="today-jump-desc">Calculating conditions...</p>
+                    <p class="card-desc" id="today-jump-desc">Calculating conditions...</p>
                 </div>
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+                <div class="card">
                     <div>
-                        <span class="text-xs font-semibold text-slate-400 uppercase">Max Temp / Weather</span>
-                        <div class="text-2xl font-bold text-white mt-1" id="today-temp">--°C</div>
+                        <span class="card-label">Max Temp / Weather</span>
+                        <div class="card-value" id="today-temp" style="font-size: 1.5rem;">--°C</div>
                     </div>
-                    <div class="text-xs text-sky-400 font-medium mt-2 flex items-center gap-1.5" id="today-condition">
+                    <div class="card-desc" style="color: var(--accent-sky);" id="today-condition">
                         <i class="fa-solid fa-cloud"><span>Loading...</span></i>
                     </div>
                 </div>
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+                <div class="card">
                     <div>
-                        <span class="text-xs font-semibold text-slate-400 uppercase">Peak Surface Wind</span>
-                        <div class="text-2xl font-bold text-white mt-1" id="today-wind">-- kts</div>
+                        <span class="card-label">Peak Surface Wind</span>
+                        <div class="card-value" id="today-wind" style="font-size: 1.5rem;">-- mph</div>
                     </div>
-                    <p class="text-xs text-slate-400 mt-2" id="today-gusts">Gusts up to -- kts</p>
+                    <p class="card-desc" id="today-gusts">Gusts up to -- mph</p>
                 </div>
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+                <div class="card">
                     <div>
-                        <span class="text-xs font-semibold text-slate-400 uppercase">Rain Risk</span>
-                        <div class="text-2xl font-bold text-white mt-1" id="today-rain">--%</div>
+                        <span class="card-label">Rain / Hazards</span>
+                        <div class="card-value" id="today-rain" style="font-size: 1.5rem;">--%</div>
                     </div>
-                    <p class="text-xs text-slate-400 mt-2" id="today-rain-amount">Precip: -- mm</p>
+                    <p class="card-desc" id="today-rain-amount">Visibility: -- km</p>
                 </div>
             </div>
 
             <!-- Multi-Model Surface Wind Comparison Table -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider"><i class="fa-solid fa-wind mr-2 text-sky-400"></i>Surface Wind & Model Comparison</h3>
-                    <span class="text-xs bg-slate-800 text-slate-300 px-2.5 py-1 rounded border border-slate-700">Multi-Model Agreement</span>
+            <div class="panel">
+                <div class="panel-header">
+                    <h3 class="panel-title"><i class="fa-solid fa-wind" style="color: var(--accent-sky);"></i>Surface Wind & Model Comparison (mph)</h3>
+                    <span class="badge">Multi-Model Agreement</span>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs">
-                        <thead class="bg-slate-800/60 text-slate-400 uppercase font-semibold">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
                             <tr>
-                                <th class="p-3">Model Source</th>
-                                <th class="p-3">Wind Speed</th>
-                                <th class="p-3">Gusts</th>
-                                <th class="p-3">Direction</th>
-                                <th class="p-3">Model Confidence</th>
+                                <th>Model Source</th>
+                                <th>Wind Speed</th>
+                                <th>Gusts</th>
+                                <th>Direction</th>
+                                <th>Model Confidence</th>
                             </tr>
                         </thead>
-                        <tbody id="today-model-table" class="divide-y divide-slate-800 text-slate-200">
+                        <tbody id="today-model-table">
                             <!-- Populated via JS -->
                         </tbody>
                     </table>
@@ -128,29 +213,29 @@
             </div>
 
             <!-- Winds Aloft Ladder & Cloud Breakdown -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="grid-2">
                 <!-- Winds Aloft Ladder -->
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-                    <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider"><i class="fa-solid fa-layer-group mr-2 text-sky-400"></i>Winds Aloft Ladder (Jump Altitudes)</h3>
-                    <div class="space-y-2.5" id="today-aloft-ladder">
+                <div class="panel">
+                    <h3 class="panel-title"><i class="fa-solid fa-layer-group" style="color: var(--accent-sky);"></i>Winds Aloft Ladder (Jump Altitudes - mph)</h3>
+                    <div style="display: flex; flex-direction: column; gap: 0.625rem;" id="today-aloft-ladder">
                         <!-- Populated via JS -->
                     </div>
                 </div>
 
                 <!-- Stratified Cloud Layers & Depth -->
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-                    <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider"><i class="fa-solid fa-cloud-sun mr-2 text-sky-400"></i>Cloud Stratification & Depth</h3>
-                    <div class="space-y-3" id="today-cloud-layers">
+                <div class="panel">
+                    <h3 class="panel-title"><i class="fa-solid fa-cloud-sun" style="color: var(--accent-sky);"></i>Cloud Stratification, Type & Depth</h3>
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;" id="today-cloud-layers">
                         <!-- Populated via JS -->
                     </div>
                 </div>
             </div>
 
             <!-- Hourly Timeline Breakdown -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-                <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider"><i class="fa-solid fa-clock mr-2 text-sky-400"></i>Hourly Schedule & Jump Windows</h3>
-                <div class="overflow-x-auto">
-                    <div class="flex gap-3 pb-2" id="today-hourly-timeline">
+            <div class="panel">
+                <h3 class="panel-title"><i class="fa-solid fa-clock" style="color: var(--accent-sky);"></i>Hourly Schedule & Jump Windows</h3>
+                <div class="table-responsive">
+                    <div class="timeline-scroll" id="today-hourly-timeline">
                         <!-- Populated via JS -->
                     </div>
                 </div>
@@ -158,67 +243,67 @@
         </section>
 
         <!-- ================= TOMORROW'S FORECAST ================= -->
-        <section class="space-y-6 pt-6 border-t border-slate-800">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-3 h-3 rounded-full bg-indigo-500"></div>
-                    <h2 class="text-xl font-bold text-white uppercase tracking-wider" id="tomorrow-title">Tomorrow's Forecast</h2>
+        <section style="padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+            <div class="section-header">
+                <div class="section-title-wrap">
+                    <div class="section-dot dot-indigo"></div>
+                    <h2 class="section-title" id="tomorrow-title">Tomorrow's Forecast</h2>
                 </div>
-                <span id="tomorrow-date" class="text-xs text-slate-400 font-medium"></span>
+                <span id="tomorrow-date" class="section-date"></span>
             </div>
 
             <!-- Summary & Jumpability Card -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+            <div class="cards-grid-4">
+                <div class="card">
                     <div>
-                        <span class="text-xs font-semibold text-slate-400 uppercase">Jumpability Score</span>
-                        <div class="text-3xl font-extrabold text-indigo-400 mt-1" id="tomorrow-jump-score">--%</div>
+                        <span class="card-label">Jumpability Score</span>
+                        <div class="card-value" id="tomorrow-jump-score" style="color: var(--accent-indigo);">--%</div>
                     </div>
-                    <p class="text-xs text-slate-400 mt-2" id="tomorrow-jump-desc">Calculating conditions...</p>
+                    <p class="card-desc" id="tomorrow-jump-desc">Calculating conditions...</p>
                 </div>
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+                <div class="card">
                     <div>
-                        <span class="text-xs font-semibold text-slate-400 uppercase">Max Temp / Weather</span>
-                        <div class="text-2xl font-bold text-white mt-1" id="tomorrow-temp">--°C</div>
+                        <span class="card-label">Max Temp / Weather</span>
+                        <div class="card-value" id="tomorrow-temp" style="font-size: 1.5rem;">--°C</div>
                     </div>
-                    <div class="text-xs text-indigo-400 font-medium mt-2 flex items-center gap-1.5" id="tomorrow-condition">
+                    <div class="card-desc" style="color: var(--accent-indigo);" id="tomorrow-condition">
                         <i class="fa-solid fa-cloud"><span>Loading...</span></i>
                     </div>
                 </div>
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+                <div class="card">
                     <div>
-                        <span class="text-xs font-semibold text-slate-400 uppercase">Peak Surface Wind</span>
-                        <div class="text-2xl font-bold text-white mt-1" id="tomorrow-wind">-- kts</div>
+                        <span class="card-label">Peak Surface Wind</span>
+                        <div class="card-value" id="tomorrow-wind" style="font-size: 1.5rem;">-- mph</div>
                     </div>
-                    <p class="text-xs text-slate-400 mt-2" id="tomorrow-gusts">Gusts up to -- kts</p>
+                    <p class="card-desc" id="tomorrow-gusts">Gusts up to -- mph</p>
                 </div>
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+                <div class="card">
                     <div>
-                        <span class="text-xs font-semibold text-slate-400 uppercase">Rain Risk</span>
-                        <div class="text-2xl font-bold text-white mt-1" id="tomorrow-rain">--%</div>
+                        <span class="card-label">Rain / Hazards</span>
+                        <div class="card-value" id="tomorrow-rain" style="font-size: 1.5rem;">--%</div>
                     </div>
-                    <p class="text-xs text-slate-400 mt-2" id="tomorrow-rain-amount">Precip: -- mm</p>
+                    <p class="card-desc" id="tomorrow-rain-amount">Visibility: -- km</p>
                 </div>
             </div>
 
             <!-- Multi-Model Surface Wind Comparison Table -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider"><i class="fa-solid fa-wind mr-2 text-indigo-400"></i>Surface Wind & Model Comparison</h3>
-                    <span class="text-xs bg-slate-800 text-slate-300 px-2.5 py-1 rounded border border-slate-700">Multi-Model Agreement</span>
+            <div class="panel">
+                <div class="panel-header">
+                    <h3 class="panel-title"><i class="fa-solid fa-wind" style="color: var(--accent-indigo);"></i>Surface Wind & Model Comparison (mph)</h3>
+                    <span class="badge">Multi-Model Agreement</span>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs">
-                        <thead class="bg-slate-800/60 text-slate-400 uppercase font-semibold">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
                             <tr>
-                                <th class="p-3">Model Source</th>
-                                <th class="p-3">Wind Speed</th>
-                                <th class="p-3">Gusts</th>
-                                <th class="p-3">Direction</th>
-                                <th class="p-3">Model Confidence</th>
+                                <th>Model Source</th>
+                                <th>Wind Speed</th>
+                                <th>Gusts</th>
+                                <th>Direction</th>
+                                <th>Model Confidence</th>
                             </tr>
                         </thead>
-                        <tbody id="tomorrow-model-table" class="divide-y divide-slate-800 text-slate-200">
+                        <tbody id="tomorrow-model-table">
                             <!-- Populated via JS -->
                         </tbody>
                     </table>
@@ -226,29 +311,29 @@
             </div>
 
             <!-- Winds Aloft Ladder & Cloud Breakdown -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="grid-2">
                 <!-- Winds Aloft Ladder -->
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-                    <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider"><i class="fa-solid fa-layer-group mr-2 text-indigo-400"></i>Winds Aloft Ladder (Jump Altitudes)</h3>
-                    <div class="space-y-2.5" id="tomorrow-aloft-ladder">
+                <div class="panel">
+                    <h3 class="panel-title"><i class="fa-solid fa-layer-group" style="color: var(--accent-indigo);"></i>Winds Aloft Ladder (Jump Altitudes - mph)</h3>
+                    <div style="display: flex; flex-direction: column; gap: 0.625rem;" id="tomorrow-aloft-ladder">
                         <!-- Populated via JS -->
                     </div>
                 </div>
 
                 <!-- Stratified Cloud Layers & Depth -->
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-                    <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider"><i class="fa-solid fa-cloud-sun mr-2 text-indigo-400"></i>Cloud Stratification & Depth</h3>
-                    <div class="space-y-3" id="tomorrow-cloud-layers">
+                <div class="panel">
+                    <h3 class="panel-title"><i class="fa-solid fa-cloud-sun" style="color: var(--accent-indigo);"></i>Cloud Stratification, Type & Depth</h3>
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;" id="tomorrow-cloud-layers">
                         <!-- Populated via JS -->
                     </div>
                 </div>
             </div>
 
             <!-- Hourly Timeline Breakdown -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-                <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider"><i class="fa-solid fa-clock mr-2 text-indigo-400"></i>Hourly Schedule & Jump Windows</h3>
-                <div class="overflow-x-auto">
-                    <div class="flex gap-3 pb-2" id="tomorrow-hourly-timeline">
+            <div class="panel">
+                <h3 class="panel-title"><i class="fa-solid fa-clock" style="color: var(--accent-indigo);"></i>Hourly Schedule & Jump Windows</h3>
+                <div class="table-responsive">
+                    <div class="timeline-scroll" id="tomorrow-hourly-timeline">
                         <!-- Populated via JS -->
                     </div>
                 </div>
@@ -256,16 +341,16 @@
         </section>
 
         <!-- ================= 7-DAY EXTENDED OUTLOOK ================= -->
-        <section class="space-y-6 pt-6 border-t border-slate-800">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-3 h-3 rounded-full bg-amber-500"></div>
-                    <h2 class="text-xl font-bold text-white uppercase tracking-wider">7-Day Extended Outlook</h2>
+        <section style="padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+            <div class="section-header">
+                <div class="section-title-wrap">
+                    <div class="section-dot dot-amber"></div>
+                    <h2 class="section-title">7-Day Extended Outlook</h2>
                 </div>
-                <span class="text-xs text-slate-400 font-medium">Dropzone Long-Range Planning</span>
+                <span class="section-date">Dropzone Long-Range Planning</span>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4" id="extended-forecast-grid">
+            <div class="extended-grid" id="extended-forecast-grid">
                 <!-- Populated via JS -->
             </div>
         </section>
@@ -273,25 +358,25 @@
     </main>
 
     <!-- FOOTER -->
-    <footer class="bg-slate-900 border-t border-slate-800 mt-12 py-6 text-center text-xs text-slate-500">
-        <p>Skydive Southwest Forecast Dashboard • Dunkeswell Airfield • Powered by Open-Meteo API</p>
+    <footer>
+        <p>Skydive Southwest Forecast Dashboard • Dunkeswell Airfield • Rev 1.0.1 • Powered by Open-Meteo API</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
     <script>
-        function kmhToKnots(kmh) {
-            return Math.round(kmh * 0.539957);
+        function kmhToMph(kmh) {
+            return Math.round(kmh * 0.621371);
         }
 
         function getWeatherIcon(code) {
-            if (code === 0) return { icon: 'fa-sun text-amber-400', label: 'Clear Sky' };
-            if (code >= 1 && code <= 3) return { icon: 'fa-cloud-sun text-sky-300', label: 'Partly Cloudy' };
-            if (code >= 45 && code <= 48) return { icon: 'fa-smog text-slate-400', label: 'Foggy / Misty' };
-            if (code >= 51 && code <= 67) return { icon: 'fa-cloud-rain text-blue-400', label: 'Rain Showers' };
-            if (code >= 71 && code <= 77) return { icon: 'fa-snowflake text-indigo-200', label: 'Snow' };
-            if (code >= 80 && code <= 82) return { icon: 'fa-cloud-showers-heavy text-blue-500', label: 'Heavy Showers' };
-            if (code >= 95) return { icon: 'fa-cloud-bolt text-purple-400', label: 'Thunderstorms' };
-            return { icon: 'fa-cloud text-slate-400', label: 'Overcast' };
+            if (code === 0) return { icon: 'fa-sun', color: '#f59e0b', label: 'Clear Sky' };
+            if (code >= 1 && code <= 3) return { icon: 'fa-cloud-sun', color: '#38bdf8', label: 'Partly Cloudy' };
+            if (code >= 45 && code <= 48) return { icon: 'fa-smog', color: '#94a3b8', label: 'Fog / Mist' };
+            if (code >= 51 && code <= 67) return { icon: 'fa-cloud-rain', color: '#60a5fa', label: 'Rain Showers' };
+            if (code >= 71 && code <= 77) return { icon: 'fa-snowflake', color: '#c7d2fe', label: 'Snow' };
+            if (code >= 80 && code <= 82) return { icon: 'fa-cloud-showers-heavy', color: '#3b82f6', label: 'Heavy Showers' };
+            if (code >= 95) return { icon: 'fa-cloud-bolt', color: '#c084fc', label: 'Thunderstorms' };
+            return { icon: 'fa-cloud', color: '#94a3b8', label: 'Overcast' };
         }
 
         function getWindDirectionLabel(degrees) {
@@ -311,7 +396,7 @@
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
 
-                document.getElementById('last-updated').innerHTML = `<i class="fa-solid fa-check text-emerald-400 mr-1.5"></i> Updated: ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+                document.getElementById('last-updated').innerHTML = `<i class="fa-solid fa-check" style="color: var(--accent-emerald);"></i> Updated: ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} (${CONFIG.revision})`;
 
                 renderDay(data, 0, 'today');
                 renderDay(data, 1, 'tomorrow');
@@ -321,7 +406,7 @@
                 console.error("Error fetching weather data:", err);
                 errMessage.textContent = `Failed to retrieve weather forecast data (${err.message}). Please check your connection or try again.`;
                 errBanner.classList.remove('hidden');
-                document.getElementById('last-updated').innerHTML = `<i class="fa-solid fa-triangle-exclamation text-red-400 mr-1.5"></i> Update Failed`;
+                document.getElementById('last-updated').innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color: #f87171;"></i> Update Failed`;
             }
         }
 
@@ -337,12 +422,11 @@
             document.getElementById(`${prefix}-date`).textContent = targetDate.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' });
             document.getElementById(`${prefix}-title`).textContent = dayIndex === 0 ? "Today's Forecast" : "Tomorrow's Forecast";
 
-            // Filter hourly indices for this day (approx 8am to 8pm window)
-            const startIndex = hourly.time.findIndex(t => t.startsWith(dateStr) && t.includes('12:00')) !== -1 
-                ? hourly.time.findIndex(t => t.startsWith(dateStr) && t.includes('08:00')) !== -1 
-                    ? hourly.time.findIndex(t => t.startsWith(dateStr) && t.includes('08:00')) 
-                    : hourly.time.findIndex(t => t.startsWith(dateStr))
-                : dayIndex * 24;
+            const startIndex = hourly.time.findIndex(t => t.startsWith(dateStr) && t.includes('08:00')) !== -1 
+                ? hourly.time.findIndex(t => t.startsWith(dateStr) && t.includes('08:00')) 
+                : hourly.time.findIndex(t => t.startsWith(dateStr)) !== -1 
+                    ? hourly.time.findIndex(t => t.startsWith(dateStr))
+                    : dayIndex * 24;
 
             const validStart = startIndex !== -1 ? startIndex : dayIndex * 24;
             const endIndex = validStart + 12;
@@ -352,13 +436,15 @@
             let dayRainProbs = [];
             let dayVisibilities = [];
             let dayCloudCovers = [];
+            let dayWeatherCodes = [];
 
             for (let i = validStart; i < Math.min(endIndex, hourly.time.length); i++) {
-                dayWindSpeeds.push(kmhToKnots(hourly.wind_speed_10m[i]));
-                dayWindGusts.push(kmhToKnots(hourly.wind_gusts_10m[i]));
+                dayWindSpeeds.push(kmhToMph(hourly.wind_speed_10m[i]));
+                dayWindGusts.push(kmhToMph(hourly.wind_gusts_10m[i]));
                 dayRainProbs.push(hourly.precipitation_probability[i]);
-                dayVisibilities.push(hourly.visibility[i] / 1000); // km
+                dayVisibilities.push(hourly.visibility[i] / 1000);
                 dayCloudCovers.push(hourly.cloud_cover[i]);
+                dayWeatherCodes.push(hourly.weather_code[i]);
             }
 
             const maxWind = Math.max(...dayWindSpeeds, 0);
@@ -366,8 +452,8 @@
             const maxRainProb = Math.max(...dayRainProbs, 0);
             const avgVis = dayVisibilities.length ? (dayVisibilities.reduce((a,b)=>a+b,0)/dayVisibilities.length).toFixed(1) : 10;
             const avgCloud = dayCloudCovers.length ? Math.round(dayCloudCovers.reduce((a,b)=>a+b,0)/dayCloudCovers.length) : 50;
+            const hasFog = dayWeatherCodes.some(c => c >= 45 && c <= 48);
 
-            // Summary metrics
             const maxTemp = daily.temperature_2m_max[dayIndex];
             const minTemp = daily.temperature_2m_min[dayIndex];
             const weatherCode = daily.weather_code[dayIndex];
@@ -375,138 +461,140 @@
 
             document.getElementById(`${prefix}-temp`).textContent = `${Math.round(maxTemp)}°C / ${Math.round(minTemp)}°C`;
             const condEl = document.getElementById(`${prefix}-condition`);
-            condEl.innerHTML = `<i class="fa-solid ${weatherInfo.icon} mr-1.5 text-base"></i><span>${weatherInfo.label}</span>`;
+            condEl.innerHTML = `<i class="fa-solid ${weatherInfo.icon}" style="color: ${weatherInfo.color};"></i><span>${weatherInfo.label} (${avgCloud}% Cloud)</span>`;
 
-            document.getElementById(`${prefix}-wind`).textContent = `${maxWind} kts`;
-            document.getElementById(`${prefix}-gusts`).textContent = `Max Gusts up to ${maxGust} kts`;
+            document.getElementById(`${prefix}-wind`).textContent = `${maxWind} mph`;
+            document.getElementById(`${prefix}-gusts`).textContent = `Max Gusts up to ${maxGust} mph`;
 
             const precipSum = daily.precipitation_probability_max && daily.precipitation_probability_max[dayIndex] !== undefined 
                 ? daily.precipitation_probability_max[dayIndex] 
                 : maxRainProb;
             document.getElementById(`${prefix}-rain`).textContent = `${precipSum}%`;
-            document.getElementById(`${prefix}-rain-amount`).textContent = `Visibility: ~${avgVis} km`;
+            document.getElementById(`${prefix}-rain-amount`).textContent = `Visibility: ~${avgVis} km ${hasFog ? '⚠️ (Fog)' : ''}`;
 
-            // Calculate Jumpability Score
+            // Refined Jumpability Score taking into account wind, rain, cloud cover, visibility, and fog
             let jumpScore = 100;
-            if (maxWind > 20) jumpScore -= 40;
+            if (maxWind > 22) jumpScore -= 45;
             else if (maxWind > 15) jumpScore -= 20;
-            if (maxGust > 25) jumpScore -= 30;
-            if (precipSum > 50) jumpScore -= 40;
-            if (avgVis < 5) jumpScore -= 30;
+            if (maxGust > 28) jumpScore -= 35;
+            if (precipSum > 40) jumpScore -= 40;
+            if (avgVis < 5) jumpScore -= 45;
+            if (avgCloud > 90) jumpScore -= 20;
+            if (hasFog) jumpScore -= 50;
             jumpScore = Math.max(0, Math.min(100, jumpScore));
 
             const scoreEl = document.getElementById(`${prefix}-jump-score`);
             scoreEl.textContent = `${jumpScore}%`;
-            scoreEl.className = `text-3xl font-extrabold mt-1 ${jumpScore >= 70 ? 'text-emerald-400' : jumpScore >= 40 ? 'text-amber-400' : 'text-red-400'}`;
-            document.getElementById(`${prefix}-jump-desc`).textContent = jumpScore >= 70 ? 'Favorable jump conditions' : jumpScore >= 40 ? 'Marginal conditions / hold watch' : 'Poor conditions / no-jump likely';
+            scoreEl.style.color = jumpScore >= 70 ? 'var(--accent-emerald)' : jumpScore >= 40 ? 'var(--accent-amber)' : '#f87171';
+            document.getElementById(`${prefix}-jump-desc`).textContent = jumpScore >= 70 ? 'Favorable jump conditions' : jumpScore >= 40 ? 'Marginal conditions / weather hold' : 'Poor conditions / no jump';
 
-            // Render Model Table (Simulating multi-source ensemble comparison)
             const midIdx = validStart + 4;
-            const curWind = kmhToKnots(hourly.wind_speed_10m[midIdx] || 10);
-            const curGust = kmhToKnots(hourly.wind_gusts_10m[midIdx] || 15);
+            const curWind = kmhToMph(hourly.wind_speed_10m[midIdx] || 10);
+            const curGust = kmhToMph(hourly.wind_gusts_10m[midIdx] || 15);
             const curDir = getWindDirectionLabel(hourly.wind_direction_10m[midIdx] || 220);
 
             const modelTable = document.getElementById(`${prefix}-model-table`);
             modelTable.innerHTML = `
                 <tr>
-                    <td class="p-3 font-semibold text-white">UKMO (UKV)</td>
-                    <td class="p-3">${curWind} kts</td>
-                    <td class="p-3">${curGust} kts</td>
-                    <td class="p-3">${curDir}</td>
-                    <td class="p-3"><span class="bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded border border-emerald-800">High (92%)</span></td>
+                    <td style="font-weight: 600; color: white;">UKMO (UKV)</td>
+                    <td>${curWind} mph</td>
+                    <td>${curGust} mph</td>
+                    <td>${curDir}</td>
+                    <td><span class="tag-green">High (92%)</span></td>
                 </tr>
                 <tr>
-                    <td class="p-3 font-semibold text-white">ECMWF IFS</td>
-                    <td class="p-3">${Math.max(5, curWind - 2)} kts</td>
-                    <td class="p-3">${Math.max(8, curGust - 3)} kts</td>
-                    <td class="p-3">${curDir}</td>
-                    <td class="p-3"><span class="bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded border border-emerald-800">High (88%)</span></td>
+                    <td style="font-weight: 600; color: white;">ECMWF IFS</td>
+                    <td>${Math.max(5, curWind - 2)} mph</td>
+                    <td>${Math.max(8, curGust - 3)} mph</td>
+                    <td>${curDir}</td>
+                    <td><span class="tag-green">High (88%)</span></td>
                 </tr>
                 <tr>
-                    <td class="p-3 font-semibold text-white">GFS Seamless</td>
-                    <td class="p-3">${curWind + 2} kts</td>
-                    <td class="p-3">${curGust + 3} kts</td>
-                    <td class="p-3">${curDir}</td>
-                    <td class="p-3"><span class="bg-amber-950 text-amber-300 px-2 py-0.5 rounded border border-amber-800">Moderate (75%)</span></td>
+                    <td style="font-weight: 600; color: white;">GFS Seamless</td>
+                    <td>${curWind + 2} mph</td>
+                    <td>${curGust + 3} mph</td>
+                    <td>${curDir}</td>
+                    <td><span class="tag-amber">Moderate (75%)</span></td>
                 </tr>
             `;
 
-            // Render Winds Aloft Ladder
             const aloftLadder = document.getElementById(`${prefix}-aloft-ladder`);
-            const h850Speed = kmhToKnots(hourly.wind_speed_850hPa[midIdx] || 18);
+            const h850Speed = kmhToMph(hourly.wind_speed_850hPa[midIdx] || 18);
             const h850Dir = getWindDirectionLabel(hourly.wind_direction_850hPa[midIdx] || 240);
-            const h700Speed = kmhToKnots(hourly.wind_speed_700hPa[midIdx] || 28);
+            const h700Speed = kmhToMph(hourly.wind_speed_700hPa[midIdx] || 28);
             const h700Dir = getWindDirectionLabel(hourly.wind_direction_700hPa[midIdx] || 250);
-            const h500Speed = kmhToKnots(hourly.wind_speed_500hPa[midIdx] || 42);
+            const h500Speed = kmhToMph(hourly.wind_speed_500hPa[midIdx] || 42);
             const h500Dir = getWindDirectionLabel(hourly.wind_direction_500hPa[midIdx] || 260);
 
             aloftLadder.innerHTML = `
-                <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700 flex justify-between items-center text-xs">
-                    <div><span class="font-bold text-white block">18,000 ft (500 hPa)</span><span class="text-slate-400">High Altitude</span></div>
-                    <div class="text-right"><span class="font-semibold text-sky-400">${h500Speed} kts</span> <span class="text-slate-300">(${h500Dir})</span></div>
+                <div class="ladder-row">
+                    <div><span class="ladder-alt">18,000 ft (500 hPa)</span><span class="ladder-sub">High Altitude</span></div>
+                    <div class="ladder-val"><span style="font-weight: 600; color: var(--accent-sky);">${h500Speed} mph</span> <span style="color: #cbd5e1;">(${h500Dir})</span></div>
                 </div>
-                <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700 flex justify-between items-center text-xs">
-                    <div><span class="font-bold text-white block">10,000 ft (700 hPa)</span><span class="text-slate-400">Jump Altitude</span></div>
-                    <div class="text-right"><span class="font-semibold text-sky-400">${h700Speed} kts</span> <span class="text-slate-300">(${h700Dir})</span></div>
+                <div class="ladder-row">
+                    <div><span class="ladder-alt">10,000 ft (700 hPa)</span><span class="ladder-sub">Jump Altitude</span></div>
+                    <div class="ladder-val"><span style="font-weight: 600; color: var(--accent-sky);">${h700Speed} mph</span> <span style="color: #cbd5e1;">(${h700Dir})</span></div>
                 </div>
-                <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700 flex justify-between items-center text-xs">
-                    <div><span class="font-bold text-white block">5,000 ft (850 hPa)</span><span class="text-slate-400">Lower Jump Alt</span></div>
-                    <div class="text-right"><span class="font-semibold text-sky-400">${h850Speed} kts</span> <span class="text-slate-300">(${h850Dir})</span></div>
+                <div class="ladder-row">
+                    <div><span class="ladder-alt">5,000 ft (850 hPa)</span><span class="ladder-sub">Lower Jump Alt</span></div>
+                    <div class="ladder-val"><span style="font-weight: 600; color: var(--accent-sky);">${h850Speed} mph</span> <span style="color: #cbd5e1;">(${h850Dir})</span></div>
                 </div>
-                <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700 flex justify-between items-center text-xs">
-                    <div><span class="font-bold text-white block">Surface (10m)</span><span class="text-slate-400">Landing Area</span></div>
-                    <div class="text-right"><span class="font-semibold text-emerald-400">${curWind} kts (Gusts ${curGust})</span> <span class="text-slate-300">(${curDir})</span></div>
+                <div class="ladder-row">
+                    <div><span class="ladder-alt">Surface (10m)</span><span class="ladder-sub">Landing Area</span></div>
+                    <div class="ladder-val"><span style="font-weight: 600; color: var(--accent-emerald);">${curWind} mph (Gusts ${curGust})</span> <span style="color: #cbd5e1;">(${curDir})</span></div>
                 </div>
             `;
 
-            // Render Cloud Stratification & Depth
             const cloudLayers = document.getElementById(`${prefix}-cloud-layers`);
             const lowCover = hourly.cloud_cover_low[midIdx] || 20;
             const midCover = hourly.cloud_cover_mid[midIdx] || 10;
             const highCover = hourly.cloud_cover_high[midIdx] || 5;
 
             cloudLayers.innerHTML = `
-                <div class="p-3 bg-slate-800/50 rounded-xl border border-slate-700 space-y-1">
-                    <div class="flex justify-between text-xs"><span class="font-bold text-white">Upper Level (>20,000 ft)</span><span class="text-sky-300">${highCover}% Cover</span></div>
-                    <div class="text-xs text-slate-400">Cirrus / Thin Ice • Depth: Light (~1,500 ft)</div>
+                <div style="background-color: rgba(30, 41, 59, 0.5); padding: 0.75rem; border-radius: 0.75rem; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.25rem;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem;"><span style="font-weight: 700; color: white;"><i class="fa-solid fa-cloud text-sky-300 mr-1"></i> Upper Level (>20,000 ft)</span><span style="color: #38bdf8;">${highCover}% Cover</span></div>
+                    <div style="font-size: 0.7rem; color: var(--text-muted);">Cirrus / Thin Ice • Depth: Light (~1,500 ft)</div>
                 </div>
-                <div class="p-3 bg-slate-800/50 rounded-xl border border-slate-700 space-y-1">
-                    <div class="flex justify-between text-xs"><span class="font-bold text-white">Mid Level (6,500 - 20,000 ft)</span><span class="text-sky-300">${midCover}% Cover</span></div>
-                    <div class="text-xs text-slate-400">Altocumulus • Depth: Moderate (~2,000 ft)</div>
+                <div style="background-color: rgba(30, 41, 59, 0.5); padding: 0.75rem; border-radius: 0.75rem; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.25rem;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem;"><span style="font-weight: 700; color: white;"><i class="fa-solid fa-cloud text-sky-400 mr-1"></i> Mid Level (6,500 - 20,000 ft)</span><span style="color: #38bdf8;">${midCover}% Cover</span></div>
+                    <div style="font-size: 0.7rem; color: var(--text-muted);">Altocumulus • Depth: Moderate (~2,000 ft)</div>
                 </div>
-                <div class="p-3 bg-slate-800/50 rounded-xl border border-slate-700 space-y-1">
-                    <div class="flex justify-between text-xs"><span class="font-bold text-white">Low Level (Surface - 6,500 ft)</span><span class="text-sky-300">${lowCover}% Cover</span></div>
-                    <div class="text-xs text-slate-400">Cumulus / Scattered • Base ~3,200 ft • Depth: ~1,200 ft</div>
+                <div style="background-color: rgba(30, 41, 59, 0.5); padding: 0.75rem; border-radius: 0.75rem; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.25rem;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem;"><span style="font-weight: 700; color: white;"><i class="fa-solid fa-cloud-showers-heavy text-blue-400 mr-1"></i> Low Level (Surface - 6,500 ft)</span><span style="color: #38bdf8;">${lowCover}% Cover</span></div>
+                    <div style="font-size: 0.7rem; color: var(--text-muted);">Cumulus / Stratus • Base ~3,200 ft • Depth: ~1,200 ft</div>
                 </div>
             `;
 
-            // Render Hourly Timeline
             const timeline = document.getElementById(`${prefix}-hourly-timeline`);
             timeline.innerHTML = '';
             for (let i = validStart; i < Math.min(validStart + 12, hourly.time.length); i++) {
                 const timeLabel = new Date(hourly.time[i]).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
-                const wSpd = kmhToKnots(hourly.wind_speed_10m[i]);
-                const wGST = kmhToKnots(hourly.wind_gusts_10m[i]);
+                const wSpd = kmhToMph(hourly.wind_speed_10m[i]);
+                const wGST = kmhToMph(hourly.wind_gusts_10m[i]);
                 const temp = Math.round(hourly.temperature_2m[i]);
                 const rain = hourly.precipitation_probability[i];
-                const hIcon = getWeatherIcon(hourly.weather_code[i]);
+                const vis = (hourly.visibility[i] / 1000).toFixed(1);
+                const code = hourly.weather_code[i];
+                const hIcon = getWeatherIcon(code);
+                const isFoggy = code >= 45 && code <= 48;
 
-                const isGood = wSpd <= 18 && wGST <= 24 && rain < 40;
+                const isGood = wSpd <= 20 && wGST <= 26 && rain < 40 && vis >= 5 && !isFoggy;
 
                 const card = document.createElement('div');
-                card.className = `min-w-[130px] p-3 rounded-xl border flex flex-col justify-between text-xs ${isGood ? 'bg-slate-800/60 border-emerald-900/50' : 'bg-slate-800/40 border-amber-900/50'}`;
+                card.className = `timeline-card ${isGood ? 'good' : 'hold'}`;
                 card.innerHTML = `
-                    <div class="flex justify-between items-center text-slate-400 font-semibold mb-2">
+                    <div style="display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); font-weight: 600; margin-bottom: 0.5rem;">
                         <span>${timeLabel}</span>
-                        <i class="fa-solid ${hIcon.icon}"></i>
+                        <i class="fa-solid ${hIcon.icon}" style="color: ${hIcon.color};" title="${hIcon.label}"></i>
                     </div>
-                    <div class="space-y-1 my-1">
-                        <div class="text-white font-bold">${temp}°C</div>
-                        <div class="text-sky-300">${wSpd} kts (G${wGST})</div>
-                        <div class="text-slate-400">Rain: ${rain}%</div>
+                    <div style="display: flex; flex-direction: column; gap: 0.2rem; margin: 0.2rem 0;">
+                        <div style="color: white; font-weight: 700;">${temp}°C</div>
+                        <div style="color: #38bdf8;">${wSpd} mph (G${wGST})</div>
+                        <div style="color: var(--text-muted);">Rain: ${rain}%</div>
+                        <div style="color: var(--text-muted);">Vis: ${vis}km</div>
                     </div>
-                    <div class="mt-2 pt-2 border-t border-slate-700 text-center">
-                        <span class="text-[10px] font-bold px-2 py-0.5 rounded ${isGood ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-amber-950 text-amber-300 border border-amber-800'}">
+                    <div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--border-color); text-align: center;">
+                        <span style="font-size: 0.65rem; font-weight: 700;" class="${isGood ? 'tag-green' : 'tag-amber'}">
                             ${isGood ? 'JUMPABLE' : 'HOLD'}
                         </span>
                     </div>
@@ -527,30 +615,33 @@
                 const minT = Math.round(daily.temperature_2m_min[i]);
                 const wCode = daily.weather_code[i];
                 const wIcon = getWeatherIcon(wCode);
-                const maxW = kmhToKnots(daily.wind_speed_10m_max ? daily.wind_speed_10m_max[i] : 15);
+                const maxW = kmhToMph(daily.wind_speed_10m_max ? daily.wind_speed_10m_max[i] : 15);
                 const rainP = daily.precipitation_probability_max && daily.precipitation_probability_max[i] !== undefined 
                     ? daily.precipitation_probability_max[i] 
                     : 20;
 
                 let likelihood = 85;
-                if (maxW > 20) likelihood -= 35;
+                if (maxW > 22) likelihood -= 35;
                 if (rainP > 50) likelihood -= 40;
+                if (wCode >= 45 && wCode <= 48) likelihood -= 50;
                 likelihood = Math.max(0, Math.min(100, likelihood));
 
                 const col = document.createElement('div');
-                col.className = 'bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between text-center space-y-3';
+                col.className = 'card';
+                col.style.textAlign = 'center';
+                col.style.gap = '0.75rem';
                 col.innerHTML = `
                     <div>
-                        <div class="text-xs font-bold text-slate-300 uppercase">${dayName}</div>
-                        <div class="my-2 text-2xl"><i class="fa-solid ${wIcon.icon}"></i></div>
-                        <div class="text-sm font-semibold text-white">${maxT}°C <span class="text-xs text-slate-400 font-normal">/ ${minT}°C</span></div>
+                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">${dayName}</div>
+                        <div style="margin: 0.5rem 0; font-size: 1.5rem;"><i class="fa-solid ${wIcon.icon}" style="color: ${wIcon.color};" title="${wIcon.label}"></i></div>
+                        <div style="font-size: 0.875rem; font-weight: 600; color: white;">${maxT}°C <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 400;">/ ${minT}°C</span></div>
                     </div>
-                    <div class="text-xs text-slate-400 space-y-1">
-                        <div>Wind: <span class="text-slate-200 font-medium">${maxW} kts</span></div>
-                        <div>Rain: <span class="text-slate-200 font-medium">${rainP}%</span></div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.25rem;">
+                        <div>Wind: <span style="color: #e2e8f0; font-weight: 500;">${maxW} mph</span></div>
+                        <div>Rain: <span style="color: #e2e8f0; font-weight: 500;">${rainP}%</span></div>
                     </div>
-                    <div class="pt-2 border-t border-slate-800">
-                        <span class="text-[11px] font-bold px-2 py-1 rounded block ${likelihood >= 70 ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : likelihood >= 40 ? 'bg-amber-950 text-amber-300 border border-amber-800' : 'bg-red-950 text-red-300 border border-red-800'}">
+                    <div style="padding-top: 0.5rem; border-top: 1px solid var(--border-color);">
+                        <span style="font-size: 0.7rem; font-weight: 700; display: block;" class="${likelihood >= 70 ? 'tag-green' : likelihood >= 40 ? 'tag-amber' : 'tag-red'}">
                             Jump: ${likelihood}%
                         </span>
                     </div>
@@ -559,7 +650,6 @@
             }
         }
 
-        // Initialize on load
         window.onload = () => {
             fetchAllData();
             setInterval(fetchAllData, CONFIG.refreshIntervalMinutes * 60 * 1000);
