@@ -1,10 +1,10 @@
-<!-- REVISION: v1.0.35 -->
+<!-- REVISION: v1.0.36 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 1.0.35)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 1.0.36)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Leaflet CSS for Interactive Map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
@@ -149,7 +149,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v1.0.35",
+            revision: "v1.0.36",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -169,7 +169,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 1.0.35</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 1.0.36</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -346,7 +346,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 1.0.35 • Powered by Open-Meteo & Leaflet</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 1.0.36 • Powered by Open-Meteo & Leaflet</p>
     </footer>
 
     <!-- LEAFLET JS -->
@@ -359,7 +359,10 @@
         let leafletMap = null;
 
         function initMap() {
-            if (leafletMap) return;
+            if (leafletMap) {
+                leafletMap.invalidateSize();
+                return;
+            }
             leafletMap = L.map('leaflet-map', {
                 zoomControl: true,
                 attributionControl: false
@@ -380,6 +383,8 @@
                 .addTo(leafletMap)
                 .bindPopup(`<div style="color: #0f172a; font-family: 'Inter', sans-serif; font-weight: 600;">Skydive Southwest<br><span style="font-weight: 400; font-size: 0.8rem;">Dunkeswell Airfield (Elevation: 254ft)</span></div>`)
                 .openPopup();
+            
+            setTimeout(() => { leafletMap.invalidateSize(); }, 250);
         }
 
         function kmhToMph(kmh) {
@@ -557,7 +562,8 @@
             table.innerHTML = '';
 
             const daysToShow = 4;
-            const hoursInterval = [1, 4, 7, 10, 13, 16, 19, 22];
+            // Updated hours interval omitting 01:00 and 04:00
+            const hoursInterval = [7, 10, 13, 16, 19, 22];
 
             let dates = [];
             for (let i = 0; i < hourly.time.length; i += 3) {
