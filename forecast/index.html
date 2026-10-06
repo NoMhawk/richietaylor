@@ -1,10 +1,10 @@
-<!-- REVISION: v1.0.27 -->
+<!-- REVISION: v1.0.28 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 1.0.27)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 1.0.28)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -26,7 +26,7 @@
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-primary); color: var(--text-main); min-height: 100vh; line-height: 1.5; }
 
         header { background-color: var(--bg-card); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 50; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-        .header-container { max-width: 1400px; margin: 0 auto; padding: 1rem 1.5rem; display: flex; flex-direction: column; gap: 1rem; align-items: center; justify-content: space-between; }
+        .header-container { max-width: 1500px; margin: 0 auto; padding: 1rem 1.5rem; display: flex; flex-direction: column; gap: 1rem; align-items: center; justify-content: space-between; }
         @media(min-width: 640px) { .header-container { flex-direction: row; } }
 
         .logo-box { display: flex; align-items: center; gap: 0.75rem; }
@@ -40,7 +40,7 @@
         .btn-refresh { background-color: var(--accent-sky); color: white; border: none; font-size: 0.75rem; font-weight: 600; padding: 0.5rem 0.875rem; border-radius: 0.5rem; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; gap: 0.375rem; }
         .btn-refresh:hover { background-color: #0284c7; }
 
-        main { max-width: 1400px; margin: 0 auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 2rem; }
+        main { max-width: 1500px; margin: 0 auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 2rem; }
 
         .error-banner { background-color: rgba(127, 29, 29, 0.8); border: 1px solid #b91c1c; color: #fecaca; padding: 0.85rem 1.25rem; border-radius: 0.75rem; font-size: 0.875rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 1rem; }
         .hidden { display: none !important; }
@@ -73,6 +73,29 @@
         .panel-header { display: flex; justify-content: space-between; align-items: center; }
         .panel-title { font-size: 0.9rem; font-weight: 600; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 0.5rem; }
         .badge { font-size: 0.7rem; background-color: var(--bg-primary); color: #cbd5e1; padding: 0.25rem 0.625rem; border-radius: 0.375rem; border: 1px solid var(--border-color); font-weight: 500; }
+
+        /* WINDFINDER-STYLE SUPERFORECAST MATRIX STYLES */
+        .windfinder-container { width: 100%; overflow-x: auto; background: #0b1329; border: 1px solid var(--border-color); border-radius: 1rem; padding: 1rem; }
+        .wf-table { width: 100%; border-collapse: collapse; text-align: center; font-size: 0.75rem; white-space: nowrap; font-family: 'Inter', sans-serif; }
+        .wf-table th, .wf-table td { padding: 0.45rem 0.35rem; border: 1px solid rgba(51, 65, 85, 0.4); }
+        .wf-label { text-align: left !important; padding-left: 0.75rem !important; color: var(--text-muted); font-weight: 600; background: rgba(15, 23, 42, 0.9); width: 180px; min-width: 180px; }
+        .wf-day-header { background: #1e293b; color: white; font-weight: 700; font-size: 0.8rem; text-align: center; }
+        .wf-time-header { background: rgba(30, 41, 59, 0.7); color: var(--text-muted); font-weight: 600; font-size: 0.7rem; }
+        .wf-arrow { font-size: 1rem; display: inline-block; color: #38bdf8; }
+        
+        /* Speed / Gust Pill Colors matching Windfinder vibe */
+        .wf-val { font-weight: 700; padding: 0.2rem 0.1rem; border-radius: 0.2rem; display: block; color: white; }
+        .wf-wind-0 { background: #3b82f6; }
+        .wf-wind-10 { background: #06b6d4; }
+        .wf-wind-15 { background: #10b981; }
+        .wf-wind-20 { background: #f59e0b; }
+        .wf-wind-25 { background: #f97316; }
+        .wf-wind-30 { background: #ef4444; }
+
+        .wf-temp-hot { background: #f97316; color: white; font-weight: 700; }
+        .wf-temp-warm { background: #facc15; color: #0f172a; font-weight: 700; }
+        .wf-temp-mild { background: #34d399; color: #0f172a; font-weight: 700; }
+        .wf-temp-cool { background: #3b82f6; color: white; font-weight: 700; }
 
         .table-responsive { width: 100%; overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.8rem; }
@@ -119,4 +142,214 @@
         .map-container { position: relative; width: 100%; height: 450px; border-radius: 0.75rem; overflow: hidden; border: 1px solid var(--border-color); background: #000; }
         .map-container iframe { width: 100%; height: 100%; border: none; }
 
-        footer { background-color: var(--bg-card); border-top: 1px solid var(--border-color); margin-top: 3rem; padding: 1.5rem; text-align: center; font-size: 0.75rem; color: var
+        footer { background-color: var(--bg-card); border-top: 1px solid var(--border-color); margin-top: 3rem; padding: 1.5rem; text-align: center; font-size: 0.75rem; color: var(--text-muted); }
+    </style>
+</head>
+<body>
+
+    <!-- CONFIGURATION & SETTINGS BLOCK -->
+    <script>
+        const CONFIG = {
+            revision: "v1.0.28",
+            systemName: "RichBot",
+            locationName: "Skydive Southwest, Dunkeswell Airfield",
+            latitude: 50.880,
+            longitude: -3.230,
+            elevation: 254,
+            timezone: "Europe/London",
+            refreshIntervalMinutes: 5,
+            models: ['best_match', 'ecmwf_ifs', 'gfs_seamless', 'ukmo_ukv']
+        };
+    </script>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-container">
+            <div class="logo-box">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-plane-departure"></i>
+                </div>
+                <div>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 1.0.28</span></h1>
+                    <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <span id="last-updated" class="last-updated">
+                    <i class="fa-solid fa-sync fa-spin" style="color: var(--accent-sky);"></i> Loading...
+                </span>
+                <button onclick="fetchAllData()" class="btn-refresh">
+                    <i class="fa-solid fa-rotate"></i> Refresh
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main>
+
+        <!-- ERROR BANNER -->
+        <div id="error-banner" class="error-banner hidden">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.125rem;"></i>
+                <span id="error-message">Weather service temporarily busy (503). Retrying automatically...</span>
+            </div>
+            <button onclick="fetchAllData()" style="background: #991b1b; color: white; border: 1px solid #f87171; padding: 0.3rem 0.75rem; border-radius: 0.375rem; cursor: pointer; font-weight: 600; font-size: 0.75rem;">Retry Now</button>
+        </div>
+
+        <!-- ================= 7-DAY EXTENDED SELECTOR (TOP) ================= -->
+        <section class="space-y-3">
+            <div class="section-header">
+                <div class="section-title-wrap">
+                    <div class="section-dot"></div>
+                    <h2 class="section-title">7-Day Dropzone Outlook (Click to View Day)</h2>
+                </div>
+                <span class="section-date" id="selected-day-header-label">Select Day</span>
+            </div>
+            <div class="selector-grid" id="day-selector-grid">
+                <!-- Populated via JS -->
+            </div>
+        </section>
+
+        <!-- ================= WINDFINDER-STYLE SUPERFORECAST MATRIX ================= -->
+        <section class="space-y-3">
+            <div class="section-header">
+                <div class="section-title-wrap">
+                    <div class="section-dot" style="background-color: var(--accent-emerald);"></div>
+                    <h2 class="section-title">Multi-Day Superforecast Overview</h2>
+                </div>
+                <span class="section-date">Windfinder Style Matrix</span>
+            </div>
+            <div class="windfinder-container">
+                <div class="table-responsive">
+                    <table class="wf-table" id="wf-matrix-table">
+                        <!-- Populated dynamically via JS -->
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SELECTED DAY OPERATIONAL VIEW ================= -->
+        <section class="space-y-6">
+            <div class="section-header">
+                <div class="section-title-wrap">
+                    <div class="section-dot" style="background-color: var(--accent-emerald);"></div>
+                    <h2 class="section-title" id="active-day-title">Today's Detailed View</h2>
+                </div>
+                <span id="active-day-date" class="section-date"></span>
+            </div>
+
+            <!-- Summary & Jumpability Card -->
+            <div class="cards-grid-4">
+                <div class="card">
+                    <div>
+                        <span class="card-label">Jumpability Score</span>
+                        <div class="card-value" id="active-jump-score" style="color: var(--accent-emerald);">--%</div>
+                    </div>
+                    <p class="card-desc" id="active-jump-desc">Calculating conditions...</p>
+                </div>
+                <div class="card">
+                    <div>
+                        <span class="card-label">Max Temp / Weather</span>
+                        <div class="card-value" id="active-temp" style="font-size: 1.5rem;">--°C</div>
+                    </div>
+                    <div class="card-desc" style="color: var(--accent-sky);" id="active-condition">
+                        <i class="fa-solid fa-cloud"><span>Loading...</span></i>
+                    </div>
+                </div>
+                <div class="card">
+                    <div>
+                        <span class="card-label">Peak Ground Wind</span>
+                        <div class="card-value" id="active-wind" style="font-size: 1.5rem;">-- mph</div>
+                    </div>
+                    <p class="card-desc" id="active-gusts">Max Gusts up to -- mph</p>
+                </div>
+                <div class="card">
+                    <div>
+                        <span class="card-label">Fog & Hazards</span>
+                        <div class="card-value" id="active-rain" style="font-size: 1.5rem;">--%</div>
+                    </div>
+                    <p class="card-desc" id="active-rain-amount">Visibility: -- km</p>
+                </div>
+            </div>
+
+            <!-- Detailed Hourly Onsite Breakdown (07:00 to 19:00) -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h3 class="panel-title"><i class="fa-solid fa-clock" style="color: var(--accent-sky);"></i>Fixed Hourly Schedule (07:00 - 19:00)</h3>
+                    <span class="badge">Flight Line Operational View</span>
+                </div>
+                <div class="hourly-grid" id="active-hourly-grid">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
+            <!-- ================= LIVE BLUE SATELLITE AUTOPLAYBACK LOOP ================= -->
+            <div class="panel" style="padding: 1.25rem;">
+                <div class="panel-header" style="margin-bottom: 1rem;">
+                    <h3 class="panel-title"><i class="fa-solid fa-satellite" style="color: var(--accent-sky);"></i>Live Blue Satellite Autoplayback Loop</h3>
+                    <span class="badge">Real-Time Cloud Loop</span>
+                </div>
+                <div class="map-container">
+                    <iframe src="https://embed.windy.com/embed2.html?lat=50.880&lon=-3.230&detailLat=50.880&detailLon=-3.230&width=650&height=450&zoom=8&level=surface&overlay=clouds&product=satellite&menu=&message=&marker=true&calendar=now&pressure=true&type=map&location=coordinates&detail=true&metricWind=mph&metricTemp=%C2%B0C&play=1" title="RichBot Blue Satellite Autoplayback"></iframe>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--text-muted); padding-top: 0.5rem;">
+                    <span><i class="fa-solid fa-circle-play text-sky-400 mr-1"></i> Live autoplayback loop tracking natural-color blue satellite cloud formations over South West UK.</span>
+                    <span>Powered by Windy</span>
+                </div>
+            </div>
+
+            <!-- Multi-Model Surface Wind Comparison Table -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h3 class="panel-title"><i class="fa-solid fa-wind" style="color: var(--accent-sky);"></i>Ground Wind & Model Comparison (mph)</h3>
+                    <span class="badge">Multi-Model Agreement</span>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Model Source</th>
+                                <th>Wind Speed</th>
+                                <th>Gusts</th>
+                                <th>Direction</th>
+                                <th>Model Confidence</th>
+                            </tr>
+                        </thead>
+                        <tbody id="active-model-table">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Winds Aloft Ladder & Cloud Breakdown -->
+            <div class="grid-2">
+                <!-- Winds Aloft Ladder -->
+                <div class="panel">
+                    <h3 class="panel-title"><i class="fa-solid fa-layer-group" style="color: var(--accent-sky);"></i>Winds Aloft Ladder (Jump Altitudes - mph)</h3>
+                    <div style="display: flex; flex-direction: column; gap: 0.85rem;" id="active-aloft-ladder">
+                        <!-- Populated via JS -->
+                    </div>
+                </div>
+
+                <!-- Stratified Cloud Layers & Depth (0-15k+ AGL) -->
+                <div class="panel">
+                    <h3 class="panel-title"><i class="fa-solid fa-cloud-sun" style="color: var(--accent-sky);"></i>Cloud Stratification (0 - 15k+ ft AGL)</h3>
+                    <div style="display: flex; flex-direction: column; gap: 0.85rem;" id="active-cloud-layers">
+                        <!-- Populated via JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 1.0.28 • Powered by Open-Meteo & Windy API</p>
+    </footer>
+
+    <!-- APPLICATION LOGIC -->
+    <script>
+        let globalWeatherData = null
