@@ -1,10 +1,10 @@
-<!-- REVISION: v1.0.28 -->
+<!-- REVISION: v1.0.29 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 1.0.28)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 1.0.29)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -83,7 +83,6 @@
         .wf-time-header { background: rgba(30, 41, 59, 0.7); color: var(--text-muted); font-weight: 600; font-size: 0.7rem; }
         .wf-arrow { font-size: 1rem; display: inline-block; color: #38bdf8; }
         
-        /* Speed / Gust Pill Colors matching Windfinder vibe */
         .wf-val { font-weight: 700; padding: 0.2rem 0.1rem; border-radius: 0.2rem; display: block; color: white; }
         .wf-wind-0 { background: #3b82f6; }
         .wf-wind-10 { background: #06b6d4; }
@@ -102,13 +101,11 @@
         th { background-color: rgba(30, 41, 59, 0.6); color: var(--text-muted); text-transform: uppercase; font-weight: 600; padding: 0.85rem; }
         td { padding: 0.85rem; border-top: 1px solid var(--border-color); color: #e2e8f0; }
 
-        /* Threshold Color Utilities */
         .text-green { color: #34d399 !important; }
         .text-yellow { color: #facc15 !important; }
         .text-orange { color: #fb923c !important; }
         .text-red { color: #f87171 !important; }
 
-        /* 4-Tier Condition Status Pill Classes */
         .status-green { background-color: rgba(6, 78, 59, 0.7); color: #6ee7b7; border: 1px solid rgba(5, 150, 105, 0.5); padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.65rem; display: block; text-transform: uppercase; }
         .status-yellow { background-color: rgba(113, 63, 18, 0.7); color: #fde047; border: 1px solid rgba(202, 138, 4, 0.5); padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.65rem; display: block; text-transform: uppercase; }
         .status-orange { background-color: rgba(124, 45, 18, 0.7); color: #fdba74; border: 1px solid rgba(234, 88, 12, 0.5); padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.65rem; display: block; text-transform: uppercase; }
@@ -122,7 +119,6 @@
         .ladder-sub { color: var(--text-muted); font-size: 0.75rem; }
         .ladder-val { text-align: right; }
 
-        /* Hourly Grid Layout */
         .hourly-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
         @media(min-width: 768px) { .hourly-grid { grid-template-columns: repeat(2, 1fr); } }
         @media(min-width: 1200px) { .hourly-grid { grid-template-columns: repeat(3, 1fr); } }
@@ -138,7 +134,6 @@
         .status-box { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(51, 65, 85, 0.6); border-radius: 0.4rem; padding: 0.35rem 0.2rem; display: flex; flex-direction: column; gap: 0.2rem; }
         .status-title { font-size: 0.6rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
 
-        /* Satellite / Radar Embed Frame */
         .map-container { position: relative; width: 100%; height: 450px; border-radius: 0.75rem; overflow: hidden; border: 1px solid var(--border-color); background: #000; }
         .map-container iframe { width: 100%; height: 100%; border: none; }
 
@@ -147,10 +142,9 @@
 </head>
 <body>
 
-    <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v1.0.28",
+            revision: "v1.0.29",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -170,7 +164,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 1.0.28</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 1.0.29</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -347,9 +341,297 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 1.0.28 • Powered by Open-Meteo & Windy API</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 1.0.29 • Powered by Open-Meteo & Windy API</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
     <script>
-        let globalWeatherData = null
+        let globalWeatherData = null;
+        let selectedDayIndex = 0; // Default to today
+
+        function kmhToMph(kmh) {
+            return Math.round(kmh * 0.621371);
+        }
+
+        function getCloudColorClass(val) {
+            if (val <= 50) return 'text-green';
+            if (val <= 70) return 'text-yellow';
+            if (val <= 95) return 'text-orange';
+            return 'text-red';
+        }
+
+        function getWindColorClass(mph) {
+            if (mph <= 12) return 'text-green';
+            if (mph <= 17) return 'text-yellow';
+            if (mph <= 22) return 'text-orange';
+            return 'text-red';
+        }
+
+        function getVisColorClass(visKm) {
+            if (visKm >= 7) return 'text-green';
+            if (visKm >= 5) return 'text-yellow';
+            if (visKm >= 3) return 'text-orange';
+            return 'text-red';
+        }
+
+        function getRainColorClass(prob) {
+            if (prob <= 20) return 'text-green';
+            if (prob <= 40) return 'text-yellow';
+            if (prob <= 60) return 'text-orange';
+            return 'text-red';
+        }
+
+        function getBaseColorClass(baseFt) {
+            if (baseFt >= 5000) return 'text-green';
+            if (baseFt >= 3500) return 'text-yellow';
+            if (baseFt >= 2000) return 'text-orange';
+            return 'text-red';
+        }
+
+        function getWeatherIcon(code, rainProb = 0) {
+            if (rainProb >= 30) {
+                if (code >= 95) return { icon: 'fa-cloud-bolt', color: '#c084fc', label: 'Thunderstorms' };
+                if (code >= 80 && code <= 82) return { icon: 'fa-cloud-showers-heavy', color: '#3b82f6', label: 'Heavy Showers' };
+                return { icon: 'fa-cloud-rain', color: '#60a5fa', label: 'Rain Showers' };
+            }
+            if (code === 0) return { icon: 'fa-sun', color: '#f59e0b', label: 'Clear Sky' };
+            if (code >= 1 && code <= 3) return { icon: 'fa-cloud-sun', color: '#38bdf8', label: 'Partly Cloudy' };
+            if (code >= 45 && code <= 48) return { icon: 'fa-smog', color: '#94a3b8', label: 'Fog / Mist' };
+            if (code >= 71 && code <= 77) return { icon: 'fa-snowflake', color: '#c7d2fe', label: 'Snow' };
+            return { icon: 'fa-cloud', color: '#94a3b8', label: 'Overcast' };
+        }
+
+        function getWindDirectionLabel(degrees) {
+            const dirs = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+            return dirs[Math.round((degrees % 360) / 22.5) % 16];
+        }
+
+        function getWindClass(mph) {
+            if (mph < 6) return 'wf-wind-0';
+            if (mph < 12) return 'wf-wind-10';
+            if (mph < 18) return 'wf-wind-15';
+            if (mph < 24) return 'wf-wind-20';
+            if (mph < 30) return 'wf-wind-25';
+            return 'wf-wind-30';
+        }
+
+        function getTempClass(t) {
+            if (t >= 20) return 'wf-temp-hot';
+            if (t >= 15) return 'wf-temp-warm';
+            if (t >= 10) return 'wf-temp-mild';
+            return 'wf-temp-cool';
+        }
+
+        async function fetchWithRetry(url, retries = 3, delay = 1000) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url);
+                    if (response.ok) return await response.json();
+                    if (response.status === 503 && i < retries - 1) {
+                        console.warn(`Open-Meteo 503 received. Retrying in ${delay}ms...`);
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2;
+                        continue;
+                    }
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                } catch (err) {
+                    if (i === retries - 1) throw err;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2;
+                }
+            }
+        }
+
+        async function fetchAllData() {
+            const errBanner = document.getElementById('error-banner');
+            const errMessage = document.getElementById('error-message');
+            errBanner.classList.add('hidden');
+
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&elevation=${CONFIG.elevation}&hourly=temperature_2m,dew_point_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,wind_speed_10m,wind_direction_10m,wind_gusts_10m,surface_pressure,visibility,wind_speed_850hPa,wind_direction_850hPa,temperature_850hPa,wind_speed_700hPa,wind_direction_700hPa,temperature_700hPa,wind_speed_500hPa,wind_direction_500hPa,temperature_500hPa&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant&timezone=${CONFIG.timezone}`;
+
+            try {
+                globalWeatherData = await fetchWithRetry(url);
+
+                document.getElementById('last-updated').innerHTML = `<i class="fa-solid fa-check" style="color: var(--accent-emerald);"></i> Updated: ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} (${CONFIG.revision})`;
+
+                renderDaySelector();
+                renderWindfinderMatrix();
+                renderActiveDay(selectedDayIndex);
+
+            } catch (err) {
+                console.error("Error fetching weather data:", err);
+                errMessage.textContent = `Weather server temporarily unavailable (${err.message}). Click 'Retry Now' or check connection.`;
+                errBanner.classList.remove('hidden');
+                document.getElementById('last-updated').innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color: #f87171;"></i> Update Failed`;
+            }
+        }
+
+        function calculateCloudbaseAGL(temp, dewPoint, lowCover) {
+            if (lowCover < 15) return 12000;
+            const spread = Math.max(0.1, temp - dewPoint);
+            let baseFt = Math.round((spread / 2.5) * 1000);
+            if (baseFt < 200) baseFt = 200;
+            if (baseFt > 12000) baseFt = 12000;
+            return baseFt;
+        }
+
+        function getCustomCloudBands(rawLow, mid, high, visKm, rainProb) {
+            let low = rawLow;
+            if (visKm >= 10 && rainProb <= 10) {
+                low = Math.round(rawLow * 0.45);
+            }
+            const c0_5k = Math.min(100, Math.max(10, Math.round(low * 0.85)));
+            const c5_10k = Math.min(100, Math.round((low * 0.15) + (mid * 0.4)));
+            const c10_15k = Math.min(100, Math.round(mid * 0.6));
+            const c15k_plus = Math.min(100, Math.round(high));
+            return { c0_5k, c5_10k, c10_15k, c15k_plus };
+        }
+
+        function getStudentTier(wSpd, wGST, rain, vis, c0_5k, baseFt, hFog) {
+            if (hFog || vis < 7) return { tier: 'red', label: 'Fog / Vis', reason: 'Low visibility / Fog' };
+            if (rain >= 30) return { tier: 'red', label: 'Rain', reason: 'Rain risk' };
+            if (baseFt < 3000 && c0_5k >= 60) return { tier: 'red', label: 'Cloud', reason: `Low cloudbase (${baseFt} ft AGL)` };
+            if (wSpd > 17 || wGST > 23) return { tier: 'red', label: 'Wind', reason: 'Wind exceeds student limit (15kt)' };
+            if (wSpd >= 14 || wGST >= 19) return { tier: 'orange', label: 'Wind', reason: 'Near student wind limit' };
+            if (baseFt < 4500 && c0_5k >= 40) return { tier: 'yellow', label: 'Cloud', reason: `Low ceiling (${baseFt} ft)` };
+            return { tier: 'green', label: 'Nominal', reason: 'Nominal' };
+        }
+
+        function getClubTier(wSpd, wGST, rain, vis, c0_5k, baseFt, hFog) {
+            if (hFog || vis < 4) return { tier: 'red', label: 'Fog / Vis', reason: 'Low visibility / Fog' };
+            if (rain >= 50) return { tier: 'red', label: 'Rain', reason: 'Rain risk' };
+            if (baseFt < 2000 && c0_5k >= 80) return { tier: 'red', label: 'Cloud', reason: `Cloudbase too low (${baseFt} ft)` };
+            if (wSpd > 23 || wGST > 29) return { tier: 'red', label: 'Wind', reason: 'Wind exceeds club limit (20kt)' };
+            if (wSpd >= 19 || wGST >= 24) return { tier: 'orange', label: 'Wind', reason: 'Brisk winds for club jumpers' };
+            if (wSpd >= 16) return { tier: 'yellow', label: 'Wind', reason: 'Moderate breeze' };
+            return { tier: 'green', label: 'Nominal', reason: 'Nominal' };
+        }
+
+        function getTandemTier(wSpd, wGST, rain, vis, c0_5k, baseFt, hFog) {
+            if (hFog || vis < 5) return { tier: 'red', label: 'Fog / Vis', reason: 'Low visibility / Fog' };
+            if (rain >= 40) return { tier: 'red', label: 'Rain', reason: 'Rain risk' };
+            if (baseFt < 3500 && c0_5k >= 70) return { tier: 'red', label: 'Cloud', reason: `Low ceiling blocks tandems (${baseFt} ft)` };
+            if (wSpd > 23 || wGST > 29) return { tier: 'red', label: 'Wind', reason: 'Wind exceeds tandem limit (20kt)' };
+            if (wSpd >= 19 || wGST >= 24) return { tier: 'orange', label: 'Wind', reason: 'Brisk winds for tandems' };
+            if (baseFt < 5000 && c0_5k >= 50) return { tier: 'yellow', label: 'Cloud', reason: `Scattered low cloud (${baseFt} ft)` };
+            return { tier: 'green', label: 'Nominal', reason: 'Nominal' };
+        }
+
+        function renderWindfinderMatrix() {
+            const hourly = globalWeatherData.hourly;
+            const table = document.getElementById('wf-matrix-table');
+            table.innerHTML = '';
+
+            const daysToShow = 4;
+            const hoursInterval = [1, 4, 7, 10, 13, 16, 19, 22];
+
+            let dates = [];
+            for (let i = 0; i < hourly.time.length; i += 3) {
+                const dStr = hourly.time[i].split('T')[0];
+                if (!dates.includes(dStr)) dates.push(dStr);
+            }
+            dates = dates.slice(0, daysToShow);
+
+            let trDay = `<tr><th class="wf-label">Local date</th>`;
+            dates.forEach(dateStr => {
+                const dateObj = new Date(dateStr);
+                const dayName = dateObj.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+                trDay += `<th colspan="${hoursInterval.length}" class="wf-day-header">${dayName}</th>`;
+            });
+            trDay += `</tr>`;
+
+            let trTime = `<tr><th class="wf-label">Local time</th>`;
+            dates.forEach(() => {
+                hoursInterval.forEach(h => {
+                    trTime += `<th class="wf-time-header">${String(h).padStart(2, '0')}h</th>`;
+                });
+            });
+            trTime += `</tr>`;
+
+            let trDir = `<tr><td class="wf-label">Wind direction</td>`;
+            let trSpd = `<tr><td class="wf-label">Wind speed (mph)</td>`;
+            let trGust = `<tr><td class="wf-label">Wind gusts (max mph)</td>`;
+            let trCloud = `<tr><td class="wf-label">Cloud cover</td>`;
+            let trRain = `<tr><td class="wf-label">Precipitation (mm)</td>`;
+            let trTemp = `<tr><td class="wf-label">Air temperature (°C)</td>`;
+            let trPress = `<tr><td class="wf-label">Air pressure (hPa)</td>`;
+
+            dates.forEach(dateStr => {
+                hoursInterval.forEach(hTarget => {
+                    const targetStr = `${dateStr}T${String(hTarget).padStart(2, '0')}:00`;
+                    let idx = hourly.time.findIndex(t => t.startsWith(targetStr));
+                    if (idx === -1) {
+                        idx = hourly.time.findIndex(t => t.startsWith(dateStr));
+                    }
+
+                    const dirDeg = hourly.wind_direction_10m[idx] || 0;
+                    const spd = kmhToMph(hourly.wind_speed_10m[idx] || 0);
+                    const gust = kmhToMph(hourly.wind_gusts_10m[idx] || 0);
+                    const cloudPct = hourly.cloud_cover[idx] || 0;
+                    const rainMm = hourly.precipitation ? hourly.precipitation[idx] || 0 : 0;
+                    const temp = Math.round(hourly.temperature_2m[idx] || 15);
+                    const press = Math.round(hourly.surface_pressure ? hourly.surface_pressure[idx] || 1013 : 1013);
+
+                    const rot = (dirDeg + 180) % 360;
+
+                    trDir += `<td><i class="fa-solid fa-location-arrow wf-arrow" style="transform: rotate(${rot}deg);"></i></td>`;
+                    trSpd += `<td><span class="wf-val ${getWindClass(spd)}">${spd}</span></td>`;
+                    trGust += `<td><span class="wf-val ${getWindClass(gust)}">${gust}</span></td>`;
+                    
+                    let cloudIcon = 'fa-sun';
+                    let cloudColor = '#f59e0b';
+                    if (cloudPct > 80) { cloudIcon = 'fa-cloud'; cloudColor = '#94a3b8'; }
+                    else if (cloudPct > 40) { cloudIcon = 'fa-cloud-sun'; cloudColor = '#38bdf8'; }
+                    trCloud += `<td><i class="fa-solid ${cloudIcon}" style="color: ${cloudColor}; font-size: 0.85rem;" title="${cloudPct}% cloud"></i></td>`;
+
+                    trRain += `<td><span style="color: ${rainMm > 0 ? '#38bdf8' : 'var(--text-muted);'}; font-size: 0.7rem;">${rainMm > 0 ? rainMm.toFixed(1) : ''}</span></td>`;
+                    trTemp += `<td><span class="wf-val ${getTempClass(temp)}">${temp}°</span></td>`;
+                    trPress += `<td><span style="font-size: 0.7rem; color: #cbd5e1;">${press}</span></td>`;
+                });
+            });
+
+            trDir += `</tr>`;
+            trSpd += `</tr>`;
+            trGust += `</tr>`;
+            trCloud += `</tr>`;
+            trRain += `</tr>`;
+            trTemp += `</tr>`;
+            trPress += `</tr>`;
+
+            table.innerHTML = trDay + trTime + trDir + trSpd + trGust + trCloud + trRain + trTemp + trPress;
+        }
+
+        function renderDaySelector() {
+            const grid = document.getElementById('day-selector-grid');
+            grid.innerHTML = '';
+            const daily = globalWeatherData.daily;
+            const hourly = globalWeatherData.hourly;
+
+            for (let i = 0; i < Math.min(7, daily.time.length); i++) {
+                const dateObj = new Date(daily.time[i]);
+                const dayName = dateObj.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+                const maxT = Math.round(daily.temperature_2m_max[i]);
+                const minT = Math.round(daily.temperature_2m_min[i]);
+                const wCode = daily.weather_code[i];
+                const maxRainProb = daily.precipitation_probability_max ? daily.precipitation_probability_max[i] : 0;
+                const wIcon = getWeatherIcon(wCode, maxRainProb);
+
+                const targetDateStr = dateObj.toISOString().split('T')[0];
+                let dayStart = hourly.time.findIndex(t => t.startsWith(targetDateStr) && t.includes('07:00'));
+                if (dayStart === -1) dayStart = i * 24;
+                
+                let greenHoursCount = 0;
+                let evaluatedHours = 0;
+
+                for (let h = dayStart; h < Math.min(dayStart + 13, hourly.time.length); h++) {
+                    const ws = kmhToMph(hourly.wind_speed_10m[h]);
+                    const wg = kmhToMph(hourly.wind_gusts_10m[h]);
+                    const rn = hourly.precipitation_probability[h];
+                    const vs = hourly.visibility[h] / 1000;
+                    const lw = hourly.cloud_cover_low[h] || 0;
+                    const md = hourly.cloud_cover_mid[h] || 0;
+                    const hgh = hourly.cloud_cover_high[h] || 0;
+                    const cb = getCustomCloudBands(lw, md, hgh, vs, rn);
+                    const tp = hourly.temperature_2m[h];
+                    const dp = hourly.dew_point_2m[h];
+                    const base = calculateCloudbaseAGL(tp, dp,
