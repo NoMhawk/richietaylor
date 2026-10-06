@@ -1,10 +1,10 @@
-<!-- REVISION: v2.0.3 -->
+<!-- REVISION: v2.0.5 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 2.0.3)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 2.0.5)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -66,17 +66,17 @@
         .badge { font-size: 0.7rem; background-color: #f1f5f9; color: #334155; padding: 0.25rem 0.625rem; border-radius: 0.375rem; border: 1px solid var(--border-color); font-weight: 600; }
 
         /* 7-DAY INDIVIDUAL CARDS GRID CONTAINER */
-        .outlook-days-grid { display: grid; grid-template-columns: repeat(1, 1f); gap: 1rem; }
+        .outlook-days-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 1rem; }
         @media(min-width: 640px) { .outlook-days-grid { grid-template-columns: repeat(2, 1fr); } }
         @media(min-width: 1024px) { .outlook-days-grid { grid-template-columns: repeat(4, 1fr); } }
         @media(min-width: 1400px) { .outlook-days-grid { grid-template-columns: repeat(7, 1fr); } }
 
-        .outlook-day-card { background-color: var(--bg-card); border: 2px solid var(--border-color); border-radius: 1rem; padding: 1.15rem; display: flex; flex-direction: column; justify-content: space-between; gap: 0.85rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .outlook-day-card { background-color: var(--bg-card); border: 2px solid var(--border-color); border-radius: 1rem; padding: 1.15rem; display: flex; flex-direction: column; justify-content: space-between; gap: 0.75rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .outlook-day-card:hover { border-color: var(--accent-sky); box-shadow: 0 4px 6px rgba(0,0,0,0.08); }
         .outlook-day-card.active { background-color: #f0f9ff; border-color: var(--accent-sky); box-shadow: 0 0 15px rgba(2, 132, 199, 0.2); }
 
-        .outlook-section { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem 0.75rem; display: flex; flex-direction: column; gap: 0.3rem; }
-        .outlook-section-title { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.2rem; }
+        .outlook-section { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem 0.75rem; display: flex; flex-direction: column; gap: 0.25rem; }
+        .outlook-section-title { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.15rem; }
 
         .text-green { color: #059669 !important; font-weight: 700; }
         .text-yellow { color: #d97706 !important; font-weight: 700; }
@@ -98,9 +98,10 @@
         .hour-section { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem 0.75rem; display: flex; flex-direction: column; gap: 0.25rem; }
         .hour-section-title { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.2rem; margin-bottom: 0.1rem; display: flex; justify-content: space-between; }
 
-        .status-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; text-align: center; }
-        .status-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.4rem; padding: 0.35rem 0.2rem; display: flex; flex-direction: column; gap: 0.2rem; }
-        .status-title { font-size: 0.6rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+        /* 2-column grid for Students & Licenced */
+        .status-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; text-align: center; }
+        .status-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.4rem; padding: 0.4rem; display: flex; flex-direction: column; gap: 0.2rem; }
+        .status-title { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
 
         /* Windy Satellite Map Container */
         .map-container { position: relative; width: 100%; height: 500px; border-radius: 0.75rem; overflow: hidden; border: 1px solid var(--border-color); background: #e2e8f0; }
@@ -112,7 +113,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v2.0.3",
+            revision: "v2.0.5",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -131,7 +132,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 2.0.3</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 2.0.5</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -248,7 +249,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 2.0.3 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 2.0.5 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -387,27 +388,17 @@
             return { tier: 'green', label: 'Nominal', reason: 'Nominal' };
         }
 
-        function getClubTier(wSpd, wGST, rain, vis, c0_5k, baseFt, hFog) {
+        function getLicencedTier(wSpd, wGST, rain, vis, c0_5k, baseFt, hFog) {
             if (hFog || vis < 4) return { tier: 'red', label: 'Fog / Vis', reason: 'Low visibility / Fog' };
             if (rain >= 50) return { tier: 'red', label: 'Rain', reason: 'Rain risk' };
             if (baseFt < 2000 && c0_5k >= 80) return { tier: 'red', label: 'Cloud', reason: `Cloudbase too low (${baseFt} ft)` };
-            if (wSpd > 23 || wGST > 29) return { tier: 'red', label: 'Wind', reason: 'Wind exceeds club limit (20kt)' };
-            if (wSpd >= 19 || wGST >= 24) return { tier: 'orange', label: 'Wind', reason: 'Brisk winds for club jumpers' };
+            if (wSpd > 25 || wGST > 32) return { tier: 'red', label: 'Wind', reason: 'Wind exceeds licenced limit' };
+            if (wSpd >= 20 || wGST >= 26) return { tier: 'orange', label: 'Wind', reason: 'Brisk winds for licenced jumpers' };
             if (wSpd >= 16) return { tier: 'yellow', label: 'Wind', reason: 'Moderate breeze' };
             return { tier: 'green', label: 'Nominal', reason: 'Nominal' };
         }
 
-        function getTandemTier(wSpd, wGST, rain, vis, c0_5k, baseFt, hFog) {
-            if (hFog || vis < 5) return { tier: 'red', label: 'Fog / Vis', reason: 'Low visibility / Fog' };
-            if (rain >= 40) return { tier: 'red', label: 'Rain', reason: 'Rain risk' };
-            if (baseFt < 3500 && c0_5k >= 70) return { tier: 'red', label: 'Cloud', reason: `Low ceiling blocks tandems (${baseFt} ft)` };
-            if (wSpd > 23 || wGST > 29) return { tier: 'red', label: 'Wind', reason: 'Wind exceeds tandem limit (20kt)' };
-            if (wSpd >= 19 || wGST >= 24) return { tier: 'orange', label: 'Wind', reason: 'Brisk winds for tandems' };
-            if (baseFt < 5000 && c0_5k >= 50) return { tier: 'yellow', label: 'Cloud', reason: `Scattered low cloud (${baseFt} ft)` };
-            return { tier: 'green', label: 'Nominal', reason: 'Nominal' };
-        }
-
-        function calculateDayLikelihood(dayIndex, hourly) {
+        function calculateDayMetrics(dayIndex, hourly) {
             const daily = globalWeatherData.daily;
             const targetDateStr = daily.time[dayIndex];
             let dayStart = hourly.time.findIndex(t => t.startsWith(targetDateStr) && t.includes('07:00'));
@@ -415,10 +406,15 @@
 
             let greenHoursCount = 0;
             let evaluatedHours = 0;
+            let maxWindForDay = 0;
+            let maxGustForDay = 0;
 
             for (let h = dayStart; h < Math.min(dayStart + 13, hourly.time.length); h++) {
                 const ws = kmhToMph(hourly.wind_speed_10m[h]);
                 const wg = kmhToMph(hourly.wind_gusts_10m[h]);
+                if (ws > maxWindForDay) maxWindForDay = ws;
+                if (wg > maxGustForDay) maxGustForDay = wg;
+
                 const rn = hourly.precipitation_probability[h];
                 const vs = hourly.visibility[h] / 1000;
                 const lw = hourly.cloud_cover_low[h] || 0;
@@ -432,14 +428,15 @@
                 const cd = hourly.weather_code[h];
                 const fg = cd >= 45 && cd <= 48 || vs < 5 || hm >= 95;
 
-                const tStat = getTandemTier(ws, wg, rn, vs, cb.c0_5k, base, fg);
-                if (tStat.tier === 'green') greenHoursCount++;
+                const licStat = getLicencedTier(ws, wg, rn, vs, cb.c0_5k, base, fg);
+                const stuStat = getStudentTier(ws, wg, rn, vs, cb.c0_5k, base, fg);
+                if (licStat.tier === 'green' && stuStat.tier === 'green') greenHoursCount++;
                 evaluatedHours++;
             }
-            return evaluatedHours > 0 ? Math.round((greenHoursCount / evaluatedHours) * 100) : 85;
+            const likelihood = evaluatedHours > 0 ? Math.round((greenHoursCount / evaluatedHours) * 100) : 85;
+            return { likelihood, maxWindForDay, maxGustForDay };
         }
 
-        // Renders 7 individual daily boxes matching the layout structure of the fixed hourly schedule cards
         function renderOutlookCards() {
             const container = document.getElementById('outlook-days-container');
             container.innerHTML = '';
@@ -449,7 +446,8 @@
             for (let i = 0; i < Math.min(7, daily.time.length); i++) {
                 const dateObj = new Date(daily.time[i]);
                 const dayName = dateObj.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }).toUpperCase();
-                const likelihood = calculateDayLikelihood(i, hourly);
+                
+                const metrics = calculateDayMetrics(i, hourly);
                 const maxT = Math.round(daily.temperature_2m_max[i]);
                 const minT = Math.round(daily.temperature_2m_min[i]);
                 const wCode = daily.weather_code[i];
@@ -457,7 +455,7 @@
                 const wInfo = getWeatherIcon(wCode, maxRainProb);
 
                 const isActive = i === selectedDayIndex ? ' active' : '';
-                const badgeClass = likelihood >= 70 ? 'status-green' : likelihood >= 40 ? 'status-yellow' : 'status-red';
+                const badgeClass = metrics.likelihood >= 70 ? 'status-green' : metrics.likelihood >= 40 ? 'status-yellow' : 'status-red';
 
                 const card = document.createElement('div');
                 card.className = `outlook-day-card${isActive}`;
@@ -467,15 +465,33 @@
                         <span style="font-weight: 700; color: #0f172a; font-size: 0.9rem;">${dayName}</span>
                         <i class="fa-solid ${wInfo.icon}" style="color: ${wInfo.color}; font-size: 1.1rem;" title="${wInfo.label}"></i>
                     </div>
+
                     <div class="outlook-section">
                         <div class="outlook-section-title">Jumpability</div>
-                        <span class="${badgeClass}">JUMP: ${likelihood}%</span>
+                        <span class="${badgeClass}">JUMP: ${metrics.likelihood}%</span>
                     </div>
+
                     <div class="outlook-section">
-                        <div class="outlook-section-title">Temperature</div>
-                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700; color: #0f172a;">
-                            <span>Max: ${maxT}°C</span>
-                            <span style="color: var(--text-muted);">Min: ${minT}°C</span>
+                        <div class="outlook-section-title">Peak Wind / Gust</div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700;">
+                            <span class="${getWindColorClass(metrics.maxWindForDay)}">${metrics.maxWindForDay} mph</span>
+                            <span class="${getWindColorClass(metrics.maxGustForDay)}" style="color: var(--text-muted);">Gusts: ${metrics.maxGustForDay}</span>
+                        </div>
+                    </div>
+
+                    <div class="outlook-section">
+                        <div class="outlook-section-title">Weather & Rain</div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 600; color: #334155;">
+                            <span>${wInfo.label}</span>
+                            <span class="${getRainColorClass(maxRainProb)}">${maxRainProb}% rain</span>
+                        </div>
+                    </div>
+
+                    <div class="outlook-section">
+                        <div class="outlook-section-title">Temperature (°C)</div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700; color: #0f172a;">
+                            <span>Max: ${maxT}°</span>
+                            <span style="color: var(--text-muted);">Min: ${minT}°</span>
                         </div>
                     </div>
                 `;
@@ -561,10 +577,9 @@
                 const hIcon = getWeatherIcon(hFog ? 45 : code, rain);
 
                 const studentStat = getStudentTier(wSpd, wGST, rain, parseFloat(vis), cb.c0_5k, cloudbaseAGL, hFog);
-                const clubStat = getClubTier(wSpd, wGST, rain, parseFloat(vis), cb.c0_5k, cloudbaseAGL, hFog);
-                const tandemStat = getTandemTier(wSpd, wGST, rain, parseFloat(vis), cb.c0_5k, cloudbaseAGL, hFog);
+                const licencedStat = getLicencedTier(wSpd, wGST, rain, parseFloat(vis), cb.c0_5k, cloudbaseAGL, hFog);
 
-                if (tandemStat.tier === 'green' && studentStat.tier === 'green') {
+                if (licencedStat.tier === 'green' && studentStat.tier === 'green') {
                     greenHours++;
                 }
                 totalEvaluated++;
@@ -576,7 +591,7 @@
                     return 'status-red';
                 }
 
-                let primaryReason = studentStat.reason !== 'Nominal' ? studentStat.reason : (tandemStat.reason !== 'Nominal' ? tandemStat.reason : clubStat.reason);
+                let primaryReason = studentStat.reason !== 'Nominal' ? studentStat.reason : licencedStat.reason;
 
                 const card = document.createElement('div');
                 card.className = `hour-card ${isCurrentHour ? 'current-hour' : ''}`;
@@ -636,20 +651,16 @@
                         </div>
                     </div>
 
-                    <!-- AUDIENCE STATUS BREAKDOWN -->
+                    <!-- AUDIENCE STATUS BREAKDOWN (Students & Licenced) -->
                     <div class="hour-section" style="background: #ffffff;">
-                        <div class="status-grid">
+                        <div class="status-grid-2">
                             <div class="status-box">
                                 <span class="status-title">Students</span>
                                 <span class="${getTierClass(studentStat.tier)}">${studentStat.label}</span>
                             </div>
                             <div class="status-box">
-                                <span class="status-title">Club</span>
-                                <span class="${getTierClass(clubStat.tier)}">${clubStat.label}</span>
-                            </div>
-                            <div class="status-box">
-                                <span class="status-title">Tandems</span>
-                                <span class="${getTierClass(tandemStat.tier)}">${tandemStat.label}</span>
+                                <span class="status-title">Licenced</span>
+                                <span class="${getTierClass(licencedStat.tier)}">${licencedStat.label}</span>
                             </div>
                         </div>
                         <div style="margin-top: 0.35rem; font-size: 0.65rem; color: var(--text-muted); text-align: center; border-top: 1px dashed #e2e8f0; padding-top: 0.2rem;">
