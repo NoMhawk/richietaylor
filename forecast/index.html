@@ -1,13 +1,11 @@
-<!-- REVISION: v1.0.36 -->
+<!-- REVISION: v1.0.37 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 1.0.36)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 1.0.37)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Leaflet CSS for Interactive Map -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
@@ -47,7 +45,7 @@
         .error-banner { background-color: #fee2e2; border: 1px solid #f87171; color: #991b1b; padding: 0.85rem 1.25rem; border-radius: 0.75rem; font-size: 0.875rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 1rem; }
         .hidden { display: none !important; }
 
-        /* 7-Day Top Selector with distinct gaps & clean vertical day dividers */
+        /* 7-Day Top Selector */
         .selector-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
         @media(min-width: 640px) { .selector-grid { grid-template-columns: repeat(4, 1fr); } }
         @media(min-width: 1024px) { .selector-grid { grid-template-columns: repeat(7, 1fr); } }
@@ -77,13 +75,20 @@
         .panel-title { font-size: 0.9rem; font-weight: 700; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 0.5rem; }
         .badge { font-size: 0.7rem; background-color: #f1f5f9; color: #334155; padding: 0.25rem 0.625rem; border-radius: 0.375rem; border: 1px solid var(--border-color); font-weight: 600; }
 
-        /* WINDFINDER-STYLE SUPERFORECAST MATRIX (Light Theme) */
+        /* WINDFINDER-STYLE SUPERFORECAST MATRIX (Boxed Day Layout) */
         .windfinder-container { width: 100%; overflow-x: auto; background: #ffffff; border: 1px solid var(--border-color); border-radius: 1rem; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .wf-table { width: 100%; border-collapse: collapse; text-align: center; font-size: 0.75rem; white-space: nowrap; font-family: 'Inter', sans-serif; }
-        .wf-table th, .wf-table td { padding: 0.45rem 0.35rem; border: 1px solid #e2e8f0; }
-        .wf-label { text-align: left !important; padding-left: 0.75rem !important; color: #475569; font-weight: 700; background: #f8fafc; width: 180px; min-width: 180px; }
-        .wf-day-header { background: #e2e8f0; color: #0f172a; font-weight: 700; font-size: 0.8rem; text-align: center; border-left: 2px solid #cbd5e1; }
-        .wf-time-header { background: #f1f5f9; color: #475569; font-weight: 600; font-size: 0.7rem; }
+        .wf-table { width: 100%; border-collapse: separate; border-spacing: 0; text-align: center; font-size: 0.75rem; white-space: nowrap; font-family: 'Inter', sans-serif; }
+        .wf-table th, .wf-table td { padding: 0.45rem 0.35rem; border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; }
+        .wf-label { text-align: left !important; padding-left: 0.75rem !important; color: #475569; font-weight: 700; background: #f8fafc; width: 180px; min-width: 180px; border-right: 2px solid #cbd5e1 !important; }
+        
+        /* Boxed Day Headers */
+        .wf-day-box-1 { background: #f0fdf4; color: #065f46; font-weight: 700; font-size: 0.8rem; text-align: center; border-top: 3px solid #059669; border-left: 3px solid #059669; border-right: 3px solid #059669; border-radius: 6px 6px 0 0; }
+        .wf-day-box-2 { background: #f0f9ff; color: #0369a1; font-weight: 700; font-size: 0.8rem; text-align: center; border-top: 3px solid #0284c7; border-left: 3px solid #0284c7; border-right: 3px solid #0284c7; border-radius: 6px 6px 0 0; }
+        .wf-day-box-3 { background: #fefce8; color: #854d0e; font-weight: 700; font-size: 0.8rem; text-align: center; border-top: 3px solid #d97706; border-left: 3px solid #d97706; border-right: 3px solid #d97706; border-radius: 6px 6px 0 0; }
+        .wf-day-box-4 { background: #faf5ff; color: #6b21a8; font-weight: 700; font-size: 0.8rem; text-align: center; border-top: 3px solid #9333ea; border-left: 3px solid #9333ea; border-right: 3px solid #9333ea; border-radius: 6px 6px 0 0; }
+
+        .wf-day-separator { border-right: 3px solid #94a3b8 !important; }
+        .wf-time-header { background: #f8fafc; color: #475569; font-weight: 600; font-size: 0.7rem; border-top: 1px solid #cbd5e1; }
         .wf-arrow { font-size: 1rem; display: inline-block; color: #0284c7; }
         
         .wf-val { font-weight: 700; padding: 0.2rem 0.1rem; border-radius: 0.2rem; display: block; }
@@ -137,9 +142,9 @@
         .status-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.4rem; padding: 0.35rem 0.2rem; display: flex; flex-direction: column; gap: 0.2rem; }
         .status-title { font-size: 0.6rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
 
-        /* Interactive Leaflet Map Container */
-        .map-container { position: relative; width: 100%; height: 450px; border-radius: 0.75rem; overflow: hidden; border: 1px solid var(--border-color); background: #e2e8f0; }
-        #leaflet-map { width: 100%; height: 100%; z-index: 1; }
+        /* Windy Satellite Map Container */
+        .map-container { position: relative; width: 100%; height: 500px; border-radius: 0.75rem; overflow: hidden; border: 1px solid var(--border-color); background: #e2e8f0; }
+        .map-container iframe { width: 100%; height: 100%; border: none; }
 
         footer { background-color: var(--bg-card); border-top: 1px solid var(--border-color); margin-top: 3rem; padding: 1.5rem; text-align: center; font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
     </style>
@@ -149,7 +154,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v1.0.36",
+            revision: "v1.0.37",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -169,7 +174,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 1.0.36</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 1.0.37</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -217,7 +222,7 @@
                     <div class="section-dot" style="background-color: var(--accent-emerald);"></div>
                     <h2 class="section-title">Multi-Day Superforecast Overview</h2>
                 </div>
-                <span class="section-date">Windfinder Style Matrix</span>
+                <span class="section-date">Windfinder Style Matrix (Day Boxed)</span>
             </div>
             <div class="windfinder-container">
                 <div class="table-responsive">
@@ -283,18 +288,18 @@
                 </div>
             </div>
 
-            <!-- ================= INTERACTIVE DROPZONE MAP (LEAFLET) ================= -->
+            <!-- ================= WINDY SATELLITE & CLOUDS MAP ================= -->
             <div class="panel" style="padding: 1.25rem;">
                 <div class="panel-header" style="margin-bottom: 1rem;">
-                    <h3 class="panel-title"><i class="fa-solid fa-map-location-dot" style="color: var(--accent-sky);"></i>Dunkeswell Airfield Location & Satellite Overview</h3>
+                    <h3 class="panel-title"><i class="fa-solid fa-satellite" style="color: var(--accent-sky);"></i>Windy Satellite & Clouds Live Radar</h3>
                     <span class="badge">Skydive Southwest Dropzone</span>
                 </div>
                 <div class="map-container">
-                    <div id="leaflet-map"></div>
+                    <iframe src="https://embed.windy.com/embed2.html?lat=50.880&lon=-3.230&detailLat=50.880&detailLon=-3.230&width=650&height=450&zoom=9&level=surface&overlay=satellite&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=mph&metricTemp=%C2%B0C&radarRange=-1" frameborder="0"></iframe>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--text-muted); padding-top: 0.5rem;">
-                    <span><i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> Interactive map centered on Dunkeswell Airfield (50.880° N, 3.230° W).</span>
-                    <span>Powered by Leaflet & OpenStreetMap</span>
+                    <span><i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> Live satellite & cloud layer tracking centered on Dunkeswell Airfield.</span>
+                    <span>Powered by Windy.com</span>
                 </div>
             </div>
 
@@ -346,46 +351,13 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 1.0.36 • Powered by Open-Meteo & Leaflet</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 1.0.37 • Powered by Open-Meteo & Windy.com</p>
     </footer>
-
-    <!-- LEAFLET JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <!-- APPLICATION LOGIC -->
     <script>
         let globalWeatherData = null;
         let selectedDayIndex = 0; // Default to today
-        let leafletMap = null;
-
-        function initMap() {
-            if (leafletMap) {
-                leafletMap.invalidateSize();
-                return;
-            }
-            leafletMap = L.map('leaflet-map', {
-                zoomControl: true,
-                attributionControl: false
-            }).setView([CONFIG.latitude, CONFIG.longitude], 11);
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19
-            }).addTo(leafletMap);
-
-            const airfieldIcon = L.divIcon({
-                className: 'custom-airfield-pin',
-                html: `<div style="background-color: #0284c7; width: 16px; height: 16px; border-radius: 50%; border: 3px solid #ffffff; box-shadow: 0 0 10px rgba(2, 132, 199, 0.5);"></div>`,
-                iconSize: [16, 16],
-                iconAnchor: [8, 8]
-            });
-
-            L.marker([CONFIG.latitude, CONFIG.longitude], { icon: airfieldIcon })
-                .addTo(leafletMap)
-                .bindPopup(`<div style="color: #0f172a; font-family: 'Inter', sans-serif; font-weight: 600;">Skydive Southwest<br><span style="font-weight: 400; font-size: 0.8rem;">Dunkeswell Airfield (Elevation: 254ft)</span></div>`)
-                .openPopup();
-            
-            setTimeout(() => { leafletMap.invalidateSize(); }, 250);
-        }
 
         function kmhToMph(kmh) {
             return Math.round(kmh * 0.621371);
@@ -495,7 +467,6 @@
                 renderDaySelector();
                 renderWindfinderMatrix();
                 renderActiveDay(selectedDayIndex);
-                initMap();
 
             } catch (err) {
                 console.error("Error fetching weather data:", err);
@@ -562,8 +533,8 @@
             table.innerHTML = '';
 
             const daysToShow = 4;
-            // Updated hours interval omitting 01:00 and 04:00
-            const hoursInterval = [7, 10, 13, 16, 19, 22];
+            // Operating hours: 07h, 10h, 13h, 16h, 19h (omitting 01, 04, 22)
+            const hoursInterval = [7, 10, 13, 16, 19];
 
             let dates = [];
             for (let i = 0; i < hourly.time.length; i += 3) {
@@ -573,17 +544,20 @@
             dates = dates.slice(0, daysToShow);
 
             let trDay = `<tr><th class="wf-label">Local date</th>`;
-            dates.forEach(dateStr => {
+            dates.forEach((dateStr, idx) => {
                 const dateObj = new Date(dateStr);
-                const dayName = dateObj.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
-                trDay += `<th colspan="${hoursInterval.length}" class="wf-day-header">${dayName}</th>`;
+                const dayName = dateObj.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' });
+                const boxClass = `wf-day-box-${(idx % 4) + 1}`;
+                trDay += `<th colspan="${hoursInterval.length}" class="${boxClass}">${dayName}</th>`;
             });
             trDay += `</tr>`;
 
             let trTime = `<tr><th class="wf-label">Local time</th>`;
             dates.forEach(() => {
-                hoursInterval.forEach(h => {
-                    trTime += `<th class="wf-time-header">${String(h).padStart(2, '0')}h</th>`;
+                hoursInterval.forEach((h, hIdx) => {
+                    const isLastInDay = hIdx === hoursInterval.length - 1;
+                    const sepClass = isLastInDay ? ' wf-day-separator' : '';
+                    trTime += `<th class="wf-time-header${sepClass}">${String(h).padStart(2, '0')}h</th>`;
                 });
             });
             trTime += `</tr>`;
@@ -596,13 +570,38 @@
             let trTemp = `<tr><td class="wf-label">Air temperature (°C)</td>`;
             let trPress = `<tr><td class="wf-label">Air pressure (hPa)</td>`;
 
-            dates.forEach(dateStr => {
-                hoursInterval.forEach(hTarget => {
+            dates.forEach(() => {
+                hoursInterval.forEach((hTarget, hIdx) => {
+                    const isLastInDay = hIdx === hoursInterval.length - 1;
+                    const sepClass = isLastInDay ? ' wf-day-separator' : '';
+
+                    trDir += `<td class="${sepClass}"><i class="fa-solid fa-location-arrow wf-arrow"></i></td>`;
+                    trSpd += `<td class="${sepClass}"><span class="wf-val wf-wind-10">--</span></td>`;
+                    trGust += `<td class="${sepClass}"><span class="wf-val wf-wind-10">--</span></td>`;
+                    trCloud += `<td class="${sepClass}"><i class="fa-solid fa-sun" style="color: #d97706; font-size: 0.85rem;"></i></td>`;
+                    trRain += `<td class="${sepClass}"><span style="color: #64748b; font-size: 0.7srem;"></span></td>`;
+                    trTemp += `<td class="${sepClass}"><span class="wf-val wf-temp-mild">--°</span></td>`;
+                    trPress += `<td class="${sepClass}"><span style="font-size: 0.7rem; color: #475569;">----</span></td>`;
+                });
+            });
+
+            // Populate actual data into rows
+            let rowColsDir = ['<tr><td class="wf-label">Wind direction</td>'];
+            let rowColsSpd = ['<tr><td class="wf-label">Wind speed (mph)</td>'];
+            let rowColsGust = ['<tr><td class="wf-label">Wind gusts (max mph)</td>'];
+            let rowColsCloud = ['<tr><td class="wf-label">Cloud cover</td>'];
+            let rowColsRain = ['<tr><td class="wf-label">Precipitation (mm)</td>'];
+            let rowColsTemp = ['<tr><td class="wf-label">Air temperature (°C)</td>'];
+            let rowColsPress = ['<tr><td class="wf-label">Air pressure (hPa)</td>'];
+
+            dates.forEach((dateStr) => {
+                hoursInterval.forEach((hTarget, hIdx) => {
+                    const isLastInDay = hIdx === hoursInterval.length - 1;
+                    const sepClass = isLastInDay ? ' wf-day-separator' : '';
+
                     const targetStr = `${dateStr}T${String(hTarget).padStart(2, '0')}:00`;
                     let idx = hourly.time.findIndex(t => t.startsWith(targetStr));
-                    if (idx === -1) {
-                        idx = hourly.time.findIndex(t => t.startsWith(dateStr));
-                    }
+                    if (idx === -1) idx = hourly.time.findIndex(t => t.startsWith(dateStr));
 
                     const dirDeg = hourly.wind_direction_10m[idx] || 0;
                     const spd = kmhToMph(hourly.wind_speed_10m[idx] || 0);
@@ -611,34 +610,32 @@
                     const rainMm = hourly.precipitation ? hourly.precipitation[idx] || 0 : 0;
                     const temp = Math.round(hourly.temperature_2m[idx] || 15);
                     const press = Math.round(hourly.surface_pressure ? hourly.surface_pressure[idx] || 1013 : 1013);
-
                     const rot = (dirDeg + 180) % 360;
 
-                    trDir += `<td><i class="fa-solid fa-location-arrow wf-arrow" style="transform: rotate(${rot}deg);"></i></td>`;
-                    trSpd += `<td><span class="wf-val ${getWindClass(spd)}">${spd}</span></td>`;
-                    trGust += `<td><span class="wf-val ${getWindClass(gust)}">${gust}</span></td>`;
-                    
+                    rowColsDir.push(`<td class="${sepClass}"><i class="fa-solid fa-location-arrow wf-arrow" style="transform: rotate(${rot}deg);"></i></td>`);
+                    rowColsSpd.push(`<td class="${sepClass}"><span class="wf-val ${getWindClass(spd)}">${spd}</span></td>`);
+                    rowColsGust.push(`<td class="${sepClass}"><span class="wf-val ${getWindClass(gust)}">${gust}</span></td>`);
+
                     let cloudIcon = 'fa-sun';
                     let cloudColor = '#d97706';
                     if (cloudPct > 80) { cloudIcon = 'fa-cloud'; cloudColor = '#64748b'; }
                     else if (cloudPct > 40) { cloudIcon = 'fa-cloud-sun'; cloudColor = '#0284c7'; }
-                    trCloud += `<td><i class="fa-solid ${cloudIcon}" style="color: ${cloudColor}; font-size: 0.85rem;" title="${cloudPct}% cloud"></i></td>`;
+                    rowColsCloud.push(`<td class="${sepClass}"><i class="fa-solid ${cloudIcon}" style="color: ${cloudColor}; font-size: 0.85rem;" title="${cloudPct}% cloud"></i></td>`);
 
-                    trRain += `<td><span style="color: ${rainMm > 0 ? '#0284c7' : '#64748b'}; font-size: 0.7rem; font-weight: 600;">${rainMm > 0 ? rainMm.toFixed(1) : ''}</span></td>`;
-                    trTemp += `<td><span class="wf-val ${getTempClass(temp)}">${temp}°</span></td>`;
-                    trPress += `<td><span style="font-size: 0.7rem; color: #475569; font-weight: 600;">${press}</span></td>`;
+                    rowColsRain.push(`<td class="${sepClass}"><span style="color: ${rainMm > 0 ? '#0284c7' : '#64748b'}; font-size: 0.7rem; font-weight: 600;">${rainMm > 0 ? rainMm.toFixed(1) : ''}</span></td>`);
+                    rowColsTemp.push(`<td class="${sepClass}"><span class="wf-val ${getTempClass(temp)}">${temp}°</span></td>`);
+                    rowColsPress.push(`<td class="${sepClass}"><span style="font-size: 0.7rem; color: #475569; font-weight: 600;">${press}</span></td>`);
                 });
             });
 
-            trDir += `</tr>`;
-            trSpd += `</tr>`;
-            trGust += `</tr>`;
-            trCloud += `</tr>`;
-            trRain += `</tr>`;
-            trTemp += `</tr>`;
-            trPress += `</tr>`;
-
-            table.innerHTML = trDay + trTime + trDir + trSpd + trGust + trCloud + trRain + trTemp + trPress;
+            table.innerHTML = trDay + trTime + 
+                rowColsDir.join('') + '</tr>' +
+                rowColsSpd.join('') + '</tr>' +
+                rowColsGust.join('') + '</tr>' +
+                rowColsCloud.join('') + '</tr>' +
+                rowColsRain.join('') + '</tr>' +
+                rowColsTemp.join('') + '</tr>' +
+                rowColsPress.join('') + '</tr>';
         }
 
         function renderDaySelector() {
@@ -805,8 +802,7 @@
                 card.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">
                         <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            <span style="font-weight: 700; color: #0f172a; font-size: 0.95rem;">${timeLabel}</span>
-                            ${isCurrentHour ? '<span style="font-size: 0.6rem; background: var(--accent-sky); color: white; padding: 0.1rem 0.35rem; border-radius: 0.25rem; font-weight: 700;">LIVE / NOW</span>' : ''}
+                            <span style="font-weight: 700; color: #0f172a; font-size: 0.95rem;">${timeLabel}</span>${isCurrentHour ? '<span style="font-size: 0.6rem; background: var(--accent-sky); color: white; padding: 0.1rem 0.35rem; border-radius: 0.25rem; font-weight: 700;">LIVE / NOW</span>' : ''}
                         </div>
                         <div style="display: flex; align-items: center; gap: 0.4rem;">
                             <span style="font-size: 0.8rem; font-weight: 700; color: #0f172a;">${temp}°C</span>
@@ -974,7 +970,7 @@
                 </div>
                 <div class="ladder-row">
                     <div><span class="ladder-alt">Surface (10m)</span><span class="ladder-sub">Landing Area</span></div>
-                    <div class="ladder-val"><span class="${getWindColorClass(curWind)}" style="font-weight: 700;">${curWind} mph (Gusts ${curGust})</span> <span style="color: #475569; font-weight: 600;">(${curDir})</span></div>
+                    <div class="ladder-val"><span class="${getWindColorClass(curWind)}" style="font-weight: 700;">${curWind} mph (Gusts${curGust})</span> <span style="color: #475569; font-weight: 600;">(${curDir})</span></div>
                 </div>
             `;
 
@@ -995,23 +991,4 @@
                 </div>
                 <div style="background-color: #f8fafc; padding: 0.85rem; border-radius: 0.75rem; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.25rem;">
                     <div style="display: flex; justify-content: space-between; font-size: 0.8rem;"><span style="font-weight: 700; color: #0f172a;"><i class="fa-solid fa-cloud text-sky-500 mr-1"></i> Mid Level (5,000 - 10,000 ft AGL)</span><span class="${getCloudColorClass(cbPanel.c5_10k)}">${cbPanel.c5_10k}% Cover</span></div>
-                    <div style="font-size: 0.75rem; color: var(--text-muted);">Mid-Air Deployment Zone • Cloud Separation Check</div>
-                </div>
-                <div style="background-color: #f8fafc; padding: 0.85rem; border-radius: 0.75rem; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;"><span style="font-weight: 700; color: #0f172a;"><i class="fa-solid fa-cloud text-indigo-600 mr-1"></i> Upper Level (10,000 - 15,000 ft AGL)</span><span class="${getCloudColorClass(cbPanel.c10_15k)}">${cbPanel.c10_15k}% Cover</span></div>
-                    <div style="font-size: 0.75rem; color: var(--text-muted);">Exit Altitude Zone • Jump Run Visibility Check</div>
-                </div>
-                <div style="background-color: #f8fafc; padding: 0.85rem; border-radius: 0.75rem; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.25rem;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;"><span style="font-weight: 700; color: #0f172a;"><i class="fa-solid fa-cloud text-blue-600 mr-1"></i> Top Level (15,000 ft+ AGL)</span><span class="${getCloudColorClass(cbPanel.c15k_plus)}">${cbPanel.c15k_plus}% Cover</span></div>
-                    <div style="font-size: 0.75rem; color: var(--text-muted);">Above Dropzone Ceiling • Cirrus / High Altitude Cover</div>
-                </div>
-            `;
-        }
-
-        window.onload = () => {
-            fetchAllData();
-            setInterval(fetchAllData, CONFIG.refreshIntervalMinutes * 60 * 1000);
-        };
-    </script>
-</body>
-</html>
+                    <div style="font-size: 0.75rem; color: var(--text
