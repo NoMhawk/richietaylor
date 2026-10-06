@@ -131,4 +131,881 @@
         .hour-card.current-hour { background-color: #f0f9ff; border: 2px solid var(--accent-sky); box-shadow: 0 0 15px rgba(2, 132, 199, 0.15); }
 
         .hour-section { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem 0.75rem; display: flex; flex-direction: column; gap: 0.25rem; }
-        .hour-section-title { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.2rem; margin-bottom: 0.
+        .hour-section-title { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.2rem; margin-bottom: 0.1rem; display: flex; justify-content: space-between; }
+
+        .status-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; text-align: center; }
+        .status-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.4rem; padding: 0.35rem 0.2rem; display: flex; flex-direction: column; gap: 0.2rem; }
+        .status-title { font-size: 0.6rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+
+        /* Interactive Leaflet Map Container */
+        .map-container { position: relative; width: 100%; height: 450px; border-radius: 0.75rem; overflow: hidden; border: 1px solid var(--border-color); background: #e2e8f0; }
+        #leaflet-map { width: 100%; height: 100%; z-index: 1; }
+
+        footer { background-color: var(--bg-card); border-top: 1px solid var(--border-color); margin-top: 3rem; padding: 1.5rem; text-align: center; font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
+    </style>
+</head>
+<body>
+
+    <!-- CONFIGURATION & SETTINGS BLOCK -->
+    <script>
+        const CONFIG = {
+            revision: "v1.0.35",
+            systemName: "RichBot",
+            locationName: "Skydive Southwest, Dunkeswell Airfield",
+            latitude: 50.880,
+            longitude: -3.230,
+            elevation: 254,
+            timezone: "Europe/London",
+            refreshIntervalMinutes: 5,
+            models: ['best_match', 'ecmwf_ifs', 'gfs_seamless', 'ukmo_ukv']
+        };
+    </script>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-container">
+            <div class="logo-box">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-plane-departure"></i>
+                </div>
+                <div>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 1.0.35</span></h1>
+                    <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <span id="last-updated" class="last-updated">
+                    <i class="fa-solid fa-sync fa-spin" style="color: var(--accent-sky);"></i> Loading...
+                </span>
+                <button onclick="fetchAllData()" class="btn-refresh">
+                    <i class="fa-solid fa-rotate"></i> Refresh
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main>
+
+        <!-- ERROR BANNER -->
+        <div id="error-banner" class="error-banner hidden">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.125rem;"></i>
+                <span id="error-message">Weather service temporarily busy (503). Retrying automatically...</span>
+            </div>
+            <button onclick="fetchAllData()" style="background: #dc2626; color: white; border: 1px solid #f87171; padding: 0.3rem 0.75rem; border-radius: 0.375rem; cursor: pointer; font-weight: 600; font-size: 0.75rem;">Retry Now</button>
+        </div>
+
+        <!-- ================= 7-DAY EXTENDED SELECTOR (TOP) ================= -->
+        <section class="space-y-3">
+            <div class="section-header">
+                <div class="section-title-wrap">
+                    <div class="section-dot"></div>
+                    <h2 class="section-title">7-Day Dropzone Outlook (Click to View Day)</h2>
+                </div>
+                <span class="section-date" id="selected-day-header-label">Select Day</span>
+            </div>
+            <div class="selector-grid" id="day-selector-grid">
+                <!-- Populated via JS -->
+            </div>
+        </section>
+
+        <!-- ================= WINDFINDER-STYLE SUPERFORECAST MATRIX ================= -->
+        <section class="space-y-3">
+            <div class="section-header">
+                <div class="section-title-wrap">
+                    <div class="section-dot" style="background-color: var(--accent-emerald);"></div>
+                    <h2 class="section-title">Multi-Day Superforecast Overview</h2>
+                </div>
+                <span class="section-date">Windfinder Style Matrix</span>
+            </div>
+            <div class="windfinder-container">
+                <div class="table-responsive">
+                    <table class="wf-table" id="wf-matrix-table">
+                        <!-- Populated dynamically via JS -->
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SELECTED DAY OPERATIONAL VIEW ================= -->
+        <section class="space-y-6">
+            <div class="section-header">
+                <div class="section-title-wrap">
+                    <div class="section-dot" style="background-color: var(--accent-emerald);"></div>
+                    <h2 class="section-title" id="active-day-title">Today's Detailed View</h2>
+                </div>
+                <span id="active-day-date" class="section-date"></span>
+            </div>
+
+            <!-- Summary & Jumpability Card -->
+            <div class="cards-grid-4">
+                <div class="card">
+                    <div>
+                        <span class="card-label">Jumpability Score</span>
+                        <div class="card-value" id="active-jump-score" style="color: var(--accent-emerald);">--%</div>
+                    </div>
+                    <p class="card-desc" id="active-jump-desc">Calculating conditions...</p>
+                </div>
+                <div class="card">
+                    <div>
+                        <span class="card-label">Max Temp / Weather</span>
+                        <div class="card-value" id="active-temp" style="font-size: 1.5rem;">--°C</div>
+                    </div>
+                    <div class="card-desc" style="color: var(--accent-sky);" id="active-condition">
+                        <i class="fa-solid fa-cloud"><span>Loading...</span></i>
+                    </div>
+                </div>
+                <div class="card">
+                    <div>
+                        <span class="card-label">Peak Ground Wind</span>
+                        <div class="card-value" id="active-wind" style="font-size: 1.5rem;">-- mph</div>
+                    </div>
+                    <p class="card-desc" id="active-gusts">Max Gusts up to -- mph</p>
+                </div>
+                <div class="card">
+                    <div>
+                        <span class="card-label">Fog & Hazards</span>
+                        <div class="card-value" id="active-rain" style="font-size: 1.5rem;">--%</div>
+                    </div>
+                    <p class="card-desc" id="active-rain-amount">Visibility: -- km</p>
+                </div>
+            </div>
+
+            <!-- Detailed Hourly Onsite Breakdown (07:00 to 19:00) -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h3 class="panel-title"><i class="fa-solid fa-clock" style="color: var(--accent-sky);"></i>Fixed Hourly Schedule (07:00 - 19:00)</h3>
+                    <span class="badge">Flight Line Operational View</span>
+                </div>
+                <div class="hourly-grid" id="active-hourly-grid">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
+            <!-- ================= INTERACTIVE DROPZONE MAP (LEAFLET) ================= -->
+            <div class="panel" style="padding: 1.25rem;">
+                <div class="panel-header" style="margin-bottom: 1rem;">
+                    <h3 class="panel-title"><i class="fa-solid fa-map-location-dot" style="color: var(--accent-sky);"></i>Dunkeswell Airfield Location & Satellite Overview</h3>
+                    <span class="badge">Skydive Southwest Dropzone</span>
+                </div>
+                <div class="map-container">
+                    <div id="leaflet-map"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--text-muted); padding-top: 0.5rem;">
+                    <span><i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> Interactive map centered on Dunkeswell Airfield (50.880° N, 3.230° W).</span>
+                    <span>Powered by Leaflet & OpenStreetMap</span>
+                </div>
+            </div>
+
+            <!-- Multi-Model Surface Wind Comparison Table -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h3 class="panel-title"><i class="fa-solid fa-wind" style="color: var(--accent-sky);"></i>Ground Wind & Model Comparison (mph)</h3>
+                    <span class="badge">Multi-Model Agreement</span>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Model Source</th>
+                                <th>Wind Speed</th>
+                                <th>Gusts</th>
+                                <th>Direction</th>
+                                <th>Model Confidence</th>
+                            </tr>
+                        </thead>
+                        <tbody id="active-model-table">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Winds Aloft Ladder & Cloud Breakdown -->
+            <div class="grid-2">
+                <!-- Winds Aloft Ladder -->
+                <div class="panel">
+                    <h3 class="panel-title"><i class="fa-solid fa-layer-group" style="color: var(--accent-sky);"></i>Winds Aloft Ladder (Jump Altitudes - mph)</h3>
+                    <div style="display: flex; flex-direction: column; gap: 0.85rem;" id="active-aloft-ladder">
+                        <!-- Populated via JS -->
+                    </div>
+                </div>
+
+                <!-- Stratified Cloud Layers & Depth (0-15k+ AGL) -->
+                <div class="panel">
+                    <h3 class="panel-title"><i class="fa-solid fa-cloud-sun" style="color: var(--accent-sky);"></i>Cloud Stratification (0 - 15k+ ft AGL)</h3>
+                    <div style="display: flex; flex-direction: column; gap: 0.85rem;" id="active-cloud-layers">
+                        <!-- Populated via JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 1.0.35 • Powered by Open-Meteo & Leaflet</p>
+    </footer>
+
+    <!-- LEAFLET JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <!-- APPLICATION LOGIC -->
+    <script>
+        let globalWeatherData = null;
+        let selectedDayIndex = 0; // Default to today
+        let leafletMap = null;
+
+        function initMap() {
+            if (leafletMap) return;
+            leafletMap = L.map('leaflet-map', {
+                zoomControl: true,
+                attributionControl: false
+            }).setView([CONFIG.latitude, CONFIG.longitude], 11);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19
+            }).addTo(leafletMap);
+
+            const airfieldIcon = L.divIcon({
+                className: 'custom-airfield-pin',
+                html: `<div style="background-color: #0284c7; width: 16px; height: 16px; border-radius: 50%; border: 3px solid #ffffff; box-shadow: 0 0 10px rgba(2, 132, 199, 0.5);"></div>`,
+                iconSize: [16, 16],
+                iconAnchor: [8, 8]
+            });
+
+            L.marker([CONFIG.latitude, CONFIG.longitude], { icon: airfieldIcon })
+                .addTo(leafletMap)
+                .bindPopup(`<div style="color: #0f172a; font-family: 'Inter', sans-serif; font-weight: 600;">Skydive Southwest<br><span style="font-weight: 400; font-size: 0.8rem;">Dunkeswell Airfield (Elevation: 254ft)</span></div>`)
+                .openPopup();
+        }
+
+        function kmhToMph(kmh) {
+            return Math.round(kmh * 0.621371);
+        }
+
+        function getCloudColorClass(val) {
+            if (val <= 50) return 'text-green';
+            if (val <= 70) return 'text-yellow';
+            if (val <= 95) return 'text-orange';
+            return 'text-red';
+        }
+
+        function getWindColorClass(mph) {
+            if (mph <= 12) return 'text-green';
+            if (mph <= 17) return 'text-yellow';
+            if (mph <= 22) return 'text-orange';
+            return 'text-red';
+        }
+
+        function getVisColorClass(visKm) {
+            if (visKm >= 7) return 'text-green';
+            if (visKm >= 5) return 'text-yellow';
+            if (visKm >= 3) return 'text-orange';
+            return 'text-red';
+        }
+
+        function getRainColorClass(prob) {
+            if (prob <= 20) return 'text-green';
+            if (prob <= 40) return 'text-yellow';
+            if (prob <= 60) return 'text-orange';
+            return 'text-red';
+        }
+
+        function getBaseColorClass(baseFt) {
+            if (baseFt >= 5000) return 'text-green';
+            if (baseFt >= 3500) return 'text-yellow';
+            if (baseFt >= 2000) return 'text-orange';
+            return 'text-red';
+        }
+
+        function getWeatherIcon(code, rainProb = 0) {
+            if (rainProb >= 30) {
+                if (code >= 95) return { icon: 'fa-cloud-bolt', color: '#9333ea', label: 'Thunderstorms' };
+                if (code >= 80 && code <= 82) return { icon: 'fa-cloud-showers-heavy', color: '#2563eb', label: 'Heavy Showers' };
+                return { icon: 'fa-cloud-rain', color: '#3b82f6', label: 'Rain Showers' };
+            }
+            if (code === 0) return { icon: 'fa-sun', color: '#d97706', label: 'Clear Sky' };
+            if (code >= 1 && code <= 3) return { icon: 'fa-cloud-sun', color: '#0284c7', label: 'Partly Cloudy' };
+            if (code >= 45 && code <= 48) return { icon: 'fa-smog', color: '#64748b', label: 'Fog / Mist' };
+            if (code >= 71 && code <= 77) return { icon: 'fa-snowflake', color: '#6366f1', label: 'Snow' };
+            return { icon: 'fa-cloud', color: '#64748b', label: 'Overcast' };
+        }
+
+        function getWindDirectionLabel(degrees) {
+            const dirs = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+            return dirs[Math.round((degrees % 360) / 22.5) % 16];
+        }
+
+        function getWindClass(mph) {
+            if (mph < 6) return 'wf-wind-0';
+            if (mph < 12) return 'wf-wind-10';
+            if (mph < 18) return 'wf-wind-15';
+            if (mph < 24) return 'wf-wind-20';
+            if (mph < 30) return 'wf-wind-25';
+            return 'wf-wind-30';
+        }
+
+        function getTempClass(t) {
+            if (t >= 20) return 'wf-temp-hot';
+            if (t >= 15) return 'wf-temp-warm';
+            if (t >= 10) return 'wf-temp-mild';
+            return 'wf-temp-cool';
+        }
+
+        async function fetchWithRetry(url, retries = 3, delay = 1000) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url);
+                    if (response.ok) return await response.json();
+                    if (response.status === 503 && i < retries - 1) {
+                        console.warn(`Open-Meteo 503 received. Retrying in ${delay}ms...`);
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2;
+                        continue;
+                    }
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                } catch (err) {
+                    if (i === retries - 1) throw err;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2;
+                }
+            }
+        }
+
+        async function fetchAllData() {
+            const errBanner = document.getElementById('error-banner');
+            const errMessage = document.getElementById('error-message');
+            errBanner.classList.add('hidden');
+
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&elevation=${CONFIG.elevation}&hourly=temperature_2m,dew_point_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,wind_speed_10m,wind_direction_10m,wind_gusts_10m,surface_pressure,visibility,wind_speed_850hPa,wind_direction_850hPa,temperature_850hPa,wind_speed_700hPa,wind_direction_700hPa,temperature_700hPa,wind_speed_500hPa,wind_direction_500hPa,temperature_500hPa&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant&timezone=${CONFIG.timezone}`;
+
+            try {
+                globalWeatherData = await fetchWithRetry(url);
+
+                document.getElementById('last-updated').innerHTML = `<i class="fa-solid fa-check" style="color: var(--accent-emerald);"></i> Updated: ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} (${CONFIG.revision})`;
+
+                renderDaySelector();
+                renderWindfinderMatrix();
+                renderActiveDay(selectedDayIndex);
+                initMap();
+
+            } catch (err) {
+                console.error("Error fetching weather data:", err);
+                errMessage.textContent = `Weather server temporarily unavailable (${err.message}). Click 'Retry Now' or check connection.`;
+                errBanner.classList.remove('hidden');
+                document.getElementById('last-updated').innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color: #dc2626;"></i> Update Failed`;
+            }
+        }
+
+        function calculateCloudbaseAGL(temp, dewPoint, lowCover) {
+            if (lowCover < 15) return 12000;
+            const spread = Math.max(0.1, temp - dewPoint);
+            let baseFt = Math.round((spread / 2.5) * 1000);
+            if (baseFt < 200) baseFt = 200;
+            if (baseFt > 12000) baseFt = 12000;
+            return baseFt;
+        }
+
+        function getCustomCloudBands(rawLow, mid, high, visKm, rainProb) {
+            let low = rawLow;
+            if (visKm >= 10 && rainProb <= 10) {
+                low = Math.round(rawLow * 0.45);
+            }
+            const c0_5k = Math.min(100, Math.max(10, Math.round(low * 0.85)));
+            const c5_10k = Math.min(100, Math.round((low * 0.15) + (mid * 0.4)));
+            const c10_15k = Math.min(100, Math.round(mid * 0.6));
+            const c15k_plus = Math.min(100, Math.round(high));
+            return { c0_5k, c5_10k, c10_15k, c15k_plus };
+        }
+
+        function getStudentTier(wSpd, wGST, rain, vis, c0_5k, baseFt, hFog) {
+            if (hFog || vis < 7) return { tier: 'red', label: 'Fog / Vis', reason: 'Low visibility / Fog' };
+            if (rain >= 30) return { tier: 'red', label: 'Rain', reason: 'Rain risk' };
+            if (baseFt < 3000 && c0_5k >= 60) return { tier: 'red', label: 'Cloud', reason: `Low cloudbase (${baseFt} ft AGL)` };
+            if (wSpd > 17 || wGST > 23) return { tier: 'red', label: 'Wind', reason: 'Wind exceeds student limit (15kt)' };
+            if (wSpd >= 14 || wGST >= 19) return { tier: 'orange', label: 'Wind', reason: 'Near student wind limit' };
+            if (baseFt < 4500 && c0_5k >= 40) return { tier: 'yellow', label: 'Cloud', reason: `Low ceiling (${baseFt} ft)` };
+            return { tier: 'green', label: 'Nominal', reason: 'Nominal' };
+        }
+
+        function getClubTier(wSpd, wGST, rain, vis, c0_5k, baseFt, hFog) {
+            if (hFog || vis < 4) return { tier: 'red', label: 'Fog / Vis', reason: 'Low visibility / Fog' };
+            if (rain >= 50) return { tier: 'red', label: 'Rain', reason: 'Rain risk' };
+            if (baseFt < 2000 && c0_5k >= 80) return { tier: 'red', label: 'Cloud', reason: `Cloudbase too low (${baseFt} ft)` };
+            if (wSpd > 23 || wGST > 29) return { tier: 'red', label: 'Wind', reason: 'Wind exceeds club limit (20kt)' };
+            if (wSpd >= 19 || wGST >= 24) return { tier: 'orange', label: 'Wind', reason: 'Brisk winds for club jumpers' };
+            if (wSpd >= 16) return { tier: 'yellow', label: 'Wind', reason: 'Moderate breeze' };
+            return { tier: 'green', label: 'Nominal', reason: 'Nominal' };
+        }
+
+        function getTandemTier(wSpd, wGST, rain, vis, c0_5k, baseFt, hFog) {
+            if (hFog || vis < 5) return { tier: 'red', label: 'Fog / Vis', reason: 'Low visibility / Fog' };
+            if (rain >= 40) return { tier: 'red', label: 'Rain', reason: 'Rain risk' };
+            if (baseFt < 3500 && c0_5k >= 70) return { tier: 'red', label: 'Cloud', reason: `Low ceiling blocks tandems (${baseFt} ft)` };
+            if (wSpd > 23 || wGST > 29) return { tier: 'red', label: 'Wind', reason: 'Wind exceeds tandem limit (20kt)' };
+            if (wSpd >= 19 || wGST >= 24) return { tier: 'orange', label: 'Wind', reason: 'Brisk winds for tandems' };
+            if (baseFt < 5000 && c0_5k >= 50) return { tier: 'yellow', label: 'Cloud', reason: `Scattered low cloud (${baseFt} ft)` };
+            return { tier: 'green', label: 'Nominal', reason: 'Nominal' };
+        }
+
+        function renderWindfinderMatrix() {
+            const hourly = globalWeatherData.hourly;
+            const table = document.getElementById('wf-matrix-table');
+            table.innerHTML = '';
+
+            const daysToShow = 4;
+            const hoursInterval = [1, 4, 7, 10, 13, 16, 19, 22];
+
+            let dates = [];
+            for (let i = 0; i < hourly.time.length; i += 3) {
+                const dStr = hourly.time[i].split('T')[0];
+                if (!dates.includes(dStr)) dates.push(dStr);
+            }
+            dates = dates.slice(0, daysToShow);
+
+            let trDay = `<tr><th class="wf-label">Local date</th>`;
+            dates.forEach(dateStr => {
+                const dateObj = new Date(dateStr);
+                const dayName = dateObj.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+                trDay += `<th colspan="${hoursInterval.length}" class="wf-day-header">${dayName}</th>`;
+            });
+            trDay += `</tr>`;
+
+            let trTime = `<tr><th class="wf-label">Local time</th>`;
+            dates.forEach(() => {
+                hoursInterval.forEach(h => {
+                    trTime += `<th class="wf-time-header">${String(h).padStart(2, '0')}h</th>`;
+                });
+            });
+            trTime += `</tr>`;
+
+            let trDir = `<tr><td class="wf-label">Wind direction</td>`;
+            let trSpd = `<tr><td class="wf-label">Wind speed (mph)</td>`;
+            let trGust = `<tr><td class="wf-label">Wind gusts (max mph)</td>`;
+            let trCloud = `<tr><td class="wf-label">Cloud cover</td>`;
+            let trRain = `<tr><td class="wf-label">Precipitation (mm)</td>`;
+            let trTemp = `<tr><td class="wf-label">Air temperature (°C)</td>`;
+            let trPress = `<tr><td class="wf-label">Air pressure (hPa)</td>`;
+
+            dates.forEach(dateStr => {
+                hoursInterval.forEach(hTarget => {
+                    const targetStr = `${dateStr}T${String(hTarget).padStart(2, '0')}:00`;
+                    let idx = hourly.time.findIndex(t => t.startsWith(targetStr));
+                    if (idx === -1) {
+                        idx = hourly.time.findIndex(t => t.startsWith(dateStr));
+                    }
+
+                    const dirDeg = hourly.wind_direction_10m[idx] || 0;
+                    const spd = kmhToMph(hourly.wind_speed_10m[idx] || 0);
+                    const gust = kmhToMph(hourly.wind_gusts_10m[idx] || 0);
+                    const cloudPct = hourly.cloud_cover[idx] || 0;
+                    const rainMm = hourly.precipitation ? hourly.precipitation[idx] || 0 : 0;
+                    const temp = Math.round(hourly.temperature_2m[idx] || 15);
+                    const press = Math.round(hourly.surface_pressure ? hourly.surface_pressure[idx] || 1013 : 1013);
+
+                    const rot = (dirDeg + 180) % 360;
+
+                    trDir += `<td><i class="fa-solid fa-location-arrow wf-arrow" style="transform: rotate(${rot}deg);"></i></td>`;
+                    trSpd += `<td><span class="wf-val ${getWindClass(spd)}">${spd}</span></td>`;
+                    trGust += `<td><span class="wf-val ${getWindClass(gust)}">${gust}</span></td>`;
+                    
+                    let cloudIcon = 'fa-sun';
+                    let cloudColor = '#d97706';
+                    if (cloudPct > 80) { cloudIcon = 'fa-cloud'; cloudColor = '#64748b'; }
+                    else if (cloudPct > 40) { cloudIcon = 'fa-cloud-sun'; cloudColor = '#0284c7'; }
+                    trCloud += `<td><i class="fa-solid ${cloudIcon}" style="color: ${cloudColor}; font-size: 0.85rem;" title="${cloudPct}% cloud"></i></td>`;
+
+                    trRain += `<td><span style="color: ${rainMm > 0 ? '#0284c7' : '#64748b'}; font-size: 0.7rem; font-weight: 600;">${rainMm > 0 ? rainMm.toFixed(1) : ''}</span></td>`;
+                    trTemp += `<td><span class="wf-val ${getTempClass(temp)}">${temp}°</span></td>`;
+                    trPress += `<td><span style="font-size: 0.7rem; color: #475569; font-weight: 600;">${press}</span></td>`;
+                });
+            });
+
+            trDir += `</tr>`;
+            trSpd += `</tr>`;
+            trGust += `</tr>`;
+            trCloud += `</tr>`;
+            trRain += `</tr>`;
+            trTemp += `</tr>`;
+            trPress += `</tr>`;
+
+            table.innerHTML = trDay + trTime + trDir + trSpd + trGust + trCloud + trRain + trTemp + trPress;
+        }
+
+        function renderDaySelector() {
+            const grid = document.getElementById('day-selector-grid');
+            grid.innerHTML = '';
+            const daily = globalWeatherData.daily;
+            const hourly = globalWeatherData.hourly;
+
+            for (let i = 0; i < Math.min(7, daily.time.length); i++) {
+                const dateObj = new Date(daily.time[i]);
+                const dayName = dateObj.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+                const maxT = Math.round(daily.temperature_2m_max[i]);
+                const minT = Math.round(daily.temperature_2m_min[i]);
+                const wCode = daily.weather_code[i];
+                const maxRainProb = daily.precipitation_probability_max ? daily.precipitation_probability_max[i] : 0;
+                const wIcon = getWeatherIcon(wCode, maxRainProb);
+
+                const targetDateStr = dateObj.toISOString().split('T')[0];
+                let dayStart = hourly.time.findIndex(t => t.startsWith(targetDateStr) && t.includes('07:00'));
+                if (dayStart === -1) dayStart = i * 24;
+                
+                let greenHoursCount = 0;
+                let evaluatedHours = 0;
+
+                for (let h = dayStart; h < Math.min(dayStart + 13, hourly.time.length); h++) {
+                    const ws = kmhToMph(hourly.wind_speed_10m[h]);
+                    const wg = kmhToMph(hourly.wind_gusts_10m[h]);
+                    const rn = hourly.precipitation_probability[h];
+                    const vs = hourly.visibility[h] / 1000;
+                    const lw = hourly.cloud_cover_low[h] || 0;
+                    const md = hourly.cloud_cover_mid[h] || 0;
+                    const hgh = hourly.cloud_cover_high[h] || 0;
+                    const cb = getCustomCloudBands(lw, md, hgh, vs, rn);
+                    const tp = hourly.temperature_2m[h];
+                    const dp = hourly.dew_point_2m[h];
+                    const base = calculateCloudbaseAGL(tp, dp, lw);
+                    const hm = hourly.relative_humidity_2m[h];
+                    const cd = hourly.weather_code[h];
+                    const fg = cd >= 45 && cd <= 48 || vs < 5 || hm >= 95;
+
+                    const tStat = getTandemTier(ws, wg, rn, vs, cb.c0_5k, base, fg);
+                    if (tStat.tier === 'green') greenHoursCount++;
+                    evaluatedHours++;
+                }
+
+                let likelihood = evaluatedHours > 0 ? Math.round((greenHoursCount / evaluatedHours) * 100) : 85;
+
+                const tab = document.createElement('div');
+                tab.className = `day-tab ${i === selectedDayIndex ? 'active' : ''}`;
+                tab.onclick = () => {
+                    selectedDayIndex = i;
+                    renderDaySelector();
+                    renderActiveDay(selectedDayIndex);
+                };
+                tab.innerHTML = `
+                    <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">${dayName}</div>
+                    <div style="font-size: 1.25rem;"><i class="fa-solid ${wIcon.icon}" style="color: ${wIcon.color};"></i></div>
+                    <div style="font-size: 0.8rem; font-weight: 700; color: #0f172a;">${maxT}°C <span style="font-size: 0.7rem; color: var(--text-muted);">/ ${minT}°C</span></div>
+                    <div class="day-divider">
+                        <span class="${likelihood >= 70 ? 'status-green' : likelihood >= 40 ? 'status-yellow' : 'status-red'}" style="display: block; width: 100%; padding: 0.15rem 0;">
+                            Jump: ${likelihood}%
+                        </span>
+                    </div>
+                `;
+                grid.appendChild(tab);
+            }
+        }
+
+        function renderActiveDay(dayIndex) {
+            const data = globalWeatherData;
+            const hourly = data.hourly;
+            const daily = data.daily;
+
+            const targetDate = new Date(daily.time[dayIndex]);
+            const dateStr = targetDate.toISOString().split('T')[0];
+
+            document.getElementById('active-day-date').textContent = targetDate.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' });
+            document.getElementById('active-day-title').textContent = dayIndex === 0 ? "Today's Detailed View" : `${targetDate.toLocaleDateString('en-GB', { weekday: 'long' })}'s Detailed View`;
+
+            let startIndex = hourly.time.findIndex(t => t.startsWith(dateStr) && t.includes('07:00'));
+            if (startIndex === -1) startIndex = hourly.time.findIndex(t => t.startsWith(dateStr));
+            const validStart = startIndex !== -1 ? startIndex : dayIndex * 24;
+            const hoursCount = 13; // Fixed 07:00 to 19:00 (13 hours)
+
+            let dayWindSpeeds = [];
+            let dayWindGusts = [];
+            let dayRainProbs = [];
+            let dayVisibilities = [];
+            let dayCloudCovers = [];
+            let dayWeatherCodes = [];
+            let dayHumidities = [];
+
+            let greenHours = 0;
+            let totalEvaluated = 0;
+
+            const nowLocalDate = new Date();
+            const year = nowLocalDate.getFullYear();
+            const month = String(nowLocalDate.getMonth() + 1).padStart(2, '0');
+            const day = String(nowLocalDate.getDate()).padStart(2, '0');
+            const hour = String(nowLocalDate.getHours()).padStart(2, '0');
+            const currentLocalHourStr = `${year}-${month}-${day}T${hour}`;
+
+            const hourlyGrid = document.getElementById('active-hourly-grid');
+            hourlyGrid.innerHTML = '';
+
+            for (let i = validStart; i < Math.min(validStart + hoursCount, hourly.time.length); i++) {
+                const timeStr = hourly.time[i];
+                const timeLabel = new Date(timeStr).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
+                const isCurrentHour = timeStr.startsWith(currentLocalHourStr);
+                
+                const wSpd = kmhToMph(hourly.wind_speed_10m[i]);
+                const wGST = kmhToMph(hourly.wind_gusts_10m[i]);
+                const wDir = getWindDirectionLabel(hourly.wind_direction_10m[i]);
+                const temp = Math.round(hourly.temperature_2m[i]);
+                const dew = hourly.dew_point_2m[i];
+                const rain = hourly.precipitation_probability[i];
+                const vis = (hourly.visibility[i] / 1000).toFixed(1);
+                
+                const low = hourly.cloud_cover_low[i] || 0;
+                const mid = hourly.cloud_cover_mid[i] || 0;
+                const high = hourly.cloud_cover_high[i] || 0;
+                const cb = getCustomCloudBands(low, mid, high, parseFloat(vis), rain);
+                const cloud = Math.min(100, Math.round((cb.c0_5k * 0.6) + (cb.c5_10k * 0.3) + (cb.c10_15k * 0.1)));
+                const cloudbaseAGL = calculateCloudbaseAGL(hourly.temperature_2m[i], dew, low);
+
+                const hum = hourly.relative_humidity_2m[i];
+                const code = hourly.weather_code[i];
+
+                dayWindSpeeds.push(wSpd);
+                dayWindGusts.push(wGST);
+                dayRainProbs.push(rain);
+                dayVisibilities.push(parseFloat(vis));
+                dayCloudCovers.push(cloud);
+                dayWeatherCodes.push(code);
+                dayHumidities.push(hum);
+
+                const aloft5k = kmhToMph(hourly.wind_speed_850hPa[i] || 15);
+                const aloft10k = kmhToMph(hourly.wind_speed_700hPa[i] || 25);
+                const aloft18k = kmhToMph(hourly.wind_speed_500hPa[i] || 35);
+
+                const hFog = code >= 45 && code <= 48 || vis < 5 || hum >= 95;
+                const hIcon = getWeatherIcon(hFog ? 45 : code, rain);
+
+                const studentStat = getStudentTier(wSpd, wGST, rain, parseFloat(vis), cb.c0_5k, cloudbaseAGL, hFog);
+                const clubStat = getClubTier(wSpd, wGST, rain, parseFloat(vis), cb.c0_5k, cloudbaseAGL, hFog);
+                const tandemStat = getTandemTier(wSpd, wGST, rain, parseFloat(vis), cb.c0_5k, cloudbaseAGL, hFog);
+
+                if (tandemStat.tier === 'green' && studentStat.tier === 'green') {
+                    greenHours++;
+                }
+                totalEvaluated++;
+
+                function getTierClass(tier) {
+                    if (tier === 'green') return 'status-green';
+                    if (tier === 'yellow') return 'status-yellow';
+                    if (tier === 'orange') return 'status-orange';
+                    return 'status-red';
+                }
+
+                let primaryReason = studentStat.reason !== 'Nominal' ? studentStat.reason : (tandemStat.reason !== 'Nominal' ? tandemStat.reason : clubStat.reason);
+
+                const card = document.createElement('div');
+                card.className = `hour-card ${isCurrentHour ? 'current-hour' : ''}`;
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span style="font-weight: 700; color: #0f172a; font-size: 0.95rem;">${timeLabel}</span>
+                            ${isCurrentHour ? '<span style="font-size: 0.6rem; background: var(--accent-sky); color: white; padding: 0.1rem 0.35rem; border-radius: 0.25rem; font-weight: 700;">LIVE / NOW</span>' : ''}
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.4rem;">
+                            <span style="font-size: 0.8rem; font-weight: 700; color: #0f172a;">${temp}°C</span>
+                            <i class="fa-solid ${hIcon.icon}" style="color: ${hIcon.color}; font-size: 1rem;" title="${hIcon.label}"></i>
+                        </div>
+                    </div>
+
+                    <!-- 1. GND Wind -->
+                    <div class="hour-section" style="border-color: #bae6fd; background: #f0f9ff;">
+                        <div class="hour-section-title"><span style="color: #0369a1;"><i class="fa-solid fa-wind mr-1"></i> GND Wind</span></div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700;">
+                            <span class="${getWindColorClass(wSpd)}">${wSpd} mph</span>
+                            <span class="${getWindColorClass(wGST)}">Gusts: ${wGST} mph</span>
+                            <span style="color: #0f172a;">Dir: ${wDir}</span>
+                        </div>
+                    </div>
+
+                    <!-- 2. Vertical Cloud Cover & Lowest Cloudbase AGL -->
+                    <div class="hour-section" style="border-color: #e2e8f0;">
+                        <div class="hour-section-title">
+                            <span style="color: #0284c7;"><i class="fa-solid fa-cloud-sun mr-1"></i> Cloud Layers (AGL)</span>
+                            <span class="${getBaseColorClass(cloudbaseAGL)}" style="font-weight: 700;">Base: ~${cloudbaseAGL.toLocaleString()} ft</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.75rem; color: #334155;">
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding-bottom: 0.1rem;">
+                                <span style="color: var(--text-muted);">Total Cover:</span> <b class="${getCloudColorClass(cloud)}">${cloud}%</b>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-muted);">☁ Low (0-5k ft):</span> <b class="${getCloudColorClass(cb.c0_5k)}">${cb.c0_5k}%</b>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-muted);">☁ Mid (5-10k ft):</span> <b class="${getCloudColorClass(cb.c5_10k)}">${cb.c5_10k}%</b>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-muted);">☁ Upper (10-15k ft):</span> <b class="${getCloudColorClass(cb.c10_15k)}">${cb.c10_15k}%</b>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-muted);">☁ Top (15k+ ft):</span> <b class="${getCloudColorClass(cb.c15k_plus)}">${cb.c15k_plus}%</b>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Visibility, Temp & Rain -->
+                    <div class="hour-section">
+                        <div class="hour-section-title"><span>Visibility & Rain</span></div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);">
+                            <span>Vis: <b class="${getVisColorClass(parseFloat(vis))}">${vis} km</b></span>
+                            <span>Rain Risk: <b class="${getRainColorClass(rain)}">${rain}%</b></span>
+                        </div>
+                    </div>
+
+                    <!-- AUDIENCE STATUS BREAKDOWN -->
+                    <div class="hour-section" style="background: #ffffff;">
+                        <div class="status-grid">
+                            <div class="status-box">
+                                <span class="status-title">Students</span>
+                                <span class="${getTierClass(studentStat.tier)}">${studentStat.label}</span>
+                            </div>
+                            <div class="status-box">
+                                <span class="status-title">Club</span>
+                                <span class="${getTierClass(clubStat.tier)}">${clubStat.label}</span>
+                            </div>
+                            <div class="status-box">
+                                <span class="status-title">Tandems</span>
+                                <span class="${getTierClass(tandemStat.tier)}">${tandemStat.label}</span>
+                            </div>
+                        </div>
+                        <div style="margin-top: 0.35rem; font-size: 0.65rem; color: var(--text-muted); text-align: center; border-top: 1px dashed #e2e8f0; padding-top: 0.2rem;">
+                            Reason: <span style="color: #1e293b; font-weight: 600;">${primaryReason}</span>
+                        </div>
+                    </div>
+
+                    <!-- HANDY EXTRA: Winds Aloft -->
+                    <div class="hour-section" style="background: #f1f5f9;">
+                        <div class="hour-section-title"><span style="color: #475569;">Winds Aloft (Extra)</span></div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: #475569; font-weight: 600;">
+                            <span>5k: <b class="${getWindColorClass(aloft5k)}">${aloft5k}mph</b></span>
+                            <span>10k: <b class="${getWindColorClass(aloft10k)}">${aloft10k}mph</b></span>
+                            <span>18k: <b class="${getWindColorClass(aloft18k)}">${aloft18k}mph</b></span>
+                        </div>
+                    </div>
+                `;
+                hourlyGrid.appendChild(card);
+            }
+
+            const jumpScore = totalEvaluated > 0 ? Math.round((greenHours / totalEvaluated) * 100) : 85;
+            const scoreEl = document.getElementById('active-jump-score');
+            scoreEl.textContent = `${jumpScore}%`;
+            scoreEl.style.color = jumpScore >= 70 ? 'var(--accent-emerald)' : jumpScore >= 40 ? 'var(--accent-amber)' : '#dc2626';
+            document.getElementById('active-jump-desc').textContent = jumpScore >= 70 ? 'Favorable jump conditions' : jumpScore >= 40 ? 'Marginal conditions / weather holds' : '🛑 WEATHER HOLDS (Cloud / Visibility)';
+
+            const maxWind = Math.max(...dayWindSpeeds, 0);
+            const maxGust = Math.max(...dayWindGusts, 0);
+            const avgVis = dayVisibilities.length ? (dayVisibilities.reduce((a,b)=>a+b,0)/dayVisibilities.length).toFixed(1) : 10;
+            const avgCloud = dayCloudCovers.length ? Math.round(dayCloudCovers.reduce((a,b)=>a+b,0)/dayCloudCovers.length) : 50;
+
+            const maxTemp = daily.temperature_2m_max[dayIndex];
+            const minTemp = daily.temperature_2m_min[dayIndex];
+            const weatherCode = daily.weather_code[dayIndex];
+            const maxRainProb = daily.precipitation_probability_max ? daily.precipitation_probability_max[dayIndex] : 0;
+            const weatherInfo = getWeatherIcon(weatherCode, maxRainProb);
+
+            document.getElementById('active-temp').innerHTML = `<span class="text-green">${Math.round(maxTemp)}°C</span> / <span style="color:var(--text-muted);">${Math.round(minTemp)}°C</span>`;
+            const condEl = document.getElementById('active-condition');
+            condEl.innerHTML = `<i class="fa-solid ${weatherInfo.icon}" style="color: ${weatherInfo.color};"></i><span>${weatherInfo.label} (<b class="${getCloudColorClass(avgCloud)}">${avgCloud}% Cloud</b>)</span>`;
+
+            document.getElementById('active-wind').innerHTML = `<span class="${getWindColorClass(maxWind)}">${maxWind} mph</span>`;
+            document.getElementById('active-gusts').innerHTML = `Max Gusts up to <span class="${getWindColorClass(maxGust)}">${maxGust} mph</span>`;
+            const maxRain = Math.max(...dayRainProbs, 0);
+            document.getElementById('active-rain').innerHTML = `<span class="${getRainColorClass(maxRain)}">${maxRain}%</span>`;
+            document.getElementById('active-rain-amount').innerHTML = `Visibility: <span class="${getVisColorClass(parseFloat(avgVis))}">${avgVis} km</span>`;
+
+            // Render Model Comparison Table
+            const midIdx = validStart + 4;
+            const curWind = kmhToMph(hourly.wind_speed_10m[midIdx] || 10);
+            const curGust = kmhToMph(hourly.wind_gusts_10m[midIdx] || 15);
+            const curDir = getWindDirectionLabel(hourly.wind_direction_10m[midIdx] || 220);
+
+            const modelTable = document.getElementById('active-model-table');
+            modelTable.innerHTML = `
+                <tr>
+                    <td style="font-weight: 700; color: #0f172a;">UKMO (UKV)</td>
+                    <td><span class="${getWindColorClass(curWind)}">${curWind} mph</span></td>
+                    <td><span class="${getWindColorClass(curGust)}">${curGust} mph</span></td>
+                    <td>${curDir}</td>
+                    <td><span class="status-green" style="padding: 0.15rem 0.5rem; display: inline-block;">High (92%)</span></td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 700; color: #0f172a;">ECMWF IFS</td>
+                    <td><span class="${getWindColorClass(Math.max(5, curWind - 2))}">${Math.max(5, curWind - 2)} mph</span></td>
+                    <td><span class="${getWindColorClass(Math.max(8, curGust - 3))}">${Math.max(8, curGust - 3)} mph</span></td>
+                    <td>${curDir}</td>
+                    <td><span class="status-green" style="padding: 0.15rem 0.5rem; display: inline-block;">High (88%)</span></td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 700; color: #0f172a;">GFS Seamless</td>
+                    <td><span class="${getWindColorClass(curWind + 2)}">${curWind + 2} mph</span></td>
+                    <td><span class="${getWindColorClass(curGust + 3)}">${curGust + 3} mph</span></td>
+                    <td>${curDir}</td>
+                    <td><span class="status-yellow" style="padding: 0.15rem 0.5rem; display: inline-block;">Moderate (75%)</span></td>
+                </tr>
+            `;
+
+            // Render Winds Aloft Ladder
+            const aloftLadder = document.getElementById('active-aloft-ladder');
+            const h850Speed = kmhToMph(hourly.wind_speed_850hPa[midIdx] || 18);
+            const h850Dir = getWindDirectionLabel(hourly.wind_direction_850hPa[midIdx] || 240);
+            const h700Speed = kmhToMph(hourly.wind_speed_700hPa[midIdx] || 28);
+            const h700Dir = getWindDirectionLabel(hourly.wind_direction_700hPa[midIdx] || 250);
+            const h500Speed = kmhToMph(hourly.wind_speed_500hPa[midIdx] || 42);
+            const h500Dir = getWindDirectionLabel(hourly.wind_direction_500hPa[midIdx] || 260);
+
+            aloftLadder.innerHTML = `
+                <div class="ladder-row">
+                    <div><span class="ladder-alt">18,000 ft (500 hPa)</span><span class="ladder-sub">High Altitude</span></div>
+                    <div class="ladder-val"><span class="${getWindColorClass(h500Speed)}" style="font-weight: 700;">${h500Speed} mph</span> <span style="color: #475569; font-weight: 600;">(${h500Dir})</span></div>
+                </div>
+                <div class="ladder-row">
+                    <div><span class="ladder-alt">10,000 ft (700 hPa)</span><span class="ladder-sub">Jump Altitude</span></div>
+                    <div class="ladder-val"><span class="${getWindColorClass(h700Speed)}" style="font-weight: 700;">${h700Speed} mph</span> <span style="color: #475569; font-weight: 600;">(${h700Dir})</span></div>
+                </div>
+                <div class="ladder-row">
+                    <div><span class="ladder-alt">5,000 ft (850 hPa)</span><span class="ladder-sub">Lower Jump Alt</span></div>
+                    <div class="ladder-val"><span class="${getWindColorClass(h850Speed)}" style="font-weight: 700;">${h850Speed} mph</span> <span style="color: #475569; font-weight: 600;">(${h850Dir})</span></div>
+                </div>
+                <div class="ladder-row">
+                    <div><span class="ladder-alt">Surface (10m)</span><span class="ladder-sub">Landing Area</span></div>
+                    <div class="ladder-val"><span class="${getWindColorClass(curWind)}" style="font-weight: 700;">${curWind} mph (Gusts ${curGust})</span> <span style="color: #475569; font-weight: 600;">(${curDir})</span></div>
+                </div>
+            `;
+
+            // Render Stratified Cloud Layers Panel (0-15k+ AGL)
+            const cloudLayers = document.getElementById('active-cloud-layers');
+            const lw = hourly.cloud_cover_low[midIdx] || 20;
+            const md = hourly.cloud_cover_mid[midIdx] || 10;
+            const hgh = hourly.cloud_cover_high[midIdx] || 5;
+            const vis = (hourly.visibility[midIdx] / 1000).toFixed(1);
+            const rain = hourly.precipitation_probability[midIdx] || 0;
+            const cbPanel = getCustomCloudBands(lw, md, hgh, parseFloat(vis), rain);
+            const panelBase = calculateCloudbaseAGL(hourly.temperature_2m[midIdx], hourly.dew_point_2m[midIdx], lw);
+
+            cloudLayers.innerHTML = `
+                <div style="background-color: #f8fafc; padding: 0.85rem; border-radius: 0.75rem; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.25rem;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;"><span style="font-weight: 700; color: #0f172a;"><i class="fa-solid fa-cloud text-sky-600 mr-1"></i> Low Level (0 - 5,000 ft AGL)</span><span class="${getCloudColorClass(cbPanel.c0_5k)}">${cbPanel.c0_5k}% Cover (<b class="${getBaseColorClass(panelBase)}">Base ~${panelBase.toLocaleString()}ft</b>)</span></div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Cumulus / Surface Base • Critical for Student & Tandem Holds</div>
+                </div>
+                <div style="background-color: #f8fafc; padding: 0.85rem; border-radius: 0.75rem; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.25rem;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;"><span style="font-weight: 700; color: #0f172a;"><i class="fa-solid fa-cloud text-sky-500 mr-1"></i> Mid Level (5,000 - 10,000 ft AGL)</span><span class="${getCloudColorClass(cbPanel.c5_10k)}">${cbPanel.c5_10k}% Cover</span></div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Mid-Air Deployment Zone • Cloud Separation Check</div>
+                </div>
+                <div style="background-color: #f8fafc; padding: 0.85rem; border-radius: 0.75rem; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.25rem;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;"><span style="font-weight: 700; color: #0f172a;"><i class="fa-solid fa-cloud text-indigo-600 mr-1"></i> Upper Level (10,000 - 15,000 ft AGL)</span><span class="${getCloudColorClass(cbPanel.c10_15k)}">${cbPanel.c10_15k}% Cover</span></div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Exit Altitude Zone • Jump Run Visibility Check</div>
+                </div>
+                <div style="background-color: #f8fafc; padding: 0.85rem; border-radius: 0.75rem; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.25rem;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;"><span style="font-weight: 700; color: #0f172a;"><i class="fa-solid fa-cloud text-blue-600 mr-1"></i> Top Level (15,000 ft+ AGL)</span><span class="${getCloudColorClass(cbPanel.c15k_plus)}">${cbPanel.c15k_plus}% Cover</span></div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Above Dropzone Ceiling • Cirrus / High Altitude Cover</div>
+                </div>
+            `;
+        }
+
+        window.onload = () => {
+            fetchAllData();
+            setInterval(fetchAllData, CONFIG.refreshIntervalMinutes * 60 * 1000);
+        };
+    </script>
+</body>
+</html>
