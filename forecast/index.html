@@ -1,10 +1,10 @@
-<!-- REVISION: v1.0.37 -->
+<!-- REVISION: v1.0.38 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 1.0.37)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 1.0.38)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -145,8 +145,6 @@
         /* Windy Satellite Map Container */
         .map-container { position: relative; width: 100%; height: 500px; border-radius: 0.75rem; overflow: hidden; border: 1px solid var(--border-color); background: #e2e8f0; }
         .map-container iframe { width: 100%; height: 100%; border: none; }
-
-        footer { background-color: var(--bg-card); border-top: 1px solid var(--border-color); margin-top: 3rem; padding: 1.5rem; text-align: center; font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
     </style>
 </head>
 <body>
@@ -154,7 +152,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v1.0.37",
+            revision: "v1.0.38",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -174,7 +172,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 1.0.37</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 1.0.38</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -351,7 +349,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 1.0.37 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 1.0.38 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -398,6 +396,7 @@
             return 'text-red';
         }
 
+        // Standardized Weather Icon Mapping Function used across the entire page
         function getWeatherIcon(code, rainProb = 0) {
             if (rainProb >= 30) {
                 if (code >= 95) return { icon: 'fa-cloud-bolt', color: '#9333ea', label: 'Thunderstorms' };
@@ -533,7 +532,6 @@
             table.innerHTML = '';
 
             const daysToShow = 4;
-            // Operating hours: 07h, 10h, 13h, 16h, 19h (omitting 01, 04, 22)
             const hoursInterval = [7, 10, 13, 16, 19];
 
             let dates = [];
@@ -562,34 +560,10 @@
             });
             trTime += `</tr>`;
 
-            let trDir = `<tr><td class="wf-label">Wind direction</td>`;
-            let trSpd = `<tr><td class="wf-label">Wind speed (mph)</td>`;
-            let trGust = `<tr><td class="wf-label">Wind gusts (max mph)</td>`;
-            let trCloud = `<tr><td class="wf-label">Cloud cover</td>`;
-            let trRain = `<tr><td class="wf-label">Precipitation (mm)</td>`;
-            let trTemp = `<tr><td class="wf-label">Air temperature (°C)</td>`;
-            let trPress = `<tr><td class="wf-label">Air pressure (hPa)</td>`;
-
-            dates.forEach(() => {
-                hoursInterval.forEach((hTarget, hIdx) => {
-                    const isLastInDay = hIdx === hoursInterval.length - 1;
-                    const sepClass = isLastInDay ? ' wf-day-separator' : '';
-
-                    trDir += `<td class="${sepClass}"><i class="fa-solid fa-location-arrow wf-arrow"></i></td>`;
-                    trSpd += `<td class="${sepClass}"><span class="wf-val wf-wind-10">--</span></td>`;
-                    trGust += `<td class="${sepClass}"><span class="wf-val wf-wind-10">--</span></td>`;
-                    trCloud += `<td class="${sepClass}"><i class="fa-solid fa-sun" style="color: #d97706; font-size: 0.85rem;"></i></td>`;
-                    trRain += `<td class="${sepClass}"><span style="color: #64748b; font-size: 0.7srem;"></span></td>`;
-                    trTemp += `<td class="${sepClass}"><span class="wf-val wf-temp-mild">--°</span></td>`;
-                    trPress += `<td class="${sepClass}"><span style="font-size: 0.7rem; color: #475569;">----</span></td>`;
-                });
-            });
-
-            // Populate actual data into rows
             let rowColsDir = ['<tr><td class="wf-label">Wind direction</td>'];
             let rowColsSpd = ['<tr><td class="wf-label">Wind speed (mph)</td>'];
             let rowColsGust = ['<tr><td class="wf-label">Wind gusts (max mph)</td>'];
-            let rowColsCloud = ['<tr><td class="wf-label">Cloud cover</td>'];
+            let rowColsCloud = ['<tr><td class="wf-label">Weather / Sky</td>'];
             let rowColsRain = ['<tr><td class="wf-label">Precipitation (mm)</td>'];
             let rowColsTemp = ['<tr><td class="wf-label">Air temperature (°C)</td>'];
             let rowColsPress = ['<tr><td class="wf-label">Air pressure (hPa)</td>'];
@@ -606,22 +580,19 @@
                     const dirDeg = hourly.wind_direction_10m[idx] || 0;
                     const spd = kmhToMph(hourly.wind_speed_10m[idx] || 0);
                     const gust = kmhToMph(hourly.wind_gusts_10m[idx] || 0);
-                    const cloudPct = hourly.cloud_cover[idx] || 0;
+                    const weatherCode = hourly.weather_code[idx] || 0;
+                    const rainProb = hourly.precipitation_probability ? hourly.precipitation_probability[idx] || 0 : 0;
                     const rainMm = hourly.precipitation ? hourly.precipitation[idx] || 0 : 0;
                     const temp = Math.round(hourly.temperature_2m[idx] || 15);
                     const press = Math.round(hourly.surface_pressure ? hourly.surface_pressure[idx] || 1013 : 1013);
                     const rot = (dirDeg + 180) % 360;
 
+                    const wInfo = getWeatherIcon(weatherCode, rainProb);
+
                     rowColsDir.push(`<td class="${sepClass}"><i class="fa-solid fa-location-arrow wf-arrow" style="transform: rotate(${rot}deg);"></i></td>`);
                     rowColsSpd.push(`<td class="${sepClass}"><span class="wf-val ${getWindClass(spd)}">${spd}</span></td>`);
                     rowColsGust.push(`<td class="${sepClass}"><span class="wf-val ${getWindClass(gust)}">${gust}</span></td>`);
-
-                    let cloudIcon = 'fa-sun';
-                    let cloudColor = '#d97706';
-                    if (cloudPct > 80) { cloudIcon = 'fa-cloud'; cloudColor = '#64748b'; }
-                    else if (cloudPct > 40) { cloudIcon = 'fa-cloud-sun'; cloudColor = '#0284c7'; }
-                    rowColsCloud.push(`<td class="${sepClass}"><i class="fa-solid ${cloudIcon}" style="color: ${cloudColor}; font-size: 0.85rem;" title="${cloudPct}% cloud"></i></td>`);
-
+                    rowColsCloud.push(`<td class="${sepClass}"><i class="fa-solid ${wInfo.icon}" style="color: ${wInfo.color}; font-size: 0.85rem;" title="${wInfo.label}"></i></td>`);
                     rowColsRain.push(`<td class="${sepClass}"><span style="color: ${rainMm > 0 ? '#0284c7' : '#64748b'}; font-size: 0.7rem; font-weight: 600;">${rainMm > 0 ? rainMm.toFixed(1) : ''}</span></td>`);
                     rowColsTemp.push(`<td class="${sepClass}"><span class="wf-val ${getTempClass(temp)}">${temp}°</span></td>`);
                     rowColsPress.push(`<td class="${sepClass}"><span style="font-size: 0.7rem; color: #475569; font-weight: 600;">${press}</span></td>`);
