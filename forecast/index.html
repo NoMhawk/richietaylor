@@ -1,10 +1,10 @@
-<!-- REVISION: v2.0.5 -->
+<!-- REVISION: v2.0.6 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 2.0.5)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 2.0.6)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -71,12 +71,18 @@
         @media(min-width: 1024px) { .outlook-days-grid { grid-template-columns: repeat(4, 1fr); } }
         @media(min-width: 1400px) { .outlook-days-grid { grid-template-columns: repeat(7, 1fr); } }
 
-        .outlook-day-card { background-color: var(--bg-card); border: 2px solid var(--border-color); border-radius: 1rem; padding: 1.15rem; display: flex; flex-direction: column; justify-content: space-between; gap: 0.75rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .outlook-day-card { background-color: var(--bg-card); border: 2px solid var(--border-color); border-radius: 1rem; padding: 0.85rem; display: flex; flex-direction: column; gap: 0.5rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .outlook-day-card:hover { border-color: var(--accent-sky); box-shadow: 0 4px 6px rgba(0,0,0,0.08); }
         .outlook-day-card.active { background-color: #f0f9ff; border-color: var(--accent-sky); box-shadow: 0 0 15px rgba(2, 132, 199, 0.2); }
 
-        .outlook-section { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem 0.75rem; display: flex; flex-direction: column; gap: 0.25rem; }
-        .outlook-section-title { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.15rem; }
+        .outlook-section { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.35rem 0.5rem; display: flex; flex-direction: column; gap: 0.25rem; }
+        
+        .outlook-matrix-mini { display: flex; flex-direction: column; gap: 0.15rem; font-size: 0.7rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.35rem; }
+        .wf-row { display: grid; grid-template-columns: 42px repeat(5, 1fr); align-items: center; text-align: center; gap: 1px; padding: 0.1rem 0; border-bottom: 1px solid #f1f5f9; }
+        .wf-row:last-child { border-bottom: none; }
+        .wf-label { text-align: left; font-weight: 700; color: #64748b; font-size: 0.6rem; padding-left: 2px; }
+        .wf-cell { display: flex; align-items: center; justify-content: center; }
+        .wf-arrow { font-size: 0.7rem; color: #0284c7; }
 
         .text-green { color: #059669 !important; font-weight: 700; }
         .text-yellow { color: #d97706 !important; font-weight: 700; }
@@ -113,7 +119,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v2.0.5",
+            revision: "v2.0.6",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -132,7 +138,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 2.0.5</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 2.0.6</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -249,7 +255,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 2.0.5 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 2.0.6 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -406,15 +412,10 @@
 
             let greenHoursCount = 0;
             let evaluatedHours = 0;
-            let maxWindForDay = 0;
-            let maxGustForDay = 0;
 
             for (let h = dayStart; h < Math.min(dayStart + 13, hourly.time.length); h++) {
                 const ws = kmhToMph(hourly.wind_speed_10m[h]);
                 const wg = kmhToMph(hourly.wind_gusts_10m[h]);
-                if (ws > maxWindForDay) maxWindForDay = ws;
-                if (wg > maxGustForDay) maxGustForDay = wg;
-
                 const rn = hourly.precipitation_probability[h];
                 const vs = hourly.visibility[h] / 1000;
                 const lw = hourly.cloud_cover_low[h] || 0;
@@ -434,7 +435,7 @@
                 evaluatedHours++;
             }
             const likelihood = evaluatedHours > 0 ? Math.round((greenHoursCount / evaluatedHours) * 100) : 85;
-            return { likelihood, maxWindForDay, maxGustForDay };
+            return { likelihood };
         }
 
         function renderOutlookCards() {
@@ -442,57 +443,74 @@
             container.innerHTML = '';
             const daily = globalWeatherData.daily;
             const hourly = globalWeatherData.hourly;
+            const hoursInterval = [7, 10, 13, 16, 19];
 
             for (let i = 0; i < Math.min(7, daily.time.length); i++) {
                 const dateObj = new Date(daily.time[i]);
                 const dayName = dateObj.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }).toUpperCase();
+                const dateStr = dateObj.toISOString().split('T')[0];
                 
                 const metrics = calculateDayMetrics(i, hourly);
-                const maxT = Math.round(daily.temperature_2m_max[i]);
-                const minT = Math.round(daily.temperature_2m_min[i]);
-                const wCode = daily.weather_code[i];
-                const maxRainProb = daily.precipitation_probability_max ? daily.precipitation_probability_max[i] : 0;
-                const wInfo = getWeatherIcon(wCode, maxRainProb);
-
                 const isActive = i === selectedDayIndex ? ' active' : '';
                 const badgeClass = metrics.likelihood >= 70 ? 'status-green' : metrics.likelihood >= 40 ? 'status-yellow' : 'status-red';
+
+                let timeRow = `<div class="wf-row"><span class="wf-label">TIME</span>`;
+                let dirRow = `<div class="wf-row"><span class="wf-label">DIR</span>`;
+                let spdRow = `<div class="wf-row"><span class="wf-label">WIND</span>`;
+                let gustRow = `<div class="wf-row"><span class="wf-label">GUST</span>`;
+                let weatherRow = `<div class="wf-row"><span class="wf-label">SKY</span>`;
+                let rainRow = `<div class="wf-row"><span class="wf-label">RAIN</span>`;
+                let tempRow = `<div class="wf-row"><span class="wf-label">TEMP</span>`;
+                let pressRow = `<div class="wf-row"><span class="wf-label">PRESS</span>`;
+
+                hoursInterval.forEach(hTarget => {
+                    const targetStr = `${dateStr}T${String(hTarget).padStart(2, '0')}:00`;
+                    let idx = hourly.time.findIndex(t => t.startsWith(targetStr));
+                    if (idx === -1) idx = hourly.time.findIndex(t => t.startsWith(dateStr));
+
+                    const dirDeg = hourly.wind_direction_10m[idx] || 0;
+                    const spd = kmhToMph(hourly.wind_speed_10m[idx] || 0);
+                    const gust = kmhToMph(hourly.wind_gusts_10m[idx] || 0);
+                    const weatherCode = hourly.weather_code[idx] || 0;
+                    const rainProb = hourly.precipitation_probability ? hourly.precipitation_probability[idx] || 0 : 0;
+                    const rainMm = hourly.precipitation ? hourly.precipitation[idx] || 0 : 0;
+                    const temp = Math.round(hourly.temperature_2m[idx] || 15);
+                    const press = Math.round(hourly.surface_pressure ? hourly.surface_pressure[idx] || 1013 : 1013);
+                    const rot = (dirDeg + 180) % 360;
+                    const wInfo = getWeatherIcon(weatherCode, rainProb);
+
+                    timeRow += `<span class="wf-cell">${String(hTarget).padStart(2, '0')}h</span>`;
+                    dirRow += `<span class="wf-cell"><i class="fa-solid fa-location-arrow wf-arrow" style="transform: rotate(${rot}deg);"></i></span>`;
+                    spdRow += `<span class="wf-cell"><span class="${getWindColorClass(spd)}">${spd}</span></span>`;
+                    gustRow += `<span class="wf-cell"><span class="${getWindColorClass(gust)}">${gust}</span></span>`;
+                    weatherRow += `<span class="wf-cell"><i class="fa-solid ${wInfo.icon}" style="color: ${wInfo.color}; font-size: 0.75rem;" title="${wInfo.label}"></i></span>`;
+                    rainRow += `<span class="wf-cell" style="color: ${rainMm > 0 ? '#0284c7' : '#64748b'}; font-size: 0.6rem;">${rainMm > 0 ? rainMm.toFixed(1) : ''}</span>`;
+                    tempRow += `<span class="wf-cell"><span>${temp}°</span></span>`;
+                    pressRow += `<span class="wf-cell" style="font-size: 0.6rem; color: #475569;">${press}</span>`;
+                });
+
+                timeRow += `</div>`; dirRow += `</div>`; spdRow += `</div>`; gustRow += `</div>`;
+                weatherRow += `</div>`; rainRow += `</div>`; tempRow += `</div>`; pressRow += `</div>`;
 
                 const card = document.createElement('div');
                 card.className = `outlook-day-card${isActive}`;
                 card.onclick = () => selectDay(i);
                 card.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">
-                        <span style="font-weight: 700; color: #0f172a; font-size: 0.9rem;">${dayName}</span>
-                        <i class="fa-solid ${wInfo.icon}" style="color: ${wInfo.color}; font-size: 1.1rem;" title="${wInfo.label}"></i>
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.4rem;">
+                        <span style="font-weight: 700; color: #0f172a; font-size: 0.85rem;">${dayName}</span>
                     </div>
-
                     <div class="outlook-section">
-                        <div class="outlook-section-title">Jumpability</div>
-                        <span class="${badgeClass}">JUMP: ${metrics.likelihood}%</span>
+                        <span class="${badgeClass}" style="width: 100%;">JUMP: ${metrics.likelihood}%</span>
                     </div>
-
-                    <div class="outlook-section">
-                        <div class="outlook-section-title">Peak Wind / Gust</div>
-                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700;">
-                            <span class="${getWindColorClass(metrics.maxWindForDay)}">${metrics.maxWindForDay} mph</span>
-                            <span class="${getWindColorClass(metrics.maxGustForDay)}" style="color: var(--text-muted);">Gusts: ${metrics.maxGustForDay}</span>
-                        </div>
-                    </div>
-
-                    <div class="outlook-section">
-                        <div class="outlook-section-title">Weather & Rain</div>
-                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 600; color: #334155;">
-                            <span>${wInfo.label}</span>
-                            <span class="${getRainColorClass(maxRainProb)}">${maxRainProb}% rain</span>
-                        </div>
-                    </div>
-
-                    <div class="outlook-section">
-                        <div class="outlook-section-title">Temperature (°C)</div>
-                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700; color: #0f172a;">
-                            <span>Max: ${maxT}°</span>
-                            <span style="color: var(--text-muted);">Min: ${minT}°</span>
-                        </div>
+                    <div class="outlook-matrix-mini">
+                        ${timeRow}
+                        ${dirRow}
+                        ${spdRow}
+                        ${gustRow}
+                        ${weatherRow}
+                        ${rainRow}
+                        ${tempRow}
+                        ${pressRow}
                     </div>
                 `;
                 container.appendChild(card);
