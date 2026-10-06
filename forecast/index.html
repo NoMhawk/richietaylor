@@ -1,10 +1,10 @@
-<!-- REVISION: v2.0.6 -->
+<!-- REVISION: v2.1.0 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 2.0.6)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 2.1.0)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -91,6 +91,7 @@
 
         .status-green { background-color: #ecfdf5; color: #065f46; border: 1px solid #10b981; padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.7rem; display: block; text-transform: uppercase; }
         .status-yellow { background-color: #fefce8; color: #854d0e; border: 1px solid #eab308; padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.7rem; display: block; text-transform: uppercase; }
+        .status-orange { background-color: #fff7ed; color: #c2410c; border: 1px solid #f97316; padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.7rem; display: block; text-transform: uppercase; }
         .status-red { background-color: #fef2f2; color: #991b1b; border: 1px solid #ef4444; padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.7rem; display: block; text-transform: uppercase; }
 
         .hourly-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
@@ -119,7 +120,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v2.0.6",
+            revision: "v2.1.0",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -138,7 +139,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 2.0.6</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 2.1.0</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -255,7 +256,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 2.0.6 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 2.1.0 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -412,6 +413,7 @@
 
             let greenHoursCount = 0;
             let evaluatedHours = 0;
+            let reasonCounts = {};
 
             for (let h = dayStart; h < Math.min(dayStart + 13, hourly.time.length); h++) {
                 const ws = kmhToMph(hourly.wind_speed_10m[h]);
@@ -431,11 +433,22 @@
 
                 const licStat = getLicencedTier(ws, wg, rn, vs, cb.c0_5k, base, fg);
                 const stuStat = getStudentTier(ws, wg, rn, vs, cb.c0_5k, base, fg);
-                if (licStat.tier === 'green' && stuStat.tier === 'green') greenHoursCount++;
+                
+                if (licStat.tier === 'green' && stuStat.tier === 'green') {
+                    greenHoursCount++;
+                } else {
+                    let nonGreenReason = stuStat.tier !== 'green' ? stuStat.reason : licStat.reason;
+                    reasonCounts[nonGreenReason] = (reasonCounts[nonGreenReason] || 0) + 1;
+                }
                 evaluatedHours++;
             }
             const likelihood = evaluatedHours > 0 ? Math.round((greenHoursCount / evaluatedHours) * 100) : 85;
-            return { likelihood };
+            
+            let primaryReason = 'Nominal';
+            if (likelihood < 100 && Object.keys(reasonCounts).length > 0) {
+                primaryReason = Object.keys(reasonCounts).reduce((a, b) => reasonCounts[a] > reasonCounts[b] ? a : b);
+            }
+            return { likelihood, primaryReason };
         }
 
         function renderOutlookCards() {
@@ -501,6 +514,7 @@
                     </div>
                     <div class="outlook-section">
                         <span class="${badgeClass}" style="width: 100%;">JUMP: ${metrics.likelihood}%</span>
+                        ${metrics.primaryReason !== 'Nominal' ? `<div style="font-size: 0.6rem; color: var(--text-muted); text-align: center; margin-top: 0.15rem; font-weight: 600;">⚠️ ${metrics.primaryReason}</div>` : ''}
                     </div>
                     <div class="outlook-matrix-mini">
                         ${timeRow}
