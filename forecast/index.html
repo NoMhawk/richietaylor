@@ -1,10 +1,10 @@
-<!-- REVISION: v2.1.3 -->
+<!-- REVISION: v2.1.5 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 2.1.3)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 2.1.5)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -113,14 +113,16 @@
         .map-container { position: relative; width: 100%; height: 500px; border-radius: 0.75rem; overflow: hidden; border: 1px solid var(--border-color); background: #e2e8f0; }
         .map-container iframe { width: 100%; height: 100%; border: none; }
 
-        /* Webcam Grid */
+        /* Webcam & Live Feeds Layout */
         .webcam-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-        @media(min-width: 768px) { .webcam-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media(min-width: 768px) { .webcam-grid { grid-template-columns: repeat(2, 1fr); } }
 
-        .webcam-card { background: #f8fafc; border: 1px solid var(--border-color); border-radius: 0.75rem; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04); text-decoration: none; color: inherit; transition: all 0.2s; }
-        .webcam-card:hover { border-color: var(--accent-sky); box-shadow: 0 4px 6px rgba(0,0,0,0.08); background: #f0f9ff; }
+        .webcam-card { background: #f8fafc; border: 1px solid var(--border-color); border-radius: 0.75rem; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
         .webcam-title { font-size: 0.85rem; font-weight: 700; color: #0f172a; display: flex; align-items: center; justify-content: space-between; }
-        .webcam-btn { background: var(--accent-sky); color: white; text-align: center; padding: 0.4rem; border-radius: 0.375rem; font-size: 0.75rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 0.35rem; }
+        
+        .dunkeswell-banner { background: #f0f9ff; border: 1px solid var(--accent-sky); border-radius: 0.75rem; padding: 1rem 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; align-items: center; justify-content: space-between; text-decoration: none; color: inherit; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        @media(min-width: 640px) { .dunkeswell-banner { flex-direction: row; } }
+        .dunkeswell-banner:hover { background: #e0f2fe; border-color: #0284c7; box-shadow: 0 4px 6px rgba(0,0,0,0.06); }
 
         footer { background-color: var(--bg-card); border-top: 1px solid var(--border-color); margin-top: 3rem; padding: 1.5rem; text-align: center; font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
     </style>
@@ -130,7 +132,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v2.1.3",
+            revision: "v2.1.5",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -149,7 +151,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 2.1.3</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 2.1.5</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -245,7 +247,7 @@
                 </div>
             </div>
 
-<!-- ================= WINDY SATELLITE & CLOUDS MAP ================= -->
+            <!-- ================= WINDY SATELLITE & CLOUDS MAP ================= -->
             <div class="panel" style="padding: 1.25rem;">
                 <div class="panel-header" style="margin-bottom: 1rem;">
                     <h3 class="panel-title"><i class="fa-solid fa-satellite" style="color: var(--accent-sky);"></i>Windy Satellite & Clouds Live Radar</h3>
@@ -260,42 +262,47 @@
                 </div>
             </div>
 
-            
             <!-- ================= LOCAL AIRFIELD WEBCAMS & LIVE FEEDS ================= -->
             <div class="panel" style="padding: 1.25rem;">
                 <div class="panel-header" style="margin-bottom: 1rem;">
                     <h3 class="panel-title"><i class="fa-solid fa-video" style="color: var(--accent-sky);"></i>Local Airfield Live Feeds & Webcams</h3>
                     <span class="badge">Dunkeswell & North Hill</span>
                 </div>
-                <div class="webcam-grid">
-                    <!-- Dunkeswell Webcam Link Card -->
-                    <a href="https://www.dunkeswell.co.uk/webcam" target="_blank" class="webcam-card" style="justify-content: space-between;">
-                        <div>
-                            <div class="webcam-title" style="margin-bottom: 0.5rem;">
-                                <span>Dunkeswell Aerodrome Webcam</span>
-                                <i class="fa-solid fa-external-link-alt" style="color: var(--accent-sky);"></i>
-                            </div>
-                            <p style="font-size: 0.75rem; color: var(--text-muted);">Official airfield and flight line webcam feed at Dunkeswell.</p>
-                        </div>
-                        <div class="webcam-btn" style="margin-top: 1rem;"><i class="fa-solid fa-eye"></i> Open Dunkeswell Webcam</div>
-                    </a>
 
-                    <!-- DSGC YouTube Stream 1 -->
-                    <div class="webcam-card" style="cursor: default;">
-                        <div class="webcam-title" style="margin-bottom: 0.25rem;">
-                            <span>North Hill Cam 1 (West)</span>
+                <!-- Dunkeswell Aerodrome Link Banner -->
+                <a href="https://www.dunkeswell.co.uk/webcam" target="_blank" class="dunkeswell-banner">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <div style="background: var(--accent-sky); color: white; width: 36px; height: 36px; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 1rem;">
+                            <i class="fa-solid fa-video"></i>
                         </div>
-                        <div style="position: relative; width: 100%; height: 200px; border-radius: 0.5rem; overflow: hidden; background: #000;">
+                        <div>
+                            <div style="font-weight: 700; color: #0f172a; font-size: 0.9rem;">Dunkeswell Aerodrome Webcam Link</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">Open official airfield and flight line webcam feed in a new tab.</div>
+                        </div>
+                    </div>
+                    <div style="background: var(--accent-sky); color: white; padding: 0.45rem 0.875rem; border-radius: 0.375rem; font-size: 0.75rem; font-weight: 600; display: flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
+                        <i class="fa-solid fa-external-link-alt"></i> Open Dunkeswell Webcam
+                    </div>
+                </a>
+
+                <!-- Side-by-Side YouTube Live Feeds -->
+                <div class="webcam-grid">
+                    <!-- DSGC YouTube Stream 1 -->
+                    <div class="webcam-card">
+                        <div class="webcam-title" style="margin-bottom: 0.25rem;">
+                            <span>North Hill Cam 1 (Facing West)</span>
+                        </div>
+                        <div style="position: relative; width: 100%; height: 280px; border-radius: 0.5rem; overflow: hidden; background: #000;">
                             <iframe width="100%" height="100%" src="https://www.youtube.com/embed/AATnwsbH4Ic" title="DSGC North Hill Webcam 1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                         </div>
                     </div>
 
                     <!-- DSGC YouTube Stream 2 -->
-                    <div class="webcam-card" style="cursor: default;">
+                    <div class="webcam-card">
                         <div class="webcam-title" style="margin-bottom: 0.25rem;">
-                            <span>North Hill Cam 2 (East)</span>
+                            <span>North Hill Cam 2 (Facing East)</span>
                         </div>
-                        <div style="position: relative; width: 100%; height: 200px; border-radius: 0.5rem; overflow: hidden; background: #000;">
+                        <div style="position: relative; width: 100%; height: 280px; border-radius: 0.5rem; overflow: hidden; background: #000;">
                             <iframe width="100%" height="100%" src="https://www.youtube.com/embed/19q9pJw1vAg" title="DSGC North Hill Webcam 2" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                         </div>
                     </div>
@@ -308,7 +315,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 2.1.3 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 2.1.5 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
