@@ -1,10 +1,10 @@
-<!-- REVISION: v2.1.7 -->
+<!-- REVISION: v2.1.8 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 2.1.7)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 2.1.8)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -113,7 +113,7 @@
         .map-container { position: relative; width: 100%; height: 500px; border-radius: 0.75rem; overflow: hidden; border: 1px solid var(--border-color); background: #e2e8f0; }
         .map-container iframe { width: 100%; height: 100%; border: none; }
 
-        /* Webcam & Live Feeds Grid (2x2 or 4-column layout) */
+        /* Webcam & Live Feeds Grid */
         .webcam-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
         @media(min-width: 768px) { .webcam-grid { grid-template-columns: repeat(2, 1fr); } }
         @media(min-width: 1200px) { .webcam-grid { grid-template-columns: repeat(4, 1fr); } }
@@ -129,7 +129,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v2.1.7",
+            revision: "v2.1.8",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -148,7 +148,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 2.1.7</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 2.1.8</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -320,7 +320,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 2.1.7 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 2.1.8 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -695,7 +695,7 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">
                         <div style="display: flex; align-items: center; gap: 0.5rem;">
                             <span style="font-weight: 700; color: #0f172a; font-size: 0.95rem;">${timeLabel}</span>
-                            ${isCurrentHour ? '<span style="font-size: 0.6rem; background: var(--accent-sky); color: white; padding: 0.1rem 0.35rem; border-radius: 0.25rem; font-weight: 700;">LIVE / NOW</span>' : ''}
+                            ${isCurrentHour ? '<span style="font-weight: 700; background: var(--accent-sky); color: white; padding: 0.1rem 0.35rem; border-radius: 0.25rem; font-size: 0.6rem;">LIVE / NOW</span>' : ''}
                         </div>
                         <div style="display: flex; align-items: center; gap: 0.4rem;">
                             <span style="font-size: 0.8rem; font-weight: 700; color: #0f172a;">${temp}°C</span>
