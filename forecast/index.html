@@ -1,10 +1,10 @@
-<!-- REVISION: v2.2.0 -->
+<!-- REVISION: v2.2.1 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 2.2.0)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 2.2.1)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -138,7 +138,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v2.2.0",
+            revision: "v2.2.1",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -157,7 +157,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 2.2.0</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 2.2.1</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -329,7 +329,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 2.2.0 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 2.2.1 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -517,10 +517,6 @@
             let morningCloudIssue = false;
             let afternoonCloudIssue = false;
             let rainIssue = false;
-            let clearingAfterMorning = false;
-
-            let morningHoursChecked = 0;
-            let afternoonHoursChecked = 0;
 
             for (let h = dayStart; h < Math.min(dayStart + 13, hourly.time.length); h++) {
                 const hourNum = parseInt(hourly.time[h].split('T')[1].split(':')[0]);
@@ -542,13 +538,11 @@
                 const isBad = ws > 17 || wg > 23 || base < 2500 || rn >= 40 || fg;
 
                 if (hourNum < 12) {
-                    morningHoursChecked++;
                     if (isBad) {
                         if (ws > 17 || wg > 23) morningWindIssue = true;
                         if (base < 2500 || fg) morningCloudIssue = true;
                     }
                 } else {
-                    afternoonHoursChecked++;
                     if (isBad) {
                         if (ws > 17 || wg > 23) afternoonWindIssue = true;
                         if (base < 2500 || fg) afternoonCloudIssue = true;
@@ -941,7 +935,7 @@
             document.getElementById('active-gusts').innerHTML = `Max Gusts up to <span class="${getWindColorClass(maxGust)}">${maxGust} mph</span>`;
             const maxRain = Math.max(...dayRainProbs, 0);
             document.getElementById('active-rain').innerHTML = `<span class="${getRainColorClass(maxRain)}">${maxRain}%</span>`;
-            document.getElementById('active-rain-amount').innerHTML = `Visibility: <span class="${getVisColorClass(parseFloat(vis))}">${vis} km</b></span>`;
+            document.getElementById('active-rain-amount').innerHTML = `Visibility: <span class="${getVisColorClass(parseFloat(avgVis))}">${avgVis} km</span>`;
         }
 
         window.onload = () => {
