@@ -1,10 +1,10 @@
-<!-- REVISION: v2.1.13 -->
+<!-- REVISION: v2.2.0 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 2.1.13)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 2.2.0)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -84,6 +84,9 @@
         .wf-cell { display: flex; align-items: center; justify-content: center; }
         .wf-arrow { font-size: 0.7rem; color: #0284c7; }
 
+        /* Diagnosing the Day summary block */
+        .diagnosis-box { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 0.5rem; padding: 0.5rem; font-size: 0.7rem; color: #0369a1; line-height: 1.35; font-weight: 500; margin-top: auto; }
+
         .text-green { color: #059669 !important; font-weight: 700; }
         .text-yellow { color: #d97706 !important; font-weight: 700; }
         .text-orange { color: #ea580c !important; font-weight: 700; }
@@ -135,7 +138,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v2.1.13",
+            revision: "v2.2.0",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -154,7 +157,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 2.1.13</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 2.2.0</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -225,7 +228,7 @@
                 </div>
                 <div class="card">
                     <div>
-                        <span class="card-label">Peak Ground Wind</span>
+                        <span class="card-label">Peak Ground Wind / Gust</span>
                         <div class="card-value" id="active-wind" style="font-size: 1.5rem;">-- mph</div>
                     </div>
                     <p class="card-desc" id="active-gusts">Max Gusts up to -- mph</p>
@@ -326,7 +329,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 2.1.13 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 2.2.0 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -503,6 +506,80 @@
             return { tier: 'green', label: 'Nominal', reason: 'Nominal' };
         }
 
+        function generateDayDiagnosis(dayIndex, hourly) {
+            const daily = globalWeatherData.daily;
+            const targetDateStr = daily.time[dayIndex];
+            let dayStart = hourly.time.findIndex(t => t.startsWith(targetDateStr) && t.includes('07:00'));
+            if (dayStart === -1) dayStart = dayIndex * 24;
+
+            let morningWindIssue = false;
+            let afternoonWindIssue = false;
+            let morningCloudIssue = false;
+            let afternoonCloudIssue = false;
+            let rainIssue = false;
+            let clearingAfterMorning = false;
+
+            let morningHoursChecked = 0;
+            let afternoonHoursChecked = 0;
+
+            for (let h = dayStart; h < Math.min(dayStart + 13, hourly.time.length); h++) {
+                const hourNum = parseInt(hourly.time[h].split('T')[1].split(':')[0]);
+                const ws = kmhToMph(hourly.wind_speed_10m[h]);
+                const wg = kmhToMph(hourly.wind_gusts_10m[h]);
+                const rn = hourly.precipitation_probability[h];
+                const vs = hourly.visibility[h] / 1000;
+                const lw = hourly.cloud_cover_low[h] || 0;
+                const md = hourly.cloud_cover_mid[h] || 0;
+                const hgh = hourly.cloud_cover_high[h] || 0;
+                const cb = getCustomCloudBands(lw, md, hgh, vs, rn);
+                const tp = hourly.temperature_2m[h];
+                const dp = hourly.dew_point_2m[h];
+                const hm = hourly.relative_humidity_2m[h];
+                const cd = hourly.weather_code[h];
+                const base = calculateCloudbaseAGL(tp, dp, lw, hm, cd);
+                const fg = cd >= 45 && cd <= 48 || vs < 5 || hm >= 95;
+
+                const isBad = ws > 17 || wg > 23 || base < 2500 || rn >= 40 || fg;
+
+                if (hourNum < 12) {
+                    morningHoursChecked++;
+                    if (isBad) {
+                        if (ws > 17 || wg > 23) morningWindIssue = true;
+                        if (base < 2500 || fg) morningCloudIssue = true;
+                    }
+                } else {
+                    afternoonHoursChecked++;
+                    if (isBad) {
+                        if (ws > 17 || wg > 23) afternoonWindIssue = true;
+                        if (base < 2500 || fg) afternoonCloudIssue = true;
+                    }
+                }
+                if (rn >= 50) rainIssue = true;
+            }
+
+            const metrics = calculateDayMetrics(dayIndex, hourly);
+
+            if (metrics.likelihood >= 85) {
+                return "Favorable all-day conditions with solid cloud ceilings and manageable winds. Excellent window for student and tandem ops.";
+            }
+            if (morningWindIssue && !afternoonWindIssue) {
+                return "Brisk or gusty winds early, but conditions ease heading past midday allowing jumping to get underway.";
+            }
+            if (morningCloudIssue && !afternoonCloudIssue) {
+                return "Low morning cloud or mist deck lifting toward midday, clearing the way for afternoon jumping.";
+            }
+            if ((morningWindIssue || morningCloudIssue) && (!afternoonWindIssue && !afternoonCloudIssue)) {
+                return "Probably too cloudy and windy in the morning, but improving after 11:00 as ceilings lift and jumping becomes likely.";
+            }
+            if (rainIssue) {
+                return "Rain showers or precipitation risk dominating periods of the day. Expect intermittent weather holds.";
+            }
+            if (metrics.likelihood < 40) {
+                return "Challenging conditions throughout with sustained winds or low cloud ceilings restricting operations.";
+            }
+            return "Marginal or changeable conditions. Monitor local live webcams and wind sensors closely before calling loads.";
+        }
+
         function calculateDayMetrics(dayIndex, hourly) {
             const daily = globalWeatherData.daily;
             const targetDateStr = daily.time[dayIndex];
@@ -535,7 +612,7 @@
                 if (licStat.tier === 'green' && stuStat.tier === 'green') {
                     greenHoursCount++;
                 } else {
-                    let nonGreenReason = stuStat.tier !== 'green' ? stuStat.reason : licStat.reason;
+                    let nonGreenReason = stuStat.tier !== 'green' ? stuStat.reason : licencedStat.reason;
                     reasonCounts[nonGreenReason] = (reasonCounts[nonGreenReason] || 0) + 1;
                 }
                 evaluatedHours++;
@@ -562,6 +639,7 @@
                 const dateStr = dateObj.toISOString().split('T')[0];
                 
                 const metrics = calculateDayMetrics(i, hourly);
+                const diagnosisText = generateDayDiagnosis(i, hourly);
                 const isActive = i === selectedDayIndex ? ' active' : '';
                 const badgeClass = metrics.likelihood >= 70 ? 'status-green' : metrics.likelihood >= 40 ? 'status-yellow' : 'status-red';
 
@@ -623,6 +701,9 @@
                         ${rainRow}
                         ${tempRow}
                         ${pressRow}
+                    </div>
+                    <div class="diagnosis-box">
+                        <b>Diagnosing the day:</b> ${diagnosisText}
                     </div>
                 `;
                 container.appendChild(card);
@@ -726,7 +807,6 @@
 
                 let primaryReason = studentStat.reason !== 'Nominal' ? studentStat.reason : licencedStat.reason;
 
-                // Build Model Table Rows for this hour
                 let modelTableRows = '';
                 modelsConfig.forEach(m => {
                     const modelObj = multiModelData[m.key];
@@ -861,7 +941,7 @@
             document.getElementById('active-gusts').innerHTML = `Max Gusts up to <span class="${getWindColorClass(maxGust)}">${maxGust} mph</span>`;
             const maxRain = Math.max(...dayRainProbs, 0);
             document.getElementById('active-rain').innerHTML = `<span class="${getRainColorClass(maxRain)}">${maxRain}%</span>`;
-            document.getElementById('active-rain-amount').innerHTML = `Visibility: <span class="${getVisColorClass(parseFloat(avgVis))}">${avgVis} km</b></span>`;
+            document.getElementById('active-rain-amount').innerHTML = `Visibility: <span class="${getVisColorClass(parseFloat(vis))}">${vis} km</b></span>`;
         }
 
         window.onload = () => {
