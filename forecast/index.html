@@ -1,10 +1,10 @@
-<!-- REVISION: v2.1.9 -->
+<!-- REVISION: v2.1.10 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 2.1.9)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 2.1.10)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -109,6 +109,11 @@
         .status-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.4rem; padding: 0.4rem; display: flex; flex-direction: column; gap: 0.2rem; }
         .status-title { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
 
+        /* Multi-Model Comparison Cards Grid */
+        .model-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.4rem; }
+        .model-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.35rem; padding: 0.35rem; font-size: 0.7rem; display: flex; flex-direction: column; gap: 0.1rem; }
+        .model-name { font-weight: 700; color: var(--accent-sky); font-size: 0.65rem; text-transform: uppercase; border-bottom: 1px dashed #e2e8f0; padding-bottom: 0.1rem; }
+
         /* Windy Satellite Map Container */
         .map-container { position: relative; width: 100%; height: 500px; border-radius: 0.75rem; overflow: hidden; border: 1px solid var(--border-color); background: #e2e8f0; }
         .map-container iframe { width: 100%; height: 100%; border: none; }
@@ -129,7 +134,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v2.1.9",
+            revision: "v2.1.10",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -148,7 +153,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 2.1.9</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 2.1.10</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -244,6 +249,18 @@
                 </div>
             </div>
 
+            <!-- ================= MULTI-MODEL WIND & FORECAST COMPARISON ================= -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h3 class="panel-title"><i class="fa-solid fa-compass" style="color: var(--accent-sky);"></i>Multi-Model Wind & Forecast Comparison</h3>
+                    <span class="badge">ECMWF, GFS, ICON & Meteofrance</span>
+                </div>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: -0.5rem;">Comparing predicted hourly wind speeds, peak gusts, and wind directions across leading global forecast models for the selected day.</p>
+                <div class="hourly-grid" id="multi-model-hourly-grid">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
             <!-- ================= WINDY SATELLITE & CLOUDS MAP ================= -->
             <div class="panel" style="padding: 1.25rem;">
                 <div class="panel-header" style="margin-bottom: 1rem;">
@@ -320,12 +337,13 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 2.1.9 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 2.1.10 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
     <script>
         let globalWeatherData = null;
+        let multiModelData = {};
         let selectedDayIndex = 0; // Default to today
 
         function kmhToMph(kmh) {
@@ -410,15 +428,26 @@
             const errMessage = document.getElementById('error-message');
             errBanner.classList.add('hidden');
 
-            const url = `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&elevation=${CONFIG.elevation}&hourly=temperature_2m,dew_point_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,wind_speed_10m,wind_direction_10m,wind_gusts_10m,surface_pressure,visibility&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant&timezone=${CONFIG.timezone}`;
+            const mainUrl = `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&elevation=${CONFIG.elevation}&hourly=temperature_2m,dew_point_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,wind_speed_10m,wind_direction_10m,wind_gusts_10m,surface_pressure,visibility&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant&timezone=${CONFIG.timezone}`;
+
+            // Multi-model endpoint for wind comparison
+            const modelList = "ecmwf_ifs025,gfs_seamless,icon_seamless,meteofrance_seamless";
+            const multiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&elevation=${CONFIG.elevation}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&models=${modelList}&timezone=${CONFIG.timezone}`;
 
             try {
-                globalWeatherData = await fetchWithRetry(url);
+                const [mainData, multiData] = await Promise.all([
+                    fetchWithRetry(mainUrl),
+                    fetchWithRetry(multiUrl)
+                ]);
+
+                globalWeatherData = mainData;
+                multiModelData = multiData;
 
                 document.getElementById('last-updated').innerHTML = `<i class="fa-solid fa-check" style="color: var(--accent-emerald);"></i> Updated: ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} (${CONFIG.revision})`;
 
                 renderOutlookCards();
                 renderActiveDay(selectedDayIndex);
+                renderMultiModelSchedule(selectedDayIndex);
 
             } catch (err) {
                 console.error("Error fetching weather data:", err);
@@ -429,25 +458,17 @@
         }
 
         function calculateCloudbaseAGL(temp, dewPoint, lowCover, relativeHumidity, weatherCode) {
-            // 1. Fog / Mist override (Visibility or high RH near surface)
             if (relativeHumidity >= 95 || (weatherCode >= 45 && weatherCode <= 48)) {
                 return 300; 
             }
-
-            // 2. Standard surface spread calculation
             const spread = Math.max(0.1, temp - dewPoint);
             let baseFt = Math.round((spread / 2.5) * 1000);
-
-            // 3. Low Cloud & Moisture Trap Override
             if (lowCover >= 50 && relativeHumidity >= 85) {
                 const cappedBase = Math.round(2000 + ((95 - relativeHumidity) * 100));
                 baseFt = Math.min(baseFt, Math.max(1200, cappedBase));
             }
-
-            // Hard safety boundaries for skydiving operations
             if (baseFt < 200) baseFt = 200;
             if (baseFt > 12000) baseFt = 12000;
-            
             return baseFt;
         }
 
@@ -613,6 +634,7 @@
             selectedDayIndex = dayIndex;
             renderOutlookCards();
             renderActiveDay(selectedDayIndex);
+            renderMultiModelSchedule(selectedDayIndex);
         }
 
         function renderActiveDay(dayIndex) {
@@ -629,15 +651,13 @@
             let startIndex = hourly.time.findIndex(t => t.startsWith(dateStr) && t.includes('07:00'));
             if (startIndex === -1) startIndex = hourly.time.findIndex(t => t.startsWith(dateStr));
             const validStart = startIndex !== -1 ? startIndex : dayIndex * 24;
-            const hoursCount = 13; // Fixed 07:00 to 19:00 (13 hours)
+            const hoursCount = 13;
 
             let dayWindSpeeds = [];
             let dayWindGusts = [];
             let dayRainProbs = [];
             let dayVisibilities = [];
             let dayCloudCovers = [];
-            let dayWeatherCodes = [];
-            let dayHumidities = [];
 
             let greenHours = 0;
             let totalEvaluated = 0;
@@ -680,8 +700,6 @@
                 dayRainProbs.push(rain);
                 dayVisibilities.push(parseFloat(vis));
                 dayCloudCovers.push(cloud);
-                dayWeatherCodes.push(code);
-                dayHumidities.push(hum);
 
                 const hFog = code >= 45 && code <= 48 || vis < 5 || hum >= 95;
                 const hIcon = getWeatherIcon(hFog ? 45 : code, rain);
@@ -807,6 +825,69 @@
             const maxRain = Math.max(...dayRainProbs, 0);
             document.getElementById('active-rain').innerHTML = `<span class="${getRainColorClass(maxRain)}">${maxRain}%</span>`;
             document.getElementById('active-rain-amount').innerHTML = `Visibility: <span class="${getVisColorClass(parseFloat(avgVis))}">${avgVis} km</span>`;
+        }
+
+        function renderMultiModelSchedule(dayIndex) {
+            const daily = globalWeatherData.daily;
+            const targetDateStr = daily.time[dayIndex];
+            const hourly = globalWeatherData.hourly;
+
+            let startIndex = hourly.time.findIndex(t => t.startsWith(targetDateStr) && t.includes('07:00'));
+            if (startIndex === -1) startIndex = hourly.time.findIndex(t => t.startsWith(targetDateStr));
+            const validStart = startIndex !== -1 ? startIndex : dayIndex * 24;
+            const hoursCount = 13;
+
+            const grid = document.getElementById('multi-model-hourly-grid');
+            grid.innerHTML = '';
+
+            const modelsConfig = [
+                { key: 'ecmwf_ifs025', label: 'ECMWF IFS' },
+                { key: 'gfs_seamless', label: 'NOAA GFS' },
+                { key: 'icon_seamless', label: 'DWD ICON' },
+                { key: 'meteofrance_seamless', label: 'Meteofrance' }
+            ];
+
+            for (let i = validStart; i < Math.min(validStart + hoursCount, hourly.time.length); i++) {
+                const timeStr = hourly.time[i];
+                const timeLabel = new Date(timeStr).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
+
+                let modelBoxesHTML = '';
+                modelsConfig.forEach(m => {
+                    const mData = multiModelData[m.key];
+                    let spd = '--', gust = '--', dir = '--';
+                    if (mData && mData.hourly) {
+                        const mIdx = mData.hourly.time.findIndex(t => t === timeStr);
+                        if (mIdx !== -1) {
+                            spd = kmhToMph(mData.hourly.wind_speed_10m[mIdx] || 0);
+                            gust = kmhToMph(mData.hourly.wind_gusts_10m[mIdx] || 0);
+                            dir = getWindDirectionLabel(mData.hourly.wind_direction_10m[mIdx] || 0);
+                        }
+                    }
+                    modelBoxesHTML += `
+                        <div class="model-box">
+                            <span class="model-name">${m.label}</span>
+                            <div style="display: flex; justify-content: space-between; font-weight: 600;">
+                                <span class="${getWindColorClass(spd)}">${spd} mph</span>
+                                <span style="color: var(--text-muted);">Gust: ${gust}</span>
+                                <span style="color: #0f172a;">${dir}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                const card = document.createElement('div');
+                card.className = 'hour-card';
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.4rem;">
+                        <span style="font-weight: 700; color: #0f172a; font-size: 0.95rem;">${timeLabel}</span>
+                        <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: 600;">Wind Model Comparison</span>
+                    </div>
+                    <div class="model-grid">
+                        ${modelBoxesHTML}
+                    </div>
+                `;
+                grid.appendChild(card);
+            }
         }
 
         window.onload = () => {
