@@ -1,10 +1,10 @@
-<!-- REVISION: v2.1.12 -->
+<!-- REVISION: v2.1.13 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 2.1.12)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 2.1.13)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -109,14 +109,11 @@
         .status-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.4rem; padding: 0.4rem; display: flex; flex-direction: column; gap: 0.2rem; }
         .status-title { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
 
-        /* Multi-Model Comparison Table Styling */
-        .model-table-container { width: 100%; overflow-x: auto; border: 1px solid var(--border-color); border-radius: 0.75rem; background: #ffffff; }
-        .model-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: center; }
-        .model-table th, .model-table td { padding: 0.65rem 0.75rem; border-bottom: 1px solid #e2e8f0; border-right: 1px solid #f1f5f9; }
-        .model-table th { background-color: #f8fafc; font-weight: 700; color: #1e293b; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; }
-        .model-table th:first-child, .model-table td:first-child { font-weight: 700; color: #0f172a; background-color: #f8fafc; text-align: center; width: 80px; border-right: 2px solid #cbd5e1; }
-        .model-table tr:last-child td { border-bottom: none; }
-        .model-table tr:hover td { background-color: #f0f9ff; }
+        /* Hourly Multi-Model Table Styling */
+        .hour-model-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; text-align: left; }
+        .hour-model-table th, .hour-model-table td { padding: 0.3rem 0.4rem; border-bottom: 1px solid #f1f5f9; }
+        .hour-model-table th { font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 0.65rem; background: #f8fafc; }
+        .hour-model-table tr:last-child td { border-bottom: none; }
 
         /* Windy Satellite Map Container */
         .map-container { position: relative; width: 100%; height: 500px; border-radius: 0.75rem; overflow: hidden; border: 1px solid var(--border-color); background: #e2e8f0; }
@@ -138,7 +135,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v2.1.12",
+            revision: "v2.1.13",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -157,7 +154,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 2.1.12</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 2.1.13</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -253,31 +250,6 @@
                 </div>
             </div>
 
-            <!-- ================= MULTI-MODEL WIND & FORECAST COMPARISON TABLE ================= -->
-            <div class="panel">
-                <div class="panel-header">
-                    <h3 class="panel-title"><i class="fa-solid fa-compass" style="color: var(--accent-sky);"></i>Multi-Model Wind & Forecast Comparison</h3>
-                    <span class="badge">ECMWF, GFS, ICON & Meteofrance Matrix</span>
-                </div>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: -0.5rem;">Hour-by-hour side-by-side wind speed, gust, and direction comparison across leading global meteorological models.</p>
-                <div class="model-table-container">
-                    <table class="model-table">
-                        <thead>
-                            <tr>
-                                <th>Hour</th>
-                                <th>ECMWF IFS</th>
-                                <th>NOAA GFS</th>
-                                <th>DWD ICON</th>
-                                <th>Meteofrance</th>
-                            </tr>
-                        </thead>
-                        <tbody id="multi-model-table-body">
-                            <!-- Populated via JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
             <!-- ================= WINDY SATELLITE & CLOUDS MAP ================= -->
             <div class="panel" style="padding: 1.25rem;">
                 <div class="panel-header" style="margin-bottom: 1rem;">
@@ -354,7 +326,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 2.1.12 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 2.1.13 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -475,7 +447,6 @@
 
                 renderOutlookCards();
                 renderActiveDay(selectedDayIndex);
-                renderMultiModelTable(selectedDayIndex);
 
             } catch (err) {
                 console.error("Error fetching weather data:", err);
@@ -662,7 +633,6 @@
             selectedDayIndex = dayIndex;
             renderOutlookCards();
             renderActiveDay(selectedDayIndex);
-            renderMultiModelTable(selectedDayIndex);
         }
 
         function renderActiveDay(dayIndex) {
@@ -699,6 +669,13 @@
 
             const hourlyGrid = document.getElementById('active-hourly-grid');
             hourlyGrid.innerHTML = '';
+
+            const modelsConfig = [
+                { key: 'ecmwf_ifs025', label: 'ECMWF' },
+                { key: 'gfs_seamless', label: 'GFS' },
+                { key: 'icon_seamless', label: 'ICON' },
+                { key: 'meteofrance_seamless', label: 'Meteo' }
+            ];
 
             for (let i = validStart; i < Math.min(validStart + hoursCount, hourly.time.length); i++) {
                 const timeStr = hourly.time[i];
@@ -749,6 +726,30 @@
 
                 let primaryReason = studentStat.reason !== 'Nominal' ? studentStat.reason : licencedStat.reason;
 
+                // Build Model Table Rows for this hour
+                let modelTableRows = '';
+                modelsConfig.forEach(m => {
+                    const modelObj = multiModelData[m.key];
+                    let mSpd = '--', mGust = '--', mDir = '--';
+                    if (modelObj && modelObj.hourly) {
+                        let mIdx = modelObj.hourly.time.findIndex(t => t === timeStr);
+                        if (mIdx === -1) mIdx = i;
+                        if (mIdx !== -1 && modelObj.hourly.wind_speed_10m[mIdx] !== undefined) {
+                            mSpd = kmhToMph(modelObj.hourly.wind_speed_10m[mIdx]);
+                            mGust = kmhToMph(modelObj.hourly.wind_gusts_10m[mIdx] || 0);
+                            mDir = getWindDirectionLabel(modelObj.hourly.wind_direction_10m[mIdx] || 0);
+                        }
+                    }
+                    modelTableRows += `
+                        <tr>
+                            <td><b>${m.label}</b></td>
+                            <td class="${getWindColorClass(mSpd)}">${mSpd} mph</td>
+                            <td style="color: var(--text-muted);">G: ${mGust}</td>
+                            <td style="color: #0f172a; text-align: right;"><b>${mDir}</b></td>
+                        </tr>
+                    `;
+                });
+
                 const card = document.createElement('div');
                 card.className = `hour-card ${isCurrentHour ? 'current-hour' : ''}`;
                 card.innerHTML = `
@@ -763,14 +764,22 @@
                         </div>
                     </div>
 
-                    <!-- 1. GND Wind -->
+                    <!-- Multi-Model Wind Table -->
                     <div class="hour-section" style="border-color: #bae6fd; background: #f0f9ff;">
-                        <div class="hour-section-title"><span style="color: #0369a1;"><i class="fa-solid fa-wind mr-1"></i> GND Wind</span></div>
-                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700;">
-                            <span class="${getWindColorClass(wSpd)}">${wSpd} mph</span>
-                            <span class="${getWindColorClass(wGST)}">Gusts: ${wGST} mph</span>
-                            <span style="color: #0f172a;">Dir: ${wDir}</span>
-                        </div>
+                        <div class="hour-section-title"><span style="color: #0369a1;"><i class="fa-solid fa-wind mr-1"></i> Wind Models</span></div>
+                        <table class="hour-model-table">
+                            <thead>
+                                <tr>
+                                    <th>Model</th>
+                                    <th>Wind</th>
+                                    <th>Gust</th>
+                                    <th style="text-align: right;">Dir</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${modelTableRows}
+                            </tbody>
+                        </table>
                     </div>
 
                     <!-- 2. Vertical Cloud Cover & Lowest Cloudbase AGL -->
@@ -853,63 +862,6 @@
             const maxRain = Math.max(...dayRainProbs, 0);
             document.getElementById('active-rain').innerHTML = `<span class="${getRainColorClass(maxRain)}">${maxRain}%</span>`;
             document.getElementById('active-rain-amount').innerHTML = `Visibility: <span class="${getVisColorClass(parseFloat(avgVis))}">${avgVis} km</b></span>`;
-        }
-
-        function renderMultiModelTable(dayIndex) {
-            const daily = globalWeatherData.daily;
-            const targetDateStr = daily.time[dayIndex];
-            const hourly = globalWeatherData.hourly;
-
-            let startIndex = hourly.time.findIndex(t => t.startsWith(targetDateStr) && t.includes('07:00'));
-            if (startIndex === -1) startIndex = hourly.time.findIndex(t => t.startsWith(targetDateStr));
-            const validStart = startIndex !== -1 ? startIndex : dayIndex * 24;
-            const hoursCount = 13;
-
-            const tbody = document.getElementById('multi-model-table-body');
-            tbody.innerHTML = '';
-
-            const modelsConfig = [
-                { key: 'ecmwf_ifs025' },
-                { key: 'gfs_seamless' },
-                { key: 'icon_seamless' },
-                { key: 'meteofrance_seamless' }
-            ];
-
-            for (let i = validStart; i < Math.min(validStart + hoursCount, hourly.time.length); i++) {
-                const timeStr = hourly.time[i];
-                const timeLabel = new Date(timeStr).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
-
-                let rowHTML = `<td>${timeLabel}</td>`;
-
-                modelsConfig.forEach(m => {
-                    const modelObj = multiModelData[m.key];
-                    let spd = '--', gust = '--', dir = '--';
-                    if (modelObj && modelObj.hourly) {
-                        let mIdx = modelObj.hourly.time.findIndex(t => t === timeStr);
-                        if (mIdx === -1) {
-                            mIdx = i; // Fallback index matching base array
-                        }
-                        if (mIdx !== -1 && modelObj.hourly.wind_speed_10m[mIdx] !== undefined) {
-                            spd = kmhToMph(modelObj.hourly.wind_speed_10m[mIdx]);
-                            gust = kmhToMph(modelObj.hourly.wind_gusts_10m[mIdx] || 0);
-                            dir = getWindDirectionLabel(modelObj.hourly.wind_direction_10m[mIdx] || 0);
-                        }
-                    }
-                    rowHTML += `
-                        <td>
-                            <div style="display: flex; justify-content: space-around; align-items: center; gap: 0.5rem; font-weight: 600;">
-                                <span class="${getWindColorClass(spd)}" style="min-width: 45px; text-align: right;">${spd} mph</span>
-                                <span style="color: var(--text-muted); font-size: 0.75rem; min-width: 55px;">G: ${gust}</span>
-                                <span style="color: #0f172a; min-width: 30px; text-align: left;">${dir}</span>
-                            </div>
-                        </td>
-                    `;
-                });
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = rowHTML;
-                tbody.appendChild(tr);
-            }
         }
 
         window.onload = () => {
