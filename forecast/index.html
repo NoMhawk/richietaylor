@@ -1,10 +1,10 @@
-<!-- REVISION: v2.6.0 -->
+<!-- REVISION: v2.9.0 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 2.6.0)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 2.9.0)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -146,7 +146,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v2.6.0",
+            revision: "v2.9.0",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -165,7 +165,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 2.6.0</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 2.9.0</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -350,7 +350,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 2.6.0 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 2.9.0 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -525,26 +525,23 @@
                 const wg = kmhToMph(hourly.wind_gusts_10m[h]);
                 const rn = hourly.precipitation_probability[h];
                 const vs = hourly.visibility[h] / 1000;
-                const lw = hourly.cloud_cover_low[h] || 0;
-                const md = hourly.cloud_cover_mid[h] || 0;
-                const hgh = hourly.cloud_cover_high[h] || 0;
                 const tp = hourly.temperature_2m[h];
                 const dp = hourly.dew_point_2m[h];
                 const hm = hourly.relative_humidity_2m[h];
                 const cd = hourly.weather_code[h];
-                const base = calculateCloudbaseAGL(tp, dp, lw, hm, cd);
-                const fg = cd >= 45 && cd <= 48 || vs < 5 || hm >= 95;
+                const fg = cd >= 45 && cd <= 48 || vs < 3 || hm >= 95;
 
-                const isBad = ws > 17 || wg > 23 || rn >= 40 || fg;
+                // Tandem limits: wind > 22 or gust > 22 or fog/rain
+                const isBad = ws > 22 || wg > 22 || rn >= 50 || fg;
 
                 if (hourNum < 12) {
                     if (isBad) {
-                        if (ws > 17 || wg > 23) morningWindIssue = true;
+                        if (ws > 22 || wg > 22) morningWindIssue = true;
                         if (fg) morningCloudIssue = true;
                     }
                 } else {
                     if (isBad) {
-                        if (ws > 17 || wg > 23) afternoonWindIssue = true;
+                        if (ws > 22 || wg > 22) afternoonWindIssue = true;
                         if (fg) afternoonCloudIssue = true;
                     }
                 }
@@ -554,22 +551,19 @@
             const metrics = calculateDayMetrics(dayIndex, hourly);
 
             if (metrics.likelihood >= 85) {
-                return "Favorable all-day conditions with solid cloud ceilings and manageable winds. Excellent window for student and tandem ops.";
+                return "Favorable tandem conditions with manageable winds and solid visibility. Excellent window for tandem operations.";
             }
             if (morningWindIssue && !afternoonWindIssue) {
-                return "Brisk or gusty winds early, but conditions ease heading past midday allowing jumping to get underway.";
+                return "Brisk winds early for tandem operations, but conditions ease heading past midday allowing jumping.";
             }
             if (morningCloudIssue && !afternoonCloudIssue) {
-                return "Low morning cloud or mist deck lifting toward midday, clearing the way for afternoon jumping.";
-            }
-            if ((morningWindIssue || morningCloudIssue) && (!afternoonWindIssue && !afternoonCloudIssue)) {
-                return "Probably too cloudy and windy in the morning, but improving after 11:00 as ceilings lift and jumping becomes likely.";
+                return "Low morning cloud or mist deck lifting toward midday, clearing the way for afternoon tandem jumps.";
             }
             if (rainIssue) {
                 return "Rain showers or precipitation risk dominating periods of the day. Expect intermittent weather holds.";
             }
             if (metrics.likelihood < 40) {
-                return "Challenging conditions throughout with sustained winds or low cloud ceilings restricting operations.";
+                return "Challenging conditions throughout with high winds or weather limits restricting tandem operations.";
             }
             return "Marginal or changeable conditions. Monitor local live webcams and wind sensors closely before calling loads.";
         }
@@ -589,20 +583,20 @@
                 const rn = hourly.precipitation_probability[h];
                 const vs = hourly.visibility[h] / 1000;
                 const lw = hourly.cloud_cover_low[h] || 0;
-                const md = hourly.cloud_cover_mid[h] || 0;
-                const hgh = hourly.cloud_cover_high[h] || 0;
                 const tp = hourly.temperature_2m[h];
                 const dp = hourly.dew_point_2m[h];
                 const hm = hourly.relative_humidity_2m[h];
                 const cd = hourly.weather_code[h];
-                const fg = cd >= 45 && cd <= 48 || vs < 5 || hm >= 95;
+                const base = calculateCloudbaseAGL(tp, dp, lw, hm, cd);
+                const fg = cd >= 45 && cd <= 48 || vs < 3 || hm >= 95;
 
-                // Cloudbase weight is minimized (only absolute fog / zero vis / extreme rain / high wind restrict score)
-                const windOk = ws <= 17 && wg <= 23;
-                const rainOk = rn < 40;
-                const visOk = !fg && vs >= 5;
+                // Tandem limits: wind/gust <= 22 mph, rain < 50%, vis >= 3km, base >= 1000ft
+                const windOk = ws <= 22 && wg <= 22;
+                const rainOk = rn < 50;
+                const visOk = !fg && vs >= 3;
+                const baseOk = base >= 1000;
 
-                if (windOk && rainOk && visOk) {
+                if (windOk && rainOk && visOk && baseOk) {
                     greenHoursCount++;
                 }
                 evaluatedHours++;
@@ -705,9 +699,9 @@
             let label = `${value}${unit}`;
 
             if (category === 'wind' || category === 'gust') {
-                if (value > 25) { status = 'red'; label = `${value} mph`; }
-                else if (value > 19) { status = 'orange'; label = `${value} mph`; }
-                else if (value > 13) { status = 'yellow'; label = `${value} mph`; }
+                if (value > 22) { status = 'red'; label = `${value} mph`; }
+                else if (value > 17) { status = 'orange'; label = `${value} mph`; }
+                else if (value > 12) { status = 'yellow'; label = `${value} mph`; }
                 else { status = 'green'; label = `${value} mph`; }
             } else if (category === 'rain') {
                 if (value >= 60) { status = 'red'; label = `${value}%`; }
@@ -725,9 +719,9 @@
                 else if (value < 7) { status = 'yellow'; label = `${value} km`; }
                 else { status = 'green'; label = `${value} km`; }
             } else if (category === 'base') {
-                if (value < 1500) { status = 'red'; label = `${value}ft`; }
-                else if (value < 2500) { status = 'orange'; label = `${value}ft`; }
-                else if (value < 4000) { status = 'yellow'; label = `${value}ft`; }
+                if (value < 2000) { status = 'red'; label = `${value}ft`; }
+                else if (value < 3500) { status = 'orange'; label = `${value}ft`; }
+                else if (value < 5000) { status = 'yellow'; label = `${value}ft`; }
                 else { status = 'green'; label = `${value}ft`; }
             }
 
@@ -813,14 +807,15 @@
                 dayVisibilities.push(vis);
                 dayCloudCovers.push(cloud);
 
-                const hFog = code >= 45 && code <= 48 || vis < 5 || hum >= 95;
+                const hFog = code >= 45 && code <= 48 || vis < 3 || hum >= 95;
                 const hIcon = getWeatherIcon(hFog ? 45 : code, rain);
 
-                const windOk = wSpd <= 17 && wGST <= 23;
-                const rainOk = rain < 40;
-                const visOk = !hFog && vis >= 5;
+                const windOk = wSpd <= 22 && wGST <= 22;
+                const rainOk = rain < 50;
+                const visOk = !hFog && vis >= 3;
+                const baseOk = cloudbaseAGL >= 1000;
 
-                if (windOk && rainOk && visOk) {
+                if (windOk && rainOk && visOk && baseOk) {
                     greenHours++;
                 }
                 totalEvaluated++;
@@ -950,7 +945,7 @@
             const scoreEl = document.getElementById('active-jump-score');
             scoreEl.textContent = `${jumpScore}%`;
             scoreEl.style.color = jumpScore >= 70 ? 'var(--accent-emerald)' : jumpScore >= 40 ? 'var(--accent-amber)' : '#dc2626';
-            document.getElementById('active-jump-desc').textContent = jumpScore >= 70 ? 'Favorable jump conditions' : jumpScore >= 40 ? 'Marginal conditions / weather holds' : '🛑 WEATHER HOLDS (Wind / Rain / Vis)';
+            document.getElementById('active-jump-desc').textContent = jumpScore >= 70 ? 'Favorable tandem jump conditions' : jumpScore >= 40 ? 'Marginal tandem conditions' : '🛑 TANDEM WEATHER HOLDS';
 
             const maxWind = Math.max(...dayWindSpeeds, 0);
             const maxGust = Math.max(...dayWindGusts, 0);
