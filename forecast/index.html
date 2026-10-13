@@ -1,10 +1,10 @@
-<!-- REVISION: v3.0.0 -->
+<!-- REVISION: v3.1.0 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.0.0)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.1.0)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -104,6 +104,11 @@
         .master-traffic-table th { font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 0.65rem; background: #f8fafc; width: calc((100% - 90px) / 13); }
         .master-traffic-table th.param-label, .master-traffic-table td.param-label { text-align: left; font-weight: 700; color: #475569; background: #f8fafc; padding-left: 0.5rem; width: 90px; min-width: 90px; }
 
+        /* Current Hour Column Highlight in Matrix */
+        .master-traffic-table th.current-col, .master-traffic-table td.current-col { background-color: #f0f9ff !important; border-left: 2px solid var(--accent-sky) !important; border-right: 2px solid var(--accent-sky) !important; }
+        .master-traffic-table th.current-col { border-top: 2px solid var(--accent-sky) !important; color: var(--accent-sky) !important; }
+        .master-traffic-table tr:last-child td.current-col { border-bottom: 2px solid var(--accent-sky) !important; }
+
         .status-green { background-color: #ecfdf5; color: #065f46; border: 1px solid #10b981; padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.7rem; display: block; text-transform: uppercase; }
         .status-yellow { background-color: #fefce8; color: #854d0e; border: 1px solid #eab308; padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.7rem; display: block; text-transform: uppercase; }
         .status-orange { background-color: #fff7ed; color: #c2410c; border: 1px solid #f97316; padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.7rem; display: block; text-transform: uppercase; }
@@ -146,7 +151,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v3.0.0",
+            revision: "v3.1.0",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -165,7 +170,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.0.0</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.1.0</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -350,7 +355,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.0.0 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.1.0 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -783,6 +788,7 @@
                 const timeStr = hourly.time[i];
                 const timeLabel = new Date(timeStr).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
                 const isCurrentHour = timeStr.startsWith(currentLocalHourStr);
+                const colClass = isCurrentHour ? ' current-col' : '';
                 
                 const wSpd = kmhToMph(hourly.wind_speed_10m[i]);
                 const wGST = kmhToMph(hourly.wind_gusts_10m[i]);
@@ -820,14 +826,15 @@
                 }
                 totalEvaluated++;
 
-                // Build Master Table Columns
-                hourHeaders += `<th>${timeLabel}</th>`;
-                windRow += `<td>${getTrafficBadge('wind', wSpd)}</td>`;
-                gustRow += `<td>${getTrafficBadge('gust', wGST)}</td>`;
-                rainRow += `<td>${getTrafficBadge('rain', rain, '%')}</td>`;
-                cloudRow += `<td>${getTrafficBadge('cloud', cloud, '%')}</td>`;
-                visRow += `<td>${getTrafficBadge('vis', vis, 'km')}</td>`;
-                baseRow += `<td>${getTrafficBadge('base', cloudbaseAGL)}</td>`;
+                // Build Master Table Columns with current hour highlighting
+                const headerContent = isCurrentHour ? `${timeLabel}<br><span style="font-size:0.55rem; background:var(--accent-sky); color:white; padding:0.05rem 0.2rem; border-radius:0.2rem;">NOW</span>` : timeLabel;
+                hourHeaders += `<th class="${colClass}">${headerContent}</th>`;
+                windRow += `<td class="${colClass}">${getTrafficBadge('wind', wSpd)}</td>`;
+                gustRow += `<td class="${colClass}">${getTrafficBadge('gust', wGST)}</td>`;
+                rainRow += `<td class="${colClass}">${getTrafficBadge('rain', rain, '%')}</td>`;
+                cloudRow += `<td class="${colClass}">${getTrafficBadge('cloud', cloud, '%')}</td>`;
+                visRow += `<td class="${colClass}">${getTrafficBadge('vis', vis, 'km')}</td>`;
+                baseRow += `<td class="${colClass}">${getTrafficBadge('base', cloudbaseAGL)}</td>`;
 
                 let modelTableRows = '';
                 modelsConfig.forEach(m => {
