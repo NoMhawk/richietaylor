@@ -1,10 +1,10 @@
-<!-- REVISION: v2.9.0 -->
+<!-- REVISION: v3.0.0 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 2.9.0)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.0.0)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -146,7 +146,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v2.9.0",
+            revision: "v3.0.0",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -165,7 +165,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 2.9.0</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.0.0</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -350,7 +350,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 2.9.0 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.0.0 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -371,9 +371,9 @@
         }
 
         function getWindColorClass(mph) {
-            if (mph <= 12) return 'text-green';
-            if (mph <= 17) return 'text-yellow';
-            if (mph <= 22) return 'text-orange';
+            if (mph <= 14) return 'text-green';
+            if (mph <= 19) return 'text-yellow';
+            if (mph <= 23) return 'text-orange';
             return 'text-red';
         }
 
@@ -531,17 +531,17 @@
                 const cd = hourly.weather_code[h];
                 const fg = cd >= 45 && cd <= 48 || vs < 3 || hm >= 95;
 
-                // Tandem limits: wind > 22 or gust > 22 or fog/rain
-                const isBad = ws > 22 || wg > 22 || rn >= 50 || fg;
+                // British Skydiving Tandem Limit: 20 knots (~23 mph)
+                const isBad = ws > 23 || wg > 23 || rn >= 50 || fg;
 
                 if (hourNum < 12) {
                     if (isBad) {
-                        if (ws > 22 || wg > 22) morningWindIssue = true;
+                        if (ws > 23 || wg > 23) morningWindIssue = true;
                         if (fg) morningCloudIssue = true;
                     }
                 } else {
                     if (isBad) {
-                        if (ws > 22 || wg > 22) afternoonWindIssue = true;
+                        if (ws > 23 || wg > 23) afternoonWindIssue = true;
                         if (fg) afternoonCloudIssue = true;
                     }
                 }
@@ -551,10 +551,10 @@
             const metrics = calculateDayMetrics(dayIndex, hourly);
 
             if (metrics.likelihood >= 85) {
-                return "Favorable tandem conditions with manageable winds and solid visibility. Excellent window for tandem operations.";
+                return "Favorable tandem conditions within British Skydiving limits. Excellent window for tandem operations.";
             }
             if (morningWindIssue && !afternoonWindIssue) {
-                return "Brisk winds early for tandem operations, but conditions ease heading past midday allowing jumping.";
+                return "Brisk winds early exceeding tandem limits, but conditions ease heading past midday allowing jumping.";
             }
             if (morningCloudIssue && !afternoonCloudIssue) {
                 return "Low morning cloud or mist deck lifting toward midday, clearing the way for afternoon tandem jumps.";
@@ -590,8 +590,8 @@
                 const base = calculateCloudbaseAGL(tp, dp, lw, hm, cd);
                 const fg = cd >= 45 && cd <= 48 || vs < 3 || hm >= 95;
 
-                // Tandem limits: wind/gust <= 22 mph, rain < 50%, vis >= 3km, base >= 1000ft
-                const windOk = ws <= 22 && wg <= 22;
+                // BS Ops Manual Tandem Limits: wind/gust <= 23 mph (20 knots)
+                const windOk = ws <= 23 && wg <= 23;
                 const rainOk = rn < 50;
                 const visOk = !fg && vs >= 3;
                 const baseOk = base >= 1000;
@@ -699,9 +699,9 @@
             let label = `${value}${unit}`;
 
             if (category === 'wind' || category === 'gust') {
-                if (value > 22) { status = 'red'; label = `${value} mph`; }
-                else if (value > 17) { status = 'orange'; label = `${value} mph`; }
-                else if (value > 12) { status = 'yellow'; label = `${value} mph`; }
+                if (value > 23) { status = 'red'; label = `${value} mph`; }
+                else if (value > 19) { status = 'orange'; label = `${value} mph`; }
+                else if (value > 14) { status = 'yellow'; label = `${value} mph`; }
                 else { status = 'green'; label = `${value} mph`; }
             } else if (category === 'rain') {
                 if (value >= 60) { status = 'red'; label = `${value}%`; }
@@ -810,7 +810,7 @@
                 const hFog = code >= 45 && code <= 48 || vis < 3 || hum >= 95;
                 const hIcon = getWeatherIcon(hFog ? 45 : code, rain);
 
-                const windOk = wSpd <= 22 && wGST <= 22;
+                const windOk = wSpd <= 23 && wGST <= 23;
                 const rainOk = rain < 50;
                 const visOk = !hFog && vis >= 3;
                 const baseOk = cloudbaseAGL >= 1000;
