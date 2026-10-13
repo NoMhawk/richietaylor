@@ -1,10 +1,10 @@
-<!-- REVISION: v3.1.0 -->
+<!-- REVISION: v3.2.0 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.1.0)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.2.0)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -151,7 +151,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v3.1.0",
+            revision: "v3.2.0",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -170,7 +170,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.1.0</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.2.0</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -355,7 +355,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.1.0 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.2.0 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -480,7 +480,7 @@
             } catch (err) {
                 console.error("Error fetching weather data:", err);
                 errMessage.textContent = `Weather server temporarily unavailable (${err.message}). Click 'Retry Now' or check connection.`;
-                errBanner.classList.remove('hidden');
+                errBanner.classList.add('hidden');
                 document.getElementById('last-updated').innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color: #dc2626;"></i> Update Failed`;
             }
         }
@@ -534,43 +534,51 @@
                 const dp = hourly.dew_point_2m[h];
                 const hm = hourly.relative_humidity_2m[h];
                 const cd = hourly.weather_code[h];
+                const base = calculateCloudbaseAGL(tp, dp, hourly.cloud_cover_low[h] || 0, hm, cd);
                 const fg = cd >= 45 && cd <= 48 || vs < 3 || hm >= 95;
 
-                // British Skydiving Tandem Limit: 20 knots (~23 mph)
-                const isBad = ws > 23 || wg > 23 || rn >= 50 || fg;
+                const windBad = ws > 23 || wg > 23;
+                const cloudBad = base < 1000 || fg;
+                const rainBad = rn >= 50;
 
                 if (hourNum < 12) {
-                    if (isBad) {
-                        if (ws > 23 || wg > 23) morningWindIssue = true;
-                        if (fg) morningCloudIssue = true;
-                    }
+                    if (windBad) morningWindIssue = true;
+                    if (cloudBad) morningCloudIssue = true;
                 } else {
-                    if (isBad) {
-                        if (ws > 23 || wg > 23) afternoonWindIssue = true;
-                        if (fg) afternoonCloudIssue = true;
-                    }
+                    if (windBad) afternoonWindIssue = true;
+                    if (cloudBad) afternoonCloudIssue = true;
                 }
-                if (rn >= 50) rainIssue = true;
+                if (rainBad) rainIssue = true;
             }
 
-            const metrics = calculateDayMetrics(dayIndex, hourly);
+            // Construct factual diagnosis string
+            let parts = [];
+            
+            if (morningWindIssue && afternoonWindIssue) {
+                parts.push("Winds and gusts at or above tandem limits all day.");
+            } else if (morningWindIssue) {
+                parts.push("Morning winds/gusts near or above limits, easing toward afternoon.");
+            } else if (afternoonWindIssue) {
+                parts.push("Morning looks ok, but after lunch and into the afternoon gusts could be at/over limits.");
+            } else {
+                parts.push("Winds manageable within tandem limits.");
+            }
 
-            if (metrics.likelihood >= 85) {
-                return "Favorable tandem conditions within British Skydiving limits. Excellent window for tandem operations.";
+            if (morningCloudIssue && afternoonCloudIssue) {
+                parts.push("Low cloud bases/ceilings restricting operations throughout the day.");
+            } else if (morningCloudIssue) {
+                parts.push("Low cloud base in the morning lifting later.");
+            } else if (afternoonCloudIssue) {
+                parts.push("Cloud bases dropping into the afternoon.");
+            } else {
+                parts.push("Solid cloud ceilings.");
             }
-            if (morningWindIssue && !afternoonWindIssue) {
-                return "Brisk winds early exceeding tandem limits, but conditions ease heading past midday allowing jumping.";
-            }
-            if (morningCloudIssue && !afternoonCloudIssue) {
-                return "Low morning cloud or mist deck lifting toward midday, clearing the way for afternoon tandem jumps.";
-            }
+
             if (rainIssue) {
-                return "Rain showers or precipitation risk dominating periods of the day. Expect intermittent weather holds.";
+                parts.push("Rain risk present.");
             }
-            if (metrics.likelihood < 40) {
-                return "Challenging conditions throughout with high winds or weather limits restricting tandem operations.";
-            }
-            return "Marginal or changeable conditions. Monitor local live webcams and wind sensors closely before calling loads.";
+
+            return parts.join(" ");
         }
 
         function calculateDayMetrics(dayIndex, hourly) {
@@ -595,7 +603,6 @@
                 const base = calculateCloudbaseAGL(tp, dp, lw, hm, cd);
                 const fg = cd >= 45 && cd <= 48 || vs < 3 || hm >= 95;
 
-                // BS Ops Manual Tandem Limits: wind/gust <= 23 mph (20 knots)
                 const windOk = ws <= 23 && wg <= 23;
                 const rainOk = rn < 50;
                 const visOk = !fg && vs >= 3;
@@ -799,7 +806,7 @@
                 
                 const low = hourly.cloud_cover_low[i] || 0;
                 const mid = hourly.cloud_cover_mid[i] || 0;
-                const high = hourly.cloud_cover_high[i] || 0;
+                const high = hourly.cloud_cover_hgh ? hourly.cloud_cover_hgh[i] : 0;
                 const hum = hourly.relative_humidity_2m[i];
                 const code = hourly.weather_code[i];
 
