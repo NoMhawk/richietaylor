@@ -1,10 +1,10 @@
-<!-- REVISION: v2.4.0 -->
+<!-- REVISION: v2.5.0 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 2.4.0)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 2.5.0)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -146,7 +146,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v2.4.0",
+            revision: "v2.5.0",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -165,7 +165,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 2.4.0</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 2.5.0</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -350,7 +350,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 2.4.0 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 2.5.0 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -707,10 +707,10 @@
             let status = 'green';
             let label = `${value}${unit}`;
 
-            if (category === 'wind') {
-                if (value > 22) { status = 'red'; label = `${value} mph`; }
-                else if (value > 17) { status = 'orange'; label = `${value} mph`; }
-                else if (value > 12) { status = 'yellow'; label = `${value} mph`; }
+            if (category === 'wind' || category === 'gust') {
+                if (value > 25) { status = 'red'; label = `${value} mph`; }
+                else if (value > 19) { status = 'orange'; label = `${value} mph`; }
+                else if (value > 13) { status = 'yellow'; label = `${value} mph`; }
                 else { status = 'green'; label = `${value} mph`; }
             } else if (category === 'rain') {
                 if (value >= 60) { status = 'red'; label = `${value}%`; }
@@ -775,6 +775,7 @@
             // Arrays for Master Traffic Light Table
             let hourHeaders = `<tr><th class="param-label">Parameter</th>`;
             let windRow = `<tr><td class="param-label">Wind</td>`;
+            let gustRow = `<tr><td class="param-label">Gusts</td>`;
             let rainRow = `<tr><td class="param-label">Rain</td>`;
             let cloudRow = `<tr><td class="param-label">Cloud</td>`;
             let visRow = `<tr><td class="param-label">Vis</td>`;
@@ -831,6 +832,7 @@
                 // Build Master Table Columns
                 hourHeaders += `<th>${timeLabel}</th>`;
                 windRow += `<td>${getTrafficBadge('wind', wSpd)}</td>`;
+                gustRow += `<td>${getTrafficBadge('gust', wGST)}</td>`;
                 rainRow += `<td>${getTrafficBadge('rain', rain, '%')}</td>`;
                 cloudRow += `<td>${getTrafficBadge('cloud', cloud, '%')}</td>`;
                 visRow += `<td>${getTrafficBadge('vis', vis, 'km')}</td>`;
@@ -931,6 +933,7 @@
             // Render Master Traffic Light Table
             hourHeaders += `</tr>`;
             windRow += `</tr>`;
+            gustRow += `</tr>`;
             rainRow += `</tr>`;
             cloudRow += `</tr>`;
             visRow += `</tr>`;
@@ -939,6 +942,7 @@
                 <thead>${hourHeaders}</thead>
                 <tbody>
                     ${windRow}
+                    ${gustRow}
                     ${rainRow}
                     ${cloudRow}
                     ${visRow}
