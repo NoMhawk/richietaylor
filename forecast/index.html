@@ -1,10 +1,10 @@
-<!-- REVISION: v3.4.0 -->
+<!-- REVISION: v3.5.0 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.4.0)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.5.0)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -151,7 +151,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v3.4.0",
+            revision: "v3.5.0",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -170,7 +170,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.4.0</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.5.0</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -355,7 +355,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.4.0 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.5.0 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -553,24 +553,26 @@
 
             let parts = [];
             
+            // Clean & simplified wind diagnostics
             if (morningWindIssue && afternoonWindIssue) {
-                parts.push("Winds and gusts at or above tandem limits all day.");
+                parts.push("Winds and gusts at or above limits all day.");
             } else if (morningWindIssue) {
-                parts.push("Morning winds/gusts near or above limits, easing toward afternoon.");
+                parts.push("Morning winds/gusts near or above limits, easing later.");
             } else if (afternoonWindIssue) {
-                parts.push("Morning looks ok, but after lunch and into the afternoon gusts could be at/over limits.");
+                parts.push("Morning looks ok, but afternoon gusts could be at/over limits.");
             } else {
-                parts.push("Winds manageable within tandem limits.");
+                parts.push("Winds and gusts ok.");
             }
 
+            // Clean & simplified cloud/visibility diagnostics
             if (morningCloudIssue && afternoonCloudIssue) {
-                parts.push("Low cloud bases/ceilings restricting operations throughout the day.");
+                parts.push("Low cloud bases restricting operations all day.");
             } else if (morningCloudIssue) {
                 parts.push("Low cloud base in the morning lifting later.");
             } else if (afternoonCloudIssue) {
                 parts.push("Cloud bases dropping into the afternoon.");
             } else {
-                parts.push("Solid cloud ceilings.");
+                parts.push("Good cloud ceilings.");
             }
 
             if (rainIssue) {
@@ -774,7 +776,6 @@
             const hourlyGrid = document.getElementById('active-hourly-grid');
             hourlyGrid.innerHTML = '';
 
-            // Arrays for Master Traffic Light Table (Blank header label to save mobile space)
             let hourHeaders = `<tr><th class="param-label"></th>`;
             let windRow = `<tr><td class="param-label">Wind</td>`;
             let gustRow = `<tr><td class="param-label">Gusts</td>`;
@@ -832,7 +833,6 @@
                 }
                 totalEvaluated++;
 
-                // Build Master Table Columns with current hour highlighting
                 const headerContent = isCurrentHour ? `${timeLabel}<br><span style="font-size:0.5rem; background:var(--accent-sky); color:white; padding:0.02rem 0.15rem; border-radius:0.15rem;">NOW</span>` : timeLabel;
                 hourHeaders += `<th class="${colClass}">${headerContent}</th>`;
                 windRow += `<td class="${colClass}">${getTrafficBadge('wind', wSpd)}</td>`;
@@ -934,7 +934,6 @@
                 hourlyGrid.appendChild(card);
             }
 
-            // Render Master Traffic Light Table
             hourHeaders += `</tr>`;
             windRow += `</tr>`;
             gustRow += `</tr>`;
