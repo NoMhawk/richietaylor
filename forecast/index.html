@@ -1,10 +1,10 @@
-<!-- REVISION: v3.5.0 -->
+<!-- REVISION: v3.6.0 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.5.0)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.6.0)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -85,7 +85,7 @@
         .wf-arrow { font-size: 0.7rem; color: #0284c7; }
 
         /* Diagnosing the Day summary block */
-        .diagnosis-box { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 0.5rem; padding: 0.5rem; font-size: 0.7rem; color: #0369a1; line-height: 1.35; font-weight: 500; margin-top: auto; }
+        .diagnosis-box { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 0.5rem; padding: 0.5rem; font-size: 0.7rem; color: #0369a1; line-height: 1.35; font-weight: 500; margin-top: auto; display: flex; flex-direction: column; gap: 0.15rem; }
 
         .text-green { color: #059669 !important; font-weight: 700; }
         .text-yellow { color: #d97706 !important; font-weight: 700; }
@@ -151,7 +151,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v3.5.0",
+            revision: "v3.6.0",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -170,7 +170,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.5.0</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.6.0</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -355,7 +355,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.5.0 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.6.0 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -512,20 +512,20 @@
             return { c0_5k, c5_10k, c10_15k, c15k_plus };
         }
 
-        function generateDayDiagnosis(dayIndex, hourly) {
+        function generateStructuredDiagnosis(dayIndex, hourly) {
             const daily = globalWeatherData.daily;
             const targetDateStr = daily.time[dayIndex];
             let dayStart = hourly.time.findIndex(t => t.startsWith(targetDateStr) && t.includes('07:00'));
             if (dayStart === -1) dayStart = dayIndex * 24;
 
-            let morningWindIssue = false;
-            let afternoonWindIssue = false;
-            let morningCloudIssue = false;
-            let afternoonCloudIssue = false;
-            let rainIssue = false;
+            let windIssues = 0;
+            let gustIssues = 0;
+            let rainIssues = 0;
+            let cloudIssues = 0;
+            let baseIssues = 0;
+            let totalHours = 0;
 
             for (let h = dayStart; h < Math.min(dayStart + 13, hourly.time.length); h++) {
-                const hourNum = parseInt(hourly.time[h].split('T')[1].split(':')[0]);
                 const ws = kmhToMph(hourly.wind_speed_10m[h]);
                 const wg = kmhToMph(hourly.wind_gusts_10m[h]);
                 const rn = hourly.precipitation_probability[h];
@@ -534,52 +534,67 @@
                 const dp = hourly.dew_point_2m[h];
                 const hm = hourly.relative_humidity_2m[h];
                 const cd = hourly.weather_code[h];
-                const base = calculateCloudbaseAGL(tp, dp, hourly.cloud_cover_low[h] || 0, hm, cd);
+                const lw = hourly.cloud_cover_low[h] || 0;
+                const mid = hourly.cloud_cover_mid[h] || 0;
+                const high = hourly.cloud_cover_hgh ? hourly.cloud_cover_hgh[h] : 0;
+                const cbBands = getCustomCloudBands(lw, mid, high, vs, rn);
+                const cloudCover = Math.min(100, Math.round((cbBands.c0_5k * 0.6) + (cbBands.c5_10k * 0.3) + (cbBands.c10_15k * 0.1)));
+                
+                const base = calculateCloudbaseAGL(tp, dp, lw, hm, cd);
                 const fg = cd >= 45 && cd <= 48 || vs < 3 || hm >= 95;
 
-                const windBad = ws > 23 || wg > 23;
-                const cloudBad = base < 1000 || fg;
-                const rainBad = rn >= 50;
-
-                if (hourNum < 12) {
-                    if (windBad) morningWindIssue = true;
-                    if (cloudBad) morningCloudIssue = true;
-                } else {
-                    if (windBad) afternoonWindIssue = true;
-                    if (cloudBad) afternoonCloudIssue = true;
-                }
-                if (rainBad) rainIssue = true;
+                if (ws > 23) windIssues++;
+                if (wg > 23) gustIssues++;
+                if (rn >= 50) rainIssues++;
+                if (cloudCover >= 90) cloudIssues++;
+                if (base < 1000 || fg) baseIssues++;
+                totalHours++;
             }
 
-            let parts = [];
-            
-            // Clean & simplified wind diagnostics
-            if (morningWindIssue && afternoonWindIssue) {
-                parts.push("Winds and gusts at or above limits all day.");
-            } else if (morningWindIssue) {
-                parts.push("Morning winds/gusts near or above limits, easing later.");
-            } else if (afternoonWindIssue) {
-                parts.push("Morning looks ok, but afternoon gusts could be at/over limits.");
+            let lines = [];
+
+            // Wind
+            if (windIssues === 0) {
+                lines.push("• <b>Wind:</b> Ok");
+            } else if (windIssues <= totalHours / 3) {
+                lines.push("• <b>Wind:</b> Mostly ok with brief periods near limits");
             } else {
-                parts.push("Winds and gusts ok.");
+                lines.push("• <b>Wind:</b> High speeds restricting operations");
             }
 
-            // Clean & simplified cloud/visibility diagnostics
-            if (morningCloudIssue && afternoonCloudIssue) {
-                parts.push("Low cloud bases restricting operations all day.");
-            } else if (morningCloudIssue) {
-                parts.push("Low cloud base in the morning lifting later.");
-            } else if (afternoonCloudIssue) {
-                parts.push("Cloud bases dropping into the afternoon.");
+            // Gusts
+            if (gustIssues === 0) {
+                lines.push("• <b>Gusts:</b> Ok");
+            } else if (gustIssues <= totalHours / 3) {
+                lines.push("• <b>Gusts:</b> Occasional gust peaks above limit");
             } else {
-                parts.push("Good cloud ceilings.");
+                lines.push("• <b>Gusts:</b> Strong gusts above limit");
             }
 
-            if (rainIssue) {
-                parts.push("Rain risk present.");
+            // Rain
+            if (rainIssues === 0) {
+                lines.push("• <b>Rain:</b> Ok");
+            } else {
+                lines.push("• <b>Rain:</b> High precipitation risk");
             }
 
-            return parts.join(" ");
+            // Cloud
+            if (cloudIssues === 0) {
+                lines.push("• <b>Cloud:</b> Ok");
+            } else {
+                lines.push("• <b>Cloud:</b> Heavy overcast skies");
+            }
+
+            // Cloudbase
+            if (baseIssues === 0) {
+                lines.push("• <b>Cloudbase:</b> Ok");
+            } else if (baseIssues <= totalHours / 3) {
+                lines.push("• <b>Cloudbase:</b> Low base early/late, lifting");
+            } else {
+                lines.push("• <b>Cloudbase:</b> Low bases/ceilings restricting operations");
+            }
+
+            return lines.join("<br>");
         }
 
         function calculateDayMetrics(dayIndex, hourly) {
@@ -631,7 +646,7 @@
                 const dateStr = dateObj.toISOString().split('T')[0];
                 
                 const metrics = calculateDayMetrics(i, hourly);
-                const diagnosisText = generateDayDiagnosis(i, hourly);
+                const diagnosisHtml = generateStructuredDiagnosis(i, hourly);
                 const isActive = i === selectedDayIndex ? ' active' : '';
                 const badgeClass = metrics.likelihood >= 70 ? 'status-green' : metrics.likelihood >= 40 ? 'status-yellow' : 'status-red';
 
@@ -694,7 +709,8 @@
                         ${pressRow}
                     </div>
                     <div class="diagnosis-box">
-                        <b>Diagnosing the day:</b> ${diagnosisText}
+                        <b style="color: #0284c7; margin-bottom: 0.1rem; display: block;">Diagnosing the day:</b>
+                        ${diagnosisHtml}
                     </div>
                 `;
                 container.appendChild(card);
