@@ -1,10 +1,10 @@
-<!-- REVISION: v3.7.0 -->
+<!-- REVISION: v3.8.0 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.7.0)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.8.0)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -151,7 +151,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v3.7.0",
+            revision: "v3.8.0",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -170,7 +170,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.7.0</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.8.0</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -355,7 +355,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.7.0 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.8.0 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -551,20 +551,20 @@
                 totalHours++;
             }
 
-            let problems = [];
-            if (windIssues > 0) problems.push(windIssues > totalHours / 3 ? "wind speeds" : "brief wind peaks");
-            if (gustIssues > 0) problems.push(gustIssues > totalHours / 3 ? "gusts above limits" : "occasional gust peaks");
-            if (rainIssues > 0) problems.push("rain risk");
-            if (cloudIssues > 0) problems.push("heavy cloud cover");
-            if (baseIssues > 0) problems.push(baseIssues > totalHours / 3 ? "low cloudbases" : "low cloudbase early/late");
+            let concerns = [];
+            if (windIssues > 0) concerns.push(windIssues > totalHours / 3 ? "strong winds" : "brief wind peaks");
+            if (gustIssues > 0) concerns.push(gustIssues > totalHours / 3 ? "gusts above limits" : "occasional gust peaks");
+            if (rainIssues > 0) concerns.push("rain risk");
+            if (cloudIssues > 0) concerns.push("heavy cloud cover");
+            if (baseIssues > 0) concerns.push(baseIssues > totalHours / 3 ? "low cloudbases" : "low cloudbase early/late");
 
-            if (problems.length === 0) {
-                return "Everything is ok for wind, gusts, rain, cloud, and cloudbase.";
-            } else if (problems.length === 1) {
-                return `Everything is ok except for ${problems[0]}.`;
+            if (concerns.length === 0) {
+                return "All conditions look good.";
+            } else if (concerns.length === 1) {
+                return `Things to watch: ${concerns[0]}.`;
             } else {
-                const last = problems.pop();
-                return `Everything is ok except for ${problems.join(', ')} and ${last}.`;
+                const last = concerns.pop();
+                return `Things to watch: ${concerns.join(', ')} and ${last}.`;
             }
         }
 
