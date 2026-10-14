@@ -1,10 +1,10 @@
-<!-- REVISION: v3.8.0 -->
+<!-- REVISION: v3.9.0 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.8.0)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.9.0)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -84,7 +84,7 @@
         .wf-cell { display: flex; align-items: center; justify-content: center; }
         .wf-arrow { font-size: 0.7rem; color: #0284c7; }
 
-        /* Diagnosing the Day summary block */
+        /* Outlook summary block */
         .diagnosis-box { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 0.5rem; padding: 0.5rem; font-size: 0.7rem; color: #0369a1; line-height: 1.35; font-weight: 500; margin-top: auto; }
 
         .text-green { color: #059669 !important; font-weight: 700; }
@@ -151,7 +151,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v3.8.0",
+            revision: "v3.9.0",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -170,7 +170,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.8.0</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.9.0</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -355,7 +355,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.8.0 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.9.0 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -512,20 +512,18 @@
             return { c0_5k, c5_10k, c10_15k, c15k_plus };
         }
 
-        function generateSingleSentenceDiagnosis(dayIndex, hourly) {
+        function generateTimedOutlookSummary(dayIndex, hourly) {
             const daily = globalWeatherData.daily;
             const targetDateStr = daily.time[dayIndex];
             let dayStart = hourly.time.findIndex(t => t.startsWith(targetDateStr) && t.includes('07:00'));
             if (dayStart === -1) dayStart = dayIndex * 24;
 
-            let windIssues = 0;
-            let gustIssues = 0;
-            let rainIssues = 0;
-            let cloudIssues = 0;
-            let baseIssues = 0;
-            let totalHours = 0;
+            let periods = { early: [], mid: [], late: [] }; // Early: 07-10, Mid: 13-16, Late: 19
 
             for (let h = dayStart; h < Math.min(dayStart + 13, hourly.time.length); h++) {
+                const timeStr = hourly.time[h];
+                const hourNum = parseInt(timeStr.split('T')[1].split(':')[0]);
+                
                 const ws = kmhToMph(hourly.wind_speed_10m[h]);
                 const wg = kmhToMph(hourly.wind_gusts_10m[h]);
                 const rn = hourly.precipitation_probability[h];
@@ -539,32 +537,35 @@
                 const high = hourly.cloud_cover_hgh ? hourly.cloud_cover_hgh[h] : 0;
                 const cbBands = getCustomCloudBands(lw, mid, high, vs, rn);
                 const cloudCover = Math.min(100, Math.round((cbBands.c0_5k * 0.6) + (cbBands.c5_10k * 0.3) + (cbBands.c10_15k * 0.1)));
-                
                 const base = calculateCloudbaseAGL(tp, dp, lw, hm, cd);
                 const fg = cd >= 45 && cd <= 48 || vs < 3 || hm >= 95;
 
-                if (ws > 23) windIssues++;
-                if (wg > 23) gustIssues++;
-                if (rn >= 50) rainIssues++;
-                if (cloudCover >= 90) cloudIssues++;
-                if (base < 1000 || fg) baseIssues++;
-                totalHours++;
+                let issues = [];
+                if (ws > 23 || wg > 23) issues.push("high winds/gusts");
+                if (rn >= 50) issues.push("rain");
+                if (cloudCover >= 90) issues.push("heavy cloud cover");
+                if (base < 1000 || fg) issues.push("low cloudbase");
+
+                if (issues.length > 0) {
+                    if (hourNum <= 10) {
+                        issues.forEach(i => { if (!periods.early.includes(i)) periods.early.push(i); });
+                    } else if (hourNum >= 16) {
+                        issues.forEach(i => { if (!periods.late.includes(i)) periods.late.push(i); });
+                    } else {
+                        issues.forEach(i => { if (!periods.mid.includes(i)) periods.mid.push(i); });
+                    }
+                }
             }
 
-            let concerns = [];
-            if (windIssues > 0) concerns.push(windIssues > totalHours / 3 ? "strong winds" : "brief wind peaks");
-            if (gustIssues > 0) concerns.push(gustIssues > totalHours / 3 ? "gusts above limits" : "occasional gust peaks");
-            if (rainIssues > 0) concerns.push("rain risk");
-            if (cloudIssues > 0) concerns.push("heavy cloud cover");
-            if (baseIssues > 0) concerns.push(baseIssues > totalHours / 3 ? "low cloudbases" : "low cloudbase early/late");
+            let parts = [];
+            if (periods.early.length > 0) parts.push(`${periods.early.join(', ')} in the early morning`);
+            if (periods.mid.length > 0) parts.push(`${periods.mid.join(', ')} around midday / early afternoon`);
+            if (periods.late.length > 0) parts.push(`${periods.late.join(', ')} in the late afternoon`);
 
-            if (concerns.length === 0) {
-                return "All conditions look good.";
-            } else if (concerns.length === 1) {
-                return `Things to watch: ${concerns[0]}.`;
+            if (parts.length === 0) {
+                return "All conditions look good throughout the day.";
             } else {
-                const last = concerns.pop();
-                return `Things to watch: ${concerns.join(', ')} and ${last}.`;
+                return `Expect ${parts.join('; and ')}.`;
             }
         }
 
@@ -617,7 +618,7 @@
                 const dateStr = dateObj.toISOString().split('T')[0];
                 
                 const metrics = calculateDayMetrics(i, hourly);
-                const diagnosisText = generateSingleSentenceDiagnosis(i, hourly);
+                const diagnosisText = generateTimedOutlookSummary(i, hourly);
                 const isActive = i === selectedDayIndex ? ' active' : '';
                 const badgeClass = metrics.likelihood >= 70 ? 'status-green' : metrics.likelihood >= 40 ? 'status-yellow' : 'status-red';
 
@@ -680,7 +681,7 @@
                         ${pressRow}
                     </div>
                     <div class="diagnosis-box">
-                        <b>Diagnosing the day:</b> ${diagnosisText}
+                        <b>Outlook:</b> ${diagnosisText}
                     </div>
                 `;
                 container.appendChild(card);
