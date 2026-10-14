@@ -1,10 +1,10 @@
-<!-- REVISION: v3.6.0 -->
+<!-- REVISION: v3.7.0 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.6.0)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.7.0)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -85,7 +85,7 @@
         .wf-arrow { font-size: 0.7rem; color: #0284c7; }
 
         /* Diagnosing the Day summary block */
-        .diagnosis-box { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 0.5rem; padding: 0.5rem; font-size: 0.7rem; color: #0369a1; line-height: 1.35; font-weight: 500; margin-top: auto; display: flex; flex-direction: column; gap: 0.15rem; }
+        .diagnosis-box { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 0.5rem; padding: 0.5rem; font-size: 0.7rem; color: #0369a1; line-height: 1.35; font-weight: 500; margin-top: auto; }
 
         .text-green { color: #059669 !important; font-weight: 700; }
         .text-yellow { color: #d97706 !important; font-weight: 700; }
@@ -151,7 +151,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v3.6.0",
+            revision: "v3.7.0",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -170,7 +170,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.6.0</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.7.0</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -355,7 +355,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.6.0 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.7.0 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -512,7 +512,7 @@
             return { c0_5k, c5_10k, c10_15k, c15k_plus };
         }
 
-        function generateStructuredDiagnosis(dayIndex, hourly) {
+        function generateSingleSentenceDiagnosis(dayIndex, hourly) {
             const daily = globalWeatherData.daily;
             const targetDateStr = daily.time[dayIndex];
             let dayStart = hourly.time.findIndex(t => t.startsWith(targetDateStr) && t.includes('07:00'));
@@ -551,50 +551,21 @@
                 totalHours++;
             }
 
-            let lines = [];
+            let problems = [];
+            if (windIssues > 0) problems.push(windIssues > totalHours / 3 ? "wind speeds" : "brief wind peaks");
+            if (gustIssues > 0) problems.push(gustIssues > totalHours / 3 ? "gusts above limits" : "occasional gust peaks");
+            if (rainIssues > 0) problems.push("rain risk");
+            if (cloudIssues > 0) problems.push("heavy cloud cover");
+            if (baseIssues > 0) problems.push(baseIssues > totalHours / 3 ? "low cloudbases" : "low cloudbase early/late");
 
-            // Wind
-            if (windIssues === 0) {
-                lines.push("• <b>Wind:</b> Ok");
-            } else if (windIssues <= totalHours / 3) {
-                lines.push("• <b>Wind:</b> Mostly ok with brief periods near limits");
+            if (problems.length === 0) {
+                return "Everything is ok for wind, gusts, rain, cloud, and cloudbase.";
+            } else if (problems.length === 1) {
+                return `Everything is ok except for ${problems[0]}.`;
             } else {
-                lines.push("• <b>Wind:</b> High speeds restricting operations");
+                const last = problems.pop();
+                return `Everything is ok except for ${problems.join(', ')} and ${last}.`;
             }
-
-            // Gusts
-            if (gustIssues === 0) {
-                lines.push("• <b>Gusts:</b> Ok");
-            } else if (gustIssues <= totalHours / 3) {
-                lines.push("• <b>Gusts:</b> Occasional gust peaks above limit");
-            } else {
-                lines.push("• <b>Gusts:</b> Strong gusts above limit");
-            }
-
-            // Rain
-            if (rainIssues === 0) {
-                lines.push("• <b>Rain:</b> Ok");
-            } else {
-                lines.push("• <b>Rain:</b> High precipitation risk");
-            }
-
-            // Cloud
-            if (cloudIssues === 0) {
-                lines.push("• <b>Cloud:</b> Ok");
-            } else {
-                lines.push("• <b>Cloud:</b> Heavy overcast skies");
-            }
-
-            // Cloudbase
-            if (baseIssues === 0) {
-                lines.push("• <b>Cloudbase:</b> Ok");
-            } else if (baseIssues <= totalHours / 3) {
-                lines.push("• <b>Cloudbase:</b> Low base early/late, lifting");
-            } else {
-                lines.push("• <b>Cloudbase:</b> Low bases/ceilings restricting operations");
-            }
-
-            return lines.join("<br>");
         }
 
         function calculateDayMetrics(dayIndex, hourly) {
@@ -646,7 +617,7 @@
                 const dateStr = dateObj.toISOString().split('T')[0];
                 
                 const metrics = calculateDayMetrics(i, hourly);
-                const diagnosisHtml = generateStructuredDiagnosis(i, hourly);
+                const diagnosisText = generateSingleSentenceDiagnosis(i, hourly);
                 const isActive = i === selectedDayIndex ? ' active' : '';
                 const badgeClass = metrics.likelihood >= 70 ? 'status-green' : metrics.likelihood >= 40 ? 'status-yellow' : 'status-red';
 
@@ -709,8 +680,7 @@
                         ${pressRow}
                     </div>
                     <div class="diagnosis-box">
-                        <b style="color: #0284c7; margin-bottom: 0.1rem; display: block;">Diagnosing the day:</b>
-                        ${diagnosisHtml}
+                        <b>Diagnosing the day:</b> ${diagnosisText}
                     </div>
                 `;
                 container.appendChild(card);
