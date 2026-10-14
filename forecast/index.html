@@ -1,10 +1,10 @@
-<!-- REVISION: v3.9.0 -->
+<!-- REVISION: v3.10.0 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.9.0)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.10.0)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -151,7 +151,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v3.9.0",
+            revision: "v3.10.0",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -170,7 +170,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.9.0</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.10.0</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -355,7 +355,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.9.0 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.10.0 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -518,7 +518,7 @@
             let dayStart = hourly.time.findIndex(t => t.startsWith(targetDateStr) && t.includes('07:00'));
             if (dayStart === -1) dayStart = dayIndex * 24;
 
-            let periods = { early: [], mid: [], late: [] }; // Early: 07-10, Mid: 13-16, Late: 19
+            let slotIssues = { early: [], mid: [], late: [] }; // Early: 07-10, Mid: 11-15, Late: 16-19
 
             for (let h = dayStart; h < Math.min(dayStart + 13, hourly.time.length); h++) {
                 const timeStr = hourly.time[h];
@@ -541,31 +541,41 @@
                 const fg = cd >= 45 && cd <= 48 || vs < 3 || hm >= 95;
 
                 let issues = [];
-                if (ws > 23 || wg > 23) issues.push("high winds/gusts");
+                if (ws > 23 || wg > 23) issues.push("strong winds");
                 if (rn >= 50) issues.push("rain");
-                if (cloudCover >= 90) issues.push("heavy cloud cover");
+                if (cloudCover >= 90) issues.push("heavy cloud");
                 if (base < 1000 || fg) issues.push("low cloudbase");
 
-                if (issues.length > 0) {
-                    if (hourNum <= 10) {
-                        issues.forEach(i => { if (!periods.early.includes(i)) periods.early.push(i); });
-                    } else if (hourNum >= 16) {
-                        issues.forEach(i => { if (!periods.late.includes(i)) periods.late.push(i); });
-                    } else {
-                        issues.forEach(i => { if (!periods.mid.includes(i)) periods.mid.push(i); });
-                    }
-                }
+                let targetSlot = hourNum <= 10 ? 'early' : (hourNum >= 16 ? 'late' : 'mid');
+                issues.forEach(iss => {
+                    if (!slotIssues[targetSlot].includes(iss)) slotIssues[targetSlot].push(iss);
+                });
             }
 
-            let parts = [];
-            if (periods.early.length > 0) parts.push(`${periods.early.join(', ')} in the early morning`);
-            if (periods.mid.length > 0) parts.push(`${periods.mid.join(', ')} around midday / early afternoon`);
-            if (periods.late.length > 0) parts.push(`${periods.late.join(', ')} in the late afternoon`);
+            let formatSlot = (issues) => {
+                if (issues.length === 0) return null;
+                if (issues.length === 1) return issues[0];
+                if (issues.length === 2) return `${issues[0]} and ${issues[1]}`;
+                return `${issues.slice(0, -1).join(', ')} and ${issues[issues.length - 1]}`;
+            };
 
-            if (parts.length === 0) {
+            let earlyStr = formatSlot(slotIssues.early);
+            let midStr = formatSlot(slotIssues.mid);
+            let lateStr = formatSlot(slotIssues.late);
+
+            let segments = [];
+            if (earlyStr) segments.push(`${earlyStr} early morning`);
+            if (midStr) segments.push(`${midStr} around midday`);
+            if (lateStr) segments.push(`${lateStr} late afternoon`);
+
+            if (segments.length === 0) {
                 return "All conditions look good throughout the day.";
+            } else if (segments.length === 1) {
+                return `Expect ${segments[0]}.`;
+            } else if (segments.length === 2) {
+                return `Expect ${segments[0]} and ${segments[1]}.`;
             } else {
-                return `Expect ${parts.join('; and ')}.`;
+                return `Expect ${segments[0]}, ${segments[1]}, and ${segments[2]}.`;
             }
         }
 
