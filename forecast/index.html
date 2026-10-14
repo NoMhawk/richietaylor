@@ -1,10 +1,10 @@
-<!-- REVISION: v3.3.0 -->
+<!-- REVISION: v3.4.0 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.3.0)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.4.0)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -93,16 +93,16 @@
         .text-red { color: #dc2626 !important; font-weight: 700; }
 
         /* Traffic Light Badges */
-        .traffic-badge-green { background-color: #ecfdf5; color: #065f46; border: 1px solid #10b981; padding: 0.2rem 0.2rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.62rem; display: block; text-transform: uppercase; width: 100%; white-space: nowrap; }
-        .traffic-badge-yellow { background-color: #fefce8; color: #854d0e; border: 1px solid #eab308; padding: 0.2rem 0.2rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.62rem; display: block; text-transform: uppercase; width: 100%; white-space: nowrap; }
-        .traffic-badge-orange { background-color: #fff7ed; color: #c2410c; border: 1px solid #f97316; padding: 0.2rem 0.2rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.62rem; display: block; text-transform: uppercase; width: 100%; white-space: nowrap; }
-        .traffic-badge-red { background-color: #fef2f2; color: #991b1b; border: 1px solid #ef4444; padding: 0.2rem 0.2rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.62rem; display: block; text-transform: uppercase; width: 100%; white-space: nowrap; }
+        .traffic-badge-green { background-color: #ecfdf5; color: #065f46; border: 1px solid #10b981; padding: 0.2rem 0.1rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.6rem; display: block; text-transform: uppercase; width: 100%; white-space: nowrap; }
+        .traffic-badge-yellow { background-color: #fefce8; color: #854d0e; border: 1px solid #eab308; padding: 0.2rem 0.1rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.6rem; display: block; text-transform: uppercase; width: 100%; white-space: nowrap; }
+        .traffic-badge-orange { background-color: #fff7ed; color: #c2410c; border: 1px solid #f97316; padding: 0.2rem 0.1rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.6rem; display: block; text-transform: uppercase; width: 100%; white-space: nowrap; }
+        .traffic-badge-red { background-color: #fef2f2; color: #991b1b; border: 1px solid #ef4444; padding: 0.2rem 0.1rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.6rem; display: block; text-transform: uppercase; width: 100%; white-space: nowrap; }
 
-        /* Master Traffic Light Table (Uniform Column Sizing) */
+        /* Master Traffic Light Table (Optimized Slim Column Sizing) */
         .master-traffic-table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 0.75rem; text-align: center; background: #fff; }
-        .master-traffic-table th, .master-traffic-table td { padding: 0.4rem 0.2rem; border: 1px solid #e2e8f0; overflow: hidden; text-overflow: ellipsis; }
-        .master-traffic-table th { font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 0.65rem; background: #f8fafc; width: calc((100% - 90px) / 13); }
-        .master-traffic-table th.param-label, .master-traffic-table td.param-label { text-align: left; font-weight: 700; color: #475569; background: #f8fafc; padding-left: 0.5rem; width: 90px; min-width: 90px; }
+        .master-traffic-table th, .master-traffic-table td { padding: 0.35rem 0.1rem; border: 1px solid #e2e8f0; overflow: hidden; text-overflow: ellipsis; }
+        .master-traffic-table th { font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 0.62rem; background: #f8fafc; width: calc((100% - 55px) / 13); }
+        .master-traffic-table th.param-label, .master-traffic-table td.param-label { text-align: left; font-weight: 700; color: #475569; background: #f8fafc; padding-left: 0.35rem; width: 55px; min-width: 55px; font-size: 0.65rem; }
 
         /* Current Hour Column Highlight in Matrix */
         .master-traffic-table th.current-col, .master-traffic-table td.current-col { background-color: #f0f9ff !important; border-left: 2px solid var(--accent-sky) !important; border-right: 2px solid var(--accent-sky) !important; }
@@ -151,7 +151,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v3.3.0",
+            revision: "v3.4.0",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -170,7 +170,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.3.0</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.4.0</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -355,7 +355,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.3.0 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.4.0 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -480,7 +480,7 @@
             } catch (err) {
                 console.error("Error fetching weather data:", err);
                 errMessage.textContent = `Weather server temporarily unavailable (${err.message}). Click 'Retry Now' or check connection.`;
-                errBanner.classList.remove('hidden');
+                errBanner.classList.add('hidden');
                 document.getElementById('last-updated').innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color: #dc2626;"></i> Update Failed`;
             }
         }
@@ -710,10 +710,10 @@
             let label = `${value}${unit}`;
 
             if (category === 'wind' || category === 'gust') {
-                if (value > 23) { status = 'red'; label = `${value} mph`; }
-                else if (value > 19) { status = 'orange'; label = `${value} mph`; }
-                else if (value > 14) { status = 'yellow'; label = `${value} mph`; }
-                else { status = 'green'; label = `${value} mph`; }
+                if (value > 23) { status = 'red'; label = `${value}`; }
+                else if (value > 19) { status = 'orange'; label = `${value}`; }
+                else if (value > 14) { status = 'yellow'; label = `${value}`; }
+                else { status = 'green'; label = `${value}`; }
             } else if (category === 'rain') {
                 if (value >= 60) { status = 'red'; label = `${value}%`; }
                 else if (value >= 40) { status = 'orange'; label = `${value}%`; }
@@ -725,15 +725,15 @@
                 else if (value >= 50) { status = 'yellow'; label = `${value}%`; }
                 else { status = 'green'; label = `${value}%`; }
             } else if (category === 'vis') {
-                if (value < 3) { status = 'red'; label = `${value} km`; }
-                else if (value < 5) { status = 'orange'; label = `${value} km`; }
-                else if (value < 7) { status = 'yellow'; label = `${value} km`; }
-                else { status = 'green'; label = `${value} km`; }
+                if (value < 3) { status = 'red'; label = `${value}`; }
+                else if (value < 5) { status = 'orange'; label = `${value}`; }
+                else if (value < 7) { status = 'yellow'; label = `${value}`; }
+                else { status = 'green'; label = `${value}`; }
             } else if (category === 'base') {
-                if (value < 2000) { status = 'red'; label = `${value}ft`; }
-                else if (value < 3500) { status = 'orange'; label = `${value}ft`; }
-                else if (value < 5000) { status = 'yellow'; label = `${value}ft`; }
-                else { status = 'green'; label = `${value}ft`; }
+                if (value < 2000) { status = 'red'; label = `${value}`; }
+                else if (value < 3500) { status = 'orange'; label = `${value}`; }
+                else if (value < 5000) { status = 'yellow'; label = `${value}`; }
+                else { status = 'green'; label = `${value}`; }
             }
 
             return `<span class="traffic-badge-${status}">${label}</span>`;
@@ -774,8 +774,8 @@
             const hourlyGrid = document.getElementById('active-hourly-grid');
             hourlyGrid.innerHTML = '';
 
-            // Arrays for Master Traffic Light Table
-            let hourHeaders = `<tr><th class="param-label">Parameter</th>`;
+            // Arrays for Master Traffic Light Table (Blank header label to save mobile space)
+            let hourHeaders = `<tr><th class="param-label"></th>`;
             let windRow = `<tr><td class="param-label">Wind</td>`;
             let gustRow = `<tr><td class="param-label">Gusts</td>`;
             let rainRow = `<tr><td class="param-label">Rain</td>`;
@@ -833,7 +833,7 @@
                 totalEvaluated++;
 
                 // Build Master Table Columns with current hour highlighting
-                const headerContent = isCurrentHour ? `${timeLabel}<br><span style="font-size:0.55rem; background:var(--accent-sky); color:white; padding:0.05rem 0.2rem; border-radius:0.2rem;">NOW</span>` : timeLabel;
+                const headerContent = isCurrentHour ? `${timeLabel}<br><span style="font-size:0.5rem; background:var(--accent-sky); color:white; padding:0.02rem 0.15rem; border-radius:0.15rem;">NOW</span>` : timeLabel;
                 hourHeaders += `<th class="${colClass}">${headerContent}</th>`;
                 windRow += `<td class="${colClass}">${getTrafficBadge('wind', wSpd)}</td>`;
                 gustRow += `<td class="${colClass}">${getTrafficBadge('gust', wGST)}</td>`;
