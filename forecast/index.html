@@ -1,10 +1,11 @@
-<!-- REVISION: v3.11.0 -->
+Here is the complete v3.10.0 HTML page code as requested:
+<!-- REVISION: v3.10.0 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.11.0)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.10.0)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -71,27 +72,21 @@
         @media(min-width: 1024px) { .outlook-days-grid { grid-template-columns: repeat(4, 1fr); } }
         @media(min-width: 1400px) { .outlook-days-grid { grid-template-columns: repeat(7, 1fr); } }
 
-        .outlook-day-card { border: 2px solid var(--border-color); border-radius: 1rem; padding: 0.85rem; display: flex; flex-direction: column; gap: 0.5rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .outlook-day-card { background-color: var(--bg-card); border: 2px solid var(--border-color); border-radius: 1rem; padding: 0.85rem; display: flex; flex-direction: column; gap: 0.5rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .outlook-day-card:hover { border-color: var(--accent-sky); box-shadow: 0 4px 6px rgba(0,0,0,0.08); }
-        .outlook-day-card.active { border-color: var(--accent-sky); box-shadow: 0 0 15px rgba(2, 132, 199, 0.2); }
+        .outlook-day-card.active { background-color: #f0f9ff; border-color: var(--accent-sky); box-shadow: 0 0 15px rgba(2, 132, 199, 0.2); }
 
-        /* Dynamic Background Tints for Outlook Cards based on status */
-        .card-bg-green { background-color: #f0fdf4; border-color: #86efac; }
-        .card-bg-yellow { background-color: #fefce8; border-color: #fde047; }
-        .card-bg-orange { background-color: #fff7ed; border-color: #fdba74; }
-        .card-bg-red { background-color: #fef2f2; border-color: #fca5a5; }
-
-        .outlook-section { background: rgba(255, 255, 255, 0.7); border: 1px solid rgba(0, 0, 0, 0.08); border-radius: 0.5rem; padding: 0.35rem 0.5rem; display: flex; flex-direction: column; gap: 0.25rem; }
+        .outlook-section { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.35rem 0.5rem; display: flex; flex-direction: column; gap: 0.25rem; }
         
-        .outlook-matrix-mini { display: flex; flex-direction: column; gap: 0.15rem; font-size: 0.7rem; background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(0, 0, 0, 0.08); border-radius: 0.5rem; padding: 0.35rem; }
-        .wf-row { display: grid; grid-template-columns: 42px repeat(5, 1fr); align-items: center; text-align: center; gap: 1px; padding: 0.1rem 0; border-bottom: 1px solid rgba(0, 0, 0, 0.05); }
+        .outlook-matrix-mini { display: flex; flex-direction: column; gap: 0.15rem; font-size: 0.7rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.35rem; }
+        .wf-row { display: grid; grid-template-columns: 42px repeat(5, 1fr); align-items: center; text-align: center; gap: 1px; padding: 0.1rem 0; border-bottom: 1px solid #f1f5f9; }
         .wf-row:last-child { border-bottom: none; }
         .wf-label { text-align: left; font-weight: 700; color: #64748b; font-size: 0.6rem; padding-left: 2px; }
         .wf-cell { display: flex; align-items: center; justify-content: center; }
         .wf-arrow { font-size: 0.7rem; color: #0284c7; }
 
         /* Outlook summary block */
-        .diagnosis-box { background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(2, 132, 199, 0.2); border-radius: 0.5rem; padding: 0.5rem; font-size: 0.7rem; color: #0369a1; line-height: 1.35; font-weight: 500; margin-top: auto; }
+        .diagnosis-box { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 0.5rem; padding: 0.5rem; font-size: 0.7rem; color: #0369a1; line-height: 1.35; font-weight: 500; margin-top: auto; }
 
         .text-green { color: #059669 !important; font-weight: 700; }
         .text-yellow { color: #d97706 !important; font-weight: 700; }
@@ -157,7 +152,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v3.11.0",
+            revision: "v3.10.0",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -176,7 +171,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.11.0</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.10.0</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -361,7 +356,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.11.0 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.10.0 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -452,7 +447,7 @@
             const errMessage = document.getElementById('error-message');
             errBanner.classList.add('hidden');
 
-            const mainUrl = `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&elevation=${CONFIG.elevation}&hourly=temperature_2m,dew_point_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_hgh,wind_speed_10m,wind_direction_10m,wind_gusts_10m,surface_pressure,visibility&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant&timezone=${CONFIG.timezone}`;
+            const mainUrl = `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&elevation=${CONFIG.elevation}&hourly=temperature_2m,dew_point_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,wind_speed_10m,wind_direction_10m,wind_gusts_10m,surface_pressure,visibility&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant&timezone=${CONFIG.timezone}`;
 
             const modelsConfig = [
                 { key: 'ecmwf', url: `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&models=ecmwf_ifs025&timezone=${CONFIG.timezone}` },
@@ -636,17 +631,7 @@
                 const metrics = calculateDayMetrics(i, hourly);
                 const diagnosisText = generateTimedOutlookSummary(i, hourly);
                 const isActive = i === selectedDayIndex ? ' active' : '';
-                
-                // Determine background tint and badge class based on jump likelihood score
-                let bgTintClass = 'card-bg-green';
-                let badgeClass = 'status-green';
-                if (metrics.likelihood < 40) {
-                    bgTintClass = 'card-bg-red';
-                    badgeClass = 'status-red';
-                } else if (metrics.likelihood < 70) {
-                    bgTintClass = metrics.likelihood < 55 ? 'card-bg-orange' : 'card-bg-yellow';
-                    badgeClass = metrics.likelihood < 55 ? 'status-orange' : 'status-yellow';
-                }
+                const badgeClass = metrics.likelihood >= 70 ? 'status-green' : metrics.likelihood >= 40 ? 'status-yellow' : 'status-red';
 
                 let timeRow = `<div class="wf-row"><span class="wf-label">TIME</span>`;
                 let dirRow = `<div class="wf-row"><span class="wf-label">DIR</span>`;
@@ -687,10 +672,10 @@
                 weatherRow += `</div>`; rainRow += `</div>`; tempRow += `</div>`; pressRow += `</div>`;
 
                 const card = document.createElement('div');
-                card.className = `outlook-day-card ${bgTintClass}${isActive ? ' active' : ''}`;
+                card.className = `outlook-day-card${isActive}`;
                 card.onclick = () => selectDay(i);
                 card.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,0,0,0.08); padding-bottom: 0.4rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.4rem;">
                         <span style="font-weight: 700; color: #0f172a; font-size: 0.85rem;">${dayName}</span>
                     </div>
                     <div class="outlook-section">
@@ -1001,3 +986,4 @@
     </script>
 </body>
 </html>
+
