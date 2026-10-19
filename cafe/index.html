@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Split-Flap Cafe Board</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Desktop/TV Scaling */
+            --flap-w: 1.6vw;
+            --flap-h: 2.5vw;
+            --font-size: 1.8vw;
+            --flap-gap: 0.15vw;
+            --row-gap: 0.6vw;
+            
+            /* Colors */
+            --bg-wall: #0a0a0a;
+            --board-frame: #111111;
+            --flap-bg: #1c1c1c;
+            --flap-border: #000000;
+            --text-item: #ffcc00; /* Solari Yellow */
+            --text-header: #ffffff;
+        }
+
+        @media (max-width: 1024px) {
+            /* Mobile/Tablet Scaling (Switches to single column logic) */
+            :root {
+                --flap-w: 3.2vw;
+                --flap-h: 5vw;
+                --font-size: 3.6vw;
+                --flap-gap: 0.3vw;
+                --row-gap: 1.2vw;
+            }
+            .board-frame {
+                flex-direction: column;
+            }
+        }
+
+        body {
+            background-color: var(--bg-wall);
+            background-image: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Roboto Mono', monospace;
+            overflow-x: hidden;
+            padding: 2vw;
+            box-sizing: border-box;
+        }
+
+        .board-wrapper {
+            background-color: var(--board-frame);
+            padding: 2vw 3vw 3vw 3vw;
+            border-radius: 1vw;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.9), inset 0 0 15px rgba(255,255,255,0.05);
+            border: 4px solid #222;
+        }
+
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2vw;
+            margin-bottom: 2vw;
+        }
+
+        .board-logo {
+            height: 4vw;
+            border-radius: 0.5vw;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+        }
+
+        .board-title {
+            color: #444;
+            text-align: center;
+            font-size: 2vw;
+            letter-spacing: 0.5vw;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .board-frame {
+            display: flex;
+            gap: 4vw;
+        }
+
+        .board-column {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .board-row {
+            display: flex;
+            gap: var(--flap-gap);
+            margin-bottom: var(--row-gap);
+        }
+
+        .flap {
+            width: var(--flap-w);
+            height: var(--flap-h);
+            background-color: var(--flap-bg);
+            color: var(--text-item);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid var(--flap-border);
+            border-radius: 2px;
+            font-size: var(--font-size);
+            font-weight: 700;
+            line-height: 1;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.6);
+            /* Prevent text selection */
+            user-select: none;
+        }
+
+        /* The mechanical hinge slicing through the middle */
+        .flap::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--flap-border);
+            transform: translateY(-50%);
+            z-index: 10;
+            box-shadow: 0 1px 1px rgba(255,255,255,0.05);
+        }
+
+        /* Subtle top shadow for 3D depth */
+        .flap::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.08), rgba(0,0,0,0.2));
+            z-index: 1;
+        }
+
+        .flap span {
+            position: relative;
+            z-index: 5;
+        }
+
+        /* Styling for Header Rows */
+        .header-row .flap {
+            color: var(--text-header);
+        }
+
+        /* Optional slight visual change while flipping */
+        .flap.flipping {
+            color: #fff;
+            filter: brightness(1.2);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="board-wrapper">
+        <div class="header-container">
+            <img src="https://www.skydivesouthwest.com/logo.jpg" alt="Skydive Southwest Logo" class="board-logo">
+            <h1 class="board-title">Skydive Southwest Cafe</h1>
+        </div>
+        <div class="board-frame">
+            <div id="col-left" class="board-column"></div>
+            <div id="col-right" class="board-column"></div>
+        </div>
+    </div>
+
+    <script>
+        // Set fixed row length to maintain the grid (25 characters wide)
+        const ROW_LENGTH = 25;
+        const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789£. &';
+
+        // perfectly balanced data
+        const menuDataLeft = [
+            { title: "COFFEE", items: [
+                { name: "AMERICANO", price: "£2.95" },
+                { name: "LATTE", price: "£3.50" },
+                { name: "CAPPUCCINO", price: "£3.50" },
+                { name: "MOCHA", price: "£3.50" },
+                { name: "FLAT WHITE", price: "£3.50" },
+                { name: "TEA", price: "£2.20" }
+            ]},
+            { title: "COLD DRINKS", items: [
+                { name: "CANS", price: "£1.80" },
+                { name: "BOTTLES", price: "£2.50" },
+                { name: "WATER", price: "£1.50" },
+                { name: "ENERGY DRINKS", price: "£2.80" },
+                { name: "KIDS DRINKS", price: "£1.50" }
+            ]}
+        ];
+
+        const menuDataRight = [
+            { title: "ICED COFFEE", items: [
+                { name: "ICED LATTE", price: "£3.75" },
+                { name: "VANILLA", price: "£3.95" },
+                { name: "CARAMEL", price: "£3.95" }
+            ]},
+            { title: "FOOD", items: [
+                { name: "CRISPS", price: "£1.40" },
+                { name: "CHOC BARS", price: "£1.30" },
+                { name: "FRUIT", price: "90P" },
+                { name: "ICE CREAM", price: "£3.00" },
+                { name: "ICE LOLLY", price: "£2.00" }
+            ]}
+        ];
+
+        function renderBoard() {
+            const leftCol = document.getElementById('col-left');
+            const rightCol = document.getElementById('col-right');
+
+            leftCol.innerHTML = '';
+            rightCol.innerHTML = '';
+
+            buildColumn(leftCol, menuDataLeft);
+            buildColumn(rightCol, menuDataRight);
+        }
+
+        function buildColumn(container, dataChunks) {
+            let rowIndex = 0;
+            
+            dataChunks.forEach((chunk, chunkIndex) => {
+                // Generate Header Row
+                let headerStr = chunk.title.padEnd(ROW_LENGTH, ' ');
+                let headerRow = createRow(headerStr, true, rowIndex++);
+                container.appendChild(headerRow);
+
+                // Generate Item Rows
+                chunk.items.forEach(item => {
+                    const name = item.name.toUpperCase();
+                    const price = item.price.toUpperCase();
+                    
+                    // Calculate dynamic spaces to align price to the right
+                    const spacesNeeded = ROW_LENGTH - name.length - price.length;
+                    const itemStr = name + ' '.repeat(Math.max(0, spacesNeeded)) + price;
+                    
+                    let row = createRow(itemStr, false, rowIndex++);
+                    container.appendChild(row);
+                });
+
+                // Add a blank spacer row between categories
+                if (chunkIndex < dataChunks.length - 1) {
+                    let blankRow = createRow(' '.repeat(ROW_LENGTH), false, rowIndex++);
+                    container.appendChild(blankRow);
+                }
+            });
+        }
+
+        function createRow(str, isHeader, rowIndex) {
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'board-row';
+            if (isHeader) rowDiv.classList.add('header-row');
+
+            // Limit string to ROW_LENGTH just in case
+            const safeStr = str.substring(0, ROW_LENGTH).padEnd(ROW_LENGTH, ' ');
+
+            for (let i = 0; i < safeStr.length; i++) {
+                const flap = document.createElement('div');
+                flap.className = 'flap';
+                
+                const charSpan = document.createElement('span');
+                charSpan.innerText = ' '; // Initial state is blank
+                flap.appendChild(charSpan);
+                
+                rowDiv.appendChild(flap);
+                
+                const targetChar = safeStr[i].toUpperCase();
+                
+                // Stagger the animation: cascading diagonally from top-left
+                const delay = (rowIndex * 100) + (i * 20); 
+                animateFlap(flap, charSpan, targetChar, delay);
+            }
+            
+            return rowDiv;
+        }
+
+        function animateFlap(flap, charSpan, targetChar, delay) {
+            // Skip heavy animation for intentional spaces to optimize performance
+            if (targetChar === ' ') {
+                setTimeout(() => { charSpan.innerText = ' '; }, delay);
+                return;
+            }
+
+            setTimeout(() => {
+                let flips = 10 + Math.floor(Math.random() * 20); // Random cycles between 10-30
+                let currentIdx = Math.floor(Math.random() * CHARS.length);
+                
+                flap.classList.add('flipping');
+
+                const interval = setInterval(() => {
+                    charSpan.innerText = CHARS[currentIdx];
+                    currentIdx = (currentIdx + 1) % CHARS.length;
+                    flips--;
+
+                    // Stop when cycles run out AND we land on the correct character
+                    if (flips <= 0 && charSpan.innerText === targetChar) {
+                        clearInterval(interval);
+                        flap.classList.remove('flipping');
+                    }
+                }, 40); // 40ms per flip gives that mechanical blur effect
+            }, delay);
+        }
+
+        // Initialize and setup repeating refresh
+        window.addEventListener('DOMContentLoaded', () => {
+            renderBoard();
+            
+            // Re-run the board animation every 30 seconds
+            setInterval(() => {
+                renderBoard();
+            }, 30000); 
+        });
+    </script>
+</body>
+</html>
