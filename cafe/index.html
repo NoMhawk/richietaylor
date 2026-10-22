@@ -3,90 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Retro Split-Flap Cafe Board</title>
+    <title>Skydive Southwest Cafe Screen</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&family=Amatic+SC:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Desktop/TV Scaling */
-            --flap-w: 1.6vw;
-            --flap-h: 2.5vw;
-            --font-size: 1.8vw;
-            --flap-gap: 0.15vw;
-            --row-gap: 0.6vw;
+            /* Desktop Screen Scales for 1080p fit */
+            --flap-w: 1.4vw;
+            --flap-h: 2.2vw;
+            --font-size: 1.5vw;
+            --flap-gap: 0.1vw;
+            --row-gap: 0.4vw;
             
-            /* Colors */
-            --bg-wall: #0a0a0a;
-            --board-frame: #111111;
+            /* Board Colors */
+            --bg-page: #050505;
+            --board-bg: #111111;
             --flap-bg: #1c1c1c;
-            --flap-border: #000000;
-            --text-item: #ffcc00; /* Solari Yellow */
-            --text-header: #ffffff;
+            --flap-border: #000;
+            --text-item: #ffcc00;
+            --text-header: #fff;
+            
+            /* Chalkboard Colors */
+            --chalk-bg: #2a3132;
+            --chalk-white: #f4f4f4;
+            --espresso: #2e1503;
+            --water: #a8d5e5;
+            --milk: #fdf6e3;
+            --foam: #fffef8;
+            --choco: #4a2e1b;
+            --tea: #c46210;
         }
 
-        @media (max-width: 1024px) {
-            /* Mobile/Tablet Scaling (Switches to single column logic) */
-            :root {
-                --flap-w: 3.2vw;
-                --flap-h: 5vw;
-                --font-size: 3.6vw;
-                --flap-gap: 0.3vw;
-                --row-gap: 1.2vw;
-            }
-            .board-frame {
-                flex-direction: column;
-            }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            background-color: var(--bg-wall);
-            background-image: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
-            margin: 0;
-            min-height: 100vh;
+            background-color: var(--bg-page);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            font-family: 'Roboto Mono', monospace;
+            overflow: hidden; /* Designed for full 1080p display screen without scroll */
+        }
+
+        /* =========================================
+           TOP SECTION: SPLIT FLAP BOARD
+           ========================================= */
+        .top-section {
+            flex-grow: 1;
+            padding: 1vw 2vw;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: 'Roboto Mono', monospace;
-            overflow-x: hidden;
-            padding: 2vw;
-            box-sizing: border-box;
+            background-image: radial-gradient(circle at top, #1a1a1a 0%, #050505 100%);
         }
 
         .board-wrapper {
-            background-color: var(--board-frame);
-            padding: 2vw 3vw 3vw 3vw;
-            border-radius: 1vw;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.9), inset 0 0 15px rgba(255,255,255,0.05);
-            border: 4px solid #222;
+            background-color: var(--board-bg);
+            padding: 1.5vw 2.5vw 2vw;
+            border-radius: 0.5vw;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.9), inset 0 0 15px rgba(255,255,255,0.02);
+            border: 3px solid #222;
         }
 
         .header-container {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 2vw;
-            margin-bottom: 2vw;
+            gap: 1.5vw;
+            margin-bottom: 1.5vw;
         }
 
-        .board-logo {
-            height: 4vw;
-            border-radius: 0.5vw;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+        .chalk-logo {
+            height: 7vh;
+            border-radius: 0.3vw;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.6);
+            margin-top: 1.5vh;
+            margin-bottom: 1vh;
+            border: 2px solid rgba(255,255,255,0.1);
+            opacity: 0.95;
         }
 
         .board-title {
-            color: #444;
+            color: #ccc;
             text-align: center;
-            font-size: 2vw;
-            letter-spacing: 0.5vw;
-            margin: 0;
+            font-size: 1.8vw;
+            letter-spacing: 0.4vw;
             text-transform: uppercase;
         }
 
         .board-frame {
             display: flex;
-            gap: 4vw;
+            gap: 3vw;
         }
 
         .board-column {
@@ -114,35 +126,20 @@
             font-weight: 700;
             line-height: 1;
             position: relative;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.6);
-            /* Prevent text selection */
+            box-shadow: 0 2px 3px rgba(0,0,0,0.6);
             user-select: none;
         }
 
-        /* The mechanical hinge slicing through the middle */
         .flap::after {
             content: '';
             position: absolute;
             top: 50%;
             left: 0;
             right: 0;
-            height: 2px;
-            background-color: var(--flap-border);
+            height: 1.5px;
+            background-color: rgba(0,0,0,0.8);
             transform: translateY(-50%);
             z-index: 10;
-            box-shadow: 0 1px 1px rgba(255,255,255,0.05);
-        }
-
-        /* Subtle top shadow for 3D depth */
-        .flap::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 50%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.08), rgba(0,0,0,0.2));
-            z-index: 1;
         }
 
         .flap span {
@@ -150,37 +147,317 @@
             z-index: 5;
         }
 
-        /* Styling for Header Rows */
         .header-row .flap {
             color: var(--text-header);
         }
 
-        /* Optional slight visual change while flipping */
         .flap.flipping {
             color: #fff;
             filter: brightness(1.2);
         }
+
+        /* =========================================
+           BOTTOM SECTION: CHALKBOARD DIAGRAM
+           ========================================= */
+        .bottom-section {
+            padding-bottom: 1vh;
+            background-color: var(--chalk-bg);
+            background-image: 
+                radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 60%),
+                url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+            border-top: 8px solid #4a3f35; /* Wooden frame top edge */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 2vh;
+            font-family: 'Amatic SC', cursive;
+        }
+
+        /* Chalk Ribbon */
+        .ribbon-container {
+            position: relative;
+            margin-bottom: 1.5vh;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chalk-ribbon {
+            border: 3px solid var(--chalk-white);
+            padding: 0.5vh 3vw;
+            font-size: 3.5vw;
+            color: var(--chalk-white);
+            font-weight: 700;
+            letter-spacing: 0.2vw;
+            position: relative;
+            text-shadow: 0 0 5px rgba(255,255,255,0.3);
+            box-shadow: 0 0 8px rgba(255,255,255,0.1), inset 0 0 8px rgba(255,255,255,0.1);
+        }
+
+        .chalk-ribbon::before, .chalk-ribbon::after {
+            content: "";
+            position: absolute;
+            top: 15%;
+            height: 70%;
+            width: 3vw;
+            border: 3px solid var(--chalk-white);
+        }
+
+        .chalk-ribbon::before {
+            left: -3.5vw;
+            border-right: none;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 20% 50%);
+        }
+
+        .chalk-ribbon::after {
+            right: -3.5vw;
+            border-left: none;
+            clip-path: polygon(0 0, 100% 0, 80% 50%, 100% 100%, 0 100%);
+        }
+
+        /* Cups Layout */
+        .cups-container {
+            display: flex;
+            justify-content: center;
+            gap: 4vw;
+            width: 100%;
+        }
+
+        .cup-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .cup-glass-container {
+            position: relative;
+            margin-bottom: 1vh;
+        }
+
+        .cup-body {
+            width: 6.5vw;
+            height: 7.5vw;
+            border: 3px solid var(--chalk-white);
+            border-top: none;
+            border-radius: 0 0 1.5vw 1.5vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            overflow: hidden; /* Keeps liquid inside */
+            position: relative;
+            background: rgba(255,255,255,0.05); /* Slight glass reflection */
+            z-index: 2;
+        }
+
+        .cup-handle {
+            position: absolute;
+            right: -1.5vw;
+            top: 1.5vw;
+            width: 2vw;
+            height: 4vw;
+            border: 3px solid var(--chalk-white);
+            border-left: none;
+            border-radius: 0 1.5vw 1.5vw 0;
+            z-index: 1;
+        }
+
+        .cup-name {
+            color: var(--chalk-white);
+            font-size: 2vw;
+            font-weight: 700;
+            letter-spacing: 0.1vw;
+            text-shadow: 0 0 4px rgba(255,255,255,0.3);
+        }
+
+        /* Liquid Layers */
+        .layer {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2vw;
+            font-weight: 700;
+            text-align: center;
+            font-family: 'Amatic SC', cursive;
+            letter-spacing: 0.05vw;
+        }
+
+        .espresso { background-color: var(--espresso); color: var(--milk); }
+        .water { background-color: var(--water); color: var(--espresso); }
+        .steamed-milk { background-color: var(--milk); color: var(--espresso); }
+        .milk-foam { 
+            background-color: var(--foam); 
+            color: var(--espresso); 
+            border-bottom: 2px dashed rgba(0,0,0,0.1); 
+        }
+        .choco { background-color: var(--choco); color: var(--milk); }
+        .tea-liquid { background-color: var(--tea); color: var(--milk); }
+
+        /* Specific Cup Heights */
+        /* Americano */
+        .cup-americano .water { height: 75%; }
+        .cup-americano .espresso { height: 25%; }
+        
+        /* Latte */
+        .cup-latte .milk-foam { height: 15%; }
+        .cup-latte .steamed-milk { height: 60%; }
+        .cup-latte .espresso { height: 25%; }
+
+        /* Cappuccino */
+        .cup-cap .milk-foam { height: 40%; }
+        .cup-cap .steamed-milk { height: 35%; }
+        .cup-cap .espresso { height: 25%; }
+
+        /* Mocha */
+        .cup-mocha .steamed-milk { height: 20%; }
+        .cup-mocha .choco { height: 55%; }
+        .cup-mocha .espresso { height: 25%; }
+
+        /* Flat White */
+        .cup-flat .steamed-milk { height: 70%; }
+        .cup-flat .espresso { height: 30%; }
+
+        /* Tea (Full + Teabag) */
+        .cup-tea .tea-liquid { height: 90%; }
+        
+        .tea-string {
+            position: absolute;
+            top: -1.5vw;
+            right: 1.5vw;
+            width: 2px;
+            height: 3vw;
+            background-color: var(--chalk-white);
+            z-index: 5;
+            transform: rotate(15deg);
+        }
+        .tea-tag {
+            position: absolute;
+            top: 1.2vw;
+            right: -0.5vw;
+            background-color: var(--chalk-white);
+            color: var(--chalk-bg);
+            padding: 0.1vw 0.4vw;
+            font-size: 1vw;
+            font-family: 'Roboto Mono', monospace;
+            border-radius: 2px;
+            z-index: 6;
+            transform: rotate(15deg);
+        }
+
     </style>
 </head>
 <body>
 
-    <div class="board-wrapper">
-        <div class="header-container">
-            <img src="https://www.skydivesouthwest.com/logo.jpg" alt="Skydive Southwest Logo" class="board-logo">
-            <h1 class="board-title">Cafe</h1>
-        </div>
-        <div class="board-frame">
-            <div id="col-left" class="board-column"></div>
-            <div id="col-right" class="board-column"></div>
+    <!-- TOP SECTION: BOARD -->
+    <div class="top-section">
+        <div class="board-wrapper">
+            <div class="header-container">
+                <h1 class="board-title">Skydive Southwest Cafe</h1>
+            </div>
+            <div class="board-frame">
+                <div id="col-left" class="board-column"></div>
+                <div id="col-right" class="board-column"></div>
+            </div>
         </div>
     </div>
 
+    <!-- BOTTOM SECTION: CHALKBOARD -->
+    <div class="bottom-section">
+        
+        <div class="ribbon-container">
+            <div class="chalk-ribbon">THE MANIFEST OF COFFEE</div>
+        </div>
+
+        <div class="cups-container">
+            <!-- 1. Americano -->
+            <div class="cup-wrapper">
+                <div class="cup-glass-container">
+                    <div class="cup-handle"></div>
+                    <div class="cup-body cup-americano">
+                        <div class="layer water">HOT WATER</div>
+                        <div class="layer espresso">ESPRESSO</div>
+                    </div>
+                </div>
+                <div class="cup-name">AMERICANO</div>
+            </div>
+
+            <!-- 2. Latte -->
+            <div class="cup-wrapper">
+                <div class="cup-glass-container">
+                    <div class="cup-handle"></div>
+                    <div class="cup-body cup-latte">
+                        <div class="layer milk-foam">MILK FOAM</div>
+                        <div class="layer steamed-milk">STEAMED MILK</div>
+                        <div class="layer espresso">ESPRESSO</div>
+                    </div>
+                </div>
+                <div class="cup-name">LATTE</div>
+            </div>
+
+            <!-- 3. Cappuccino -->
+            <div class="cup-wrapper">
+                <div class="cup-glass-container">
+                    <div class="cup-handle"></div>
+                    <div class="cup-body cup-cap">
+                        <div class="layer milk-foam">MILK FOAM</div>
+                        <div class="layer steamed-milk">STEAMED MILK</div>
+                        <div class="layer espresso">ESPRESSO</div>
+                    </div>
+                </div>
+                <div class="cup-name">CAPPUCCINO</div>
+            </div>
+
+            <!-- 4. Mocha -->
+            <div class="cup-wrapper">
+                <div class="cup-glass-container">
+                    <div class="cup-handle"></div>
+                    <div class="cup-body cup-mocha">
+                        <div class="layer steamed-milk">MILK</div>
+                        <div class="layer choco">HOT CHOCOLATE</div>
+                        <div class="layer espresso">ESPRESSO</div>
+                    </div>
+                </div>
+                <div class="cup-name">MOCHA</div>
+            </div>
+
+            <!-- 5. Flat White -->
+            <div class="cup-wrapper">
+                <div class="cup-glass-container">
+                    <div class="cup-handle"></div>
+                    <div class="cup-body cup-flat">
+                        <div class="layer steamed-milk">STEAMED MILK</div>
+                        <div class="layer espresso">ESPRESSO</div>
+                    </div>
+                </div>
+                <div class="cup-name">FLAT WHITE</div>
+            </div>
+
+            <!-- 6. Tea -->
+            <div class="cup-wrapper">
+                <div class="cup-glass-container">
+                    <div class="cup-handle"></div>
+                    <div class="tea-string"></div>
+                    <div class="tea-tag">TEA</div>
+                    <div class="cup-body cup-tea">
+                        <div class="layer tea-liquid">HOT TEA</div>
+                    </div>
+                </div>
+                <div class="cup-name">TEA</div>
+            </div>
+        </div>
+
+        <img src="https://www.skydivesouthwest.com/logo.jpg" alt="Skydive Southwest Logo" class="chalk-logo">
+
+    </div>
+
+    <!-- SCRIPT FOR BOARD ANIMATION -->
     <script>
-        // Set fixed row length to maintain the grid (25 characters wide)
-        const ROW_LENGTH = 25;
+        const ROW_LENGTH = 24; 
         const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789£. &';
 
-        // perfectly balanced data
+        // Balancing the menu data into two columns perfectly 
         const menuDataLeft = [
             { title: "COFFEE", items: [
                 { name: "AMERICANO", price: "£2.95" },
@@ -190,24 +467,24 @@
                 { name: "FLAT WHITE", price: "£3.50" },
                 { name: "TEA", price: "£2.20" }
             ]},
+            { title: "ICED COFFEE", items: [
+                { name: "ICED LATTE", price: "£3.75" },
+                { name: "VANILLA ICED", price: "£3.95" },
+                { name: "CARAMEL ICED", price: "£3.95" }
+            ]}
+        ];
+
+        const menuDataRight = [
             { title: "COLD DRINKS", items: [
                 { name: "CANS", price: "£1.80" },
                 { name: "BOTTLES", price: "£2.50" },
                 { name: "WATER", price: "£1.50" },
                 { name: "ENERGY DRINKS", price: "£2.80" },
                 { name: "KIDS DRINKS", price: "£1.50" }
-            ]}
-        ];
-
-        const menuDataRight = [
-            { title: "ICED COFFEE", items: [
-                { name: "ICED LATTE", price: "£3.75" },
-                { name: "VANILLA", price: "£3.95" },
-                { name: "CARAMEL", price: "£3.95" }
             ]},
             { title: "FOOD", items: [
                 { name: "CRISPS", price: "£1.40" },
-                { name: "CHOC BARS", price: "£1.30" },
+                { name: "CHOCOLATE BARS", price: "£1.30" },
                 { name: "FRUIT", price: "90P" },
                 { name: "ICE CREAM", price: "£3.00" },
                 { name: "ICE LOLLY", price: "£2.00" }
@@ -217,40 +494,28 @@
         function renderBoard() {
             const leftCol = document.getElementById('col-left');
             const rightCol = document.getElementById('col-right');
-
             leftCol.innerHTML = '';
             rightCol.innerHTML = '';
-
             buildColumn(leftCol, menuDataLeft);
             buildColumn(rightCol, menuDataRight);
         }
 
         function buildColumn(container, dataChunks) {
             let rowIndex = 0;
-            
             dataChunks.forEach((chunk, chunkIndex) => {
-                // Generate Header Row
                 let headerStr = chunk.title.padEnd(ROW_LENGTH, ' ');
-                let headerRow = createRow(headerStr, true, rowIndex++);
-                container.appendChild(headerRow);
+                container.appendChild(createRow(headerStr, true, rowIndex++));
 
-                // Generate Item Rows
                 chunk.items.forEach(item => {
                     const name = item.name.toUpperCase();
                     const price = item.price.toUpperCase();
-                    
-                    // Calculate dynamic spaces to align price to the right
                     const spacesNeeded = ROW_LENGTH - name.length - price.length;
                     const itemStr = name + ' '.repeat(Math.max(0, spacesNeeded)) + price;
-                    
-                    let row = createRow(itemStr, false, rowIndex++);
-                    container.appendChild(row);
+                    container.appendChild(createRow(itemStr, false, rowIndex++));
                 });
 
-                // Add a blank spacer row between categories
                 if (chunkIndex < dataChunks.length - 1) {
-                    let blankRow = createRow(' '.repeat(ROW_LENGTH), false, rowIndex++);
-                    container.appendChild(blankRow);
+                    container.appendChild(createRow(' '.repeat(ROW_LENGTH), false, rowIndex++));
                 }
             });
         }
@@ -260,40 +525,33 @@
             rowDiv.className = 'board-row';
             if (isHeader) rowDiv.classList.add('header-row');
 
-            // Limit string to ROW_LENGTH just in case
             const safeStr = str.substring(0, ROW_LENGTH).padEnd(ROW_LENGTH, ' ');
 
             for (let i = 0; i < safeStr.length; i++) {
                 const flap = document.createElement('div');
                 flap.className = 'flap';
-                
                 const charSpan = document.createElement('span');
-                charSpan.innerText = ' '; // Initial state is blank
+                charSpan.innerText = ' ';
                 flap.appendChild(charSpan);
-                
                 rowDiv.appendChild(flap);
                 
                 const targetChar = safeStr[i].toUpperCase();
-                
-                // Stagger the animation: cascading diagonally from top-left
-                const delay = (rowIndex * 100) + (i * 20); 
+                // cascading delay
+                const delay = (rowIndex * 80) + (i * 20); 
                 animateFlap(flap, charSpan, targetChar, delay);
             }
-            
             return rowDiv;
         }
 
         function animateFlap(flap, charSpan, targetChar, delay) {
-            // Skip heavy animation for intentional spaces to optimize performance
             if (targetChar === ' ') {
                 setTimeout(() => { charSpan.innerText = ' '; }, delay);
                 return;
             }
 
             setTimeout(() => {
-                let flips = 10 + Math.floor(Math.random() * 20); // Random cycles between 10-30
+                let flips = 10 + Math.floor(Math.random() * 15);
                 let currentIdx = Math.floor(Math.random() * CHARS.length);
-                
                 flap.classList.add('flipping');
 
                 const interval = setInterval(() => {
@@ -301,23 +559,18 @@
                     currentIdx = (currentIdx + 1) % CHARS.length;
                     flips--;
 
-                    // Stop when cycles run out AND we land on the correct character
                     if (flips <= 0 && charSpan.innerText === targetChar) {
                         clearInterval(interval);
                         flap.classList.remove('flipping');
                     }
-                }, 40); // 40ms per flip gives that mechanical blur effect
+                }, 40); 
             }, delay);
         }
 
-        // Initialize and setup repeating refresh
         window.addEventListener('DOMContentLoaded', () => {
             renderBoard();
-            
-            // Re-run the board animation every 30 seconds
-            setInterval(() => {
-                renderBoard();
-            }, 30000); 
+            // Refresh mechanical board every 30 seconds
+            setInterval(renderBoard, 30000); 
         });
     </script>
 </body>
