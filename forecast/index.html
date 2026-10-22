@@ -1,10 +1,10 @@
-<!-- REVISION: v3.14.0 -->
+<!-- REVISION: v3.16.0 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.14.0)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.16.0)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -88,15 +88,18 @@
         .text-orange { color: #ea580c !important; font-weight: 700; }
         .text-red { color: #dc2626 !important; font-weight: 700; }
 
-        .traffic-badge-green { background-color: #ecfdf5; color: #065f46; border: 1px solid #10b981; padding: 0.2rem 0.1rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.6rem; display: block; text-transform: uppercase; width: 100%; white-space: nowrap; }
-        .traffic-badge-yellow { background-color: #fefce8; color: #854d0e; border: 1px solid #eab308; padding: 0.2rem 0.1rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.6rem; display: block; text-transform: uppercase; width: 100%; white-space: nowrap; }
-        .traffic-badge-orange { background-color: #fff7ed; color: #c2410c; border: 1px solid #f97316; padding: 0.2rem 0.1rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.6rem; display: block; text-transform: uppercase; width: 100%; white-space: nowrap; }
-        .traffic-badge-red { background-color: #fef2f2; color: #991b1b; border: 1px solid #ef4444; padding: 0.2rem 0.1rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.6rem; display: block; text-transform: uppercase; width: 100%; white-space: nowrap; }
+        .traffic-badge-green { background-color: #ecfdf5; color: #065f46; border: 1px solid #10b981; padding: 0.2rem 0.15rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.65rem; display: block; text-transform: uppercase; width: 100%; white-space: nowrap; }
+        .traffic-badge-yellow { background-color: #fefce8; color: #854d0e; border: 1px solid #eab308; padding: 0.2rem 0.15rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.65rem; display: block; text-transform: uppercase; width: 100%; white-space: nowrap; }
+        .traffic-badge-orange { background-color: #fff7ed; color: #c2410c; border: 1px solid #f97316; padding: 0.2rem 0.15rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.65rem; display: block; text-transform: uppercase; width: 100%; white-space: nowrap; }
+        .traffic-badge-red { background-color: #fef2f2; color: #991b1b; border: 1px solid #ef4444; padding: 0.2rem 0.15rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.65rem; display: block; text-transform: uppercase; width: 100%; white-space: nowrap; }
 
-        .master-traffic-table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 0.75rem; text-align: center; background: #fff; }
-        .master-traffic-table th, .master-traffic-table td { padding: 0.35rem 0.1rem; border: 1px solid #e2e8f0; overflow: hidden; text-overflow: ellipsis; }
-        .master-traffic-table th { font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 0.62rem; background: #f8fafc; width: calc((100% - 55px) / 11); }
-        .master-traffic-table th.param-label, .master-traffic-table td.param-label { text-align: left; font-weight: 700; color: #475569; background: #f8fafc; padding-left: 0.35rem; width: 55px; min-width: 55px; font-size: 0.65rem; }
+        /* Master Traffic Light Table (Mobile Scrollable Fix) */
+        .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid #e2e8f0; border-radius: 0.75rem; background: #fff; }
+        .master-traffic-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; text-align: center; white-space: nowrap; }
+        .master-traffic-table th, .master-traffic-table td { padding: 0.5rem 0.6rem; border: 1px solid #e2e8f0; min-width: 68px; }
+        .master-traffic-table th { font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 0.7rem; background: #f8fafc; }
+        .master-traffic-table th.param-label, .master-traffic-table td.param-label { text-align: left; font-weight: 700; color: #475569; background: #f8fafc; padding-left: 0.75rem; position: sticky; left: 0; z-index: 10; min-width: 75px; width: 75px; }
+        .master-traffic-table th.param-label { z-index: 20; }
 
         .master-traffic-table th.current-col, .master-traffic-table td.current-col { background-color: #f0f9ff !important; border-left: 2px solid var(--accent-sky) !important; border-right: 2px solid var(--accent-sky) !important; }
         .master-traffic-table th.current-col { border-top: 2px solid var(--accent-sky) !important; color: var(--accent-sky) !important; }
@@ -136,7 +139,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v3.14.0",
+            revision: "v3.16.0",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -155,7 +158,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.14.0</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.16.0</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -205,7 +208,7 @@
                     <h3 class="panel-title" id="matrix-section-title"><i class="fa-solid fa-traffic-light" style="color: var(--accent-sky);"></i>Hourly Overview (08:00 - 18:00)</h3>
                     <span class="badge">At-a-Glance Flight Line Matrix</span>
                 </div>
-                <div style="width: 100%; overflow-x: auto;">
+                <div class="table-wrapper">
                     <table class="master-traffic-table" id="master-traffic-matrix">
                         <!-- Populated dynamically via JS -->
                     </table>
@@ -293,7 +296,7 @@
     </main>
 
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.14.0 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.16.0 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -429,18 +432,16 @@
         }
 
         function calculateCloudbaseAGL(temp, dewPoint, lowCover, relativeHumidity, weatherCode, totalCloudCover) {
-            if (totalCloudCover <= 25 && relativeHumidity < 85 && weatherCode <= 2) {
-                return 12000; 
+            if (totalCloudCover < 40 && relativeHumidity < 85 && weatherCode <= 3) {
+                const spread = Math.max(0.1, temp - dewPoint);
+                let convectiveBase = Math.round((spread / 2.5) * 1000);
+                return Math.max(convectiveBase, 5000); 
             }
             if (relativeHumidity >= 95 || (weatherCode >= 45 && weatherCode <= 48)) {
                 return 300; 
             }
             const spread = Math.max(0.1, temp - dewPoint);
             let baseFt = Math.round((spread / 2.5) * 1000);
-            
-            if (lowCover < 30 && relativeHumidity < 75) {
-                baseFt = Math.max(baseFt, 5000);
-            }
 
             if (baseFt < 200) baseFt = 200;
             if (baseFt > 12000) baseFt = 12000;
@@ -465,7 +466,7 @@
             let dayStart = hourly.time.findIndex(t => t.startsWith(targetDateStr) && t.includes('08:00'));
             if (dayStart === -1) dayStart = (dayIndex * 24) + 8;
 
-            let slotIssues = { early: [], mid: [], late: [] }; // Early: 08-10, Mid: 11-15, Late: 16-18
+            let slotIssues = { early: [], mid: [], late: [] };
 
             for (let h = dayStart; h < Math.min(dayStart + 11, hourly.time.length); h++) {
                 const timeStr = hourly.time[h];
@@ -527,7 +528,6 @@
             }
         }
 
-        // Updated for 08:00 to 18:00 window (11 hours total)
         function calculateDayMetrics(dayIndex, hourly) {
             const daily = globalWeatherData.daily;
             const targetDateStr = daily.time[dayIndex];
@@ -570,7 +570,7 @@
             container.innerHTML = '';
             const daily = globalWeatherData.daily;
             const hourly = globalWeatherData.hourly;
-            const hoursInterval = [8, 11, 14, 17]; // Updated mini-matrix hours for 08-18 window
+            const hoursInterval = [8, 11, 14, 17];
 
             for (let i = 0; i < Math.min(7, daily.time.length); i++) {
                 const dateObj = new Date(daily.time[i]);
@@ -688,10 +688,10 @@
                 else if (value < 7) { status = 'yellow'; label = `${value}`; }
                 else { status = 'green'; label = `${value}`; }
             } else if (category === 'base') {
-                if (value < 2000) { status = 'red'; label = `${value}`; }
-                else if (value < 3500) { status = 'orange'; label = `${value}`; }
-                else if (value < 5000) { status = 'yellow'; label = `${value}`; }
-                else { status = 'green'; label = `${value}`; }
+                if (value === 'Unlimited' || value >= 5000) { status = 'green'; label = `${value}`; }
+                else if (value >= 3500) { status = 'yellow'; label = `${value}`; }
+                else if (value >= 2000) { status = 'orange'; label = `${value}`; }
+                else { status = 'red'; label = `${value}`; }
             }
 
             return `<span class="traffic-badge-${status}">${label}</span>`;
@@ -706,13 +706,12 @@
             const dateStr = targetDate.toISOString().split('T')[0];
             const dayOfWeekName = targetDate.toLocaleDateString('en-GB', { weekday: 'long' });
 
-            // Update matrix title dynamically with day name (e.g., "Thursday Hourly Overview (08:00 - 18:00)")
             document.getElementById('matrix-section-title').innerHTML = `<i class="fa-solid fa-traffic-light" style="color: var(--accent-sky);"></i>${dayOfWeekName} Hourly Overview (08:00 - 18:00)`;
 
             let startIndex = hourly.time.findIndex(t => t.startsWith(dateStr) && t.includes('08:00'));
             if (startIndex === -1) startIndex = (dayIndex * 24) + 8;
             const validStart = startIndex !== -1 ? startIndex : (dayIndex * 24) + 8;
-            const hoursCount = 11; // 08:00 to 18:00 inclusive (11 hours)
+            const hoursCount = 11;
 
             let greenHours = 0;
             let totalEvaluated = 0;
@@ -727,7 +726,7 @@
             const hourlyGrid = document.getElementById('active-hourly-grid');
             hourlyGrid.innerHTML = '';
 
-            let hourHeaders = `<tr><th class="param-label"></th>`;
+            let hourHeaders = `<tr><th class="param-label">Time</th>`;
             let windRow = `<tr><td class="param-label">Wind</td>`;
             let gustRow = `<tr><td class="param-label">Gusts</td>`;
             let rainRow = `<tr><td class="param-label">Rain</td>`;
@@ -765,6 +764,7 @@
                 const cb = getCustomCloudBands(low, mid, high, vis, rain);
                 const cloud = Math.min(100, Math.round((cb.c0_5k * 0.6) + (cb.c5_10k * 0.3) + (cb.c10_15k * 0.1)));
                 const cloudbaseAGL = calculateCloudbaseAGL(temp, dew, low, hum, code, totCloud);
+                const baseDisplay = cloudbaseAGL >= 12000 ? 'Unlimited' : `${cloudbaseAGL.toLocaleString()}ft`;
 
                 const hFog = code >= 45 && code <= 48 || vis < 3 || hum >= 95;
                 const hIcon = getWeatherIcon(hFog ? 45 : code, rain);
@@ -786,7 +786,7 @@
                 rainRow += `<td class="${colClass}">${getTrafficBadge('rain', rain, '%')}</td>`;
                 cloudRow += `<td class="${colClass}">${getTrafficBadge('cloud', cloud, '%')}</td>`;
                 visRow += `<td class="${colClass}">${getTrafficBadge('vis', vis, 'km')}</td>`;
-                baseRow += `<td class="${colClass}">${getTrafficBadge('base', cloudbaseAGL)}</td>`;
+                baseRow += `<td class="${colClass}">${getTrafficBadge('base', baseDisplay)}</td>`;
 
                 let modelTableRows = '';
                 modelsConfig.forEach(m => {
@@ -847,7 +847,7 @@
                     <div class="hour-section" style="border-color: #e2e8f0;">
                         <div class="hour-section-title">
                             <span style="color: #0284c7;"><i class="fa-solid fa-cloud-sun mr-1"></i> Cloud Layers (AGL)</span>
-                            <span class="${getBaseColorClass(cloudbaseAGL)}" style="font-weight: 700;">Base: ~${cloudbaseAGL >= 12000 ? 'Unlimited' : cloudbaseAGL.toLocaleString() + ' ft'}</span>
+                            <span class="${getBaseColorClass(cloudbaseAGL)}" style="font-weight: 700;">Base: ~${baseDisplay}</span>
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.75rem; color: #334155;">
                             <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding-bottom: 0.1rem;">
