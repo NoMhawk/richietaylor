@@ -1,10 +1,10 @@
-<!-- REVISION: v3.20.0 -->
+<!-- REVISION: v3.22.0 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.20.0)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.22.0)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -63,12 +63,12 @@
         @media(min-width: 1024px) { .outlook-days-grid { grid-template-columns: repeat(4, 1fr); } }
         @media(min-width: 1400px) { .outlook-days-grid { grid-template-columns: repeat(7, 1fr); } }
 
-        /* Strict flex alignment so all bottom boxes start at the exact same level */
-        .outlook-day-card { border: 2px solid var(--border-color); border-radius: 1rem; padding: 0.85rem; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.05); height: 100%; }
+        /* Perfect flex layout ensuring identical card heights and bottom box alignment */
+        .outlook-day-card { border: 2px solid var(--border-color); border-radius: 1rem; padding: 0.85rem; display: flex; flex-direction: column; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.05); height: 100%; }
         .outlook-day-card:hover { border-color: var(--accent-sky); box-shadow: 0 4px 6px rgba(0,0,0,0.08); }
         .outlook-day-card.active { border-color: var(--accent-sky); box-shadow: 0 0 15px rgba(2, 132, 199, 0.2); }
 
-        .card-top-content { display: flex; flex-direction: column; gap: 0.5rem; }
+        .card-top-content { display: flex; flex-direction: column; gap: 0.5rem; flex: 0 0 auto; }
 
         .card-bg-green { background-color: #f0fdf4; border-color: #86efac; }
         .card-bg-yellow { background-color: #fefce8; border-color: #fde047; }
@@ -84,8 +84,8 @@
         .wf-cell { display: flex; align-items: center; justify-content: center; }
         .wf-arrow { font-size: 0.7rem; color: #0284c7; }
 
-        /* Fixed height & flex behavior so descriptions start at the same line and fill remaining space uniformly */
-        .diagnosis-box { background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(2, 132, 199, 0.2); border-radius: 0.5rem; padding: 0.5rem; font-size: 0.7rem; color: #0369a1; line-height: 1.35; font-weight: 500; margin-top: 0.75rem; min-height: 85px; display: flex; flex-direction: column; justify-content: flex-start; }
+        /* Anchor diagnosis box to bottom with margin-top: auto and precise fixed height to lock alignment */
+        .diagnosis-box { background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(2, 132, 199, 0.2); border-radius: 0.5rem; padding: 0.5rem; font-size: 0.7rem; color: #0369a1; line-height: 1.35; font-weight: 500; margin-top: auto; height: 90px; max-height: 90px; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-start; }
 
         .text-green { color: #059669 !important; font-weight: 700; }
         .text-yellow { color: #d97706 !important; font-weight: 700; }
@@ -143,7 +143,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v3.20.0",
+            revision: "v3.22.0",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -162,7 +162,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.20.0</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.22.0</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -300,7 +300,7 @@
     </main>
 
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.20.0 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.22.0 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
