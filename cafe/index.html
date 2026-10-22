@@ -9,12 +9,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&family=Amatic+SC:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Desktop Screen Scales for 1080p fit */
-            --flap-w: 1.4vw;
-            --flap-h: 2.2vw;
-            --font-size: 1.5vw;
-            --flap-gap: 0.1vw;
-            --row-gap: 0.4vw;
+            /* Strictly Viewport-bound Scaling for 16:9 1080p fit */
+            --flap-w: 1.5vw;
+            --flap-h: 3.2vh;
+            --font-size: 2.2vh;
+            --flap-gap: 0.15vw;
+            --row-gap: 0.5vh;
             
             /* Board Colors */
             --bg-page: #050505;
@@ -46,28 +46,34 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
+            width: 100vw;
+            margin: 0;
+            overflow: hidden; /* Force absolutely no scrolling */
             font-family: 'Roboto Mono', monospace;
-            overflow: hidden; /* Designed for full 1080p display screen without scroll */
         }
 
         /* =========================================
            TOP SECTION: SPLIT FLAP BOARD
            ========================================= */
         .top-section {
-            flex-grow: 1;
-            padding: 1vw 2vw;
+            flex: 1 1 auto;
+            padding: 2vh 2vw;
             display: flex;
             justify-content: center;
             align-items: center;
             background-image: radial-gradient(circle at top, #1a1a1a 0%, #050505 100%);
+            min-height: 0; /* Prevents flex children from stretching the body container */
         }
 
         .board-wrapper {
             background-color: var(--board-bg);
-            padding: 1.5vw 2.5vw 2vw;
-            border-radius: 0.5vw;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.9), inset 0 0 15px rgba(255,255,255,0.02);
-            border: 3px solid #222;
+            padding: 2vh 3vw 2.5vh;
+            border-radius: 1vh;
+            box-shadow: 0 2vh 4vh rgba(0,0,0,0.9), inset 0 0 2vh rgba(255,255,255,0.02);
+            border: 0.4vh solid #222;
+            max-height: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
         .header-container {
@@ -75,23 +81,14 @@
             align-items: center;
             justify-content: center;
             gap: 1.5vw;
-            margin-bottom: 1.5vw;
-        }
-
-        .chalk-logo {
-            height: 7vh;
-            border-radius: 0.3vw;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.6);
-            margin-top: 1.5vh;
-            margin-bottom: 1vh;
-            border: 2px solid rgba(255,255,255,0.1);
-            opacity: 0.95;
+            margin-bottom: 2vh;
+            flex-shrink: 0;
         }
 
         .board-title {
             color: #ccc;
             text-align: center;
-            font-size: 1.8vw;
+            font-size: 3vh;
             letter-spacing: 0.4vw;
             text-transform: uppercase;
         }
@@ -99,6 +96,8 @@
         .board-frame {
             display: flex;
             gap: 3vw;
+            flex: 1;
+            justify-content: center;
         }
 
         .board-column {
@@ -120,13 +119,13 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            border: 1px solid var(--flap-border);
-            border-radius: 2px;
+            border: 0.1vh solid var(--flap-border);
+            border-radius: 0.2vh;
             font-size: var(--font-size);
             font-weight: 700;
             line-height: 1;
             position: relative;
-            box-shadow: 0 2px 3px rgba(0,0,0,0.6);
+            box-shadow: 0 0.2vh 0.4vh rgba(0,0,0,0.6);
             user-select: none;
         }
 
@@ -136,7 +135,7 @@
             top: 50%;
             left: 0;
             right: 0;
-            height: 1.5px;
+            height: 0.2vh;
             background-color: rgba(0,0,0,0.8);
             transform: translateY(-50%);
             z-index: 10;
@@ -160,23 +159,24 @@
            BOTTOM SECTION: CHALKBOARD DIAGRAM
            ========================================= */
         .bottom-section {
-            padding-bottom: 1vh;
+            flex: 0 0 38vh; /* Exactly 38% of viewport height */
             background-color: var(--chalk-bg);
             background-image: 
                 radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 60%),
                 url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
-            border-top: 8px solid #4a3f35; /* Wooden frame top edge */
+            border-top: 1vh solid #4a3f35;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding-top: 2vh;
+            justify-content: space-evenly;
+            padding: 1vh 0;
             font-family: 'Amatic SC', cursive;
+            box-sizing: border-box;
         }
 
         /* Chalk Ribbon */
         .ribbon-container {
             position: relative;
-            margin-bottom: 1.5vh;
             text-align: center;
             display: flex;
             align-items: center;
@@ -184,15 +184,15 @@
         }
 
         .chalk-ribbon {
-            border: 3px solid var(--chalk-white);
-            padding: 0.5vh 3vw;
-            font-size: 3.5vw;
+            border: 0.3vh solid var(--chalk-white);
+            padding: 0.5vh 4vw;
+            font-size: 4vh;
             color: var(--chalk-white);
             font-weight: 700;
             letter-spacing: 0.2vw;
             position: relative;
-            text-shadow: 0 0 5px rgba(255,255,255,0.3);
-            box-shadow: 0 0 8px rgba(255,255,255,0.1), inset 0 0 8px rgba(255,255,255,0.1);
+            text-shadow: 0 0 0.5vh rgba(255,255,255,0.3);
+            box-shadow: 0 0 0.8vh rgba(255,255,255,0.1), inset 0 0 0.8vh rgba(255,255,255,0.1);
         }
 
         .chalk-ribbon::before, .chalk-ribbon::after {
@@ -201,7 +201,7 @@
             top: 15%;
             height: 70%;
             width: 3vw;
-            border: 3px solid var(--chalk-white);
+            border: 0.3vh solid var(--chalk-white);
         }
 
         .chalk-ribbon::before {
@@ -220,8 +220,9 @@
         .cups-container {
             display: flex;
             justify-content: center;
-            gap: 4vw;
+            gap: 3vw;
             width: 100%;
+            padding: 0 2vw;
         }
 
         .cup-wrapper {
@@ -233,15 +234,15 @@
 
         .cup-glass-container {
             position: relative;
-            margin-bottom: 1vh;
+            margin-bottom: 0.5vh;
         }
 
         .cup-body {
-            width: 6.5vw;
-            height: 7.5vw;
-            border: 3px solid var(--chalk-white);
+            width: 8vh;
+            height: 10vh;
+            border: 0.3vh solid var(--chalk-white);
             border-top: none;
-            border-radius: 0 0 1.5vw 1.5vw;
+            border-radius: 0 0 2vh 2vh;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
@@ -253,22 +254,22 @@
 
         .cup-handle {
             position: absolute;
-            right: -1.5vw;
-            top: 1.5vw;
-            width: 2vw;
-            height: 4vw;
-            border: 3px solid var(--chalk-white);
+            right: -2.2vh;
+            top: 2vh;
+            width: 2.5vh;
+            height: 5vh;
+            border: 0.3vh solid var(--chalk-white);
             border-left: none;
-            border-radius: 0 1.5vw 1.5vw 0;
+            border-radius: 0 2vh 2vh 0;
             z-index: 1;
         }
 
         .cup-name {
             color: var(--chalk-white);
-            font-size: 2vw;
+            font-size: 2.5vh;
             font-weight: 700;
             letter-spacing: 0.1vw;
-            text-shadow: 0 0 4px rgba(255,255,255,0.3);
+            text-shadow: 0 0 0.4vh rgba(255,255,255,0.3);
         }
 
         /* Liquid Layers */
@@ -277,7 +278,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.2vw;
+            font-size: 1.6vh;
             font-weight: 700;
             text-align: center;
             font-family: 'Amatic SC', cursive;
@@ -290,7 +291,7 @@
         .milk-foam { 
             background-color: var(--foam); 
             color: var(--espresso); 
-            border-bottom: 2px dashed rgba(0,0,0,0.1); 
+            border-bottom: 0.2vh dashed rgba(0,0,0,0.1); 
         }
         .choco { background-color: var(--choco); color: var(--milk); }
         .tea-liquid { background-color: var(--tea); color: var(--milk); }
@@ -324,26 +325,34 @@
         
         .tea-string {
             position: absolute;
-            top: -1.5vw;
-            right: 1.5vw;
-            width: 2px;
-            height: 3vw;
+            top: -1.5vh;
+            right: 1.5vh;
+            width: 0.2vh;
+            height: 3vh;
             background-color: var(--chalk-white);
             z-index: 5;
             transform: rotate(15deg);
         }
         .tea-tag {
             position: absolute;
-            top: 1.2vw;
-            right: -0.5vw;
+            top: 1.2vh;
+            right: -0.5vh;
             background-color: var(--chalk-white);
             color: var(--chalk-bg);
-            padding: 0.1vw 0.4vw;
-            font-size: 1vw;
+            padding: 0.1vh 0.4vw;
+            font-size: 1.2vh;
             font-family: 'Roboto Mono', monospace;
-            border-radius: 2px;
+            border-radius: 0.2vh;
             z-index: 6;
             transform: rotate(15deg);
+        }
+
+        .chalk-logo {
+            height: 6vh;
+            border-radius: 0.5vh;
+            box-shadow: 0 0.6vh 1.2vh rgba(0,0,0,0.6);
+            border: 0.2vh solid rgba(255,255,255,0.1);
+            opacity: 0.95;
         }
 
     </style>
