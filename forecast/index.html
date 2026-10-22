@@ -1,10 +1,10 @@
-<!-- REVISION: v3.16.0 -->
+<!-- REVISION: v3.17.0 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.16.0)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.17.0)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -93,12 +93,12 @@
         .traffic-badge-orange { background-color: #fff7ed; color: #c2410c; border: 1px solid #f97316; padding: 0.2rem 0.15rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.65rem; display: block; text-transform: uppercase; width: 100%; white-space: nowrap; }
         .traffic-badge-red { background-color: #fef2f2; color: #991b1b; border: 1px solid #ef4444; padding: 0.2rem 0.15rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.65rem; display: block; text-transform: uppercase; width: 100%; white-space: nowrap; }
 
-        /* Master Traffic Light Table (Mobile Scrollable Fix) */
+        /* Master Traffic Light Table (Mobile Scrollable Fix with Units) */
         .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid #e2e8f0; border-radius: 0.75rem; background: #fff; }
         .master-traffic-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; text-align: center; white-space: nowrap; }
         .master-traffic-table th, .master-traffic-table td { padding: 0.5rem 0.6rem; border: 1px solid #e2e8f0; min-width: 68px; }
         .master-traffic-table th { font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 0.7rem; background: #f8fafc; }
-        .master-traffic-table th.param-label, .master-traffic-table td.param-label { text-align: left; font-weight: 700; color: #475569; background: #f8fafc; padding-left: 0.75rem; position: sticky; left: 0; z-index: 10; min-width: 75px; width: 75px; }
+        .master-traffic-table th.param-label, .master-traffic-table td.param-label { text-align: left; font-weight: 700; color: #475569; background: #f8fafc; padding-left: 0.75rem; position: sticky; left: 0; z-index: 10; min-width: 95px; width: 95px; font-size: 0.68rem; }
         .master-traffic-table th.param-label { z-index: 20; }
 
         .master-traffic-table th.current-col, .master-traffic-table td.current-col { background-color: #f0f9ff !important; border-left: 2px solid var(--accent-sky) !important; border-right: 2px solid var(--accent-sky) !important; }
@@ -139,7 +139,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v3.16.0",
+            revision: "v3.17.0",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -158,7 +158,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.16.0</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.17.0</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -296,7 +296,7 @@
     </main>
 
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.16.0 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.17.0 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -726,13 +726,13 @@
             const hourlyGrid = document.getElementById('active-hourly-grid');
             hourlyGrid.innerHTML = '';
 
-            let hourHeaders = `<tr><th class="param-label">Time</th>`;
-            let windRow = `<tr><td class="param-label">Wind</td>`;
-            let gustRow = `<tr><td class="param-label">Gusts</td>`;
-            let rainRow = `<tr><td class="param-label">Rain</td>`;
-            let cloudRow = `<tr><td class="param-label">Cloud</td>`;
-            let visRow = `<tr><td class="param-label">Vis</td>`;
-            let baseRow = `<tr><td class="param-label">Base</td>`;
+            let hourHeaders = `<tr><th class="param-label"></th>`;
+            let windRow = `<tr><td class="param-label">Wind (mph)</td>`;
+            let gustRow = `<tr><td class="param-label">Gusts (mph)</td>`;
+            let rainRow = `<tr><td class="param-label">Rain (%)</td>`;
+            let cloudRow = `<tr><td class="param-label">Cloud (%)</td>`;
+            let visRow = `<tr><td class="param-label">Vis (km)</td>`;
+            let baseRow = `<tr><td class="param-label">Base (ft)</td>`;
 
             const modelsConfig = [
                 { key: 'ecmwf_ifs025', label: 'ECMWF' },
@@ -764,7 +764,7 @@
                 const cb = getCustomCloudBands(low, mid, high, vis, rain);
                 const cloud = Math.min(100, Math.round((cb.c0_5k * 0.6) + (cb.c5_10k * 0.3) + (cb.c10_15k * 0.1)));
                 const cloudbaseAGL = calculateCloudbaseAGL(temp, dew, low, hum, code, totCloud);
-                const baseDisplay = cloudbaseAGL >= 12000 ? 'Unlimited' : `${cloudbaseAGL.toLocaleString()}ft`;
+                const baseDisplay = cloudbaseAGL >= 12000 ? 'Unlimited' : `${cloudbaseAGL.toLocaleString()}`;
 
                 const hFog = code >= 45 && code <= 48 || vis < 3 || hum >= 95;
                 const hIcon = getWeatherIcon(hFog ? 45 : code, rain);
@@ -785,7 +785,7 @@
                 gustRow += `<td class="${colClass}">${getTrafficBadge('gust', wGST)}</td>`;
                 rainRow += `<td class="${colClass}">${getTrafficBadge('rain', rain, '%')}</td>`;
                 cloudRow += `<td class="${colClass}">${getTrafficBadge('cloud', cloud, '%')}</td>`;
-                visRow += `<td class="${colClass}">${getTrafficBadge('vis', vis, 'km')}</td>`;
+                visRow += `<td class="${colClass}">${getTrafficBadge('vis', vis)}</td>`;
                 baseRow += `<td class="${colClass}">${getTrafficBadge('base', baseDisplay)}</td>`;
 
                 let modelTableRows = '';
@@ -847,7 +847,7 @@
                     <div class="hour-section" style="border-color: #e2e8f0;">
                         <div class="hour-section-title">
                             <span style="color: #0284c7;"><i class="fa-solid fa-cloud-sun mr-1"></i> Cloud Layers (AGL)</span>
-                            <span class="${getBaseColorClass(cloudbaseAGL)}" style="font-weight: 700;">Base: ~${baseDisplay}</span>
+                            <span class="${getBaseColorClass(cloudbaseAGL)}" style="font-weight: 700;">Base: ~${baseDisplay}ft</span>
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.75rem; color: #334155;">
                             <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding-bottom: 0.1rem;">
