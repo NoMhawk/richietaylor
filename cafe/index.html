@@ -85,12 +85,10 @@
             flex-shrink: 0;
         }
 
-        .board-title {
-            color: #ccc;
-            text-align: center;
-            font-size: 3vh;
-            letter-spacing: 0.4vw;
-            text-transform: uppercase;
+        .header-logo {
+            height: 8vh;
+            border-radius: 0.5vh;
+            box-shadow: 0 0.5vh 1vh rgba(0,0,0,0.5);
         }
 
         .board-frame {
@@ -347,12 +345,106 @@
             transform: rotate(15deg);
         }
 
-        .chalk-logo {
-            height: 6vh;
-            border-radius: 0.5vh;
-            box-shadow: 0 0.6vh 1.2vh rgba(0,0,0,0.6);
-            border: 0.2vh solid rgba(255,255,255,0.1);
-            opacity: 0.95;
+        /* =========================================
+           PORTRAIT / MOBILE RESPONSIVE OVERRIDES
+           ========================================= */
+        @media (max-aspect-ratio: 1/1), (max-width: 768px) {
+            :root {
+                --flap-w: 3.6vw;
+                --flap-h: 6vw;
+                --font-size: 4vw;
+                --flap-gap: 0.4vw;
+                --row-gap: 1vw;
+            }
+            
+            body {
+                height: auto;
+                min-height: 100vh;
+                overflow-y: auto; /* Allow scrolling on portrait */
+                overflow-x: hidden;
+            }
+
+            .top-section {
+                padding: 4vw 2vw;
+            }
+
+            .header-logo {
+                height: 12vw;
+            }
+
+            .board-wrapper {
+                padding: 4vw;
+                border-width: 0.8vw;
+            }
+
+            .board-frame {
+                flex-direction: column; /* Stack columns */
+                gap: 6vw;
+            }
+
+            .bottom-section {
+                flex: none;
+                height: auto;
+                padding: 8vw 0;
+            }
+
+            .ribbon-container {
+                margin-bottom: 6vw;
+            }
+
+            .chalk-ribbon {
+                font-size: 6vw;
+                padding: 1vw 6vw;
+                border-width: 0.6vw;
+            }
+
+            .chalk-ribbon::before, .chalk-ribbon::after {
+                border-width: 0.6vw;
+            }
+
+            .cups-container {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr); /* 2-column grid for cups */
+                gap: 8vw 4vw;
+            }
+
+            .cup-body {
+                width: 18vw;
+                height: 22vw;
+                border-width: 0.6vw;
+                border-radius: 0 0 4vw 4vw;
+            }
+
+            .cup-handle {
+                right: -4vw;
+                top: 4vw;
+                width: 5vw;
+                height: 10vw;
+                border-width: 0.6vw;
+                border-radius: 0 4vw 4vw 0;
+            }
+
+            .cup-name {
+                font-size: 4.5vw;
+                margin-top: 2vw;
+            }
+
+            .layer {
+                font-size: 3vw;
+            }
+
+            .tea-string {
+                top: -3vw;
+                right: 3vw;
+                width: 0.4vw;
+                height: 6vw;
+            }
+
+            .tea-tag {
+                top: 2vw;
+                right: -2vw;
+                font-size: 2.5vw;
+            }
         }
 
     </style>
@@ -363,7 +455,7 @@
     <div class="top-section">
         <div class="board-wrapper">
             <div class="header-container">
-                <h1 class="board-title">Skydive Southwest Cafe</h1>
+                <img src="https://www.skydivesouthwest.com/logo.jpg" alt="Skydive Southwest Logo" class="header-logo">
             </div>
             <div class="board-frame">
                 <div id="col-left" class="board-column"></div>
@@ -456,8 +548,6 @@
                 <div class="cup-name">TEA</div>
             </div>
         </div>
-
-        <img src="https://www.skydivesouthwest.com/logo.jpg" alt="Skydive Southwest Logo" class="chalk-logo">
 
     </div>
 
