@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Skydive Southwest Cafe Screen</title>
     
-    <!-- Hard refresh the page every 3600 seconds (1 hour) -->
-    <meta http-equiv="refresh" content="240">
+    <!-- Reload the page every 180 seconds (3 minutes) to check for updates -->
+    <meta http-equiv="refresh" content="180">
     
     <link rel="preconnect" href="https://fonts.googleapis.com/">
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
@@ -451,7 +451,13 @@
             }
         }
 
-    </style>
+        /* TEMPORARILY HIDE THE COFFEE MANIFEST; keep its HTML for later.
+       Using display:none rather than HTML comments because the section
+       contains its own comments. */
+    .bottom-section {
+        display: none !important;
+    }
+</style>
 </head>
 <body>
 
