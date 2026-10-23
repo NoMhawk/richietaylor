@@ -4,10 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Skydive Southwest Cafe Screen</title>
-    
     <!-- Reload the page every 180 seconds (3 minutes) to check for updates -->
     <meta http-equiv="refresh" content="180">
-    
+
+    <!-- ==========================================================
+         MENU DATA: EDIT PRICES AND ITEMS HERE
+         ========================================================== -->
+    <script>
+        const menuDataLeft = [
+            { title: "COFFEE", items: [
+                { name: "TEA", price: "£2.20" },
+                { name: "AMERICANO", price: "£2.95" },
+                { name: "LATTE", price: "£3.50" },
+                { name: "CAPPUCCINO", price: "£3.50" },
+                { name: "MOCHA", price: "£3.50" },
+                { name: "FLAT WHITE", price: "£3.50" }
+            ]},
+            { title: "ICED COFFEE", items: [
+                { name: "ICED LATTE", price: "£3.75" },
+                { name: "VANILLA ICED", price: "£3.95" },
+                { name: "CARAMEL ICED", price: "£3.95" }
+            ]}
+        ];
+
+        const menuDataRight = [
+            { title: "COLD DRINKS", items: [
+                { name: "WATER", price: "£1.50" },
+                { name: "KIDS DRINKS", price: "£1.50" },
+                { name: "CANS", price: "£1.80" },
+                { name: "BOTTLES", price: "£2.50" },
+                { name: "ENERGY DRINKS", price: "£2.80" }
+            ]},
+            { title: "FOOD", items: [
+                { name: "FRUIT", price: "90P" },
+                { name: "CHOCOLATE BARS", price: "£1.30" },
+                { name: "CRISPS", price: "£1.40" },
+                { name: "ICE LOLLY", price: "£2.00" },
+                { name: "ICE CREAM", price: "£3.00" }
+            ]}
+        ];
+    </script>
+    <!-- ========================================================== -->
+
     <link rel="preconnect" href="https://fonts.googleapis.com/">
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&family=Amatic+SC:wght@400;700&display=swap" rel="stylesheet">
@@ -165,7 +203,7 @@
             background-color: var(--chalk-bg);
             background-image: 
                 radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 60%),
-                url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http\://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+                url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
             border-top: 1vh solid #4a3f35;
             display: flex;
             flex-direction: column;
@@ -452,15 +490,14 @@
         }
 
         /* TEMPORARILY HIDE THE COFFEE MANIFEST; keep its HTML for later.
-       Using display:none rather than HTML comments because the section
-       contains its own comments. */
-    .bottom-section {
-        display: none !important;
-    }
-</style>
+           Using display:none rather than HTML comments because the section
+           contains its own comments. */
+        .bottom-section {
+            display: none !important;
+        }
+    </style>
 </head>
 <body>
-
     <!-- TOP SECTION: BOARD -->
     <div class="top-section">
         <div class="board-wrapper">
@@ -558,47 +595,12 @@
                 <div class="cup-name">TEA</div>
             </div>
         </div>
-
     </div>
 
     <!-- SCRIPT FOR BOARD ANIMATION -->
     <script>
         const ROW_LENGTH = 24; 
         const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789£. &';
-
-        // Balancing the menu data into two columns perfectly 
-        const menuDataLeft = [
-            { title: "COFFEE", items: [
-                { name: "AMERICANO", price: "£2.95" },
-                { name: "LATTE", price: "£3.50" },
-                { name: "CAPPUCCINO", price: "£3.50" },
-                { name: "MOCHA", price: "£3.50" },
-                { name: "FLAT WHITE", price: "£3.50" },
-                { name: "TEA", price: "£2.20" }
-            ]},
-            { title: "ICED COFFEE", items: [
-                { name: "ICED LATTE", price: "£3.75" },
-                { name: "VANILLA ICED", price: "£3.95" },
-                { name: "CARAMEL ICED", price: "£3.95" }
-            ]}
-        ];
-
-        const menuDataRight = [
-            { title: "COLD DRINKS", items: [
-                { name: "CANS", price: "£1.80" },
-                { name: "BOTTLES", price: "£2.50" },
-                { name: "WATER", price: "£1.50" },
-                { name: "ENERGY DRINKS", price: "£2.80" },
-                { name: "KIDS DRINKS", price: "£1.50" }
-            ]},
-            { title: "FOOD", items: [
-                { name: "CRISPS", price: "£1.40" },
-                { name: "CHOCOLATE BARS", price: "£1.30" },
-                { name: "FRUIT", price: "90P" },
-                { name: "ICE CREAM", price: "£3.00" },
-                { name: "ICE LOLLY", price: "£2.00" }
-            ]}
-        ];
 
         function renderBoard() {
             const leftCol = document.getElementById('col-left');
@@ -706,4 +708,3 @@
     </script>
 </body>
 </html>
-
