@@ -654,7 +654,7 @@
             flaps.forEach((flap, index) => {
                 const row = Math.floor(index / ROW_LENGTH);
                 const column = index % ROW_LENGTH;
-                const delay = (row * 18) + (column * 5);
+                const delay = (row * 45) + (column * 12);
                 animateFlap(flap, flap.firstElementChild, flap.dataset.target, delay);
             });
         }
@@ -666,8 +666,8 @@
             }
 
             window.setTimeout(() => {
-                // Fewer flips and a slightly slower cadence reduce CPU/GPU load on the Pi.
-                const flips = 4 + Math.floor(Math.random() * 4); // 4–7 flips
+                // Restore the longer split-flap effect without returning to the heaviest settings.
+                const flips = 10 + Math.floor(Math.random() * 7); // 10–16 flips
                 const targetIndex = CHARS.indexOf(targetChar);
                 if (targetIndex === -1) {
                     charSpan.textContent = targetChar;
@@ -688,7 +688,7 @@
                         charSpan.textContent = targetChar;
                         flap.classList.remove('flipping');
                     }
-                }, 55);
+                }, 45);
             }, delay);
         }
 
