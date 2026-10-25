@@ -1,10 +1,10 @@
-<!-- REVISION: v3.26.0 -->
+<!-- REVISION: v3.27.0 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.26.0)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.27.0)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -140,7 +140,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v3.26.0",
+            revision: "v3.27.0",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -159,7 +159,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.26.0</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.27.0</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -297,7 +297,7 @@
     </main>
 
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.26.0 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.27.0 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -407,7 +407,6 @@
                         const res = await fetch(m.url);
                         if (res.ok) {
                             const json = await res.json();
-                            // Validate that the model actually returned hourly wind data
                             if (json && json.hourly && json.hourly.wind_speed_10m && json.hourly.wind_speed_10m.length > 0) {
                                 return { key: m.key, data: json };
                             }
@@ -755,8 +754,30 @@
                 const isCurrentHour = timeStr.startsWith(currentLocalHourStr);
                 const colClass = isCurrentHour ? ' current-col' : '';
                 
-                const wSpd = kmhToMph(hourly.wind_speed_10m[i]);
-                const wGST = kmhToMph(hourly.wind_gusts_10m[i]);
+                // Calculate average wind and gusts across active models for the matrix matching the cards below
+                let modelWindSum = 0;
+                let modelGustSum = 0;
+                let activeModelCount = 0;
+
+                modelsConfig.forEach(m => {
+                    const modelObj = multiModelData[m.key];
+                    if (modelObj && modelObj.hourly && modelObj.hourly.wind_speed_10m) {
+                        let mIdx = modelObj.hourly.time.findIndex(t => t === timeStr);
+                        if (mIdx === -1) mIdx = i;
+                        if (mIdx !== -1 && modelObj.hourly.wind_speed_10m[mIdx] !== undefined && modelObj.hourly.wind_speed_10m[mIdx] !== null) {
+                            const rawSpd = modelObj.hourly.wind_speed_10m[mIdx];
+                            const rawGust = modelObj.hourly.wind_gusts_10m ? modelObj.hourly.wind_gusts_10m[mIdx] : 0;
+                            modelWindSum += kmhToMph(rawSpd);
+                            modelGustSum += kmhToMph(rawGust);
+                            activeModelCount++;
+                        }
+                    }
+                });
+
+                // Fallback to main forecast if no models responded
+                const wSpd = activeModelCount > 0 ? Math.round(modelWindSum / activeModelCount) : kmhToMph(hourly.wind_speed_10m[i]);
+                const wGST = activeModelCount > 0 ? Math.round(modelGustSum / activeModelCount) : kmhToMph(hourly.wind_gusts_10m[i]);
+
                 const temp = Math.round(hourly.temperature_2m[i]);
                 const dew = hourly.dew_point_2m[i];
                 const rain = hourly.precipitation_probability[i];
