@@ -1,10 +1,10 @@
-<!-- REVISION: v3.29.0 -->
+<!-- REVISION: v3.30.0 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.29.0)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.30.0)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -142,7 +142,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v3.29.0",
+            revision: "v3.30.0",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -161,7 +161,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.29.0</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.30.0</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -299,7 +299,7 @@
     </main>
 
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.29.0 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.30.0 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -342,7 +342,7 @@
         }
 
         function getBaseColorClass(baseFt) {
-            if (baseFt >= 5000) return 'text-green';
+            if (baseFt === 'Unlimited' || baseFt >= 5000) return 'text-green';
             if (baseFt >= 3500) return 'text-yellow';
             if (baseFt >= 2000) return 'text-orange';
             return 'text-red';
@@ -541,7 +541,7 @@
             let dayStart = hourly.time.findIndex(t => t.startsWith(targetDateStr) && t.includes('08:00'));
             if (dayStart === -1) dayStart = (dayIndex * 24) + 8;
 
-            let greenHoursCount = 0;
+            let scoreSum = 0;
             let evaluatedHours = 0;
             let hasLowCloudbase = false;
 
@@ -568,11 +568,21 @@
                 const visOk = !fg && vs >= 3;
 
                 if (windOk && rainOk && visOk) {
-                    greenHoursCount++;
+                    let hourScore = 100;
+                    
+                    if (base < 1000 || fg) {
+                        hourScore -= 70;
+                    } else if (base < 2000) {
+                        hourScore -= 40;
+                    } else if (base < 3500) {
+                        hourScore -= 15;
+                    }
+
+                    scoreSum += Math.max(0, hourScore);
                 }
                 evaluatedHours++;
             }
-            const likelihood = evaluatedHours > 0 ? Math.round((greenHoursCount / evaluatedHours) * 100) : 85;
+            const likelihood = evaluatedHours > 0 ? Math.round(scoreSum / evaluatedHours) : 85;
             return { likelihood, hasLowCloudbase };
         }
 
@@ -706,10 +716,10 @@
                 else if (value < 7) { status = 'yellow'; label = `${value}`; }
                 else { status = 'green'; label = `${value}`; }
             } else if (category === 'base') {
-                if (value === 'Unlimited' || value >= 5000) { status = 'green'; label = `${value}`; }
-                else if (value >= 3500) { status = 'yellow'; label = `${value}`; }
-                else if (value >= 2000) { status = 'orange'; label = `${value}`; }
-                else { status = 'red'; label = `${value}`; }
+                if (value === 'Unlimited' || value >= 5000) { status = 'green'; label = typeof value === 'number' ? value.toLocaleString() : value; }
+                else if (value >= 3500) { status = 'yellow'; label = value.toLocaleString(); }
+                else if (value >= 2000) { status = 'orange'; label = value.toLocaleString(); }
+                else { status = 'red'; label = value.toLocaleString(); }
             }
 
             return `<span class="traffic-badge-${status}">${label}</span>`;
@@ -802,7 +812,7 @@
                 const cb = getCustomCloudBands(low, mid, high, vis, rain);
                 const cloud = Math.min(100, Math.round((cb.c0_5k * 0.6) + (cb.c5_10k * 0.3) + (cb.c10_15k * 0.1)));
                 const cloudbaseAGL = calculateCloudbaseAGL(temp, dew, low, hum, code, totCloud);
-                const baseDisplay = cloudbaseAGL >= 12000 ? 'Unlimited' : `${cloudbaseAGL.toLocaleString()}`;
+                const basePassVal = cloudbaseAGL >= 12000 ? 'Unlimited' : cloudbaseAGL;
 
                 const hFog = code >= 45 && code <= 48 || vis < 3 || hum >= 95;
                 const hIcon = getWeatherIcon(hFog ? 45 : code, rain);
@@ -823,7 +833,7 @@
                 rainRow += `<td class="${colClass}">${getTrafficBadge('rain', rain, '%')}</td>`;
                 cloudRow += `<td class="${colClass}">${getTrafficBadge('cloud', cloud, '%')}</td>`;
                 visRow += `<td class="${colClass}">${getTrafficBadge('vis', vis)}</td>`;
-                baseRow += `<td class="${colClass}">${getTrafficBadge('base', cloudbaseAGL >= 12000 ? 'Unlimited' : cloudbaseAGL)}</td>`;
+                baseRow += `<td class="${colClass}">${getTrafficBadge('base', basePassVal)}</td>`;
 
                 let modelTableRows = '';
                 modelsConfig.forEach(m => {
@@ -855,6 +865,8 @@
                         </tr>
                     `;
                 });
+
+                const baseDisplay = cloudbaseAGL >= 12000 ? 'Unlimited' : cloudbaseAGL.toLocaleString();
 
                 const card = document.createElement('div');
                 card.className = `hour-card ${isCurrentHour ? 'current-hour' : ''}`;
