@@ -1,10 +1,10 @@
-<!-- REVISION: v3.28.0 -->
+<!-- REVISION: v3.29.0 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.28.0)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.29.0)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -83,6 +83,8 @@
         .wf-cell { display: flex; align-items: center; justify-content: center; }
         .wf-arrow { font-size: 0.7rem; color: #0284c7; }
 
+        .cloudbase-warning-badge { background-color: #fef2f2; color: #991b1b; border: 1px solid #f87171; padding: 0.2rem 0.25rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.6rem; display: block; text-transform: uppercase; width: 100%; margin-top: 0.25rem; letter-spacing: 0.025em; }
+
         .diagnosis-box { background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(2, 132, 199, 0.2); border-radius: 0.5rem; padding: 0.5rem; font-size: 0.7rem; color: #0369a1; line-height: 1.35; font-weight: 500; margin-top: 0.75rem; flex: 1 1 auto; display: flex; flex-direction: column; justify-content: flex-start; }
 
         .text-green { color: #059669 !important; font-weight: 700; }
@@ -140,7 +142,7 @@
     <!-- CONFIGURATION & SETTINGS BLOCK -->
     <script>
         const CONFIG = {
-            revision: "v3.28.0",
+            revision: "v3.29.0",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -159,7 +161,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.28.0</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.29.0</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -297,7 +299,7 @@
     </main>
 
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.28.0 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.29.0 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- APPLICATION LOGIC -->
@@ -541,6 +543,7 @@
 
             let greenHoursCount = 0;
             let evaluatedHours = 0;
+            let hasLowCloudbase = false;
 
             for (let h = dayStart; h < Math.min(dayStart + 11, hourly.time.length); h++) {
                 const ws = kmhToMph(hourly.wind_speed_10m[h]);
@@ -551,12 +554,18 @@
                 const dp = hourly.dew_point_2m[h];
                 const hm = hourly.relative_humidity_2m[h];
                 const cd = hourly.weather_code[h];
+                const lw = hourly.cloud_cover_low[h] || 0;
+                const totCloud = hourly.cloud_cover ? hourly.cloud_cover[h] : lw;
+                const base = calculateCloudbaseAGL(tp, dp, lw, hm, cd, totCloud);
                 const fg = cd >= 45 && cd <= 48 || vs < 3 || hm >= 95;
+
+                if (base < 1000 || fg) {
+                    hasLowCloudbase = true;
+                }
 
                 const windOk = ws <= 23 && wg <= 23;
                 const rainOk = rn < 50;
                 const visOk = !fg && vs >= 3;
-                // Cloudbase is a warning/outlook item only and does not disqualify jumpability percentage
 
                 if (windOk && rainOk && visOk) {
                     greenHoursCount++;
@@ -564,7 +573,7 @@
                 evaluatedHours++;
             }
             const likelihood = evaluatedHours > 0 ? Math.round((greenHoursCount / evaluatedHours) * 100) : 85;
-            return { likelihood };
+            return { likelihood, hasLowCloudbase };
         }
 
         function renderOutlookCards() {
@@ -631,6 +640,10 @@
                 timeRow += `</div>`; dirRow += `</div>`; spdRow += `</div>`; gustRow += `</div>`;
                 weatherRow += `</div>`; rainRow += `</div>`; tempRow += `</div>`; pressRow += `</div>`;
 
+                const cloudbaseWarningHtml = metrics.hasLowCloudbase 
+                    ? `<span class="cloudbase-warning-badge"><i class="fa-solid fa-triangle-exclamation mr-1"></i> CHECK CLOUDBASE</span>` 
+                    : '';
+
                 const card = document.createElement('div');
                 card.className = `outlook-day-card ${bgTintClass}${isActive ? ' active' : ''}`;
                 card.onclick = () => selectDay(i);
@@ -641,6 +654,7 @@
                         </div>
                         <div class="outlook-section">
                             <span class="${badgeClass}" style="width: 100%;">JUMP: ${metrics.likelihood}%</span>
+                            ${cloudbaseWarningHtml}
                         </div>
                         <div class="outlook-matrix-mini">
                             ${timeRow}
