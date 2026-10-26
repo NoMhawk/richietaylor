@@ -1,11 +1,19 @@
-<!-- REVISION: v3.31.0 -->
+<!-- ========================================================================= -->
+<!-- REVISION: v4.0                                                            -->
+<!-- SYSTEM: RichBot - Skydive Southwest Flight Line Forecast                  -->
+<!-- TARGET FILE: forecast/index.html                                          -->
+<!-- ========================================================================= -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- [SUB-SECTION: HTML HEAD & METADATA] -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 3.31.0)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 4.0)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- [SECTION: CORE STYLESHEET] -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
@@ -25,6 +33,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-primary); color: var(--text-main); min-height: 100vh; line-height: 1.5; }
 
+        /* [SUB-SECTION: HEADER STYLES] */
         header { background-color: var(--bg-card); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 50; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); }
         .header-container { max-width: 1500px; margin: 0 auto; padding: 1rem 1.5rem; display: flex; flex-direction: column; gap: 1rem; align-items: center; justify-content: space-between; }
         @media(min-width: 640px) { .header-container { flex-direction: row; } }
@@ -57,7 +66,7 @@
         .panel-title { font-size: 0.9rem; font-weight: 700; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 0.5rem; }
         .badge { font-size: 0.7rem; background-color: #f1f5f9; color: #334155; padding: 0.25rem 0.625rem; border-radius: 0.375rem; border: 1px solid var(--border-color); font-weight: 600; }
 
-        /* 7-DAY INDIVIDUAL CARDS GRID CONTAINER */
+        /* [SUB-SECTION: 7-DAY OUTLOOK CARD STYLES] */
         .outlook-days-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 1rem; align-items: stretch; }
         @media(min-width: 640px) { .outlook-days-grid { grid-template-columns: repeat(2, 1fr); } }
         @media(min-width: 1024px) { .outlook-days-grid { grid-template-columns: repeat(4, 1fr); } }
@@ -84,9 +93,9 @@
         .wf-arrow { font-size: 0.7rem; color: #0284c7; }
 
         .cloudbase-warning-badge { background-color: #fef2f2; color: #991b1b; border: 1px solid #f87171; padding: 0.2rem 0.25rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.6rem; display: block; text-transform: uppercase; width: 100%; margin-top: 0.25rem; letter-spacing: 0.025em; }
-
         .diagnosis-box { background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(2, 132, 199, 0.2); border-radius: 0.5rem; padding: 0.5rem; font-size: 0.7rem; color: #0369a1; line-height: 1.35; font-weight: 500; margin-top: 0.75rem; flex: 1 1 auto; display: flex; flex-direction: column; justify-content: flex-start; }
 
+        /* [SUB-SECTION: TRAFFIC BADGE & COLOR UTILITIES] */
         .text-green { color: #059669 !important; font-weight: 700; }
         .text-yellow { color: #d97706 !important; font-weight: 700; }
         .text-orange { color: #ea580c !important; font-weight: 700; }
@@ -97,6 +106,7 @@
         .traffic-badge-orange { background-color: #fff7ed; color: #c2410c; border: 1px solid #f97316; padding: 0.2rem 0.15rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.65rem; display: block; text-transform: uppercase; width: 100%; white-space: nowrap; }
         .traffic-badge-red { background-color: #fef2f2; color: #991b1b; border: 1px solid #ef4444; padding: 0.2rem 0.15rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.65rem; display: block; text-transform: uppercase; width: 100%; white-space: nowrap; }
 
+        /* [SUB-SECTION: MASTER MATRIX & HOURLY CARD STYLES] */
         .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid #e2e8f0; border-radius: 0.75rem; background: #fff; }
         .master-traffic-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; text-align: center; white-space: nowrap; }
         .master-traffic-table th, .master-traffic-table td { padding: 0.5rem 0.6rem; border: 1px solid #e2e8f0; min-width: 68px; }
@@ -124,6 +134,7 @@
         .hour-model-table th { font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 0.65rem; background: #f8fafc; }
         .hour-model-table tr:last-child td { border-bottom: none; }
 
+        /* [SUB-SECTION: MAP & WEBCAM STYLES] */
         .map-container { position: relative; width: 100%; height: 500px; border-radius: 0.75rem; overflow: hidden; border: 1px solid var(--border-color); background: #e2e8f0; }
         .map-container iframe { width: 100%; height: 100%; border: none; }
 
@@ -139,10 +150,10 @@
 </head>
 <body>
 
-    <!-- CONFIGURATION & SETTINGS BLOCK -->
+    <!-- [SECTION: CONFIGURATION & SETTINGS BLOCK] -->
     <script>
         const CONFIG = {
-            revision: "v3.32",
+            revision: "v4.0",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -153,7 +164,7 @@
         };
     </script>
 
-    <!-- HEADER -->
+    <!-- [SECTION: PAGE HEADER] -->
     <header>
         <div class="header-container">
             <div class="logo-box">
@@ -161,7 +172,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 3.31.0</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 4.0</span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -176,10 +187,10 @@
         </div>
     </header>
 
-    <!-- MAIN CONTAINER -->
+    <!-- [SECTION: MAIN PAGE BODY CONTAINER] -->
     <main>
 
-        <!-- ERROR BANNER -->
+        <!-- [SUB-SECTION: ERROR BANNER] -->
         <div id="error-banner" class="error-banner hidden">
             <div style="display: flex; align-items: center; gap: 0.75rem;">
                 <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.125rem;"></i>
@@ -188,7 +199,7 @@
             <button onclick="fetchAllData()" style="background: #dc2626; color: white; border: 1px solid #f87171; padding: 0.3rem 0.75rem; border-radius: 0.375rem; cursor: pointer; font-weight: 600; font-size: 0.75rem;">Retry Now</button>
         </div>
 
-        <!-- ================= 7-DAY INDIVIDUAL CARD BOXES OUTLOOK ================= -->
+        <!-- [SECTION: 7-DAY DROPZONE OUTLOOK CARDS] -->
         <section class="space-y-3">
             <div class="section-header">
                 <div class="section-title-wrap">
@@ -202,10 +213,10 @@
             </div>
         </section>
 
-        <!-- ================= SELECTED DAY OPERATIONAL VIEW ================= -->
+        <!-- [SECTION: SELECTED DAY OPERATIONAL VIEW] -->
         <section class="space-y-6">
 
-            <!-- ================= MASTER ALL-DAY HOURLY TRAFFIC LIGHT MATRIX ================= -->
+            <!-- [SUB-SECTION: MASTER ALL-DAY HOURLY TRAFFIC LIGHT MATRIX] -->
             <div class="panel">
                 <div class="panel-header">
                     <h3 class="panel-title" id="matrix-section-title"><i class="fa-solid fa-traffic-light" style="color: var(--accent-sky);"></i>Hourly Overview (08:00 - 18:00)</h3>
@@ -218,7 +229,7 @@
                 </div>
             </div>
 
-            <!-- Detailed Hourly Onsite Breakdown (08:00 to 18:00) -->
+            <!-- [SUB-SECTION: FIXED HOURLY SCHEDULE CARDS] -->
             <div class="panel">
                 <div class="panel-header">
                     <h3 class="panel-title"><i class="fa-solid fa-clock" style="color: var(--accent-sky);"></i>Fixed Hourly Schedule Cards</h3>
@@ -229,7 +240,7 @@
                 </div>
             </div>
 
-            <!-- ================= WINDY SATELLITE & CLOUDS MAP ================= -->
+            <!-- [SUB-SECTION: WINDY SATELLITE & CLOUDS MAP] -->
             <div class="panel" style="padding: 1.25rem;">
                 <div class="panel-header" style="margin-bottom: 1rem;">
                     <h3 class="panel-title"><i class="fa-solid fa-satellite" style="color: var(--accent-sky);"></i>Windy Satellite & Clouds Live Radar</h3>
@@ -244,7 +255,7 @@
                 </div>
             </div>
 
-            <!-- ================= LOCAL AIRFIELD LIVE FEEDS & WEBCAMS ================= -->
+            <!-- [SUB-SECTION: LOCAL AIRFIELD LIVE FEEDS & WEBCAMS] -->
             <div class="panel" style="padding: 1.25rem;">
                 <div class="panel-header" style="margin-bottom: 1rem;">
                     <h3 class="panel-title"><i class="fa-solid fa-video" style="color: var(--accent-sky);"></i>Local Airfield Live Feeds</h3>
@@ -298,20 +309,23 @@
 
     </main>
 
+    <!-- [SECTION: PAGE FOOTER] -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 3.31.0 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 4.0 • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
-    <!-- APPLICATION LOGIC -->
+    <!-- [SECTION: APPLICATION LOGIC & JAVASCRIPT] -->
     <script>
         let globalWeatherData = null;
         let multiModelData = {};
         let selectedDayIndex = 0;
 
+        // [SUB-SECTION: UNIT CONVERSION UTILITIES]
         function kmhToMph(kmh) {
             return Math.round(kmh * 0.621371);
         }
 
+        // [SUB-SECTION: COLOR & BADGE THRESHOLD HELPERS]
         function getCloudColorClass(val) {
             if (val <= 50) return 'text-green';
             if (val <= 70) return 'text-yellow';
@@ -367,6 +381,7 @@
             return dirs[Math.round((degrees % 360) / 22.5) % 16];
         }
 
+        // [SUB-SECTION: API FETCH & NETWORK HANDLERS]
         async function fetchWithRetry(url, retries = 3, delay = 1000) {
             for (let i = 0; i < retries; i++) {
                 try {
@@ -438,6 +453,7 @@
             }
         }
 
+        // [SUB-SECTION: METEOROLOGICAL & CLOUDBASE CALCULATIONS]
         function calculateCloudbaseAGL(temp, dewPoint, lowCover, relativeHumidity, weatherCode, totalCloudCover) {
             if (totalCloudCover < 40 && relativeHumidity < 85 && weatherCode <= 3) {
                 const spread = Math.max(0.1, temp - dewPoint);
@@ -586,6 +602,7 @@
             return { likelihood, hasLowCloudbase };
         }
 
+        // [SUB-SECTION: 7-DAY OUTLOOK CARDS RENDERER]
         function renderOutlookCards() {
             const container = document.getElementById('outlook-days-container');
             container.innerHTML = '';
@@ -691,6 +708,7 @@
             renderActiveDay(selectedDayIndex);
         }
 
+        // [SUB-SECTION: TRAFFIC LIGHT BADGE GENERATOR]
         function getTrafficBadge(category, value, unit = '') {
             let status = 'green';
             let label = `${value}${unit}`;
@@ -725,6 +743,7 @@
             return `<span class="traffic-badge-${status}">${label}</span>`;
         }
 
+        // [SUB-SECTION: ACTIVE DAY & HOURLY SCHEDULE RENDERER]
         function renderActiveDay(dayIndex) {
             const data = globalWeatherData;
             const hourly = data.hourly;
@@ -957,6 +976,7 @@
             `;
         }
 
+        // [SUB-SECTION: INITIALIZATION HOOK]
         window.onload = () => {
             fetchAllData();
             setInterval(fetchAllData, CONFIG.refreshIntervalMinutes * 60 * 1000);
