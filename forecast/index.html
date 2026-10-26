@@ -823,7 +823,7 @@
                 rainRow += `<td class="${colClass}">${getTrafficBadge('rain', rain, '%')}</td>`;
                 cloudRow += `<td class="${colClass}">${getTrafficBadge('cloud', cloud, '%')}</td>`;
                 visRow += `<td class="${colClass}">${getTrafficBadge('vis', vis)}</td>`;
-                baseRow += `<td class="${colClass}">${getTrafficBadge('base', baseDisplay)}</td>`;
+                baseRow += `<td class="${colClass}">${getTrafficBadge('base', cloudbaseAGL >= 12000 ? 'Unlimited' : cloudbaseAGL)}</td>`;
 
                 let modelTableRows = '';
                 modelsConfig.forEach(m => {
