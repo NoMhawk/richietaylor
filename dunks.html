@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- 1. Meta Refresh: Redirects after 0 seconds to the new URL -->
+    <meta http-equiv="refresh" content="0; url=https://NEW-WEBSITE-URL.com">
+    
+    <!-- 2. JavaScript Redirect: Backup in case meta refresh is blocked -->
+    <script type="text/javascript">
+        window.location.href = "https://NEW-WEBSITE-URL.com";
+    </script>
+
+    <title>Page Moved</title>
+</head>
+<body>
+    <!-- 3. Manual Fallback Link: In case auto-redirects are disabled in the browser -->
+    <p>This page has moved. If you are not redirected automatically, <a href="https://NEW-WEBSITE-URL.com">click here to go to the new site</a>.</p>
+</body>
+</html>
