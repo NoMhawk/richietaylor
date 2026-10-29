@@ -1,4 +1,4 @@
-<!-- REV: 9.8 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 9.9 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -91,7 +91,7 @@
     #map { width: 100%; height: 100%; z-index: 1; }
 
     /* ==========================================================
-        SIDEBAR (REV 9.8)
+        SIDEBAR (REV 9.9)
         ========================================================== */
     .map-info-overlay {
       --w: clamp(460px, 34vw, 720px);
@@ -506,7 +506,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Dunkeswell Weather Operations</span>
-      <span class="rev-badge">REV: 9.8</span>
+      <span class="rev-badge">REV: 9.9</span>
     </div>
     <div class="header-right-meta">
       <div class="meta-item">Current: <span id="clock-current">--:--:--</span></div>
@@ -568,7 +568,7 @@
 
     </div>
 
-    <!-- SIDEBAR (REV 9.8) -->
+    <!-- SIDEBAR (REV 9.9) -->
     <div class="map-info-overlay" id="sidebar">
       <div class="ov-header">
         <span>⚡ Live ops</span>
@@ -972,15 +972,22 @@
       }
 
       // ==========================================
-      // JJ'S JUMP RUN LOGIC (REV 9.8)
+      // JJ'S JUMP RUN LOGIC (REV 9.9 - Into-Wind Runway Selector)
       // ==========================================
-      const rwy04 = 42;
-      const rwy22 = 222;
+      const runwayEnds = [42, 222, 170, 350]; // Available Dunkeswell runway headings
+      let bestRunwayHdg = 42;
+      let minAngleDiff = 999;
 
-      const diff04 = Math.abs((effectiveWindDir - rwy04 + 540) % 360 - 180);
-      const diff22 = Math.abs((effectiveWindDir - rwy22 + 540) % 360 - 180);
-      
-      const jjRunwayHdg = diff22 < diff04 ? 222 : 42;
+      runwayEnds.forEach(rwy => {
+        // Find angular difference between wind and runway heading
+        const diff = Math.abs((effectiveWindDir - rwy + 540) % 360 - 180);
+        if (diff < minAngleDiff) {
+          minAngleDiff = diff;
+          bestRunwayHdg = rwy;
+        }
+      });
+
+      const jjRunwayHdg = bestRunwayHdg;
 
       const angleDiff = (effectiveWindDir - jjRunwayHdg + 360) % 360;
       const jjOffsetDist = 0.3; 
