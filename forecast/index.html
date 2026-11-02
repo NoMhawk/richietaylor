@@ -199,10 +199,10 @@
             <button onclick="fetchAllData()" style="background: #dc2626; color: white; border: 1px solid #f87171; padding: 0.3rem 0.75rem; border-radius: 0.375rem; cursor: pointer; font-weight: 600; font-size: 0.75rem;">Retry Now</button>
         </div>
 
-        <!-- [SECTION: 1. HOURLY OVERVIEW & OPERATIONAL VIEW (FIRST)] -->
+        <!-- [SECTION: OPERATIONAL VIEW & OUTLOOK] -->
         <section class="space-y-6">
 
-            <!-- [SUB-SECTION: MASTER ALL-DAY HOURLY TRAFFIC LIGHT MATRIX] -->
+            <!-- [SUB-SECTION: 1. MASTER ALL-DAY HOURLY TRAFFIC LIGHT MATRIX (FIRST)] -->
             <div class="panel">
                 <div class="panel-header">
                     <h3 class="panel-title" id="matrix-section-title"><i class="fa-solid fa-traffic-light" style="color: var(--accent-sky);"></i>Hourly Overview (08:00 - 18:00)</h3>
@@ -215,7 +215,21 @@
                 </div>
             </div>
 
-            <!-- [SUB-SECTION: FIXED HOURLY SCHEDULE CARDS] -->
+            <!-- [SUB-SECTION: 2. 7-DAY DROPZONE OUTLOOK CARDS (SECOND)] -->
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <div class="section-header">
+                    <div class="section-title-wrap">
+                        <div class="section-dot" style="background-color: var(--accent-emerald);"></div>
+                        <h2 class="section-title">7-Day Dropzone Outlook</h2>
+                    </div>
+                    <span class="section-date" id="selected-day-header-label">Click Day Box to View Detailed Schedule</span>
+                </div>
+                <div class="outlook-days-grid" id="outlook-days-container">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </div>
+
+            <!-- [SUB-SECTION: 3. FIXED HOURLY SCHEDULE CARDS (THIRD)] -->
             <div class="panel">
                 <div class="panel-header">
                     <h3 class="panel-title"><i class="fa-solid fa-clock" style="color: var(--accent-sky);"></i>Fixed Hourly Schedule Cards</h3>
@@ -291,20 +305,6 @@
                 </div>
             </div>
 
-        </section>
-
-        <!-- [SECTION: 2. 7-DAY DROPZONE OUTLOOK CARDS (SECOND)] -->
-        <section class="space-y-3">
-            <div class="section-header">
-                <div class="section-title-wrap">
-                    <div class="section-dot" style="background-color: var(--accent-emerald);"></div>
-                    <h2 class="section-title">7-Day Dropzone Outlook</h2>
-                </div>
-                <span class="section-date" id="selected-day-header-label">Click Day Box to View Detailed Schedule</span>
-            </div>
-            <div class="outlook-days-grid" id="outlook-days-container">
-                <!-- Populated dynamically via JS -->
-            </div>
         </section>
 
     </main>
