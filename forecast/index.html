@@ -188,6 +188,7 @@
     </header>
 
     <!-- [SECTION: MAIN PAGE BODY CONTAINER] -->
+<!-- [SECTION: MAIN PAGE BODY CONTAINER] -->
     <main>
 
         <!-- [SUB-SECTION: ERROR BANNER] -->
@@ -199,27 +200,13 @@
             <button onclick="fetchAllData()" style="background: #dc2626; color: white; border: 1px solid #f87171; padding: 0.3rem 0.75rem; border-radius: 0.375rem; cursor: pointer; font-weight: 600; font-size: 0.75rem;">Retry Now</button>
         </div>
 
-        <!-- [SECTION: 7-DAY DROPZONE OUTLOOK CARDS] -->
-        <section class="space-y-3">
-            <div class="section-header">
-                <div class="section-title-wrap">
-                    <div class="section-dot" style="background-color: var(--accent-emerald);"></div>
-                    <h2 class="section-title">7-Day Dropzone Outlook</h2>
-                </div>
-                <span class="section-date" id="selected-day-header-label">Click Day Box to View Detailed Schedule</span>
-            </div>
-            <div class="outlook-days-grid" id="outlook-days-container">
-                <!-- Populated dynamically via JS -->
-            </div>
-        </section>
-
-        <!-- [SECTION: SELECTED DAY OPERATIONAL VIEW] -->
+        <!-- [SECTION: SELECTED DAY OPERATIONAL VIEW - MOVED TO TOP] -->
         <section class="space-y-6">
 
             <!-- [SUB-SECTION: MASTER ALL-DAY HOURLY TRAFFIC LIGHT MATRIX] -->
             <div class="panel">
                 <div class="panel-header">
-                    <h3 class="panel-title" id="matrix-section-title"><i class="fa-solid fa-traffic-light" style="color: var(--accent-sky);"></i>Hourly Overview Average</h3>
+                    <h3 class="panel-title" id="matrix-section-title"><i class="fa-solid fa-traffic-light" style="color: var(--accent-sky);"></i>Hourly Overview (08:00 - 18:00)</h3>
                     <span class="badge">At-a-Glance Flight Line Matrix</span>
                 </div>
                 <div class="table-wrapper">
@@ -283,10 +270,9 @@
                         </div>
                     </div>
 
-
                     <div class="webcam-card">
                         <div class="webcam-title" style="margin-bottom: 0.25rem;">
-                            <span>Gliders Cam 1 (West)</span>
+                            <span>North Hill Cam 1 (West)</span>
                             <span style="font-size: 0.65rem; color: #dc2626; background: rgba(220,38,38,0.1); padding: 0.1rem 0.3rem; border-radius: 0.25rem;">YouTube Live</span>
                         </div>
                         <div style="position: relative; width: 100%; height: 260px; border-radius: 0.5rem; overflow: hidden; background: #000;">
@@ -296,18 +282,30 @@
 
                     <div class="webcam-card">
                         <div class="webcam-title" style="margin-bottom: 0.25rem;">
-                            <span>Gliders Cam 2 (East)</span>
+                            <span>North Hill Cam 2 (East)</span>
                             <span style="font-size: 0.65rem; color: #dc2626; background: rgba(220,38,38,0.1); padding: 0.1rem 0.3rem; border-radius: 0.25rem;">YouTube Live</span>
                         </div>
                         <div style="position: relative; width: 100%; height: 260px; border-radius: 0.5rem; overflow: hidden; background: #000;">
                             <iframe width="100%" height="100%" src="https://www.youtube.com/embed/live_stream?channel=UCmn1hb_77LmtrYaYp9GRgnw" title="DSGC North Hill Webcam 2" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                         </div>
                     </div>
-                    
-                    
                 </div>
             </div>
 
+        </section>
+
+        <!-- [SECTION: 7-DAY DROPZONE OUTLOOK CARDS - MOVED BELOW] -->
+        <section class="space-y-3">
+            <div class="section-header">
+                <div class="section-title-wrap">
+                    <div class="section-dot" style="background-color: var(--accent-emerald);"></div>
+                    <h2 class="section-title">7-Day Dropzone Outlook</h2>
+                </div>
+                <span class="section-date" id="selected-day-header-label">Click Day Box to View Detailed Schedule</span>
+            </div>
+            <div class="outlook-days-grid" id="outlook-days-container">
+                <!-- Populated dynamically via JS -->
+            </div>
         </section>
 
     </main>
