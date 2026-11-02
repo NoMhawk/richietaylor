@@ -677,8 +677,11 @@ async function fetchWithRetry(url, retries = 3, delay = 2000) {
                 timeRow += `</div>`; dirRow += `</div>`; spdRow += `</div>`; gustRow += `</div>`;
                 weatherRow += `</div>`; rainRow += `</div>`; tempRow += `</div>`; pressRow += `</div>`;
 
-                const cloudbaseWarningHtml = metrics.hasLowCloudbase 
+const cloudbaseWarningHtml = metrics.hasLowCloudbase 
                     ? `<span class="cloudbase-warning-badge"><i class="fa-solid fa-triangle-exclamation mr-1"></i> CHECK CLOUDBASE</span>` 
+                    : '';
+                const fogWarningHtml = metrics.hasFogWarning
+                    ? `<span class="cloudbase-warning-badge" style="background:#fee2e2; color:#991b1b; border-color:#f87171;"><i class="fa-solid fa-triangle-exclamation mr-1"></i> CHECK FOG / MIST</span>`
                     : '';
 
                 const card = document.createElement('div');
