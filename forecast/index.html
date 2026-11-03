@@ -1,5 +1,5 @@
 <!-- ========================================================================= -->
-<!-- REVISION: v4.0                                                            -->
+<!-- REVISION: v4.1                                                            -->
 <!-- SYSTEM: RichBot - Skydive Southwest Flight Line Forecast                  -->
 <!-- TARGET FILE: forecast/index.html                                          -->
 <!-- ========================================================================= -->
@@ -10,7 +10,7 @@
     <!-- [SUB-SECTION: HTML HEAD & METADATA] -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 4.0)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 4.1)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- [SECTION: CORE STYLESHEET] -->
@@ -760,7 +760,7 @@ const cloudbaseWarningHtml = metrics.hasLowCloudbase
             return `<span class="traffic-badge-${status}">${label}</span>`;
         }
 
-   // [SUB-SECTION: ACTIVE DAY & HOURLY SCHEDULE RENDERER]
+// [SUB-SECTION: ACTIVE DAY & HOURLY SCHEDULE RENDERER]
         function renderActiveDay(dayIndex) {
             const data = globalWeatherData;
             const hourly = data.hourly;
@@ -770,7 +770,22 @@ const cloudbaseWarningHtml = metrics.hasLowCloudbase
             const dateStr = targetDate.toISOString().split('T')[0];
             const dayOfWeekName = targetDate.toLocaleDateString('en-GB', { weekday: 'long' });
 
-            document.getElementById('matrix-section-title').innerHTML = `<i class="fa-solid fa-traffic-light" style="color: var(--accent-sky);"></i>${dayOfWeekName} Hourly Overview (08:00 - 18:00)`;
+            // Extract exact sunrise and sunset times for the selected day
+            const sunriseIso = daily.sunrise ? daily.sunrise[dayIndex] : null;
+            const sunsetIso = daily.sunset ? daily.sunset[dayIndex] : null;
+            const sunriseTime = sunriseIso ? new Date(sunriseIso).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false}) : '--:--';
+            const sunsetTime = sunsetIso ? new Date(sunsetIso).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false}) : '--:--';
+
+            // Update header title with exact sunrise and sunset times inline
+            document.getElementById('matrix-section-title').innerHTML = `
+                <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; width: 100%; gap: 1rem;">
+                    <span><i class="fa-solid fa-traffic-light" style="color: var(--accent-sky);"></i>${dayOfWeekName} Hourly Overview (08:00 - 18:00)</span>
+                    <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); background: #f8fafc; padding: 0.2rem 0.6rem; border-radius: 0.375rem; border: 1px solid var(--border-color);">
+                        <i class="fa-solid fa-sun" style="color: #d97706; margin-right: 0.2rem;"></i> Rise: <b>${sunriseTime}</b> &nbsp;|&nbsp; 
+                        <i class="fa-solid fa-moon" style="color: #ea580c; margin-right: 0.2rem;"></i> Set: <b>${sunsetTime}</b>
+                    </span>
+                </div>
+            `;
 
             let startIndex = hourly.time.findIndex(t => t.startsWith(dateStr) && t.includes('08:00'));
             if (startIndex === -1) startIndex = (dayIndex * 24) + 8;
