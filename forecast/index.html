@@ -886,12 +886,11 @@ const cloudbaseWarningHtml = metrics.hasLowCloudbase
 
                 let eventBadge = '';
                 if (sunriseHour === hourNum && sunriseMinStr) {
-                    eventBadge += `<div style="font-size: 0.55rem; background: #fef3c7; color: #b45309; border: 1px solid #fcd34d; padding: 0.05rem 0.2rem; border-radius: 0.2rem; margin-bottom: 0.15rem; font-weight: 700;"><i class="fa-solid fa-sun mr-0.5"></i>Rise ${sunriseMinStr}</div>`;
+                    eventBadge += `<div style="font-size: 0.55rem; background: #fef3c7; color: #b45309; border: 1px solid #fcd34d; padding: 0.05rem 0.2rem; border-radius: 0.2rem; margin-bottom: 0.15rem; font-weight: 700; text-align: center;">Sunrise ${sunriseMinStr}</div>`;
                 }
                 if (sunsetHour === hourNum && sunsetMinStr) {
-                    eventBadge += `<div style="font-size: 0.55rem; background: #ffedd5; color: #c2410c; border: 1px solid #fdba74; padding: 0.05rem 0.2rem; border-radius: 0.2rem; margin-bottom: 0.15rem; font-weight: 700;"><i class="fa-solid fa-moon mr-0.5"></i>Set ${sunsetMinStr}</div>`;
+                    eventBadge += `<div style="font-size: 0.55rem; background: #ffedd5; color: #c2410c; border: 1px solid #fdba74; padding: 0.05rem 0.2rem; border-radius: 0.2rem; margin-bottom: 0.15rem; font-weight: 700; text-align: center;">Sunset ${sunsetMinStr}</div>`;
                 }
-
                 const nowTag = isCurrentHour ? `<br><span style="font-size:0.5rem; background:var(--accent-sky); color:white; padding:0.02rem 0.15rem; border-radius:0.15rem;">NOW</span>` : '';
                 const headerContent = `${eventBadge}${timeLabel}${nowTag}`;
 
