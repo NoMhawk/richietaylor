@@ -885,7 +885,6 @@ const cloudbaseWarningHtml = metrics.hasLowCloudbase
                 }
                 totalEvaluated++;
 
-                // Check if sunrise or sunset falls into this hour block
                 let eventBadge = '';
                 if (sunriseHour === hourNum && sunriseMinStr) {
                     eventBadge += `<div style="font-size: 0.55rem; background: #fef3c7; color: #b45309; border: 1px solid #fcd34d; padding: 0.05rem 0.2rem; border-radius: 0.2rem; margin-bottom: 0.15rem; font-weight: 700;"><i class="fa-solid fa-sun mr-0.5"></i>Rise ${sunriseMinStr}</div>`;
@@ -997,65 +996,6 @@ const cloudbaseWarningHtml = metrics.hasLowCloudbase
                         </div>
                     </div>
 
-                    <div class="hour-section">
-                        <div class="hour-section-title"><span>Visibility & Rain</span></div>
-                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);">
-                            <span>Vis: <b class="${getVisColorClass(vis)}">${vis} km</b></span>
-                            <span>Rain Risk: <b class="${getRainColorClass(rain)}">${rain}%</b></span>
-                        </div>
-                    </div>
-                `;
-                hourlyGrid.appendChild(card);
-            }
-
-            hourHeaders += `</tr>`;
-            windRow += `</tr>`;
-            gustRow += `</tr>`;
-            rainRow += `</tr>`;
-            cloudRow += `</tr>`;
-            visRow += `</tr>`;
-            baseRow += `</tr>`;
-            fogRow += `</tr>`;
-            document.getElementById('master-traffic-matrix').innerHTML = `
-                <thead>${hourHeaders}</thead>
-                <tbody>
-                    ${windRow}
-                    ${gustRow}
-                    ${rainRow}
-                    ${cloudRow}
-                    ${visRow}
-                    ${baseRow}
-                    ${fogRow}
-                </tbody>
-            `;
-        }
-
-                    <!-- 2. Vertical Cloud Cover & Lowest Cloudbase AGL -->
-                    <div class="hour-section" style="border-color: #e2e8f0;">
-                        <div class="hour-section-title">
-                            <span style="color: #0284c7;"><i class="fa-solid fa-cloud-sun mr-1"></i> Cloud Layers (AGL)</span>
-                            <span class="${getBaseColorClass(cloudbaseAGL)}" style="font-weight: 700;">Base: ~${baseDisplay}ft</span>
-                        </div>
-                        <div style="display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.75rem; color: #334155;">
-                            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #e2e8f0; padding-bottom: 0.1rem;">
-                                <span style="color: var(--text-muted);">Total Cover:</span> <b class="${getCloudColorClass(cloud)}">${cloud}%</b>
-                            </div>
-                            <div style="display: flex; justify-content: space-between;">
-                                <span style="color: var(--text-muted);">☁ Low (0-5k ft):</span> <b class="${getCloudColorClass(cb.c0_5k)}">${cb.c0_5k}%</b>
-                            </div>
-                            <div style="display: flex; justify-content: space-between;">
-                                <span style="color: var(--text-muted);">☁ Mid (5-10k ft):</span> <b class="${getCloudColorClass(cb.c5_10k)}">${cb.c5_10k}%</b>
-                            </div>
-                            <div style="display: flex; justify-content: space-between;">
-                                <span style="color: var(--text-muted);">☁ Upper (10-15k ft):</span> <b class="${getCloudColorClass(cb.c10_15k)}">${cb.c10_15k}%</b>
-                            </div>
-                            <div style="display: flex; justify-content: space-between;">
-                                <span style="color: var(--text-muted);">☁ Top (15k+ ft):</span> <b class="${getCloudColorClass(cb.c15k_plus)}">${cb.c15k_plus}%</b>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 3. Visibility & Rain -->
                     <div class="hour-section">
                         <div class="hour-section-title"><span>Visibility & Rain</span></div>
                         <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);">
