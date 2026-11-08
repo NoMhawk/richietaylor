@@ -511,8 +511,7 @@ const mainUrl = `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitu
                 const cbBands = getCustomCloudBands(lw, mid, high, vs, rn);
                 const cloudCover = Math.min(100, Math.round((cbBands.c0_5k * 0.6) + (cbBands.c5_10k * 0.3) + (cbBands.c10_15k * 0.1)));
                 const base = calculateCloudbaseAGL(tp, dp, lw, hm, cd, totCloud);
-                const isFog = (cd >= 45 && cd <= 48) || vs < 1.0 || (hm >= 95 && (tp - dp) <= 1.0);
-
+                const isFog = (vs < 1.0) || ((cd >= 45 && cd <= 48) && vs < 3.0) || (vs < 5.0 && hm >= 90 && (tp - dp) <= 1.5);
                 let issues = [];
                 if (ws > 23 || wg > 23) issues.push("strong winds");
                 if (rn >= 50) issues.push("rain");
@@ -576,8 +575,7 @@ const mainUrl = `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitu
                 const lw = hourly.cloud_cover_low[h] || 0;
                 const totCloud = hourly.cloud_cover ? hourly.cloud_cover[h] : lw;
                 const base = calculateCloudbaseAGL(tp, dp, lw, hm, cd, totCloud);
-                const isFog = (cd >= 45 && cd <= 48) || vs < 1.0 || (hm >= 95 && (tp - dp) <= 1.0);
-
+                const isFog = (vs < 1.0) || ((cd >= 45 && cd <= 48) && vs < 3.0) || (vs < 5.0 && hm >= 90 && (tp - dp) <= 1.5);
                 if (base < 1000) {
                     hasLowCloudbase = true;
                 }
@@ -865,8 +863,13 @@ const cloudbaseWarningHtml = metrics.hasLowCloudbase
 
                 const isDirectFogCode = (code >= 45 && code <= 48);
                 const isSaturated = (hum >= 95 && (temp - dew) <= 1.0);
-                const fogStatus = (isDirectFogCode || vis < 1.0 || (isSaturated && vis < 2.0)) ? 'FOG' : ((vis < 3.0 || (hum >= 90 && (temp - dew) <= 2.0)) ? 'MIST' : 'CLEAR');
-
+// Hill-aware Fog / Mist Detection criteria (requires actual restricted visibility)
+                let fogStatus = 'CLEAR';
+                if (vis < 1.0 || (code >= 45 && code <= 48 && vis < 3.0)) {
+                    fogStatus = 'FOG';
+                } else if (vis < 5.0 && (hum >= 90 || (temp - dew) <= 1.5)) {
+                    fogStatus = 'MIST';
+                }
                 const cb = getCustomCloudBands(low, mid, high, vis, rain);
                 const cloud = Math.min(100, Math.round((cb.c0_5k * 0.6) + (cb.c5_10k * 0.3) + (cb.c10_15k * 0.1)));
                 const cloudbaseAGL = calculateCloudbaseAGL(temp, dew, low, hum, code, totCloud);
