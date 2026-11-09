@@ -41,16 +41,19 @@
     <script>
         let allEvents = [];
 
-        async function loadEvents() {
+async function loadEvents() {
             try {
-                const response = await fetch('./events.json');
+                // Adding a timestamp parameter prevents the browser from caching an old/empty version
+                const response = await fetch(`./events.json?v=${new Date().getTime()}`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
                 allEvents = await response.json();
                 renderAgenda('all');
             } catch (error) {
                 console.error("Error loading events.json:", error);
                 document.getElementById('agenda-container').innerHTML = `
-                    <div class="bg-slate-900 border border-rose-500/30 p-6 rounded-xl text-center text-rose-400 text-sm">
-                        Could not load event data. Please verify events.json exists.
+                    <div class="bg-rose-950/40 border border-rose-500/30 p-6 rounded-2xl text-center text-rose-300 text-sm max-w-xl mx-auto">
+                        <strong>Could not load schedule data.</strong><br>Details: ${error.message}
                     </div>`;
             }
         }
