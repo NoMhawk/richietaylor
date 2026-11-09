@@ -63,14 +63,20 @@ def fetch_dinkspace_schedule():
                 else:
                     event_url = "https://dinkspace.co.uk/dinkspace-schedule"
 
-                ev_type = "Coaching"
-                if 'festival' in title_part.lower():
-                    ev_type = "Festival"
-                elif 'tournament' in title_part.lower() or 'slam' in title_part.lower() or 'championships' in title_part.lower():
-                    ev_type = "Tournament"
-                elif 'training' in title_part.lower():
-                    ev_type = "Training"
+# Inside fetch_dinkspace_schedule() where ev_type is determined:
+title_lower = title_part.lower()
 
+ev_type = "Coaching"
+if 'festival' in title_lower:
+    ev_type = "Festival"
+elif any(kw in title_lower for kw in ['tournament', 'slam', 'championships', 'open']):
+    ev_type = "Tournament"
+elif any(kw in title_lower for kw in ['training', 'squad', 'team']):
+    ev_type = "Training"
+elif any(kw in title_lower for kw in ['clinic', 'break', 'coaching']):
+    ev_type = "Coaching"
+
+    
                 events.append({
                     "title": title_part,
                     "date": iso_date,
