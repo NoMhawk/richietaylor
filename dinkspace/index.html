@@ -67,37 +67,6 @@
             renderAgenda(type);
         }
 
-        // Helper to merge consecutive/multi-day events with the same title
-        function groupMultiDayEvents(events) {
-            const merged = [];
-            
-            // Sort chronologically first
-            const sorted = [...events].sort((a, b) => new Date(a.date) - new Date(b.date));
-
-            sorted.forEach(ev => {
-                // Clean up title suffixes like "(Day 2)", "(Final Day)" to check for grouping
-                let baseTitle = ev.title.replace(/\s*\(.*?(day|2|3|4|final).*?\)/gi, '').trim();
-                
-                const last = merged[merged.length - 1];
-                
-                if (last && last.baseTitle === baseTitle && last.type === ev.type && last.location === ev.location) {
-                    // Update end date of the existing merged event
-                    last.endDate = ev.date;
-                } else {
-                    merged.push({
-                        baseTitle: baseTitle,
-                        title: baseTitle,
-                        startDate: ev.date,
-                        endDate: ev.date,
-                        type: ev.type,
-                        location: ev.location,
-                        desc: ev.desc
-                    });
-                }
-            });
-            return merged;
-        }
-
         function renderAgenda(filter) {
             const container = document.getElementById('agenda-container');
             container.innerHTML = '';
@@ -109,63 +78,65 @@
                 return;
             }
 
-            // Group consecutive multi-day events
-            const processedEvents = groupMultiDayEvents(filtered);
-
-            // Group by Month/Year header (e.g. "November 2026")
+            // Group by Month/Year header
             const groupedByMonth = {};
-            processedEvents.forEach(ev => {
-                const d = new Date(ev.startDate);
-                const monthKey = d.toLocaleString('en-GB', { month: 'long', year: 'numeric' }); // e.g. "November 2026"
+            filtered.forEach(ev => {
+                const d = new Date(ev.date);
+                const monthKey = d.toLocaleString('en-GB', { month: 'long', year: 'numeric' });
                 if (!groupedByMonth[monthKey]) groupedByMonth[monthKey] = [];
                 groupedByMonth[monthKey].push(ev);
             });
 
-            // Render each month section
             for (const [month, monthEvents] of Object.entries(groupedByMonth)) {
                 const section = document.createElement('div');
                 section.className = "space-y-4";
                 
-                // Month Header
                 const heading = document.createElement('div');
                 heading.className = "flex items-center gap-3 pb-2 border-b border-slate-800";
                 heading.innerHTML = `<h2 class="text-sm font-black tracking-wider uppercase text-emerald-400">${month}</h2><span class="text-xs text-slate-500 font-semibold">(${monthEvents.length} event${monthEvents.length > 1 ? 's' : ''})</span>`;
                 section.appendChild(heading);
 
-                // Cards Container for this month
                 const cardsList = document.createElement('div');
                 cardsList.className = "space-y-3";
 
                 monthEvents.forEach(ev => {
+                    // Default / Coaching (Emerald)
                     let badgeStyle = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
-                    if (ev.type === 'Festival') badgeStyle = 'bg-purple-500/10 text-purple-400 border-purple-500/30';
-                    if (ev.type === 'Tournament') badgeStyle = 'bg-amber-500/10 text-amber-400 border-amber-500/30';
-                    if (ev.type === 'Training') badgeStyle = 'bg-sky-500/10 text-sky-400 border-sky-500/30';
+                    let cardBg = 'bg-[#1e293b]/90 border-slate-800 hover:border-emerald-500/50';
+                    let dateColor = 'text-emerald-400';
+                    let btnStyle = 'bg-slate-900 hover:bg-slate-800 text-slate-200 border-slate-700';
 
-                    // Format Date Range
-                    let dateDisplay = "";
-                    try {
-                        const start = new Date(ev.startDate);
-                        const startStr = start.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
-                        if (ev.startDate !== ev.endDate) {
-                            const end = new Date(ev.endDate);
-                            const endStr = end.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-                            dateDisplay = `${startStr} – ${endStr}`;
-                        } else {
-                            dateDisplay = `${startStr}, ${start.getFullYear()}`;
-                        }
-                    } catch(e) {
-                        dateDisplay = ev.startDate;
+                    if (ev.type === 'Festival') {
+                        badgeStyle = 'bg-purple-500/10 text-purple-400 border-purple-500/30';
+                        cardBg = 'bg-[#1e1b2e]/90 border-purple-900/40 hover:border-purple-500/50';
+                        dateColor = 'text-purple-400';
+                        btnStyle = 'bg-purple-950/40 hover:bg-purple-900/50 text-purple-200 border-purple-800/60';
+                    } else if (ev.type === 'Tournament') {
+                        badgeStyle = 'bg-amber-500/10 text-amber-400 border-amber-500/30';
+                        cardBg = 'bg-[#261f1a]/90 border-amber-900/40 hover:border-amber-500/50';
+                        dateColor = 'text-amber-400';
+                        btnStyle = 'bg-amber-950/40 hover:bg-amber-900/50 text-amber-200 border-amber-800/60';
+                    } else if (ev.type === 'Training') {
+                        badgeStyle = 'bg-sky-500/10 text-sky-400 border-sky-500/30';
+                        cardBg = 'bg-[#172033]/90 border-sky-900/40 hover:border-sky-500/50';
+                        dateColor = 'text-sky-400';
+                        btnStyle = 'bg-sky-950/40 hover:bg-sky-900/50 text-sky-200 border-sky-800/60';
                     }
 
+                    let formattedDate = ev.date;
+                    try {
+                        const d = new Date(ev.date);
+                        formattedDate = d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+                    } catch(e) {}
+
                     const card = document.createElement('div');
-                    card.className = "bg-[#1e293b] border border-slate-800 rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-slate-700 transition shadow-lg";
+                    card.className = `border rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 transition shadow-lg ${cardBg}`;
                     card.innerHTML = `
                         <div class="space-y-1.5">
                             <div class="flex items-center gap-3">
                                 <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${badgeStyle}">${ev.type}</span>
-                                <span class="text-xs text-emerald-400 font-medium flex items-center gap-1.5">
-                                    <i class="fa-regular fa-calendar"></i> ${dateDisplay}
+                                <span class="text-xs ${dateColor} font-medium flex items-center gap-1.5">
+                                    <i class="fa-regular fa-calendar"></i> ${formattedDate}
                                 </span>
                             </div>
                             <h3 class="text-lg font-bold text-white">${ev.title}</h3>
@@ -174,11 +145,11 @@
                             </p>
                             <p class="text-sm text-slate-300 pt-1">${ev.desc}</p>
                         </div>
-                        <div class="flex md:flex-col items-end justify-between md:justify-center border-t md:border-t-0 pt-3 md:pt-0 border-slate-800">
-                           <a href="${ev.url}" target="_blank" class="bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 text-xs font-semibold px-4 py-2 rounded-xl transition flex items-center gap-2">
-    <span>View Event</span> <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
-</a>
-</div>
+                        <div class="flex md:flex-col items-end justify-between md:justify-center border-t md:border-t-0 pt-3 md:pt-0 border-slate-800/60">
+                            <a href="${ev.url}" target="_blank" class="border text-xs font-semibold px-4 py-2 rounded-xl transition flex items-center gap-2 ${btnStyle}">
+                                <span>View Event</span> <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                            </a>
+                        </div>
                     `;
                     cardsList.appendChild(card);
                 });
