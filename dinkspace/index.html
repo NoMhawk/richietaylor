@@ -100,7 +100,9 @@
                 cardsList.className = "space-y-3";
 
                 monthEvents.forEach(ev => {
-// Default fallback (Coaching - Emerald)
+
+
+                    // Default / Coaching styling (Emerald)
                     let badgeStyle = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
                     let cardBg = 'bg-[#1e293b]/90 border-slate-800 hover:border-emerald-500/50';
                     let dateColor = 'text-emerald-400';
@@ -121,6 +123,11 @@
                         cardBg = 'bg-[#172033]/90 border-sky-900/40 hover:border-sky-500/50';
                         dateColor = 'text-sky-400';
                         btnStyle = 'bg-sky-950/40 hover:bg-sky-900/50 text-sky-200 border-sky-800/60';
+                    } else if (ev.type === 'Coaching') {
+                        badgeStyle = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
+                        cardBg = 'bg-[#172622]/90 border-emerald-900/40 hover:border-emerald-500/50';
+                        dateColor = 'text-emerald-400';
+                        btnStyle = 'bg-emerald-950/40 hover:bg-emerald-900/50 text-emerald-200 border-emerald-800/60';
                     }
 
                     let formattedDate = ev.date;
