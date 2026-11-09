@@ -38,7 +38,7 @@ def fetch_dinkspace_schedule():
     events = []
     today = datetime.now().date()
 
-    # Iterate through elements that contain links
+    # Search broadly across list items, paragraphs, and div blocks
     for element in soup.select('li, p, div, span'):
         text = element.get_text(strip=True)
         
@@ -59,31 +59,38 @@ def fetch_dinkspace_schedule():
                 except Exception:
                     continue
 
-                # Look for an <a> tag inside or attached to this element that contains an anchor/path
-                link_elem = element.find('a') or element.find_parent('a')
-                link = link_elem.get('href', '') if link_elem else ''
-
-                # Construct the correct URL preserving the #anchor hash
-                if '#ovat' in link or '#' in link:
-                    if link.startswith('http'):
-                        event_url = link
-                    elif link.startswith('#'):
-                        event_url = f"https://dinkspace.co.uk/dinkspace-schedule{link}"
-                    else:
-                        base_path = link.split('#')[0]
-                        anchor = '#' + link.split('#')[1]
-                        if not base_path or base_path == '/':
-                            event_url = f"https://dinkspace.co.uk/dinkspace-schedule{anchor}"
+                # Extract precise anchor links (#hashes) from the element or its children
+                event_url = "https://dinkspace.co.uk/dinkspace-schedule"
+                
+                # Search all <a> tags within the element block for anchors
+                for a_tag in element.find_all('a'):
+                    href = a_tag.get('href', '')
+                    if '#' in href:
+                        if href.startswith('http'):
+                            event_url = href
+                        elif href.startswith('#'):
+                            event_url = f"https://dinkspace.co.uk/dinkspace-schedule{href}"
                         else:
-                            clean_base = base_path if base_path.startswith('http') else f"https://dinkspace.co.uk{base_path if base_path.startswith('/') else '/' + base_path}"
-                            event_url = f"{clean_base}{anchor}"
-                elif link:
-                    event_url = link if link.startswith('http') else f"https://dinkspace.co.uk{link if link.startswith('/') else '/' + link}"
-                else:
-                    # Fallback URL if no specific tag link is found
-                    event_url = "https://dinkspace.co.uk/dinkspace-schedule"
+                            base = href.split('#')[0]
+                            anchor = '#' + href.split('#')[1]
+                            clean_base = base if base.startswith('http') else f"https://dinkspace.co.uk{base if base.startswith('/') else '/' + base}" if base else "https://dinkspace.co.uk/dinkspace-schedule"
+                            event_url = f"{clean_base.split('#')[0]}{anchor}"
+                        break
+                
+                # Fallback regex search on element HTML if no direct <a> tag matched
+                if '#' not in event_url:
+                    html_str = str(element)
+                    match_href = re.search(r'href=["\']([^"\']*#[^"\']*)["\']', html_str)
+                    if match_href:
+                        found_link = match_href.group(1)
+                        if found_link.startswith('#'):
+                            event_url = f"https://dinkspace.co.uk/dinkspace-schedule{found_link}"
+                        elif found_link.startswith('http'):
+                            event_url = found_link
+                        else:
+                            event_url = f"https://dinkspace.co.uk{found_link if found_link.startswith('/') else '/' + found_link}"
 
-                # Classify Type
+                # Classify Event Type
                 title_lower = title_part.lower()
                 ev_type = "Coaching"
                 if 'festival' in title_lower:
@@ -99,12 +106,11 @@ def fetch_dinkspace_schedule():
                     "title": title_part,
                     "date": iso_date,
                     "type": ev_type,
-                    "location": "Dinkspace Venue",
                     "url": event_url,
                     "desc": f"Official scheduled event: {title_part}"
                 })
 
-    # Deduplicate
+    # Deduplicate events by title and date
     unique_events = []
     seen = set()
     for ev in events:
