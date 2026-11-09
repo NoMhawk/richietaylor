@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dinkspace Schedule | Richietaylor.net</title>
+    <title>Dinkspace Schedule</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -18,7 +18,7 @@
                     <i class="fa-solid fa-calendar-days"></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-black tracking-tight text-white">Dinkspace Event Schedule</h1>
+                    <h1 class="text-2xl font-black tracking-tight text-white">Dinkspace Schedule</h1>
                     <p class="text-xs text-emerald-400 font-medium tracking-wide uppercase mt-0.5">Upcoming Festivals, Coaching & Tournaments</p>
                 </div>
             </div>
@@ -34,7 +34,6 @@
 
         <!-- Timeline / Agenda Container -->
         <div id="agenda-container" class="space-y-4">
-            <!-- Dynamically populated from events.json -->
             <div class="text-center py-12 text-slate-500">Loading schedule...</div>
         </div>
     </div>
@@ -51,13 +50,12 @@
                 console.error("Error loading events.json:", error);
                 document.getElementById('agenda-container').innerHTML = `
                     <div class="bg-slate-900 border border-rose-500/30 p-6 rounded-xl text-center text-rose-400 text-sm">
-                        Could not load event data. Please verify events.json exists in the dinkspace folder.
+                        Could not load event data. Please verify events.json exists.
                     </div>`;
             }
         }
 
         function filterEvents(type) {
-            // Update button styles
             ['all', 'Festival', 'Coaching', 'Training'].forEach(t => {
                 const btn = document.getElementById(`btn-${t}`);
                 if (t === type) {
@@ -86,7 +84,6 @@
                 if (ev.type === 'Tournament') badgeStyle = 'bg-amber-500/10 text-amber-400 border-amber-500/30';
                 if (ev.type === 'Training') badgeStyle = 'bg-sky-500/10 text-sky-400 border-sky-500/30';
 
-                // Format date nicely (e.g., Sat, Nov 7, 2026)
                 let formattedDate = ev.date;
                 try {
                     const d = new Date(ev.date);
