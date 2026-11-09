@@ -142,28 +142,26 @@
  
 
 
-                        <!-- Inside your rendering loop in index.html -->
-<div class="border rounded-2xl p-7 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 transition shadow-xl ${cardBg}">
-    <div class="space-y-2.5">
+// Inside renderAgenda in index.html:
+const card = document.createElement('div');
+card.className = `border rounded-2xl p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 transition shadow-xl ${cardBg}`;
+card.innerHTML = `
+    <div class="space-y-2">
         <div class="flex items-center gap-3.5">
             <span class="text-xs font-bold px-3 py-1 rounded-full border ${badgeStyle}">${ev.type}</span>
             <span class="text-sm ${dateColor} font-semibold flex items-center gap-2">
                 <i class="fa-regular fa-calendar"></i> ${formattedDate}
             </span>
         </div>
-        <h3 class="text-xl md:text-2xl font-black tracking-tight text-white">${ev.title}</h3>
-        <p class="text-sm md:text-base text-slate-300 flex items-center gap-2 font-medium">
-            <i class="fa-solid fa-location-dot text-rose-400"></i> ${ev.location}
-        </p>
-        <p class="text-sm md:text-base text-slate-300/90 pt-1">${ev.desc}</p>
+        <h3 class="text-xl md:text-2xl font-black tracking-tight text-white pt-1">${ev.title}</h3>
+        <p class="text-sm md:text-base text-slate-300 pt-0.5">${ev.desc}</p>
     </div>
     <div class="flex md:flex-col items-end justify-between md:justify-center border-t md:border-t-0 pt-4 md:pt-0 border-slate-800/60">
         <a href="${ev.url}" target="_blank" class="border text-sm font-bold px-5 py-2.5 rounded-xl transition flex items-center gap-2.5 shadow-md ${btnStyle}">
             <span>View Event</span> <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
         </a>
     </div>
-</div>
-                    `;
+`;
                     cardsList.appendChild(card);
                 });
 
