@@ -32,3 +32,5 @@ jobs:
         with:
           commit_message: 'Auto-update Dinkspace event calendar data'
           file_pattern: 'events.json'
+
+ 
