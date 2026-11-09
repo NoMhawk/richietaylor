@@ -3,7 +3,7 @@
         "title": "Abingdon Festival",
         "date": "2026-11-15",
         "type": "Festival",
-        "url": "https://dinkspace.co.uk/dinkspace-schedule",
+        "url": "https://dinkspace.co.uk/festivals",
         "desc": "Official scheduled event: Abingdon Festival"
     },
     {
@@ -17,35 +17,35 @@
         "title": "Courtside (Stourbridge) Coaching Clinics",
         "date": "2026-11-24",
         "type": "Coaching",
-        "url": "https://dinkspace.co.uk/dinkspace-schedule",
+        "url": "https://dinkspace.co.uk/coachingclinics",
         "desc": "Official scheduled event: Courtside (Stourbridge) Coaching Clinics"
     },
     {
         "title": "Exeter Coaching Clinic",
         "date": "2026-11-28",
         "type": "Coaching",
-        "url": "https://dinkspace.co.uk/dinkspace-schedule",
+        "url": "https://dinkspace.co.uk/coachingclinics",
         "desc": "Official scheduled event: Exeter Coaching Clinic"
     },
     {
         "title": "London Christmas Festival",
         "date": "2026-12-20",
         "type": "Festival",
-        "url": "https://dinkspace.co.uk/dinkspace-schedule",
+        "url": "https://dinkspace.co.uk/festivals",
         "desc": "Official scheduled event: London Christmas Festival"
     },
     {
         "title": "Southampton Christmas Festival",
         "date": "2026-12-20",
         "type": "Festival",
-        "url": "https://dinkspace.co.uk/dinkspace-schedule",
+        "url": "https://dinkspace.co.uk/festivals",
         "desc": "Official scheduled event: Southampton Christmas Festival"
     },
     {
         "title": "Taunton Christmas Festival",
         "date": "2026-12-27",
         "type": "Festival",
-        "url": "https://dinkspace.co.uk/dinkspace-schedule",
+        "url": "https://dinkspace.co.uk/festivals",
         "desc": "Official scheduled event: Taunton Christmas Festival"
     }
 ]
