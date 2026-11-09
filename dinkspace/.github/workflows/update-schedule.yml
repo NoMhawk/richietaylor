@@ -1,0 +1,34 @@
+name: Update Dinkspace Schedule
+
+on:
+  scheduled:
+    - cron: '0 6 * * *' # Runs every day at 6:00 AM UTC
+  workflow_dispatch: # Allows you to trigger it manually anytime from GitHub
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required to allow the workflow to commit changes back to the repo
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install requests beautifulsoup4
+
+      - name: Run Scraper Script
+        run: python .github/scripts/scrape_dinkspace.py
+
+      - name: Auto-commit if events.json changed
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'Auto-update Dinkspace event calendar data'
+          file_pattern: 'events.json'
