@@ -38,11 +38,10 @@ def fetch_dinkspace_schedule():
     events = []
     today = datetime.now().date()
 
-    # Search broadly across list items, paragraphs, and div blocks
-    for element in soup.select('li, p, div'):
+    # Iterate through elements that contain links
+    for element in soup.select('li, p, div, span'):
         text = element.get_text(strip=True)
         
-        # Check if text contains a separator and schedule keywords
         if '-' in text and any(kw in text.lower() for kw in ['festival', 'coaching', 'tournament', 'break', 'clinic', 'training']):
             if len(text) < 150 and "Skip to Content" not in text:
                 parts = text.split('-', 1)
@@ -60,17 +59,28 @@ def fetch_dinkspace_schedule():
                 except Exception:
                     continue
 
-                # Check if there's a specific link inside this element
-                link_elem = element.find('a')
+                # Look for an <a> tag inside or attached to this element that contains an anchor/path
+                link_elem = element.find('a') or element.find_parent('a')
                 link = link_elem.get('href', '') if link_elem else ''
 
-                if link.startswith('http'):
-                    event_url = link
-                elif link.startswith('#'):
-                    event_url = f"https://dinkspace.co.uk/dinkspace-schedule{link}"
+                # Construct the correct URL preserving the #anchor hash
+                if '#ovat' in link or '#' in link:
+                    if link.startswith('http'):
+                        event_url = link
+                    elif link.startswith('#'):
+                        event_url = f"https://dinkspace.co.uk/dinkspace-schedule{link}"
+                    else:
+                        base_path = link.split('#')[0]
+                        anchor = '#' + link.split('#')[1]
+                        if not base_path or base_path == '/':
+                            event_url = f"https://dinkspace.co.uk/dinkspace-schedule{anchor}"
+                        else:
+                            clean_base = base_path if base_path.startswith('http') else f"https://dinkspace.co.uk{base_path if base_path.startswith('/') else '/' + base_path}"
+                            event_url = f"{clean_base}{anchor}"
                 elif link:
-                    event_url = f"https://dinkspace.co.uk{link if link.startswith('/') else '/' + link}"
+                    event_url = link if link.startswith('http') else f"https://dinkspace.co.uk{link if link.startswith('/') else '/' + link}"
                 else:
+                    # Fallback URL if no specific tag link is found
                     event_url = "https://dinkspace.co.uk/dinkspace-schedule"
 
                 # Classify Type
@@ -114,4 +124,4 @@ if __name__ == "__main__":
     output_path = os.path.join(output_dir, "events.json")
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4)
-    print(f"Successfully saved {len(data)} future events to {output_path}")
+    print(f"Successfully saved {len(data)} future events with anchors to {output_path}")
