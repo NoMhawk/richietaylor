@@ -1,0 +1,6 @@
+[
+    { "title": "Manor House Coaching Break", "date": "2026-11-30", "type": "Coaching", "location": "Manor House", "desc": "Multi-day intensive coaching holiday break." },
+    { "title": "London Christmas Festival", "date": "2026-12-20", "type": "Festival", "location": "London", "desc": "Festive social tournament and celebration event." },
+    { "title": "Southampton Christmas Festival", "date": "2026-12-20", "type": "Festival", "location": "Southampton", "desc": "Festive social tournament and celebration event." },
+    { "title": "Taunton Christmas Festival", "date": "2026-12-27", "type": "Festival", "location": "Taunton", "desc": "Post-Christmas celebration festival event." }
+]
