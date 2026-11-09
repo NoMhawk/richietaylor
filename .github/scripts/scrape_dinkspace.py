@@ -3,11 +3,11 @@ import json
 import requests
 import os
 import re
+from datetime import datetime
 
 URL = "https://dinkspace.co.uk/dinkspace-schedule"
 
 def parse_date_to_iso(date_str):
-    # Basic helper to map text dates to ISO format YYYY-MM-DD for 2026/2027
     months = {
         'january': '01', 'february': '02', 'march': '03', 'april': '04',
         'may': '05', 'june': '06', 'july': '07', 'august': '08',
@@ -16,13 +16,12 @@ def parse_date_to_iso(date_str):
     date_str = date_str.lower()
     for m_name, m_num in months.items():
         if m_name in date_str:
-            # Extract day number
             day_match = re.search(r'\b(\d{1,2})(?:st|nd|rd|th)?\b', date_str)
             if day_match:
                 day = day_match.group(1).zfill(2)
                 year = '2027' if m_num in ['01', '02', '03', '04'] and '2027' in date_str else '2026'
                 return f"{year}-{m_num}-{day}"
-    return "2026-11-01" # Default fallback
+    return None
 
 def fetch_dinkspace_schedule():
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
@@ -33,17 +32,25 @@ def fetch_dinkspace_schedule():
 
     soup = BeautifulSoup(response.text, 'html.parser')
     events = []
+    today = datetime.now().date()
 
-    # Target specific text blocks or list elements containing schedule info
     for element in soup.select('li, p, div, span'):
         text = element.get_text(strip=True)
         
-        # Look for typical schedule patterns like "7th November - Basingstoke Festival"
         if '-' in text and any(kw in text.lower() for kw in ['festival', 'coaching', 'tournament', 'break', 'clinic', 'training']):
             if len(text) < 120 and "Skip to Content" not in text:
                 parts = text.split('-', 1)
                 date_part = parts[0].strip()
                 title_part = parts[1].strip() if len(parts) > 1 else text
+
+                iso_date = parse_date_to_iso(date_part)
+                if not iso_date:
+                    continue
+
+                # Filter out past events automatically!
+                event_date = datetime.strptime(iso_date, "%Y-%m-%d").date()
+                if event_date < today:
+                    continue
 
                 ev_type = "Coaching"
                 if 'festival' in title_part.lower():
@@ -53,8 +60,6 @@ def fetch_dinkspace_schedule():
                 elif 'training' in title_part.lower():
                     ev_type = "Training"
 
-                iso_date = parse_date_to_iso(date_part)
-
                 events.append({
                     "title": title_part,
                     "date": iso_date,
@@ -63,7 +68,7 @@ def fetch_dinkspace_schedule():
                     "desc": f"Official scheduled event: {title_part}"
                 })
 
-    # Deduplicate events by title and date
+    # Deduplicate
     unique_events = []
     seen = set()
     for ev in events:
@@ -83,4 +88,4 @@ if __name__ == "__main__":
     output_path = os.path.join(output_dir, "events.json")
     with open(output_path, 'w') as f:
         json.dump(data, f, indent=4)
-    print(f"Successfully saved {len(data)} structured events to {output_path}")
+    print(f"Successfully saved {len(data)} future events to {output_path}")
