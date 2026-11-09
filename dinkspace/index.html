@@ -3,147 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dinkspace Live Calendar | Richietaylor.net</title>
+    <title>Dinkspace Schedule | Richietaylor.net</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
-    </style>
 </head>
 <body class="bg-[#0f172a] text-slate-100 font-sans min-h-screen">
 
-    <div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto px-4 py-10">
         
-        <!-- Header & Controls -->
+        <!-- Header -->
         <header class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 bg-[#1e293b] p-6 rounded-2xl border border-slate-800 shadow-xl">
             <div class="flex items-center gap-4 mb-4 md:mb-0">
-                <div class="bg-emerald-500 text-slate-950 p-3 rounded-xl font-black text-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                <div class="bg-emerald-500 text-slate-950 p-3.5 rounded-xl font-black text-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
                     <i class="fa-solid fa-calendar-days"></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-black tracking-tight text-white" id="month-display">Loading...</h1>
-                    <p class="text-xs text-emerald-400 font-medium tracking-wide uppercase mt-0.5">Live Dinkspace Schedule (richietaylor.net)</p>
+                    <h1 class="text-2xl font-black tracking-tight text-white">Dinkspace Event Schedule</h1>
+                    <p class="text-xs text-emerald-400 font-medium tracking-wide uppercase mt-0.5">Upcoming Festivals, Coaching & Tournaments</p>
                 </div>
             </div>
 
-            <!-- Month Navigator & Filters -->
-            <div class="flex flex-wrap items-center gap-3">
-                <div class="flex bg-slate-900 rounded-xl p-1 border border-slate-700">
-                    <button onclick="changeMonth(-1)" class="px-3 py-1.5 text-sm rounded-lg hover:bg-slate-800 text-slate-300 transition"><i class="fa-solid fa-chevron-left"></i></button>
-                    <span id="month-year-label" class="px-4 py-1.5 text-sm font-bold text-emerald-400 flex items-center">...</span>
-                    <button onclick="changeMonth(1)" class="px-3 py-1.5 text-sm rounded-lg hover:bg-slate-800 text-slate-300 transition"><i class="fa-solid fa-chevron-right"></i></button>
-                </div>
-                <select id="type-filter" onchange="renderCalendar()" class="bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-xl px-4 py-2.5 font-medium focus:outline-none focus:border-emerald-500 transition">
-                    <option value="all">All Event Types</option>
-                    <option value="Festival">Festivals</option>
-                    <option value="Coaching">Coaching</option>
-                    <option value="Tournament">Tournaments</option>
-                    <option value="Training">Training</option>
-                </select>
+            <!-- Filters -->
+            <div class="flex flex-wrap gap-2">
+                <button onclick="filterEvents('all')" id="btn-all" class="px-3.5 py-2 text-xs font-bold rounded-lg bg-emerald-500 text-slate-950 transition shadow">All</button>
+                <button onclick="filterEvents('Festival')" id="btn-Festival" class="px-3.5 py-2 text-xs font-bold rounded-lg bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-700 transition">Festivals</button>
+                <button onclick="filterEvents('Coaching')" id="btn-Coaching" class="px-3.5 py-2 text-xs font-bold rounded-lg bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-700 transition">Coaching</button>
+                <button onclick="filterEvents('Training')" id="btn-Training" class="px-3.5 py-2 text-xs font-bold rounded-lg bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-700 transition">Training</button>
             </div>
         </header>
 
-        <!-- Traditional Calendar Container -->
-        <div class="bg-[#1e293b] rounded-2xl border border-slate-800 shadow-2xl overflow-hidden">
-            <div class="calendar-grid bg-slate-950/60 border-b border-slate-800 text-center py-3 text-xs font-bold text-slate-400 tracking-wider uppercase">
-                <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div class="text-emerald-400">Sat</div><div class="text-emerald-400">Sun</div>
-            </div>
-            <div id="calendar-days" class="calendar-grid bg-slate-900/40 divide-y divide-x divide-slate-800/60">
-                <!-- Injected dynamically -->
-            </div>
+        <!-- Timeline / Agenda Container -->
+        <div id="agenda-container" class="space-y-4">
+            <!-- Dynamically populated from events.json -->
+            <div class="text-center py-12 text-slate-500">Loading schedule...</div>
         </div>
     </div>
 
     <script>
-        let events = [];
-        let currentYear = new Date().getFullYear();
-        let currentMonth = new Date().getMonth();
-        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        let allEvents = [];
 
-        // Fetch the dynamically generated events.json from your server route
         async function loadEvents() {
             try {
                 const response = await fetch('./events.json');
-                events = await response.json();
-                renderCalendar();
+                allEvents = await response.json();
+                renderAgenda('all');
             } catch (error) {
-                console.error("Could not load dynamic events data:", error);
-                document.getElementById('month-display').innerText = "Failed to load events.json";
+                console.error("Error loading events.json:", error);
+                document.getElementById('agenda-container').innerHTML = `
+                    <div class="bg-slate-900 border border-rose-500/30 p-6 rounded-xl text-center text-rose-400 text-sm">
+                        Could not load event data. Please verify events.json exists in the dinkspace folder.
+                    </div>`;
             }
         }
 
-        function changeMonth(direction) {
-            currentMonth += direction;
-            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
-            else if (currentMonth < 0) { currentMonth = 11; currentYear--; }
-            renderCalendar();
+        function filterEvents(type) {
+            // Update button styles
+            ['all', 'Festival', 'Coaching', 'Training'].forEach(t => {
+                const btn = document.getElementById(`btn-${t}`);
+                if (t === type) {
+                    btn.className = "px-3.5 py-2 text-xs font-bold rounded-lg bg-emerald-500 text-slate-950 transition shadow";
+                } else {
+                    btn.className = "px-3.5 py-2 text-xs font-bold rounded-lg bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-700 transition";
+                }
+            });
+            renderAgenda(type);
         }
 
-        function renderCalendar() {
-            const grid = document.getElementById('calendar-days');
-            grid.innerHTML = '';
-            const filterVal = document.getElementById('type-filter').value;
-            
-            document.getElementById('month-display').innerText = `${monthNames[currentMonth]} ${currentYear}`;
-            document.getElementById('month-year-label').innerText = `${monthNames[currentMonth].slice(0,3)} ${currentYear}`;
+        function renderAgenda(filter) {
+            const container = document.getElementById('agenda-container');
+            container.innerHTML = '';
 
-            const firstDayIndex = (new Date(currentYear, currentMonth, 1).getDay() + 6) % 7;
-            const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
-            const prevDays = new Date(currentYear, currentMonth, 0).getDate();
-            let cellsCount = 0;
+            const filtered = filter === 'all' ? allEvents : allEvents.filter(e => e.type === filter);
 
-            // Previous month trailing days
-            for (let i = firstDayIndex; i > 0; i--) {
-                grid.appendChild(createCell(prevDays - i + 1, true, ''));
-                cellsCount++;
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-slate-500 bg-[#1e293b] rounded-2xl border border-slate-800">No events found for this category.</div>`;
+                return;
             }
 
-            // Current month days
-            for (let day = 1; day <= totalDays; day++) {
-                const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                grid.appendChild(createCell(day, false, dateStr, filterVal));
-                cellsCount++;
-            }
+            filtered.forEach(ev => {
+                let badgeStyle = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
+                if (ev.type === 'Festival') badgeStyle = 'bg-purple-500/10 text-purple-400 border-purple-500/30';
+                if (ev.type === 'Tournament') badgeStyle = 'bg-amber-500/10 text-amber-400 border-amber-500/30';
+                if (ev.type === 'Training') badgeStyle = 'bg-sky-500/10 text-sky-400 border-sky-500/30';
 
-            // Next month leading padding
-            let nextDay = 1;
-            while (cellsCount % 7 !== 0) {
-                grid.appendChild(createCell(nextDay++, true, ''));
-                cellsCount++;
-            }
+                // Format date nicely (e.g., Sat, Nov 7, 2026)
+                let formattedDate = ev.date;
+                try {
+                    const d = new Date(ev.date);
+                    formattedDate = d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+                } catch(e) {}
+
+                const card = document.createElement('div');
+                card.className = "bg-[#1e293b] border border-slate-800 rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-slate-700 transition shadow-lg";
+                card.innerHTML = `
+                    <div class="space-y-1.5">
+                        <div class="flex items-center gap-3">
+                            <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${badgeStyle}">${ev.type}</span>
+                            <span class="text-xs text-emerald-400 font-medium flex items-center gap-1.5">
+                                <i class="fa-regular fa-calendar"></i> ${formattedDate}
+                            </span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white">${ev.title}</h3>
+                        <p class="text-sm text-slate-400 flex items-center gap-1.5">
+                            <i class="fa-solid fa-location-dot text-rose-400"></i> ${ev.location}
+                        </p>
+                        <p class="text-sm text-slate-300 pt-1">${ev.desc}</p>
+                    </div>
+                    <div class="flex md:flex-col items-end justify-between md:justify-center border-t md:border-t-0 pt-3 md:pt-0 border-slate-800">
+                        <a href="https://dinkspace.co.uk/dinkspace-schedule" target="_blank" class="bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 text-xs font-semibold px-4 py-2 rounded-xl transition flex items-center gap-2">
+                            <span>View Site</span> <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                        </a>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
         }
 
-        function createCell(dayNum, isMuted, dateStr, filterVal = 'all') {
-            const cell = document.createElement('div');
-            cell.className = `min-h-[110px] md:min-h-[130px] p-2 flex flex-col justify-between transition ${isMuted ? 'bg-slate-950/30 opacity-40' : 'bg-slate-900/20 hover:bg-slate-800/40'}`;
-            
-            const isToday = new Date().toISOString().slice(0, 10) === dateStr;
-            cell.innerHTML = `
-                <div class="flex justify-between items-center text-xs font-bold mb-1">
-                    <span class="${isToday ? 'bg-emerald-500 text-slate-950 px-1.5 py-0.5 rounded-md' : 'text-slate-400'}">${dayNum}</span>
-                </div>
-                <div class="space-y-1 overflow-y-auto max-h-[85px] pr-0.5" id="cell-${dateStr}"></div>
-            `;
-
-            if (dateStr) {
-                const container = cell.querySelector(`#cell-${dateStr}`);
-                const dayEvents = events.filter(ev => ev.date === dateStr && (filterVal === 'all' || ev.type === filterVal));
-                
-                dayEvents.forEach(ev => {
-                    let badgeStyle = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
-                    if (ev.type === 'Festival') badgeStyle = 'bg-purple-500/10 text-purple-400 border-purple-500/30';
-                    if (ev.type === 'Tournament') badgeStyle = 'bg-amber-500/10 text-amber-400 border-amber-500/30';
-                    
-                    const badge = document.createElement('div');
-                    badge.className = `text-[10px] font-semibold px-2 py-1 rounded border truncate cursor-pointer ${badgeStyle}`;
-                    badge.innerText = ev.title;
-                    container.appendChild(badge);
-                });
-            }
-            return cell;
-        }
-
-        // Initialize on page load
         loadEvents();
     </script>
 </body>
