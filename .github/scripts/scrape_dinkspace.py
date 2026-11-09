@@ -6,6 +6,24 @@ import re
 
 URL = "https://dinkspace.co.uk/dinkspace-schedule"
 
+def parse_date_to_iso(date_str):
+    # Basic helper to map text dates to ISO format YYYY-MM-DD for 2026/2027
+    months = {
+        'january': '01', 'february': '02', 'march': '03', 'april': '04',
+        'may': '05', 'june': '06', 'july': '07', 'august': '08',
+        'september': '09', 'october': '10', 'november': '11', 'december': '12'
+    }
+    date_str = date_str.lower()
+    for m_name, m_num in months.items():
+        if m_name in date_str:
+            # Extract day number
+            day_match = re.search(r'\b(\d{1,2})(?:st|nd|rd|th)?\b', date_str)
+            if day_match:
+                day = day_match.group(1).zfill(2)
+                year = '2027' if m_num in ['01', '02', '03', '04'] and '2027' in date_str else '2026'
+                return f"{year}-{m_num}-{day}"
+    return "2026-11-01" # Default fallback
+
 def fetch_dinkspace_schedule():
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
     response = requests.get(URL, headers=headers)
@@ -16,39 +34,45 @@ def fetch_dinkspace_schedule():
     soup = BeautifulSoup(response.text, 'html.parser')
     events = []
 
-    # Look specifically for list items, blocks, or text nodes where event schedules are typically listed
-    # Adjust this selector based on the exact container element Dinkspace uses
-    content_area = soup.select_one('main') or soup.select_one('.entry-content') or soup
-    
-    text_blob = content_area.get_text(separator="\n", strip=True)
-    lines = text_blob.split('\n')
+    # Target specific text blocks or list elements containing schedule info
+    for element in soup.select('li, p, div, span'):
+        text = element.get_text(strip=True)
+        
+        # Look for typical schedule patterns like "7th November - Basingstoke Festival"
+        if '-' in text and any(kw in text.lower() for kw in ['festival', 'coaching', 'tournament', 'break', 'clinic', 'training']):
+            if len(text) < 120 and "Skip to Content" not in text:
+                parts = text.split('-', 1)
+                date_part = parts[0].strip()
+                title_part = parts[1].strip() if len(parts) > 1 else text
 
-    # Target lines that look like events (e.g., containing dates and keywords)
-    for line in lines:
-        line = line.strip()
-        # Look for lines containing typical event keywords and date patterns
-        if any(kw in line.lower() for kw in ['festival', 'coaching', 'tournament', 'break', 'clinic', 'training']) and len(line) < 150:
-            
-            # Determine category type
-            ev_type = "Coaching"
-            if 'festival' in line.lower():
-                ev_type = "Festival"
-            elif 'tournament' in line.lower() or 'slam' in line.lower() or 'championships' in line.lower():
-                ev_type = "Tournament"
-            elif 'training' in line.lower():
-                ev_type = "Training"
+                ev_type = "Coaching"
+                if 'festival' in title_part.lower():
+                    ev_type = "Festival"
+                elif 'tournament' in title_part.lower() or 'slam' in title_part.lower() or 'championships' in title_part.lower():
+                    ev_type = "Tournament"
+                elif 'training' in title_part.lower():
+                    ev_type = "Training"
 
-            # Simple date extractor fallback (or default to current year/season)
-            # You can refine this regex or mapping based on Dinkspace's exact text format
-            events.append({
-                "title": line,
-                "date": "2026-11-07", # Default parsed date mapping example
-                "type": ev_type,
-                "location": "Dinkspace Venue",
-                "desc": "Official scheduled event listed on Dinkspace."
-            })
+                iso_date = parse_date_to_iso(date_part)
 
-    return events
+                events.append({
+                    "title": title_part,
+                    "date": iso_date,
+                    "type": ev_type,
+                    "location": "Dinkspace Venue",
+                    "desc": f"Official scheduled event: {title_part}"
+                })
+
+    # Deduplicate events by title and date
+    unique_events = []
+    seen = set()
+    for ev in events:
+        identifier = (ev['title'], ev['date'])
+        if identifier not in seen:
+            seen.add(identifier)
+            unique_events.append(ev)
+
+    return unique_events
 
 if __name__ == "__main__":
     data = fetch_dinkspace_schedule()
