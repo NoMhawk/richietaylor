@@ -38,13 +38,13 @@ def fetch_dinkspace_schedule():
     events = []
     today = datetime.now().date()
 
-    # Safely iterate through links and text blocks
-    for element in soup.select('li a, p a, div a, h3 a'):
+    # Search broadly across list items, paragraphs, and div blocks
+    for element in soup.select('li, p, div'):
         text = element.get_text(strip=True)
-        link = element.get('href', '')
         
+        # Check if text contains a separator and schedule keywords
         if '-' in text and any(kw in text.lower() for kw in ['festival', 'coaching', 'tournament', 'break', 'clinic', 'training']):
-            if len(text) < 120 and "Skip to Content" not in text:
+            if len(text) < 150 and "Skip to Content" not in text:
                 parts = text.split('-', 1)
                 date_part = parts[0].strip()
                 title_part = parts[1].strip() if len(parts) > 1 else text
@@ -60,7 +60,10 @@ def fetch_dinkspace_schedule():
                 except Exception:
                     continue
 
-                # Format URL
+                # Check if there's a specific link inside this element
+                link_elem = element.find('a')
+                link = link_elem.get('href', '') if link_elem else ''
+
                 if link.startswith('http'):
                     event_url = link
                 elif link.startswith('#'):
@@ -112,4 +115,3 @@ if __name__ == "__main__":
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4)
     print(f"Successfully saved {len(data)} future events to {output_path}")
-
