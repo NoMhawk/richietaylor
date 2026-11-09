@@ -25,16 +25,20 @@ def parse_date_to_iso(date_str):
 
 def fetch_dinkspace_schedule():
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-    response = requests.get(URL, headers=headers)
-    if response.status_code != 200:
-        print("Failed to fetch schedule page.")
+    try:
+        response = requests.get(URL, headers=headers, timeout=10)
+        if response.status_code != 200:
+            print(f"Failed to fetch schedule page, status code: {response.status_code}")
+            return []
+    except Exception as e:
+        print(f"Error fetching URL: {e}")
         return []
 
     soup = BeautifulSoup(response.text, 'html.parser')
     events = []
     today = datetime.now().date()
 
-    # Look specifically for anchor tags (links) inside list items or text blocks
+    # Safely iterate through links and text blocks
     for element in soup.select('li a, p a, div a, h3 a'):
         text = element.get_text(strip=True)
         link = element.get('href', '')
@@ -49,11 +53,14 @@ def fetch_dinkspace_schedule():
                 if not iso_date:
                     continue
 
-                event_date = datetime.strptime(iso_date, "%Y-%m-%d").date()
-                if event_date < today:
+                try:
+                    event_date = datetime.strptime(iso_date, "%Y-%m-%d").date()
+                    if event_date < today:
+                        continue
+                except Exception:
                     continue
 
-                # Format the full URL properly (handling relative links or anchors like #sotonchristmasfest)
+                # Format URL
                 if link.startswith('http'):
                     event_url = link
                 elif link.startswith('#'):
@@ -63,20 +70,18 @@ def fetch_dinkspace_schedule():
                 else:
                     event_url = "https://dinkspace.co.uk/dinkspace-schedule"
 
-# Inside fetch_dinkspace_schedule() where ev_type is determined:
-title_lower = title_part.lower()
+                # Classify Type
+                title_lower = title_part.lower()
+                ev_type = "Coaching"
+                if 'festival' in title_lower:
+                    ev_type = "Festival"
+                elif any(kw in title_lower for kw in ['tournament', 'slam', 'championships', 'open']):
+                    ev_type = "Tournament"
+                elif any(kw in title_lower for kw in ['training', 'squad', 'team']):
+                    ev_type = "Training"
+                elif any(kw in title_lower for kw in ['clinic', 'break', 'coaching']):
+                    ev_type = "Coaching"
 
-ev_type = "Coaching"
-if 'festival' in title_lower:
-    ev_type = "Festival"
-elif any(kw in title_lower for kw in ['tournament', 'slam', 'championships', 'open']):
-    ev_type = "Tournament"
-elif any(kw in title_lower for kw in ['training', 'squad', 'team']):
-    ev_type = "Training"
-elif any(kw in title_lower for kw in ['clinic', 'break', 'coaching']):
-    ev_type = "Coaching"
-
-    
                 events.append({
                     "title": title_part,
                     "date": iso_date,
@@ -104,6 +109,6 @@ if __name__ == "__main__":
     os.makedirs(output_dir, exist_ok=True)
     
     output_path = os.path.join(output_dir, "events.json")
-    with open(output_path, 'w') as f:
+    with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4)
-    print(f"Successfully saved {len(data)} future events with direct links to {output_path}")
+    print(f"Successfully saved {len(data)} future events to {output_path}")
