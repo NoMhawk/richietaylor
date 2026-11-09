@@ -38,7 +38,6 @@ def fetch_dinkspace_schedule():
     events = []
     today = datetime.now().date()
 
-    # Search broadly across list items, paragraphs, and div blocks
     for element in soup.select('li, p, div, span'):
         text = element.get_text(strip=True)
         
@@ -59,36 +58,36 @@ def fetch_dinkspace_schedule():
                 except Exception:
                     continue
 
-                # Extract precise anchor links (#hashes) from the element or its children
+                # Properly extract the full href (preserving routes like /festivals#basingstokenov)
                 event_url = "https://dinkspace.co.uk/dinkspace-schedule"
                 
-                # Search all <a> tags within the element block for anchors
                 for a_tag in element.find_all('a'):
                     href = a_tag.get('href', '')
-                    if '#' in href:
+                    if href:
                         if href.startswith('http'):
                             event_url = href
+                        elif href.startswith('/'):
+                            event_url = f"https://dinkspace.co.uk{href}"
                         elif href.startswith('#'):
                             event_url = f"https://dinkspace.co.uk/dinkspace-schedule{href}"
                         else:
-                            base = href.split('#')[0]
-                            anchor = '#' + href.split('#')[1]
-                            clean_base = base if base.startswith('http') else f"https://dinkspace.co.uk{base if base.startswith('/') else '/' + base}" if base else "https://dinkspace.co.uk/dinkspace-schedule"
-                            event_url = f"{clean_base.split('#')[0]}{anchor}"
+                            event_url = f"https://dinkspace.co.uk/{href}"
                         break
                 
-                # Fallback regex search on element HTML if no direct <a> tag matched
-                if '#' not in event_url:
+                # Regex fallback if no direct <a> tag was found inside the element
+                if event_url == "https://dinkspace.co.uk/dinkspace-schedule":
                     html_str = str(element)
-                    match_href = re.search(r'href=["\']([^"\']*#[^"\']*)["\']', html_str)
+                    match_href = re.search(r'href=["\']([^"\']+)["\']', html_str)
                     if match_href:
                         found_link = match_href.group(1)
-                        if found_link.startswith('#'):
-                            event_url = f"https://dinkspace.co.uk/dinkspace-schedule{found_link}"
-                        elif found_link.startswith('http'):
+                        if found_link.startswith('http'):
                             event_url = found_link
+                        elif found_link.startswith('/'):
+                            event_url = f"https://dinkspace.co.uk{found_link}"
+                        elif found_link.startswith('#'):
+                            event_url = f"https://dinkspace.co.uk/dinkspace-schedule{found_link}"
                         else:
-                            event_url = f"https://dinkspace.co.uk{found_link if found_link.startswith('/') else '/' + found_link}"
+                            event_url = f"https://dinkspace.co.uk/{found_link}"
 
                 # Classify Event Type
                 title_lower = title_part.lower()
@@ -130,4 +129,4 @@ if __name__ == "__main__":
     output_path = os.path.join(output_dir, "events.json")
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4)
-    print(f"Successfully saved {len(data)} future events with anchors to {output_path}")
+    print(f"Successfully saved {len(data)} future events with correct paths to {output_path}")
