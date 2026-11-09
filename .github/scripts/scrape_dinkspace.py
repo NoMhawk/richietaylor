@@ -34,33 +34,51 @@ def fetch_dinkspace_schedule():
     events = []
     today = datetime.now().date()
 
-# Inside your element loop in fetch_dinkspace_schedule():
-for element in soup.select('li a, p a, div a'):
-    text = element.get_text(strip=True)
-    link = element.get('href', 'https://dinkspace.co.uk/dinkspace-schedule')
-    
-    if '-' in text and any(kw in text.lower() for kw in ['festival', 'coaching', 'tournament', 'break', 'clinic', 'training']):
-        if len(text) < 120 and "Skip to Content" not in text:
-            parts = text.split('-', 1)
-            date_part = parts[0].strip()
-            title_part = parts[1].strip() if len(parts) > 1 else text
-            
-            iso_date = parse_date_to_iso(date_part)
-            if not iso_date:
-                continue
+    # Look specifically for anchor tags (links) inside list items or text blocks
+    for element in soup.select('li a, p a, div a, h3 a'):
+        text = element.get_text(strip=True)
+        link = element.get('href', '')
+        
+        if '-' in text and any(kw in text.lower() for kw in ['festival', 'coaching', 'tournament', 'break', 'clinic', 'training']):
+            if len(text) < 120 and "Skip to Content" not in text:
+                parts = text.split('-', 1)
+                date_part = parts[0].strip()
+                title_part = parts[1].strip() if len(parts) > 1 else text
 
-            event_date = datetime.strptime(iso_date, "%Y-%m-%d").date()
-            if event_date < today:
-                continue
+                iso_date = parse_date_to_iso(date_part)
+                if not iso_date:
+                    continue
 
-            events.append({
-                "title": title_part,
-                "date": iso_date,
-                "type": "Festival" if 'festival' in title_part.lower() else "Coaching",
-                "location": "Dinkspace Venue",
-                "url": link if link.startswith('http') else f"https://dinkspace.co.uk{link}",
-                "desc": f"Official scheduled event: {title_part}"
-            })
+                event_date = datetime.strptime(iso_date, "%Y-%m-%d").date()
+                if event_date < today:
+                    continue
+
+                # Format the full URL properly (handling relative links or anchors like #sotonchristmasfest)
+                if link.startswith('http'):
+                    event_url = link
+                elif link.startswith('#'):
+                    event_url = f"https://dinkspace.co.uk/dinkspace-schedule{link}"
+                elif link:
+                    event_url = f"https://dinkspace.co.uk{link if link.startswith('/') else '/' + link}"
+                else:
+                    event_url = "https://dinkspace.co.uk/dinkspace-schedule"
+
+                ev_type = "Coaching"
+                if 'festival' in title_part.lower():
+                    ev_type = "Festival"
+                elif 'tournament' in title_part.lower() or 'slam' in title_part.lower() or 'championships' in title_part.lower():
+                    ev_type = "Tournament"
+                elif 'training' in title_part.lower():
+                    ev_type = "Training"
+
+                events.append({
+                    "title": title_part,
+                    "date": iso_date,
+                    "type": ev_type,
+                    "location": "Dinkspace Venue",
+                    "url": event_url,
+                    "desc": f"Official scheduled event: {title_part}"
+                })
 
     # Deduplicate
     unique_events = []
@@ -82,4 +100,4 @@ if __name__ == "__main__":
     output_path = os.path.join(output_dir, "events.json")
     with open(output_path, 'w') as f:
         json.dump(data, f, indent=4)
-    print(f"Successfully saved {len(data)} future events to {output_path}")
+    print(f"Successfully saved {len(data)} future events with direct links to {output_path}")
