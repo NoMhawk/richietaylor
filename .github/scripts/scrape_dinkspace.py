@@ -34,39 +34,33 @@ def fetch_dinkspace_schedule():
     events = []
     today = datetime.now().date()
 
-    for element in soup.select('li, p, div, span'):
-        text = element.get_text(strip=True)
-        
-        if '-' in text and any(kw in text.lower() for kw in ['festival', 'coaching', 'tournament', 'break', 'clinic', 'training']):
-            if len(text) < 120 and "Skip to Content" not in text:
-                parts = text.split('-', 1)
-                date_part = parts[0].strip()
-                title_part = parts[1].strip() if len(parts) > 1 else text
+# Inside your element loop in fetch_dinkspace_schedule():
+for element in soup.select('li a, p a, div a'):
+    text = element.get_text(strip=True)
+    link = element.get('href', 'https://dinkspace.co.uk/dinkspace-schedule')
+    
+    if '-' in text and any(kw in text.lower() for kw in ['festival', 'coaching', 'tournament', 'break', 'clinic', 'training']):
+        if len(text) < 120 and "Skip to Content" not in text:
+            parts = text.split('-', 1)
+            date_part = parts[0].strip()
+            title_part = parts[1].strip() if len(parts) > 1 else text
+            
+            iso_date = parse_date_to_iso(date_part)
+            if not iso_date:
+                continue
 
-                iso_date = parse_date_to_iso(date_part)
-                if not iso_date:
-                    continue
+            event_date = datetime.strptime(iso_date, "%Y-%m-%d").date()
+            if event_date < today:
+                continue
 
-                # Filter out past events automatically!
-                event_date = datetime.strptime(iso_date, "%Y-%m-%d").date()
-                if event_date < today:
-                    continue
-
-                ev_type = "Coaching"
-                if 'festival' in title_part.lower():
-                    ev_type = "Festival"
-                elif 'tournament' in title_part.lower() or 'slam' in title_part.lower() or 'championships' in title_part.lower():
-                    ev_type = "Tournament"
-                elif 'training' in title_part.lower():
-                    ev_type = "Training"
-
-                events.append({
-                    "title": title_part,
-                    "date": iso_date,
-                    "type": ev_type,
-                    "location": "Dinkspace Venue",
-                    "desc": f"Official scheduled event: {title_part}"
-                })
+            events.append({
+                "title": title_part,
+                "date": iso_date,
+                "type": "Festival" if 'festival' in title_part.lower() else "Coaching",
+                "location": "Dinkspace Venue",
+                "url": link if link.startswith('http') else f"https://dinkspace.co.uk{link}",
+                "desc": f"Official scheduled event: {title_part}"
+            })
 
     # Deduplicate
     unique_events = []
