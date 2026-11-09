@@ -1,198 +1,184 @@
 [
     {
-        "title": "Manor House Coaching Break",
-        "date": "2026-11-07",
+        "title": "5th November-Manor House Coaching Break",
+        "date": "2026-11-01",
         "type": "Coaching",
         "location": "Dinkspace Venue",
-        "desc": "Official scheduled event listed on Dinkspace."
+        "desc": "Official scheduled event: 5th November-Manor House Coaching Break"
     },
     {
         "title": "Basingstoke Festival",
         "date": "2026-11-07",
         "type": "Festival",
         "location": "Dinkspace Venue",
-        "desc": "Official scheduled event listed on Dinkspace."
+        "desc": "Official scheduled event: Basingstoke Festival"
     },
     {
         "title": "Exeter Coaching Clinic",
         "date": "2026-11-07",
         "type": "Coaching",
         "location": "Dinkspace Venue",
-        "desc": "Official scheduled event listed on Dinkspace."
+        "desc": "Official scheduled event: Exeter Coaching Clinic"
     },
     {
         "title": "Basingstoke Improver Coaching Clinic",
-        "date": "2026-11-07",
+        "date": "2026-11-08",
         "type": "Coaching",
         "location": "Dinkspace Venue",
-        "desc": "Official scheduled event listed on Dinkspace."
+        "desc": "Official scheduled event: Basingstoke Improver Coaching Clinic"
     },
     {
         "title": "Abingdon Festival",
-        "date": "2026-11-07",
+        "date": "2026-11-15",
         "type": "Festival",
         "location": "Dinkspace Venue",
-        "desc": "Official scheduled event listed on Dinkspace."
+        "desc": "Official scheduled event: Abingdon Festival"
     },
     {
-        "title": "- Somerset County Team Training",
-        "date": "2026-11-07",
+        "title": "Somerset County Team Training",
+        "date": "2026-11-21",
         "type": "Training",
         "location": "Dinkspace Venue",
-        "desc": "Official scheduled event listed on Dinkspace."
+        "desc": "Official scheduled event: Somerset County Team Training"
     },
     {
         "title": "Courtside (Stourbridge) Coaching Clinics",
-        "date": "2026-11-07",
+        "date": "2026-11-24",
         "type": "Coaching",
         "location": "Dinkspace Venue",
-        "desc": "Official scheduled event listed on Dinkspace."
+        "desc": "Official scheduled event: Courtside (Stourbridge) Coaching Clinics"
     },
     {
         "title": "Exeter Coaching Clinic",
-        "date": "2026-11-07",
+        "date": "2026-11-28",
         "type": "Coaching",
         "location": "Dinkspace Venue",
-        "desc": "Official scheduled event listed on Dinkspace."
+        "desc": "Official scheduled event: Exeter Coaching Clinic"
     },
     {
-        "title": "Manor House Coaching Break",
-        "date": "2026-11-07",
+        "title": "4th Dec-Manor House Coaching Break",
+        "date": "2026-11-01",
         "type": "Coaching",
         "location": "Dinkspace Venue",
-        "desc": "Official scheduled event listed on Dinkspace."
-    },
-    {
-        "title": "Manor House Coaching Break",
-        "date": "2026-11-07",
-        "type": "Coaching",
-        "location": "Dinkspace Venue",
-        "desc": "Official scheduled event listed on Dinkspace."
+        "desc": "Official scheduled event: 4th Dec-Manor House Coaching Break"
     },
     {
         "title": "London Christmas Festival",
-        "date": "2026-11-07",
+        "date": "2026-12-20",
         "type": "Festival",
         "location": "Dinkspace Venue",
-        "desc": "Official scheduled event listed on Dinkspace."
+        "desc": "Official scheduled event: London Christmas Festival"
     },
     {
         "title": "Southampton Christmas Festival",
-        "date": "2026-11-07",
+        "date": "2026-12-20",
         "type": "Festival",
         "location": "Dinkspace Venue",
-        "desc": "Official scheduled event listed on Dinkspace."
+        "desc": "Official scheduled event: Southampton Christmas Festival"
     },
     {
         "title": "Taunton Christmas Festival",
-        "date": "2026-11-07",
+        "date": "2026-12-27",
         "type": "Festival",
         "location": "Dinkspace Venue",
-        "desc": "Official scheduled event listed on Dinkspace."
+        "desc": "Official scheduled event: Taunton Christmas Festival"
     },
     {
-        "title": "Southampton September Festival",
-        "date": "2026-11-07",
+        "title": "Southampton September Festival13th September -Swansea September Festival",
+        "date": "2026-09-13",
         "type": "Festival",
         "location": "Dinkspace Venue",
-        "desc": "Official scheduled event listed on Dinkspace."
-    },
-    {
-        "title": "Swansea September Festival",
-        "date": "2026-11-07",
-        "type": "Festival",
-        "location": "Dinkspace Venue",
-        "desc": "Official scheduled event listed on Dinkspace."
+        "desc": "Official scheduled event: Southampton September Festival13th September -Swansea September Festival"
     },
     {
         "title": "Manor House Coaching Break",
-        "date": "2026-11-07",
+        "date": "2026-09-21",
         "type": "Coaching",
         "location": "Dinkspace Venue",
-        "desc": "Official scheduled event listed on Dinkspace."
+        "desc": "Official scheduled event: Manor House Coaching Break"
     },
     {
         "title": "Taunton September Festival",
-        "date": "2026-11-07",
+        "date": "2026-09-27",
         "type": "Festival",
         "location": "Dinkspace Venue",
-        "desc": "Official scheduled event listed on Dinkspace."
+        "desc": "Official scheduled event: Taunton September Festival"
     },
     {
-        "title": "Manor House Coaching Break",
-        "date": "2026-11-07",
+        "title": "9th  October -Manor House Coaching Break(3 spaces)",
+        "date": "2026-11-01",
         "type": "Coaching",
         "location": "Dinkspace Venue",
-        "desc": "Official scheduled event listed on Dinkspace."
+        "desc": "Official scheduled event: 9th  October -Manor House Coaching Break(3 spaces)"
     },
     {
         "title": "Basingstoke Festival",
-        "date": "2026-11-07",
+        "date": "2026-10-10",
         "type": "Festival",
         "location": "Dinkspace Venue",
-        "desc": "Official scheduled event listed on Dinkspace."
+        "desc": "Official scheduled event: Basingstoke Festival"
     },
     {
         "title": "Basingstoke Coaching Clinic Advanced",
-        "date": "2026-11-07",
+        "date": "2026-10-11",
         "type": "Coaching",
         "location": "Dinkspace Venue",
-        "desc": "Official scheduled event listed on Dinkspace."
+        "desc": "Official scheduled event: Basingstoke Coaching Clinic Advanced"
     },
     {
-        "title": "Belfast Coaching Clinics",
-        "date": "2026-11-07",
+        "title": "Belfast Coaching Clinics(FULL)",
+        "date": "2026-10-10",
         "type": "Coaching",
         "location": "Dinkspace Venue",
-        "desc": "Official scheduled event listed on Dinkspace."
+        "desc": "Official scheduled event: Belfast Coaching Clinics(FULL)"
     },
     {
         "title": "Swansea Festival",
-        "date": "2026-11-07",
+        "date": "2026-10-18",
         "type": "Festival",
         "location": "Dinkspace Venue",
-        "desc": "Official scheduled event listed on Dinkspace."
+        "desc": "Official scheduled event: Swansea Festival"
     },
     {
-        "title": "Exeter Grand Slam Coaching Clinic",
-        "date": "2026-11-07",
-        "type": "Tournament",
-        "location": "Dinkspace Venue",
-        "desc": "Official scheduled event listed on Dinkspace."
-    },
-    {
-        "title": "Pre-English Open Coaching Clinic Southampton",
-        "date": "2026-11-07",
+        "title": "7th August",
+        "date": "2026-11-01",
         "type": "Coaching",
         "location": "Dinkspace Venue",
-        "desc": "Official scheduled event listed on Dinkspace."
+        "desc": "Official scheduled event: 7th August"
     },
     {
-        "title": "Pre-English Open Coaching Clinic Abingdon",
-        "date": "2026-11-07",
+        "title": "English Open Coaching Clinic Southampton-9th August",
+        "date": "2026-11-01",
         "type": "Coaching",
         "location": "Dinkspace Venue",
-        "desc": "Official scheduled event listed on Dinkspace."
+        "desc": "Official scheduled event: English Open Coaching Clinic Southampton-9th August"
     },
     {
-        "title": "Manor House Coaching Break",
-        "date": "2026-11-07",
+        "title": "English Open Coaching Clinic Abingdon-9th August",
+        "date": "2026-11-01",
         "type": "Coaching",
         "location": "Dinkspace Venue",
-        "desc": "Official scheduled event listed on Dinkspace."
+        "desc": "Official scheduled event: English Open Coaching Clinic Abingdon-9th August"
     },
     {
-        "title": "Basingstoke August Festival",
-        "date": "2026-11-07",
-        "type": "Festival",
-        "location": "Dinkspace Venue",
-        "desc": "Official scheduled event listed on Dinkspace."
-    },
-    {
-        "title": "Basingstoke Intermediate Coaching Clinic",
-        "date": "2026-11-07",
+        "title": "24th August",
+        "date": "2026-11-01",
         "type": "Coaching",
         "location": "Dinkspace Venue",
-        "desc": "Official scheduled event listed on Dinkspace."
+        "desc": "Official scheduled event: 24th August"
+    },
+    {
+        "title": "29th August",
+        "date": "2026-11-01",
+        "type": "Coaching",
+        "location": "Dinkspace Venue",
+        "desc": "Official scheduled event: 29th August"
+    },
+    {
+        "title": "30th August",
+        "date": "2026-11-01",
+        "type": "Coaching",
+        "location": "Dinkspace Venue",
+        "desc": "Official scheduled event: 30th August"
     }
 ]
