@@ -3,14 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dinkspace Traditional Event Calendar</title>
+    <title>Dinkspace Live Calendar | Richietaylor.net</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, minmax(0, 1fr));
-        }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
     </style>
 </head>
 <body class="bg-[#0f172a] text-slate-100 font-sans min-h-screen">
@@ -24,8 +21,8 @@
                     <i class="fa-solid fa-calendar-days"></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-black tracking-tight text-white" id="month-display">November 2026</h1>
-                    <p class="text-xs text-emerald-400 font-medium tracking-wide uppercase mt-0.5">Dinkspace Event Schedule</p>
+                    <h1 class="text-2xl font-black tracking-tight text-white" id="month-display">Loading...</h1>
+                    <p class="text-xs text-emerald-400 font-medium tracking-wide uppercase mt-0.5">Live Dinkspace Schedule (richietaylor.net)</p>
                 </div>
             </div>
 
@@ -33,7 +30,7 @@
             <div class="flex flex-wrap items-center gap-3">
                 <div class="flex bg-slate-900 rounded-xl p-1 border border-slate-700">
                     <button onclick="changeMonth(-1)" class="px-3 py-1.5 text-sm rounded-lg hover:bg-slate-800 text-slate-300 transition"><i class="fa-solid fa-chevron-left"></i></button>
-                    <span id="month-year-label" class="px-4 py-1.5 text-sm font-bold text-emerald-400 flex items-center">Nov 2026</span>
+                    <span id="month-year-label" class="px-4 py-1.5 text-sm font-bold text-emerald-400 flex items-center">...</span>
                     <button onclick="changeMonth(1)" class="px-3 py-1.5 text-sm rounded-lg hover:bg-slate-800 text-slate-300 transition"><i class="fa-solid fa-chevron-right"></i></button>
                 </div>
                 <select id="type-filter" onchange="renderCalendar()" class="bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-xl px-4 py-2.5 font-medium focus:outline-none focus:border-emerald-500 transition">
@@ -48,176 +45,106 @@
 
         <!-- Traditional Calendar Container -->
         <div class="bg-[#1e293b] rounded-2xl border border-slate-800 shadow-2xl overflow-hidden">
-            
-            <!-- Weekdays Header -->
             <div class="calendar-grid bg-slate-950/60 border-b border-slate-800 text-center py-3 text-xs font-bold text-slate-400 tracking-wider uppercase">
                 <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div class="text-emerald-400">Sat</div><div class="text-emerald-400">Sun</div>
             </div>
-
-            <!-- Days Grid -->
             <div id="calendar-days" class="calendar-grid bg-slate-900/40 divide-y divide-x divide-slate-800/60">
-                <!-- Dynamically injected cells -->
+                <!-- Injected dynamically -->
             </div>
-        </div>
-    </div>
-
-    <!-- Event Detail Modal -->
-    <div id="event-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-        <div class="bg-[#1e293b] border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
-            <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            <span id="modal-tag" class="text-xs font-bold px-2.5 py-1 rounded-full border mb-3 inline-block"></span>
-            <h3 id="modal-title" class="text-xl font-bold text-white mb-2"></h3>
-            <p id="modal-date" class="text-sm text-emerald-400 font-medium mb-1 flex items-center gap-2"><i class="fa-regular fa-calendar"></i> <span></span></p>
-            <p id="modal-location" class="text-sm text-slate-400 mb-4 flex items-center gap-2"><i class="fa-solid fa-location-dot text-rose-400"></i> <span></span></p>
-            <p id="modal-desc" class="text-sm text-slate-300 leading-relaxed mb-6 bg-slate-900/50 p-3.5 rounded-xl border border-slate-800"></p>
-            <a id="modal-link" href="https://dinkspace.co.uk/dinkspace-schedule" target="_blank" class="w-full block text-center bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-2.5 rounded-xl transition shadow-lg">View on Dinkspace Site</a>
         </div>
     </div>
 
     <script>
-        // Centralized Dinkspace Schedule Dataset (2026/2027)
-        const events = [
-            { title: "Basingstoke November Festival", date: "2026-11-07", type: "Festival", location: "Hampshire Court Hotel", desc: "15 acrylic courts festival event featuring social brackets." },
-            { title: "Exeter Coaching Clinic", date: "2026-11-07", type: "Coaching", location: "Exeter", desc: "Targeted skill sessions and strategy clinics with professional guidance." },
-            { title: "Basingstoke Improver Coaching Clinic", date: "2026-11-08", type: "Coaching", location: "Basingstoke", desc: "Improver level tactical drills and court positioning mastery." },
-            { title: "Abingdon Festival", date: "2026-11-15", type: "Festival", location: "Abingdon", desc: "Open community festival format for all tiers." },
-            { title: "Somerset County Team Training", date: "2026-11-21", type: "Training", location: "Somerset", desc: "Squad tactical training and competitive match practice." },
-            { title: "Courtside Coaching Clinics", date: "2026-11-24", type: "Coaching", location: "Stourbridge", desc: "Specialist clinics hosted at Courtside facilities." },
-            { title: "Exeter Coaching Clinic", date: "2026-11-28", type: "Coaching", location: "Exeter", desc: "Advanced and intermediate stroke breakdown sessions." },
-            { title: "Manor House Coaching Break", date: "2026-11-30", type: "Coaching", location: "Manor House", desc: "Start of multi-day intensive coaching holiday break (Nov 30 - Dec 4)." },
-            { title: "Manor House Coaching Break (Day 2)", date: "2026-12-01", type: "Coaching", location: "Manor House", desc: "Intensive training block continuing at Manor House." },
-            { title: "Manor House Coaching Break (Day 3)", date: "2026-12-02", type: "Coaching", location: "Manor House", desc: "Intensive training block continuing at Manor House." },
-            { title: "Manor House Coaching Break (Day 4)", date: "2026-12-03", type: "Coaching", location: "Manor House", desc: "Intensive training block continuing at Manor House." },
-            { title: "Manor House Coaching Break (Final Day)", date: "2026-12-04", type: "Coaching", location: "Manor House", desc: "Final sessions and wrap up of Manor House coaching break." },
-            { title: "London Christmas Festival", date: "2026-12-20", type: "Festival", location: "London", desc: "Festive social tournament and celebration event." },
-            { title: "Southampton Christmas Festival", date: "2026-12-20", type: "Festival", location: "Southampton", desc: "Festive social tournament and celebration event." },
-            { title: "Taunton Christmas Festival", date: "2026-12-27", type: "Festival", location: "Taunton", desc: "Post-Christmas holiday celebration festival event." }
-        ];
-
-        let currentYear = 2026;
-        let currentMonth = 10; // November (0-indexed)
-
+        let events = [];
+        let currentYear = new Date().getFullYear();
+        let currentMonth = new Date().getMonth();
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        // Fetch the dynamically generated events.json from your server route
+        async function loadEvents() {
+            try {
+                const response = await fetch('./events.json');
+                events = await response.json();
+                renderCalendar();
+            } catch (error) {
+                console.error("Could not load dynamic events data:", error);
+                document.getElementById('month-display').innerText = "Failed to load events.json";
+            }
+        }
 
         function changeMonth(direction) {
             currentMonth += direction;
-            if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
-            } else if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
-            }
+            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+            else if (currentMonth < 0) { currentMonth = 11; currentYear--; }
             renderCalendar();
         }
 
         function renderCalendar() {
             const grid = document.getElementById('calendar-days');
             grid.innerHTML = '';
-
             const filterVal = document.getElementById('type-filter').value;
             
             document.getElementById('month-display').innerText = `${monthNames[currentMonth]} ${currentYear}`;
             document.getElementById('month-year-label').innerText = `${monthNames[currentMonth].slice(0,3)} ${currentYear}`;
 
-            // First day of the month index (Mon = 0 ... Sun = 6)
             const firstDayIndex = (new Date(currentYear, currentMonth, 1).getDay() + 6) % 7;
             const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
             const prevDays = new Date(currentYear, currentMonth, 0).getDate();
-
             let cellsCount = 0;
 
-            // Padding days from previous month
+            // Previous month trailing days
             for (let i = firstDayIndex; i > 0; i--) {
-                const dayNum = prevDays - i + 1;
-                grid.appendChild(createCell(dayNum, true, getFormattedDate(currentMonth === 0 ? currentYear - 1 : currentYear, currentMonth === 0 ? 11 : currentMonth - 1, dayNum)));
+                grid.appendChild(createCell(prevDays - i + 1, true, ''));
                 cellsCount++;
             }
 
             // Current month days
             for (let day = 1; day <= totalDays; day++) {
-                const dateStr = getFormattedDate(currentYear, currentMonth, day);
+                const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 grid.appendChild(createCell(day, false, dateStr, filterVal));
                 cellsCount++;
             }
 
-            // Trailing padding days for complete grid row layout (ensure 35 or 42 cells total)
-            let nextMonthDay = 1;
+            // Next month leading padding
+            let nextDay = 1;
             while (cellsCount % 7 !== 0) {
-                const dateStr = getFormattedDate(currentMonth === 11 ? currentYear + 1 : currentYear, currentMonth === 11 ? 0 : currentMonth + 1, nextMonthDay);
-                grid.appendChild(createCell(nextMonthDay, true, dateStr));
-                nextMonthDay++;
+                grid.appendChild(createCell(nextDay++, true, ''));
                 cellsCount++;
             }
-        }
-
-        function getFormattedDate(year, month, day) {
-            const m = String(month + 1).padStart(2, '0');
-            const d = String(day).padStart(2, '0');
-            return `${year}-${m}-${d}`;
         }
 
         function createCell(dayNum, isMuted, dateStr, filterVal = 'all') {
             const cell = document.createElement('div');
             cell.className = `min-h-[110px] md:min-h-[130px] p-2 flex flex-col justify-between transition ${isMuted ? 'bg-slate-950/30 opacity-40' : 'bg-slate-900/20 hover:bg-slate-800/40'}`;
             
-            const dayHeader = document.createElement('div');
-            dayHeader.className = "flex justify-between items-center text-xs font-bold mb-1";
-            
             const isToday = new Date().toISOString().slice(0, 10) === dateStr;
-            
-            dayHeader.innerHTML = `
-                <span class="${isToday ? 'bg-emerald-500 text-slate-950 px-1.5 py-0.5 rounded-md' : 'text-slate-400'}">${dayNum}</span>
+            cell.innerHTML = `
+                <div class="flex justify-between items-center text-xs font-bold mb-1">
+                    <span class="${isToday ? 'bg-emerald-500 text-slate-950 px-1.5 py-0.5 rounded-md' : 'text-slate-400'}">${dayNum}</span>
+                </div>
+                <div class="space-y-1 overflow-y-auto max-h-[85px] pr-0.5" id="cell-${dateStr}"></div>
             `;
-            cell.appendChild(dayHeader);
 
-            const eventsContainer = document.createElement('div');
-            eventsContainer.className = "space-y-1 overflow-y-auto max-h-[85px] pr-0.5";
-
-            const dayEvents = events.filter(ev => ev.date === dateStr && (filterVal === 'all' || ev.type === filterVal));
-
-            dayEvents.forEach(ev => {
-                let badgeStyle = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
-                if (ev.type === 'Festival') badgeStyle = 'bg-purple-500/10 text-purple-400 border-purple-500/30';
-                if (ev.type === 'Tournament') badgeStyle = 'bg-amber-500/10 text-amber-400 border-amber-500/30';
-                if (ev.type === 'Training') badgeStyle = 'bg-sky-500/10 text-sky-400 border-sky-500/30';
-
-                const badge = document.createElement('div');
-                badge.className = `text-[10px] font-semibold px-2 py-1 rounded border truncate cursor-pointer transition hover:opacity-80 ${badgeStyle}`;
-                badge.innerText = `${ev.title}`;
-                badge.onclick = () => openModal(ev);
-                eventsContainer.appendChild(badge);
-            });
-
-            cell.appendChild(eventsContainer);
+            if (dateStr) {
+                const container = cell.querySelector(`#cell-${dateStr}`);
+                const dayEvents = events.filter(ev => ev.date === dateStr && (filterVal === 'all' || ev.type === filterVal));
+                
+                dayEvents.forEach(ev => {
+                    let badgeStyle = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
+                    if (ev.type === 'Festival') badgeStyle = 'bg-purple-500/10 text-purple-400 border-purple-500/30';
+                    if (ev.type === 'Tournament') badgeStyle = 'bg-amber-500/10 text-amber-400 border-amber-500/30';
+                    
+                    const badge = document.createElement('div');
+                    badge.className = `text-[10px] font-semibold px-2 py-1 rounded border truncate cursor-pointer ${badgeStyle}`;
+                    badge.innerText = ev.title;
+                    container.appendChild(badge);
+                });
+            }
             return cell;
         }
 
-        function openModal(ev) {
-            document.getElementById('modal-title').innerText = ev.title;
-            document.getElementById('modal-date').querySelector('span').innerText = ev.date;
-            document.getElementById('modal-location').querySelector('span').innerText = ev.location;
-            document.getElementById('modal-desc').innerText = ev.desc;
-            
-            const tag = document.getElementById('modal-tag');
-            tag.innerText = ev.type;
-            tag.className = "text-xs font-bold px-2.5 py-1 rounded-full border mb-3 inline-block";
-            if (ev.type === 'Festival') tag.classList.add('bg-purple-500/10', 'text-purple-400', 'border-purple-500/20');
-            else if (ev.type === 'Tournament') tag.classList.add('bg-amber-500/10', 'text-amber-400', 'border-amber-500/20');
-            else if (ev.type === 'Training') tag.classList.add('bg-sky-500/10', 'text-sky-400', 'border-sky-500/20');
-            else tag.classList.add('bg-emerald-500/10', 'text-emerald-400', 'border-emerald-500/20');
-
-            document.getElementById('event-modal').classList.remove('hidden');
-            document.getElementById('event-modal').classList.add('flex');
-        }
-
-        function closeModal() {
-            document.getElementById('event-modal').classList.add('hidden');
-            document.getElementById('event-modal').classList.remove('flex');
-        }
-
-        // Initialize grid on load
-        renderCalendar();
+        // Initialize on page load
+        loadEvents();
     </script>
 </body>
 </html>
