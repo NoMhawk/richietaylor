@@ -1,6 +1,17 @@
 [
-    { "title": "Manor House Coaching Break", "date": "2026-11-30", "type": "Coaching", "location": "Manor House", "desc": "Multi-day intensive coaching holiday break." },
+    { "title": "Manor House Coaching Break", "date": "2026-11-02", "type": "Coaching", "location": "Manor House", "desc": "Multi-day intensive coaching holiday break (Nov 2-5)." },
+    { "title": "Manor House Coaching Break (Day 2)", "date": "2026-11-03", "type": "Coaching", "location": "Manor House", "desc": "Intensive training block continuing at Manor House." },
+    { "title": "Manor House Coaching Break (Day 3)", "date": "2026-11-04", "type": "Coaching", "location": "Manor House", "desc": "Intensive training block continuing at Manor House." },
+    { "title": "Manor House Coaching Break (Final Day)", "date": "2026-11-05", "type": "Coaching", "location": "Manor House", "desc": "Final sessions and wrap up of Manor House coaching break." },
+    { "title": "Basingstoke Festival", "date": "2026-11-07", "type": "Festival", "location": "Basingstoke", "desc": "Acrylic courts festival event featuring social brackets." },
+    { "title": "Exeter Coaching Clinic", "date": "2026-11-07", "type": "Coaching", "location": "Exeter", "desc": "Targeted skill sessions and strategy clinics with professional guidance." },
+    { "title": "Basingstoke Improver Coaching Clinic", "date": "2026-11-08", "type": "Coaching", "location": "Basingstoke", "desc": "Improver level tactical drills and court positioning mastery." },
+    { "title": "Abingdon Festival", "date": "2026-11-15", "type": "Festival", "location": "Abingdon", "desc": "Open community festival format for all tiers." },
+    { "title": "Somerset County Team Training", "date": "2026-11-21", "type": "Training", "location": "Somerset", "desc": "Squad tactical training and competitive match practice." },
+    { "title": "Courtside (Stourbridge) Coaching Clinics", "date": "2026-11-24", "type": "Coaching", "location": "Stourbridge", "desc": "Specialist clinics hosted at Courtside facilities." },
+    { "title": "Exeter Coaching Clinic", "date": "2026-11-28", "type": "Coaching", "location": "Exeter", "desc": "Advanced and intermediate stroke breakdown sessions." },
+    { "title": "Manor House Coaching Break", "date": "2026-11-30", "type": "Coaching", "location": "Manor House", "desc": "Start of multi-day intensive coaching holiday break (Nov 30 - Dec 4)." },
     { "title": "London Christmas Festival", "date": "2026-12-20", "type": "Festival", "location": "London", "desc": "Festive social tournament and celebration event." },
     { "title": "Southampton Christmas Festival", "date": "2026-12-20", "type": "Festival", "location": "Southampton", "desc": "Festive social tournament and celebration event." },
-    { "title": "Taunton Christmas Festival", "date": "2026-12-27", "type": "Festival", "location": "Taunton", "desc": "Post-Christmas celebration festival event." }
+    { "title": "Taunton Christmas Festival", "date": "2026-12-27", "type": "Festival", "location": "Taunton", "desc": "Post-Christmas holiday celebration festival event." }
 ]
