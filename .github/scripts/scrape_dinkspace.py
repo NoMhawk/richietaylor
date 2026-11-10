@@ -117,7 +117,11 @@ def fetch_dinkspace_schedule():
 if __name__ == "__main__":
     data = fetch_dinkspace_schedule()
     
-    output_path = "events.json"
+    # Ensure the dinkspace directory exists, then save inside it
+    output_dir = "dinkspace"
+    os.makedirs(output_dir, exist_ok=True)
+    
+    output_path = os.path.join(output_dir, "events.json")
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4)
-    print(f"Successfully saved {len(data)} events with explicit anchor URLs to {output_path}")
+    print(f"Successfully saved {len(data)} events to {output_path}")
