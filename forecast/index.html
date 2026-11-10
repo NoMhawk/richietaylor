@@ -467,7 +467,7 @@
             errBanner.classList.add('hidden');
 
             // Include sunrise & sunset in daily parameters
-            const mainUrl = `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&elevation=${CONFIG.elevation}&hourly=temperature_2m,dew_point_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,wind_speed_10m,wind_direction_10m,wind_gusts_10m,surface_pressure,visibility&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,sunrise,sunset&timezone=${CONFIG.timezone}`;
+const mainUrl = `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&elevation=${CONFIG.elevation}&hourly=temperature_2m,dew_point_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,wind_speed_10m,wind_direction_10m,wind_gusts_10m,surface_pressure,visibility&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,sunrise,sunset&timezone=${CONFIG.timezone}`;
             
             const modelsConfig = [
                 { key: 'ecmwf_ifs025', url: `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&models=ecmwf_ifs025&timezone=${CONFIG.timezone}` },
@@ -828,7 +828,8 @@
             const hourlyGrid = document.getElementById('active-hourly-grid');
             hourlyGrid.innerHTML = '';
 
-            let hourHeaders = `<tr><th class="param-label"></th>`;
+let hourHeaders = `<tr><th class="param-label"></th>`;
+            let tempRow = `<tr><td class="param-label">Temp (°C)</td>`; // Added Ground Temperature Row
             let windRow = `<tr><td class="param-label">Wind (mph)</td>`;
             let gustRow = `<tr><td class="param-label">Gusts (mph)</td>`;
             let rainRow = `<tr><td class="param-label">Rain (%)</td>`;
@@ -902,7 +903,7 @@
                 const hFog = fogStatus === 'FOG' || fogStatus === 'MIST' || vis < 3;
                 const hIcon = getWeatherIcon(hFog ? 45 : code, rain);
 
-                let eventBadge = '';
+let eventBadge = '';
                 if (sunriseHour === hourNum && sunriseMinStr) {
                     eventBadge += `<div style="font-size: 0.55rem; background: #fef3c7; color: #b45309; border: 1px solid #fcd34d; padding: 0.05rem 0.2rem; border-radius: 0.2rem; margin-bottom: 0.15rem; font-weight: 700; text-align: center;">Sunrise ${sunriseMinStr}</div>`;
                 }
@@ -913,6 +914,7 @@
                 const headerContent = `${eventBadge}${timeLabel}${nowTag}`;
 
                 hourHeaders += `<th class="${colClass}">${headerContent}</th>`;
+                tempRow += `<td class="${colClass}" style="font-weight: 700; color: var(--text-main);">${temp}°</td>`; // Populating Temperature Cell
                 windRow += `<td class="${colClass}">${getTrafficBadge('wind', wSpd)}</td>`;
                 gustRow += `<td class="${colClass}">${getTrafficBadge('gust', wGST)}</td>`;
                 rainRow += `<td class="${colClass}">${getTrafficBadge('rain', rain, '%')}</td>`;
@@ -1032,9 +1034,10 @@
             baseRow += `</tr>`;
             fogRow += `</tr>`;
 
-            document.getElementById('master-traffic-matrix').innerHTML = `
+document.getElementById('master-traffic-matrix').innerHTML = `
                 <thead>${hourHeaders}</thead>
                 <tbody>
+                    ${tempRow}
                     ${windRow}
                     ${gustRow}
                     ${rainRow}
@@ -1044,6 +1047,8 @@
                     ${fogRow}
                 </tbody>
             `;
+
+            
         }
 
         // =====================================================================
