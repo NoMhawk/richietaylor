@@ -588,11 +588,17 @@ const mainUrl = `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitu
             }
         }
 
-        function calculateDayMetrics(dayIndex, hourly) {
+function calculateDayMetrics(dayIndex, hourly) {
             const daily = globalWeatherData.daily;
             const targetDateStr = daily.time[dayIndex];
             let dayStart = hourly.time.findIndex(t => t.startsWith(targetDateStr) && t.includes('08:00'));
             if (dayStart === -1) dayStart = (dayIndex * 24) + 8;
+
+            // Get exact sunset hour for this specific day if available
+            let sunsetHour = 18; // Default fallback fallback
+            if (daily.sunset && daily.sunset[dayIndex]) {
+                sunsetHour = new Date(daily.sunset[dayIndex]).getHours();
+            }
 
             let scoreSum = 0;
             let evaluatedHours = 0;
@@ -600,6 +606,12 @@ const mainUrl = `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitu
             let hasFogWarning = false;
 
             for (let h = dayStart; h < Math.min(dayStart + 11, hourly.time.length); h++) {
+                const timeStr = hourly.time[h];
+                const hourNum = parseInt(timeStr.split('T')[1].split(':')[0]);
+
+                // Do not count hours at or after sunset towards jumpability
+                if (hourNum >= sunsetHour) continue;
+
                 const ws = kmhToMph(hourly.wind_speed_10m[h]);
                 const wg = kmhToMph(hourly.wind_gusts_10m[h]);
                 const rn = hourly.precipitation_probability[h];
@@ -611,8 +623,8 @@ const mainUrl = `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitu
                 const lw = hourly.cloud_cover_low[h] || 0;
                 const totCloud = hourly.cloud_cover ? hourly.cloud_cover[h] : lw;
                 const base = calculateCloudbaseAGL(tp, dp, lw, hm, cd, totCloud);
-                
                 const isFog = (vs < 1.0) || ((cd >= 45 && cd <= 48) && vs < 3.0) || (vs < 5.0 && hm >= 90 && (tp - dp) <= 1.5);
+                
                 if (base < 1000) hasLowCloudbase = true;
                 if (isFog) hasFogWarning = true;
 
@@ -844,14 +856,21 @@ let hourHeaders = `<tr><th class="param-label"></th>`;
                 { key: 'icon_seamless', label: 'ICON' },
                 { key: 'meteofrance_seamless', label: 'Meteo' }
             ];
-
-            for (let i = validStart; i < Math.min(validStart + hoursCount, hourly.time.length); i++) {
+for (let i = validStart; i < Math.min(validStart + hoursCount, hourly.time.length); i++) {
                 const timeStr = hourly.time[i];
                 const hourObj = new Date(timeStr);
                 const hourNum = hourObj.getHours();
+
+                // Skip rendering any hours at or after sunset
+                if (sunsetHour !== -1 && hourNum >= sunsetHour) {
+                    continue;
+                }
+
                 const timeLabel = hourObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
                 const isCurrentHour = timeStr.startsWith(currentLocalHourStr);
                 const colClass = isCurrentHour ? ' current-col' : '';
+                
+                // ... (rest of your hourly card and table row building logic remains unchanged)
                 
                 let modelWindSum = 0;
                 let modelGustSum = 0;
