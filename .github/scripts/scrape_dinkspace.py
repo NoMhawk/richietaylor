@@ -7,17 +7,6 @@ from datetime import datetime
 
 URL = "https://dinkspace.co.uk/dinkspace-schedule"
 
-# Explicit mapping for exact URLs with their # anchors
-EVENT_URL_OVERRIDES = {
-    "abingdon festival": "https://dinkspace.co.uk/festivals#abingdonnov",
-    "somerset county team training": "https://dinkspace.co.uk/dinkspace-schedule#somersetnov",
-    "courtside (stourbridge) coaching clinics": "https://dinkspace.co.uk/coachingclinics#courtsidenov",
-    "exeter coaching clinic": "https://dinkspace.co.uk/coachingclinics#exeternov",
-    "london christmas festival": "https://dinkspace.co.uk/festivals#londondec",
-    "southampton christmas festival": "https://dinkspace.co.uk/festivals#southamptondec",
-    "taunton christmas festival": "https://dinkspace.co.uk/festivals#tauntondec"
-}
-
 def parse_date_to_iso(date_str):
     months = {
         'january': '01', 'february': '02', 'march': '03', 'april': '04',
@@ -49,7 +38,8 @@ def fetch_dinkspace_schedule():
     events = []
     today = datetime.now().date()
 
-    for element in soup.select('li, p, div, span'):
+    # Look for any element or directly through <a> tags that contain event text
+    for element in soup.select('li, p, div, span, a'):
         text = element.get_text(strip=True)
         
         if '-' in text and any(kw in text.lower() for kw in ['festival', 'coaching', 'tournament', 'break', 'clinic', 'training']):
@@ -69,6 +59,25 @@ def fetch_dinkspace_schedule():
                 except Exception:
                     continue
 
+                # Extract the exact href directly from the element or its parent <a> tag
+                raw_href = ""
+                a_tag = element if element.name == 'a' else element.find('a') or element.find_parent('a')
+                if a_tag and a_tag.has_attr('href'):
+                    raw_href = a_tag['href']
+
+                # Format the URL cleanly based on what was found in the href
+                if raw_href:
+                    if raw_href.startswith('http'):
+                        event_url = raw_href
+                    elif raw_href.startswith('/'):
+                        event_url = f"https://dinkspace.co.uk{raw_href}"
+                    elif raw_href.startswith('#'):
+                        event_url = f"https://dinkspace.co.uk/dinkspace-schedule{raw_href}"
+                    else:
+                        event_url = f"https://dinkspace.co.uk/{raw_href}"
+                else:
+                    event_url = URL
+
                 # Classify Event Type
                 title_lower = title_part.lower()
                 ev_type = "Coaching"
@@ -81,25 +90,11 @@ def fetch_dinkspace_schedule():
                 elif any(kw in title_lower for kw in ['clinic', 'break', 'coaching']):
                     ev_type = "Coaching"
 
-                # Check if we have an explicit override mapping for this title
-                matched_url = "https://dinkspace.co.uk/dinkspace-schedule"
-                for key, url_val in EVENT_URL_OVERRIDES.items():
-                    if key in title_lower:
-                        matched_url = url_val
-                        break
-                
-                # Fallback default subpage routes if not explicitly mapped
-                if matched_url == "https://dinkspace.co.uk/dinkspace-schedule":
-                    if ev_type == "Festival":
-                        matched_url = "https://dinkspace.co.uk/festivals"
-                    elif ev_type == "Coaching":
-                        matched_url = "https://dinkspace.co.uk/coachingclinics"
-
                 events.append({
                     "title": title_part,
                     "date": iso_date,
                     "type": ev_type,
-                    "url": matched_url,
+                    "url": event_url,
                     "desc": f"Official scheduled event: {title_part}"
                 })
 
@@ -117,11 +112,10 @@ def fetch_dinkspace_schedule():
 if __name__ == "__main__":
     data = fetch_dinkspace_schedule()
     
-    # Ensure the dinkspace directory exists, then save inside it
     output_dir = "dinkspace"
     os.makedirs(output_dir, exist_ok=True)
     
     output_path = os.path.join(output_dir, "events.json")
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4)
-    print(f"Successfully saved {len(data)} events to {output_path}")
+    print(f"Successfully saved {len(data)} events with direct page links to {output_path}")
