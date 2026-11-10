@@ -23,6 +23,29 @@ def parse_date_to_iso(date_str):
                 return f"{year}-{m_num}-{day}"
     return None
 
+def find_anchor_on_subpage(subpage_url, event_title):
+    """Fetches the subpage (e.g., /festivals) and looks for an anchor ID or heading matching the event."""
+    try:
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        res = requests.get(subpage_url, headers=headers, timeout=5)
+        if res.status_code != 200:
+            return subpage_url
+        
+        soup = BeautifulSoup(res.text, 'html.parser')
+        slug_keywords = re.sub(r'[^a-z0-9]', '', event_title.lower())
+        
+        # Search for headings or elements with IDs matching parts of the event title
+        for tag in soup.find_all(['h1', 'h2', 'h3', 'div', 'section'], id=True):
+            tag_id = tag['id'].lower()
+            clean_id = re.sub(r'[^a-z0-9]', '', tag_id)
+            if any(word in clean_id for word in slug_keywords.split() if len(word) > 3):
+                base_clean = subpage_url.split('#')[0]
+                return f"{base_clean}#{tag['id']}"
+                
+    except Exception:
+        pass
+    return subpage_url
+
 def fetch_dinkspace_schedule():
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
     try:
@@ -58,54 +81,43 @@ def fetch_dinkspace_schedule():
                 except Exception:
                     continue
 
-                # Properly extract the full href (preserving routes like /festivals#basingstokenov)
-                event_url = "https://dinkspace.co.uk/dinkspace-schedule"
-                
+                # Determine base subpage URL from <a> tag or default mapping
+                base_url = "https://dinkspace.co.uk/dinkspace-schedule"
                 for a_tag in element.find_all('a'):
                     href = a_tag.get('href', '')
                     if href:
                         if href.startswith('http'):
-                            event_url = href
+                            base_url = href.split('#')[0]
                         elif href.startswith('/'):
-                            event_url = f"https://dinkspace.co.uk{href}"
-                        elif href.startswith('#'):
-                            event_url = f"https://dinkspace.co.uk/dinkspace-schedule{href}"
+                            base_url = f"https://dinkspace.co.uk{href.split('#')[0]}"
                         else:
-                            event_url = f"https://dinkspace.co.uk/{href}"
+                            base_url = f"https://dinkspace.co.uk/{href.split('#')[0]}"
                         break
                 
-                # Regex fallback if no direct <a> tag was found inside the element
-                if event_url == "https://dinkspace.co.uk/dinkspace-schedule":
-                    html_str = str(element)
-                    match_href = re.search(r'href=["\']([^"\']+)["\']', html_str)
-                    if match_href:
-                        found_link = match_href.group(1)
-                        if found_link.startswith('http'):
-                            event_url = found_link
-                        elif found_link.startswith('/'):
-                            event_url = f"https://dinkspace.co.uk{found_link}"
-                        elif found_link.startswith('#'):
-                            event_url = f"https://dinkspace.co.uk/dinkspace-schedule{found_link}"
-                        else:
-                            event_url = f"https://dinkspace.co.uk/{found_link}"
-
                 # Classify Event Type
                 title_lower = title_part.lower()
                 ev_type = "Coaching"
                 if 'festival' in title_lower:
                     ev_type = "Festival"
+                    if base_url == "https://dinkspace.co.uk/dinkspace-schedule":
+                        base_url = "https://dinkspace.co.uk/festivals"
                 elif any(kw in title_lower for kw in ['tournament', 'slam', 'championships', 'open']):
                     ev_type = "Tournament"
                 elif any(kw in title_lower for kw in ['training', 'squad', 'team']):
                     ev_type = "Training"
                 elif any(kw in title_lower for kw in ['clinic', 'break', 'coaching']):
                     ev_type = "Coaching"
+                    if base_url == "https://dinkspace.co.uk/dinkspace-schedule":
+                        base_url = "https://dinkspace.co.uk/coachingclinics"
+
+                # Automatically resolve the precise anchor ID on the subpage
+                final_url = find_anchor_on_subpage(base_url, title_part)
 
                 events.append({
                     "title": title_part,
                     "date": iso_date,
                     "type": ev_type,
-                    "url": event_url,
+                    "url": final_url,
                     "desc": f"Official scheduled event: {title_part}"
                 })
 
@@ -123,10 +135,7 @@ def fetch_dinkspace_schedule():
 if __name__ == "__main__":
     data = fetch_dinkspace_schedule()
     
-    output_dir = "dinkspace"
-    os.makedirs(output_dir, exist_ok=True)
-    
-    output_path = os.path.join(output_dir, "events.json")
+    output_path = "events.json"
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4)
-    print(f"Successfully saved {len(data)} future events with correct paths to {output_path}")
+    print(f"Successfully saved {len(data)} future events with deep links to {output_path}")
