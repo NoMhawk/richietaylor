@@ -38,65 +38,65 @@ def fetch_dinkspace_schedule():
     events = []
     today = datetime.now().date()
 
-    # Look for any element or directly through <a> tags that contain event text
-    for element in soup.select('li, p, div, span, a'):
-        text = element.get_text(strip=True)
-        
-        if '-' in text and any(kw in text.lower() for kw in ['festival', 'coaching', 'tournament', 'break', 'clinic', 'training']):
-            if len(text) < 150 and "Skip to Content" not in text:
-                parts = text.split('-', 1)
-                date_part = parts[0].strip()
-                title_part = parts[1].strip() if len(parts) > 1 else text
-
-                iso_date = parse_date_to_iso(date_part)
-                if not iso_date:
-                    continue
-
-                try:
-                    event_date = datetime.strptime(iso_date, "%Y-%m-%d").date()
-                    if event_date < today:
-                        continue
-                except Exception:
-                    continue
-
-                # Extract the exact href directly from the element or its parent <a> tag
-                raw_href = ""
-                a_tag = element if element.name == 'a' else element.find('a') or element.find_parent('a')
-                if a_tag and a_tag.has_attr('href'):
-                    raw_href = a_tag['href']
-
-                # Format the URL cleanly based on what was found in the href
-                if raw_href:
-                    if raw_href.startswith('http'):
-                        event_url = raw_href
-                    elif raw_href.startswith('/'):
-                        event_url = f"https://dinkspace.co.uk{raw_href}"
-                    elif raw_href.startswith('#'):
-                        event_url = f"https://dinkspace.co.uk/dinkspace-schedule{raw_href}"
+    # Directly target all <a> tags that contain a hash (#) anchor in their href
+    for a_tag in soup.find_all('a', href=True):
+        href = a_tag['href']
+        if '#' in href:
+            text = a_tag.get_text(strip=True)
+            
+            # Check if the button/link text contains event keywords and a separator
+            if '-' in text or any(kw in text.lower() for kw in ['festival', 'coaching', 'tournament', 'break', 'clinic', 'training', 'november', 'december', 'january', 'february', 'march', 'april']):
+                if len(text) < 100 and "Skip to Content" not in text:
+                    
+                    # Split title and date if formatted with a dash, otherwise use full text as title
+                    if '-' in text:
+                        parts = text.split('-', 1)
+                        date_part = parts[0].strip()
+                        title_part = parts[1].strip()
                     else:
-                        event_url = f"https://dinkspace.co.uk/{raw_href}"
-                else:
-                    event_url = URL
+                        date_part = text
+                        title_part = text
 
-                # Classify Event Type
-                title_lower = title_part.lower()
-                ev_type = "Coaching"
-                if 'festival' in title_lower:
-                    ev_type = "Festival"
-                elif any(kw in title_lower for kw in ['tournament', 'slam', 'championships', 'open']):
-                    ev_type = "Tournament"
-                elif any(kw in title_lower for kw in ['training', 'squad', 'team']):
-                    ev_type = "Training"
-                elif any(kw in title_lower for kw in ['clinic', 'break', 'coaching']):
+                    iso_date = parse_date_to_iso(text) # Search full text for date components
+                    if not iso_date:
+                        continue
+
+                    try:
+                        event_date = datetime.strptime(iso_date, "%Y-%m-%d").date()
+                        if event_date < today:
+                            continue
+                    except Exception:
+                        continue
+
+                    # Construct the absolute URL from the exact href attribute
+                    if href.startswith('http'):
+                        event_url = href
+                    elif href.startswith('/'):
+                        event_url = f"https://dinkspace.co.uk{href}"
+                    elif href.startswith('#'):
+                        event_url = f"https://dinkspace.co.uk/dinkspace-schedule{href}"
+                    else:
+                        event_url = f"https://dinkspace.co.uk/{href}"
+
+                    # Classify Event Type
+                    title_lower = title_part.lower()
                     ev_type = "Coaching"
+                    if 'festival' in title_lower:
+                        ev_type = "Festival"
+                    elif any(kw in title_lower for kw in ['tournament', 'slam', 'championships', 'open']):
+                        ev_type = "Tournament"
+                    elif any(kw in title_lower for kw in ['training', 'squad', 'team']):
+                        ev_type = "Training"
+                    elif any(kw in title_lower for kw in ['clinic', 'break', 'coaching']):
+                        ev_type = "Coaching"
 
-                events.append({
-                    "title": title_part,
-                    "date": iso_date,
-                    "type": ev_type,
-                    "url": event_url,
-                    "desc": f"Official scheduled event: {title_part}"
-                })
+                    events.append({
+                        "title": title_part,
+                        "date": iso_date,
+                        "type": ev_type,
+                        "url": event_url,
+                        "desc": f"Official scheduled event: {title_part}"
+                    })
 
     # Deduplicate events by title and date
     unique_events = []
@@ -118,4 +118,4 @@ if __name__ == "__main__":
     output_path = os.path.join(output_dir, "events.json")
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4)
-    print(f"Successfully saved {len(data)} events with direct page links to {output_path}")
+    print(f"Successfully saved {len(data)} events with direct anchor links to {output_path}")
