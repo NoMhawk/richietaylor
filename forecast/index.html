@@ -408,14 +408,12 @@
             return { icon: 'fa-cloud', color: '#64748b', label: 'Overcast' };
         }
 
-        // =====================================================================
-        // SUB-SECTION: CLOUDBASE & FOG / MIST CALCULATIONS (HILL-AWARE)
-        // =====================================================================
+// [SUB-SECTION: METEOROLOGICAL & CLOUDBASE CALCULATIONS]
         function calculateCloudbaseAGL(temp, dewPoint, lowCover, relativeHumidity, weatherCode, totalCloudCover) {
-            if (totalCloudCover < 40 && relativeHumidity < 85 && weatherCode <= 3) {
-                const spread = Math.max(0.1, temp - dewPoint);
-                let convectiveBase = Math.round((spread / 2.5) * 1000);
-                return Math.max(convectiveBase, 5000); 
+            // If skies are clear or mostly clear with minimal low cloud cover, don't let 
+            // cold morning/evening high relative humidity create fake low cloudbases.
+            if (lowCover < 30 && totalCloudCover < 40 && weatherCode <= 3) {
+                return 5000;
             }
             if (relativeHumidity >= 95 || (weatherCode >= 45 && weatherCode <= 48)) {
                 return 300; 
