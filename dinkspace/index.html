@@ -39,57 +39,27 @@
     </div>
 
     <script>
-        const allEvents = [
-            {
-                "title": "Abingdon Festival",
-                "date": "2026-11-15",
-                "type": "Festival",
-                "url": "https://dinkspace.co.uk/festivals",
-                "desc": "Official scheduled event: Abingdon Festival"
-            },
-            {
-                "title": "Somerset County Team Training",
-                "date": "2026-11-21",
-                "type": "Training",
-                "url": "https://dinkspace.co.uk/dinkspace-schedule",
-                "desc": "Official scheduled event: Somerset County Team Training"
-            },
-            {
-                "title": "Courtside (Stourbridge) Coaching Clinics",
-                "date": "2026-11-24",
-                "type": "Coaching",
-                "url": "https://dinkspace.co.uk/coachingclinics",
-                "desc": "Official scheduled event: Courtside (Stourbridge) Coaching Clinics"
-            },
-            {
-                "title": "Exeter Coaching Clinic",
-                "date": "2026-11-28",
-                "type": "Coaching",
-                "url": "https://dinkspace.co.uk/coachingclinics",
-                "desc": "Official scheduled event: Exeter Coaching Clinic"
-            },
-            {
-                "title": "London Christmas Festival",
-                "date": "2026-12-20",
-                "type": "Festival",
-                "url": "https://dinkspace.co.uk/festivals",
-                "desc": "Official scheduled event: London Christmas Festival"
-            },
-            {
-                "title": "Southampton Christmas Festival",
-                "date": "2026-12-20",
-                "type": "Festival",
-                "url": "https://dinkspace.co.uk/festivals",
-                "desc": "Official scheduled event: Southampton Christmas Festival"
-            },
-            {
-                "title": "Taunton Christmas Festival",
-                "date": "2026-12-27",
-                "type": "Festival",
-                "url": "https://dinkspace.co.uk/festivals",
-                "desc": "Official scheduled event: Taunton Christmas Festival"
+  let allEvents = [];
+
+        async function loadEvents() {
+            try {
+                // Fetching live from the dinkspace folder with a timestamp to avoid caching
+                const response = await fetch(`./events.json?v=${new Date().getTime()}`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                allEvents = await response.json();
+                renderAgenda('all');
+            } catch (error) {
+                console.error("Error loading events.json:", error);
+                document.getElementById('agenda-container').innerHTML = `
+                    <div class="bg-rose-950/40 border border-rose-500/30 p-6 rounded-2xl text-center text-rose-300 text-sm max-w-xl mx-auto">
+                        <strong>Could not load schedule data.</strong><br>Details: ${error.message}
+                    </div>`;
             }
-        ];
+        }
+
+        // Call loadEvents on startup instead of renderAgenda directly
+        loadEvents();
 
         function filterEvents(type) {
             ['all', 'Festival', 'Coaching', 'Training'].forEach(t => {
