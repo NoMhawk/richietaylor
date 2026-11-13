@@ -779,19 +779,23 @@
             const currentLocalHourStr = `${year}-${month}-${day}T${hour}`;
 
             let hourHeaders = `<tr><th class="param-label"></th>`;
-            let tempRow = `<tr><td class="param-label">Temp (°C)</td>`;
-            let skyRow = `<tr><td class="param-label">Sky Condition</td>`; // Added Weather / Sky Condition Row
             
-            // Model-specific rows
+            // Core Summary Rows
+            let tempRow = `<tr><td class="param-label">Temp (°C)</td>`;
+            let skyRow = `<tr><td class="param-label">Sky Condition</td>`;
+            let windRow = `<tr><td class="param-label">Wind (mph)</td>`;
+            let gustRow = `<tr><td class="param-label">Gusts (mph)</td>`;
+            let dirRow = `<tr><td class="param-label">Wind Dir</td>`;
+
+            // Individual Model Wind Rows
             let ecmwfRow = `<tr><td class="param-label">ECMWF Wind</td>`;
             let gfsRow = `<tr><td class="param-label">GFS Wind</td>`;
             let iconRow = `<tr><td class="param-label">ICON Wind</td>`;
             let meteoRow = `<tr><td class="param-label">Meteo Wind</td>`;
 
+            // Atmospheric & Cloud Rows
             let rainRow = `<tr><td class="param-label">Rain (%)</td>`;
             let cloudRow = `<tr><td class="param-label">Cloud (%)</td>`;
-            
-            // Detailed Cloud Layers rows
             let cLowRow = `<tr><td class="param-label">☁ Low (0-5k)</td>`;
             let cMidRow = `<tr><td class="param-label">☁ Mid (5-10k)</td>`;
             let cUpperRow = `<tr><td class="param-label">☁ Upper (10-15k)</td>`;
@@ -821,10 +825,35 @@
                 const isCurrentHour = timeStr.startsWith(currentLocalHourStr);
                 const colClass = isCurrentHour ? ' current-col' : '';
 
+                let modelWindSum = 0;
+                let modelGustSum = 0;
+                let activeModelCount = 0;
+
+                modelsConfig.forEach(m => {
+                    const modelObj = multiModelData[m.key];
+                    if (modelObj && modelObj.hourly && modelObj.hourly.wind_speed_10m) {
+                        let mIdx = modelObj.hourly.time.findIndex(t => t === timeStr);
+                        if (mIdx === -1) mIdx = i;
+                        if (mIdx !== -1 && modelObj.hourly.wind_speed_10m[mIdx] !== undefined && modelObj.hourly.wind_speed_10m[mIdx] !== null) {
+                            const rawSpd = modelObj.hourly.wind_speed_10m[mIdx];
+                            const rawGust = modelObj.hourly.wind_gusts_10m ? modelObj.hourly.wind_gusts_10m[mIdx] : 0;
+                            modelWindSum += kmhToMph(rawSpd);
+                            modelGustSum += kmhToMph(rawGust);
+                            activeModelCount++;
+                        }
+                    }
+                });
+
+                const wSpd = activeModelCount > 0 ? Math.round(modelWindSum / activeModelCount) : kmhToMph(hourly.wind_speed_10m[i]);
+                const wGST = activeModelCount > 0 ? Math.round(modelGustSum / activeModelCount) : kmhToMph(hourly.wind_gusts_10m[i]);
+
                 const temp = Math.round(hourly.temperature_2m[i]);
                 const dew = hourly.dew_point_2m[i];
                 const rain = hourly.precipitation_probability[i];
                 const vis = parseFloat((hourly.visibility[i] / 1000).toFixed(1));
+                const dirDeg = hourly.wind_direction_10m[i] || 0;
+                const rot = (dirDeg + 180) % 360;
+                const dirLabel = getWindDirectionLabel(dirDeg);
                 
                 const low = hourly.cloud_cover_low[i] || 0;
                 const mid = hourly.cloud_cover_mid[i] || 0;
@@ -848,7 +877,6 @@
                 const hFog = fogStatus === 'FOG' || fogStatus === 'MIST' || vis < 3;
                 const wInfo = getWeatherIcon(hFog ? 45 : code, rain);
 
-                // Helper to extract specific model data for this hour
                 function getModelCellHtml(modelKey) {
                     const modelObj = multiModelData[modelKey];
                     if (!modelObj || !modelObj.hourly || !modelObj.hourly.wind_speed_10m) return `<td class="${colClass}" style="color:var(--text-muted); font-size:0.65rem;">--</td>`;
@@ -866,11 +894,11 @@
                     const mSpd = kmhToMph(rawSpd);
                     const mGust = kmhToMph(rawGust);
                     const mDir = getWindDirectionLabel(rawDir);
-                    const rot = (rawDir + 180) % 360;
+                    const mRot = (rawDir + 180) % 360;
 
                     return `<td class="${colClass}" style="font-size:0.7rem;">
                         <span class="${getWindColorClass(mSpd)}" style="font-weight:700;">${mSpd}</span> <span style="font-size:0.6rem; color:var(--text-muted);">G${mGust}</span><br>
-                        <i class="fa-solid fa-location-arrow" style="transform: rotate(${rot}deg); color: var(--accent-sky); font-size:0.6rem;"></i> <span style="font-size:0.65rem;">${mDir}</span>
+                        <i class="fa-solid fa-location-arrow" style="transform: rotate(${mRot}deg); color: var(--accent-sky); font-size:0.6rem;"></i> <span style="font-size:0.65rem;">${mDir}</span>
                     </td>`;
                 }
 
@@ -887,6 +915,9 @@
                 hourHeaders += `<th class="${colClass}">${headerContent}</th>`;
                 tempRow += `<td class="${colClass}" style="font-weight: 700; color: var(--text-main);">${temp}°</td>`;
                 skyRow += `<td class="${colClass}" style="font-size: 0.65rem;"><i class="fa-solid ${wInfo.icon}" style="color: ${wInfo.color}; margin-right: 0.2rem;"></i>${wInfo.label}</td>`;
+                windRow += `<td class="${colClass}">${getTrafficBadge('wind', wSpd)}</td>`;
+                gustRow += `<td class="${colClass}">${getTrafficBadge('gust', wGST)}</td>`;
+                dirRow += `<td class="${colClass}" style="font-weight: 600;"><i class="fa-solid fa-location-arrow" style="transform: rotate(${rot}deg); color: var(--accent-sky); margin-right: 0.25rem;"></i>${dirLabel}</td>`;
                 
                 ecmwfRow += getModelCellHtml('ecmwf_ifs025');
                 gfsRow += getModelCellHtml('gfs_seamless');
@@ -909,6 +940,9 @@
             hourHeaders += `</tr>`;
             tempRow += `</tr>`;
             skyRow += `</tr>`;
+            windRow += `</tr>`;
+            gustRow += `</tr>`;
+            dirRow += `</tr>`;
             ecmwfRow += `</tr>`;
             gfsRow += `</tr>`;
             iconRow += `</tr>`;
@@ -928,6 +962,9 @@
                 <tbody>
                     ${tempRow}
                     ${skyRow}
+                    ${windRow}
+                    ${gustRow}
+                    ${dirRow}
                     ${ecmwfRow}
                     ${gfsRow}
                     ${iconRow}
