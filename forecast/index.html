@@ -780,12 +780,23 @@
 
             let hourHeaders = `<tr><th class="param-label"></th>`;
             let tempRow = `<tr><td class="param-label">Temp (°C)</td>`;
-            let windRow = `<tr><td class="param-label">Wind (mph)</td>`;
-            let gustRow = `<tr><td class="param-label">Gusts (mph)</td>`;
-            let dirRow = `<tr><td class="param-label">Wind Dir</td>`;
+            let skyRow = `<tr><td class="param-label">Sky Condition</td>`; // Added Weather / Sky Condition Row
+            
+            // Model-specific rows
+            let ecmwfRow = `<tr><td class="param-label">ECMWF Wind</td>`;
+            let gfsRow = `<tr><td class="param-label">GFS Wind</td>`;
+            let iconRow = `<tr><td class="param-label">ICON Wind</td>`;
+            let meteoRow = `<tr><td class="param-label">Meteo Wind</td>`;
+
             let rainRow = `<tr><td class="param-label">Rain (%)</td>`;
             let cloudRow = `<tr><td class="param-label">Cloud (%)</td>`;
-            let lowCloudRow = `<tr><td class="param-label">Low Cld (%)</td>`;
+            
+            // Detailed Cloud Layers rows
+            let cLowRow = `<tr><td class="param-label">☁ Low (0-5k)</td>`;
+            let cMidRow = `<tr><td class="param-label">☁ Mid (5-10k)</td>`;
+            let cUpperRow = `<tr><td class="param-label">☁ Upper (10-15k)</td>`;
+            let cTopRow = `<tr><td class="param-label">☁ Top (15k+)</td>`;
+
             let visRow = `<tr><td class="param-label">Vis (km)</td>`;
             let baseRow = `<tr><td class="param-label">Base (ft)</td>`;
             let fogRow = `<tr><td class="param-label">Fog Risk</td>`;
@@ -802,7 +813,6 @@
                 const hourObj = new Date(timeStr);
                 const hourNum = hourObj.getHours();
 
-                // Keep sunset hour, skip hours strictly after sunset
                 if (sunsetHour !== -1 && hourNum > sunsetHour) {
                     continue;
                 }
@@ -810,36 +820,11 @@
                 const timeLabel = hourObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
                 const isCurrentHour = timeStr.startsWith(currentLocalHourStr);
                 const colClass = isCurrentHour ? ' current-col' : '';
-                
-                let modelWindSum = 0;
-                let modelGustSum = 0;
-                let activeModelCount = 0;
-
-                modelsConfig.forEach(m => {
-                    const modelObj = multiModelData[m.key];
-                    if (modelObj && modelObj.hourly && modelObj.hourly.wind_speed_10m) {
-                        let mIdx = modelObj.hourly.time.findIndex(t => t === timeStr);
-                        if (mIdx === -1) mIdx = i;
-                        if (mIdx !== -1 && modelObj.hourly.wind_speed_10m[mIdx] !== undefined && modelObj.hourly.wind_speed_10m[mIdx] !== null) {
-                            const rawSpd = modelObj.hourly.wind_speed_10m[mIdx];
-                            const rawGust = modelObj.hourly.wind_gusts_10m ? modelObj.hourly.wind_gusts_10m[mIdx] : 0;
-                            modelWindSum += kmhToMph(rawSpd);
-                            modelGustSum += kmhToMph(rawGust);
-                            activeModelCount++;
-                        }
-                    }
-                });
-
-                const wSpd = activeModelCount > 0 ? Math.round(modelWindSum / activeModelCount) : kmhToMph(hourly.wind_speed_10m[i]);
-                const wGST = activeModelCount > 0 ? Math.round(modelGustSum / activeModelCount) : kmhToMph(hourly.wind_gusts_10m[i]);
 
                 const temp = Math.round(hourly.temperature_2m[i]);
                 const dew = hourly.dew_point_2m[i];
                 const rain = hourly.precipitation_probability[i];
                 const vis = parseFloat((hourly.visibility[i] / 1000).toFixed(1));
-                const dirDeg = hourly.wind_direction_10m[i] || 0;
-                const rot = (dirDeg + 180) % 360;
-                const dirLabel = getWindDirectionLabel(dirDeg);
                 
                 const low = hourly.cloud_cover_low[i] || 0;
                 const mid = hourly.cloud_cover_mid[i] || 0;
@@ -854,10 +839,40 @@
                 } else if (vis < 5.0 && (hum >= 90 || (temp - dew) <= 1.5)) {
                     fogStatus = 'MIST';
                 }
+
                 const cb = getCustomCloudBands(low, mid, high, vis, rain);
                 const cloud = Math.min(100, Math.round((cb.c0_5k * 0.6) + (cb.c5_10k * 0.3) + (cb.c10_15k * 0.1)));
                 const cloudbaseAGL = calculateCloudbaseAGL(temp, dew, low, hum, code, totCloud);
                 const basePassVal = cloudbaseAGL >= 12000 ? 'Unlimited' : cloudbaseAGL;
+
+                const hFog = fogStatus === 'FOG' || fogStatus === 'MIST' || vis < 3;
+                const wInfo = getWeatherIcon(hFog ? 45 : code, rain);
+
+                // Helper to extract specific model data for this hour
+                function getModelCellHtml(modelKey) {
+                    const modelObj = multiModelData[modelKey];
+                    if (!modelObj || !modelObj.hourly || !modelObj.hourly.wind_speed_10m) return `<td class="${colClass}" style="color:var(--text-muted); font-size:0.65rem;">--</td>`;
+                    
+                    let mIdx = modelObj.hourly.time.findIndex(t => t === timeStr);
+                    if (mIdx === -1) mIdx = i;
+                    if (mIdx === -1 || modelObj.hourly.wind_speed_10m[mIdx] === undefined || modelObj.hourly.wind_speed_10m[mIdx] === null) {
+                        return `<td class="${colClass}" style="color:var(--text-muted); font-size:0.65rem;">--</td>`;
+                    }
+
+                    const rawSpd = modelObj.hourly.wind_speed_10m[mIdx];
+                    const rawGust = modelObj.hourly.wind_gusts_10m ? modelObj.hourly.wind_gusts_10m[mIdx] : 0;
+                    const rawDir = modelObj.hourly.wind_direction_10m ? modelObj.hourly.wind_direction_10m[mIdx] : 0;
+                    
+                    const mSpd = kmhToMph(rawSpd);
+                    const mGust = kmhToMph(rawGust);
+                    const mDir = getWindDirectionLabel(rawDir);
+                    const rot = (rawDir + 180) % 360;
+
+                    return `<td class="${colClass}" style="font-size:0.7rem;">
+                        <span class="${getWindColorClass(mSpd)}" style="font-weight:700;">${mSpd}</span> <span style="font-size:0.6rem; color:var(--text-muted);">G${mGust}</span><br>
+                        <i class="fa-solid fa-location-arrow" style="transform: rotate(${rot}deg); color: var(--accent-sky); font-size:0.6rem;"></i> <span style="font-size:0.65rem;">${mDir}</span>
+                    </td>`;
+                }
 
                 let eventBadge = '';
                 if (sunriseHour === hourNum && sunriseMinStr) {
@@ -871,12 +886,21 @@
 
                 hourHeaders += `<th class="${colClass}">${headerContent}</th>`;
                 tempRow += `<td class="${colClass}" style="font-weight: 700; color: var(--text-main);">${temp}°</td>`;
-                windRow += `<td class="${colClass}">${getTrafficBadge('wind', wSpd)}</td>`;
-                gustRow += `<td class="${colClass}">${getTrafficBadge('gust', wGST)}</td>`;
-                dirRow += `<td class="${colClass}" style="font-weight: 600;"><i class="fa-solid fa-location-arrow" style="transform: rotate(${rot}deg); color: var(--accent-sky); margin-right: 0.25rem;"></i>${dirLabel}</td>`;
+                skyRow += `<td class="${colClass}" style="font-size: 0.65rem;"><i class="fa-solid ${wInfo.icon}" style="color: ${wInfo.color}; margin-right: 0.2rem;"></i>${wInfo.label}</td>`;
+                
+                ecmwfRow += getModelCellHtml('ecmwf_ifs025');
+                gfsRow += getModelCellHtml('gfs_seamless');
+                iconRow += getModelCellHtml('icon_seamless');
+                meteoRow += getModelCellHtml('meteofrance_seamless');
+
                 rainRow += `<td class="${colClass}">${getTrafficBadge('rain', rain, '%')}</td>`;
                 cloudRow += `<td class="${colClass}">${getTrafficBadge('cloud', cloud, '%')}</td>`;
-                lowCloudRow += `<td class="${colClass} ${getCloudColorClass(cb.c0_5k)}" style="font-size: 0.7rem;">${cb.c0_5k}%</td>`;
+                
+                cLowRow += `<td class="${colClass} ${getCloudColorClass(cb.c0_5k)}" style="font-size: 0.7rem;">${cb.c0_5k}%</td>`;
+                cMidRow += `<td class="${colClass} ${getCloudColorClass(cb.c5_10k)}" style="font-size: 0.7rem;">${cb.c5_10k}%</td>`;
+                cUpperRow += `<td class="${colClass} ${getCloudColorClass(cb.c10_15k)}" style="font-size: 0.7rem;">${cb.c10_15k}%</td>`;
+                cTopRow += `<td class="${colClass} ${getCloudColorClass(cb.c15k_plus)}" style="font-size: 0.7rem;">${cb.c15k_plus}%</td>`;
+
                 visRow += `<td class="${colClass}">${getTrafficBadge('vis', vis)}</td>`;
                 baseRow += `<td class="${colClass}">${getTrafficBadge('base', basePassVal)}</td>`;
                 fogRow += `<td class="${colClass}">${getTrafficBadge('fog', fogStatus)}</td>`;
@@ -884,12 +908,17 @@
 
             hourHeaders += `</tr>`;
             tempRow += `</tr>`;
-            windRow += `</tr>`;
-            gustRow += `</tr>`;
-            dirRow += `</tr>`;
+            skyRow += `</tr>`;
+            ecmwfRow += `</tr>`;
+            gfsRow += `</tr>`;
+            iconRow += `</tr>`;
+            meteoRow += `</tr>`;
             rainRow += `</tr>`;
             cloudRow += `</tr>`;
-            lowCloudRow += `</tr>`;
+            cLowRow += `</tr>`;
+            cMidRow += `</tr>`;
+            cUpperRow += `</tr>`;
+            cTopRow += `</tr>`;
             visRow += `</tr>`;
             baseRow += `</tr>`;
             fogRow += `</tr>`;
@@ -898,12 +927,17 @@
                 <thead>${hourHeaders}</thead>
                 <tbody>
                     ${tempRow}
-                    ${windRow}
-                    ${gustRow}
-                    ${dirRow}
+                    ${skyRow}
+                    ${ecmwfRow}
+                    ${gfsRow}
+                    ${iconRow}
+                    ${meteoRow}
                     ${rainRow}
                     ${cloudRow}
-                    ${lowCloudRow}
+                    ${cLowRow}
+                    ${cMidRow}
+                    ${cUpperRow}
+                    ${cTopRow}
                     ${visRow}
                     ${baseRow}
                     ${fogRow}
