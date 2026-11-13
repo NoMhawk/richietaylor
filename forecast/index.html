@@ -293,6 +293,30 @@
         let multiModelData = {};
         let selectedDayIndex = 0;
 
+        // [SUB-SECTION: CIRCULAR ANGLE AVERAGE UTILITY]
+        function getAverageWindDirection(degreesArray) {
+            if (!degreesArray || degreesArray.length === 0) return 0;
+            let sumSin = 0;
+            let sumCos = 0;
+            let validCount = 0;
+
+            degreesArray.forEach(deg => {
+                if (deg !== null && deg !== undefined && !isNaN(deg)) {
+                    const rad = (deg * Math.PI) / 180;
+                    sumSin += Math.sin(rad);
+                    sumCos += Math.cos(rad);
+                    validCount++;
+                }
+            });
+
+            if (validCount === 0) return 0;
+            const avgSin = sumSin / validCount;
+            const avgCos = sumCos / validCount;
+            let avgDeg = (Math.atan2(avgSin, avgCos) * 180) / Math.PI;
+            if (avgDeg < 0) avgDeg += 360;
+            return avgDeg;
+        }
+
         // [SUB-SECTION: UNIT CONVERSION UTILITIES]
         function kmhToMph(kmh) {
             return Math.round(kmh * 0.621371);
@@ -739,7 +763,31 @@
             return `<span class="traffic-badge-${status}">${label}</span>`;
         }
 
-// [SUB-SECTION: ACTIVE DAY HOURLY OVERVIEW MATRIX RENDERER]
+// [SUB-SECTION: CIRCULAR ANGLE AVERAGE UTILITY]
+        function getAverageWindDirection(degreesArray) {
+            if (!degreesArray || degreesArray.length === 0) return 0;
+            let sumSin = 0;
+            let sumCos = 0;
+            let validCount = 0;
+
+            degreesArray.forEach(deg => {
+                if (deg !== null && deg !== undefined && !isNaN(deg)) {
+                    const rad = (deg * Math.PI) / 180;
+                    sumSin += Math.sin(rad);
+                    sumCos += Math.cos(rad);
+                    validCount++;
+                }
+            });
+
+            if (validCount === 0) return 0;
+            const avgSin = sumSin / validCount;
+            const avgCos = sumCos / validCount;
+            let avgDeg = (Math.atan2(avgSin, avgCos) * 180) / Math.PI;
+            if (avgDeg < 0) avgDeg += 360;
+            return avgDeg;
+        }
+
+        // [SUB-SECTION: ACTIVE DAY HOURLY OVERVIEW MATRIX RENDERER]
         function renderActiveDay(dayIndex) {
             const data = globalWeatherData;
             const hourly = data.hourly;
@@ -828,6 +876,7 @@
                 let modelWindSum = 0;
                 let modelGustSum = 0;
                 let activeModelCount = 0;
+                let modelDirList = [];
 
                 modelsConfig.forEach(m => {
                     const modelObj = multiModelData[m.key];
@@ -837,8 +886,11 @@
                         if (mIdx !== -1 && modelObj.hourly.wind_speed_10m[mIdx] !== undefined && modelObj.hourly.wind_speed_10m[mIdx] !== null) {
                             const rawSpd = modelObj.hourly.wind_speed_10m[mIdx];
                             const rawGust = modelObj.hourly.wind_gusts_10m ? modelObj.hourly.wind_gusts_10m[mIdx] : 0;
+                            const rawDir = modelObj.hourly.wind_direction_10m ? modelObj.hourly.wind_direction_10m[mIdx] : null;
+                            
                             modelWindSum += kmhToMph(rawSpd);
                             modelGustSum += kmhToMph(rawGust);
+                            if (rawDir !== null) modelDirList.push(rawDir);
                             activeModelCount++;
                         }
                     }
@@ -846,14 +898,19 @@
 
                 const wSpd = activeModelCount > 0 ? Math.round(modelWindSum / activeModelCount) : kmhToMph(hourly.wind_speed_10m[i]);
                 const wGST = activeModelCount > 0 ? Math.round(modelGustSum / activeModelCount) : kmhToMph(hourly.wind_gusts_10m[i]);
+                
+                // Use circular average for summary wind direction
+                if (modelDirList.length === 0) {
+                    modelDirList.push(hourly.wind_direction_10m[i] || 0);
+                }
+                const dirDeg = getAverageWindDirection(modelDirList);
+                const rot = (dirDeg + 180) % 360;
+                const dirLabel = getWindDirectionLabel(dirDeg);
 
                 const temp = Math.round(hourly.temperature_2m[i]);
                 const dew = hourly.dew_point_2m[i];
                 const rain = hourly.precipitation_probability[i];
                 const vis = parseFloat((hourly.visibility[i] / 1000).toFixed(1));
-                const dirDeg = hourly.wind_direction_10m[i] || 0;
-                const rot = (dirDeg + 180) % 360;
-                const dirLabel = getWindDirectionLabel(dirDeg);
                 
                 const low = hourly.cloud_cover_low[i] || 0;
                 const mid = hourly.cloud_cover_mid[i] || 0;
