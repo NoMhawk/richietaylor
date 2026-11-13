@@ -667,7 +667,7 @@
                     const wInfo = getWeatherIcon(weatherCode, rainProb);
 
                     timeRow += `<span class="wf-cell">${String(hTarget).padStart(2, '0')}h</span>`;
-                    dirRow += `<span class="wf-cell"><i class="fa-solid fa-location-arrow wf-arrow" style="transform: rotate(${rot}deg);"></i></span>`;
+                    dirRow += `<span class="wf-cell"><i class="fa-solid fa-arrow-up wf-arrow" style="transform: rotate(${rot}deg);"></i></span>`;
                     spdRow += `<span class="wf-cell"><span class="${getWindColorClass(spd)}">${spd}</span></span>`;
                     gustRow += `<span class="wf-cell"><span class="${getWindColorClass(gust)}">${gust}</span></span>`;
                     weatherRow += `<span class="wf-cell"><i class="fa-solid ${wInfo.icon}" style="color: ${wInfo.color}; font-size: 0.75rem;" title="${wInfo.label}"></i></span>`;
@@ -955,7 +955,7 @@
 
                     return `<td class="${colClass}" style="font-size:0.7rem;">
                         <span class="${getWindColorClass(mSpd)}" style="font-weight:700;">${mSpd}</span> <span style="font-size:0.6rem; color:var(--text-muted);">G${mGust}</span><br>
-                        <i class="fa-solid fa-location-arrow" style="transform: rotate(${mRot}deg); color: var(--accent-sky); font-size:0.6rem;"></i> <span style="font-size:0.65rem;">${mDir}</span>
+                        <i class="fa-solid fa-arrow-up" style="transform: rotate(${mRot}deg); color: var(--accent-sky); font-size:0.6rem;"></i> <span style="font-size:0.65rem;">${mDir}</span>
                     </td>`;
                 }
 
@@ -974,7 +974,7 @@
                 skyRow += `<td class="${colClass}" style="font-size: 0.65rem;"><i class="fa-solid ${wInfo.icon}" style="color: ${wInfo.color}; margin-right: 0.2rem;"></i>${wInfo.label}</td>`;
                 windRow += `<td class="${colClass}">${getTrafficBadge('wind', wSpd)}</td>`;
                 gustRow += `<td class="${colClass}">${getTrafficBadge('gust', wGST)}</td>`;
-                dirRow += `<td class="${colClass}" style="font-weight: 600;"><i class="fa-solid fa-location-arrow" style="transform: rotate(${rot}deg); color: var(--accent-sky); margin-right: 0.25rem;"></i>${dirLabel}</td>`;
+                dirRow += `<td class="${colClass}" style="font-weight: 600;"><i class="fa-solid fa-arrow-up" style="transform: rotate(${rot}deg); color: var(--accent-sky); margin-right: 0.25rem;"></i>${dirLabel}</td>`;
                 
                 ecmwfRow += getModelCellHtml('ecmwf_ifs025');
                 gfsRow += getModelCellHtml('gfs_seamless');
