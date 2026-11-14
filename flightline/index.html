@@ -1,9 +1,9 @@
-<!-- REV: 10.2 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 10.3 - SKYDIVE SOUTHWEST FLIGHTLINE -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Dunkeswell - Operations Dashboard</title>
+  <title>Skydive Southwest Flightline</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Leaflet CSS & JS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -91,7 +91,7 @@
     #map { width: 100%; height: 100%; z-index: 1; }
 
     /* ==========================================================
-        SIDEBAR (REV 10.2)
+        SIDEBAR (REV 10.3)
         ========================================================== */
     .map-info-overlay {
       --w: clamp(460px, 34vw, 720px);
@@ -124,15 +124,6 @@
       font-weight: 800;
       color: #00d8ff;
       letter-spacing: 0.02em;
-    }
-
-    #overlay-sector-tag {
-      font-size: calc(var(--u) * 2.1);
-      color: #ffee58;
-      background: rgba(255, 235, 59, 0.1);
-      padding: calc(var(--u) * 0.2) calc(var(--u) * 0.9);
-      border-radius: 6px;
-      border: 1px solid rgba(255, 235, 59, 0.4);
     }
 
     .ov-row {
@@ -476,8 +467,8 @@
   <!-- HEADER -->
   <div class="top-header">
     <div class="site-title">
-      <span>🪂 Dunkeswell Weather Operations</span>
-      <span class="rev-badge">REV: 10.2</span>
+      <span>🪂 Skydive Southwest Flightline</span>
+      <span class="rev-badge">REV: 10.3</span>
     </div>
     <div class="header-right-meta">
       <div class="meta-item">Current: <span id="clock-current">--:--:--</span></div>
@@ -522,11 +513,10 @@
 
     </div>
 
-    <!-- SIDEBAR (REV 10.2) -->
+    <!-- SIDEBAR (REV 10.3) -->
     <div class="map-info-overlay" id="sidebar">
       <div class="ov-header">
         <span>⚡ Live ops</span>
-        <span id="overlay-sector-tag">Sector SW</span>
       </div>
 
       <!-- HERO: WIND DIRECTION + SPEED -->
@@ -557,22 +547,22 @@
         </div>
       </div>
 
-      <!-- LANDING: TURN DIRECTION, SPOT, HEADING -->
+      <!-- LANDING PATTERN (RENAMED) -->
       <div class="ov-row ov-land">
         <div class="ov-cell">
-          <div class="ov-label">Pattern center / intersection</div>
+          <div class="ov-label">Landing Pattern</div>
           <div class="ov-big accent-orange" id="ov-pattern" style="font-size: calc(var(--u) * 4.2);">--</div>
         </div>
       </div>
 
-      <!-- RUN-IN INFO BOX (RENAMED FROM JJ'S RUN-IN) -->
+      <!-- RUN-IN INFO BOX -->
       <div class="ov-row ov-jump">
         <div class="ov-cell" style="background: linear-gradient(135deg, rgba(40, 20, 60, 0.85) 0%, rgba(15, 10, 26, 0.95) 100%); border-color: rgba(224, 64, 251, 0.4);">
           <div class="ov-label" style="color: #ea80fc;">Run-In Heading</div>
           <div class="ov-big accent-purple" id="ov-jj-heading">--°</div>
         </div>
         <div class="ov-cell" style="background: linear-gradient(135deg, rgba(40, 20, 60, 0.85) 0%, rgba(15, 10, 26, 0.95) 100%); border-color: rgba(224, 64, 251, 0.4);">
-          <div class="ov-label" style="color: #ea80fc;">Lateral Offset</div>
+          <div class="ov-label" style="color: #ea80fc;">Offset</div>
           <div class="ov-big accent-purple ov-jj-big" id="ov-jj-offset">--</div>
         </div>
       </div>
@@ -812,7 +802,7 @@
       let spotOffset = Math.min(0.28, Math.max(0.12, (effectiveSpeed / 100) * 1.2));
 
       // ==========================================
-      // RUN-IN LOGIC (REV 10.2 - Into-Wind Runway Selector & Rounded 1-Decimal Offset)
+      // RUN-IN LOGIC
       // ==========================================
       const runwayEnds = [42, 222, 170, 350];
       let bestRunwayHdg = 42;
@@ -973,11 +963,6 @@
       if (gustEl) {
         gustEl.innerText = `Gust ${Math.round(effectiveGust)}`;
         gustEl.style.color = getStatusColor(peak);
-      }
-
-      const elSectorTag = document.getElementById('overlay-sector-tag');
-      if (elSectorTag) {
-        elSectorTag.innerText = isLandingManual ? `Sector ${sectorName} (manual)` : `Sector ${sectorName}`;
       }
       
       setTimeout(() => { map.invalidateSize(); }, 250);
