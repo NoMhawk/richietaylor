@@ -1,4 +1,4 @@
-<!-- REV: 9.9 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 10.1 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -91,7 +91,7 @@
     #map { width: 100%; height: 100%; z-index: 1; }
 
     /* ==========================================================
-        SIDEBAR (REV 9.9)
+        SIDEBAR (REV 10.1)
         ========================================================== */
     .map-info-overlay {
       --w: clamp(460px, 34vw, 720px);
@@ -506,7 +506,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Dunkeswell Weather Operations</span>
-      <span class="rev-badge">REV: 9.9</span>
+      <span class="rev-badge">REV: 10.1</span>
     </div>
     <div class="header-right-meta">
       <div class="meta-item">Current: <span id="clock-current">--:--:--</span></div>
@@ -568,7 +568,7 @@
 
     </div>
 
-    <!-- SIDEBAR (REV 9.9) -->
+    <!-- SIDEBAR (REV 10.1) -->
     <div class="map-info-overlay" id="sidebar">
       <div class="ov-header">
         <span>⚡ Live ops</span>
@@ -972,14 +972,13 @@
       }
 
       // ==========================================
-      // JJ'S JUMP RUN LOGIC (REV 9.9 - Into-Wind Runway Selector)
+      // JJ'S JUMP RUN LOGIC (REV 10.1 - Rounded 1-Decimal Offset)
       // ==========================================
-      const runwayEnds = [42, 222, 170, 350]; // Available Dunkeswell runway headings
+      const runwayEnds = [42, 222, 170, 350];
       let bestRunwayHdg = 42;
       let minAngleDiff = 999;
 
       runwayEnds.forEach(rwy => {
-        // Find angular difference between wind and runway heading
         const diff = Math.abs((effectiveWindDir - rwy + 540) % 360 - 180);
         if (diff < minAngleDiff) {
           minAngleDiff = diff;
@@ -989,8 +988,11 @@
 
       const jjRunwayHdg = bestRunwayHdg;
 
+      // 15k Wind Speed & Rounded 1-Decimal Lateral Offset Calculation
+      const wind15kSpd = effectiveSpeed * 3.4;
+      let jjOffsetDist = Math.max(0.1, parseFloat(((wind15kSpd / 10) * 0.1).toFixed(1)));
+
       const angleDiff = (effectiveWindDir - jjRunwayHdg + 360) % 360;
-      const jjOffsetDist = 0.3; 
       const jjSideMultiplier = (angleDiff > 180 && angleDiff < 360) ? -1 : 1;
       const jjOffsetBearing = (jjRunwayHdg + (jjSideMultiplier * 90) + 360) % 360;
 
@@ -1044,7 +1046,7 @@
       const elJjHdg = document.getElementById('ov-jj-heading');
       const elJjOff = document.getElementById('ov-jj-offset');
       if (elJjHdg) elJjHdg.innerText = `${String(jjRunwayHdg).padStart(3, '0')}°`;
-      if (elJjOff) elJjOff.innerText = `0.3 ${jjSideName}`;
+      if (elJjOff) elJjOff.innerText = `${jjOffsetDist.toFixed(1)} ${jjSideName}`;
 
       // ==========================================
       // LANDING CIRCUIT
