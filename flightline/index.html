@@ -1,4 +1,4 @@
-<!-- REV: 10.1 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
+<!-- REV: 10.2 - DUNKS OPERATIONS DASHBOARD (DUNKS.HTML) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -91,7 +91,7 @@
     #map { width: 100%; height: 100%; z-index: 1; }
 
     /* ==========================================================
-        SIDEBAR (REV 10.1)
+        SIDEBAR (REV 10.2)
         ========================================================== */
     .map-info-overlay {
       --w: clamp(460px, 34vw, 720px);
@@ -392,35 +392,6 @@
       accent-color: #00d8ff;
     }
 
-    .rotated-pill {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 4px;
-      padding: 2px 6px;
-      border-radius: 4px;
-      color: #000;
-      font-family: sans-serif;
-      font-size: 10px;
-      font-weight: bold;
-      border: 1.5px solid #000;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.75);
-      white-space: nowrap;
-      pointer-events: none;
-      height: 22px;
-      width: 120px;
-      box-sizing: border-box;
-    }
-
-    .rotated-pill-tag {
-      background: #000;
-      color: #fff;
-      font-size: 8px;
-      padding: 1px 4px;
-      border-radius: 2px;
-      text-transform: uppercase;
-    }
-
     .jumprun-arrow {
       font-size: 24px;
       font-weight: bold;
@@ -441,7 +412,7 @@
     /* EXACT START-ANCHORED RUN IN LABEL */
     .runin-line-text {
       background: #0b0f19;
-      color: #ffffff;
+      color: #e040fb;
       font-family: monospace;
       font-size: 9px;
       font-weight: 900;
@@ -506,7 +477,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Dunkeswell Weather Operations</span>
-      <span class="rev-badge">REV: 10.1</span>
+      <span class="rev-badge">REV: 10.2</span>
     </div>
     <div class="header-right-meta">
       <div class="meta-item">Current: <span id="clock-current">--:--:--</span></div>
@@ -520,30 +491,13 @@
     <div class="map-card">
       <div id="map"></div>
 
-      <!-- COMPACT SPOT & LANDING CONTROLS PANEL (BOTTOM-LEFT OF MAP) -->
+      <!-- COMPACT LANDING CONTROLS PANEL (BOTTOM-LEFT OF MAP) -->
       <div class="spot-overlay-card">
         <div class="spot-overlay-header">
           <span class="spot-overlay-title">⚙️ DZ Override Controls</span>
         </div>
 
         <div class="control-slider-group" style="border-top:none; margin-top:0; padding-top:0;">
-          <div class="slider-row">
-            <span style="color:#00d8ff; font-weight:bold;">Jump-Run Mode:</span>
-            <button class="mode-toggle-btn" id="toggle-jump-btn" onclick="toggleJumpMode()">AUTO</button>
-          </div>
-          <div id="jump-manual-controls" style="display: none; flex-direction: column; gap: 5px; margin-top: 5px;">
-            <div class="slider-row">
-              <span>Heading:</span>
-              <input type="range" id="slider-jump-heading" min="0" max="359" value="144" oninput="updateDashboardMap()">
-            </div>
-            <div class="slider-row">
-              <span>Offset:</span>
-              <input type="range" id="slider-jump-dist" min="0.05" max="0.50" step="0.01" value="0.20" oninput="updateDashboardMap()">
-            </div>
-          </div>
-        </div>
-
-        <div class="control-slider-group">
           <div class="slider-row">
             <span style="color:#ff9800; font-weight:bold;">Landing Mode:</span>
             <button class="mode-toggle-btn" id="toggle-landing-btn" onclick="toggleLandingMode()" style="border-color:#ff9800; color:#ff9800;">AUTO</button>
@@ -568,7 +522,7 @@
 
     </div>
 
-    <!-- SIDEBAR (REV 10.1) -->
+    <!-- SIDEBAR (REV 10.2) -->
     <div class="map-info-overlay" id="sidebar">
       <div class="ov-header">
         <span>⚡ Live ops</span>
@@ -611,26 +565,14 @@
         </div>
       </div>
 
-      <!-- JUMP RUN: RUN-IN HEADING + DROP -->
-      <div class="ov-row ov-jump">
-        <div class="ov-cell">
-          <div class="ov-label">Run-in <span id="ov-jump-mode"></span></div>
-          <div class="ov-big" id="ov-heading">--</div>
-        </div>
-        <div class="ov-cell">
-          <div class="ov-label">Drop (NM past)</div>
-          <div class="ov-big" id="ov-drop">--</div>
-        </div>
-      </div>
-
-      <!-- JJ'S JUMP RUN INFO BOX -->
+      <!-- RUN-IN INFO BOX (RENAMED FROM JJ'S RUN-IN) -->
       <div class="ov-row ov-jump">
         <div class="ov-cell" style="background: linear-gradient(135deg, rgba(40, 20, 60, 0.85) 0%, rgba(15, 10, 26, 0.95) 100%); border-color: rgba(224, 64, 251, 0.4);">
-          <div class="ov-label" style="color: #ea80fc;">JJ's Jump Run</div>
+          <div class="ov-label" style="color: #ea80fc;">Run-In Heading</div>
           <div class="ov-big accent-purple" id="ov-jj-heading">--°</div>
         </div>
         <div class="ov-cell" style="background: linear-gradient(135deg, rgba(40, 20, 60, 0.85) 0%, rgba(15, 10, 26, 0.95) 100%); border-color: rgba(224, 64, 251, 0.4);">
-          <div class="ov-label" style="color: #ea80fc;">JJ's Offset</div>
+          <div class="ov-label" style="color: #ea80fc;">Lateral Offset</div>
           <div class="ov-big accent-purple ov-jj-big" id="ov-jj-offset">--</div>
         </div>
       </div>
@@ -695,9 +637,7 @@
     function updateClocks() {
       const now = new Date();
       const elCur = document.getElementById('clock-current');
-      const elUpd = document.getElementById('clock-updated');
       if (elCur) elCur.innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      if (elUpd) elUpd.innerText = lastUpdatedTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     }
     setInterval(updateClocks, 1000);
     updateClocks();
@@ -728,7 +668,6 @@
     map.getPane('topSpotPane').style.zIndex = 650;
 
     let windRoseLayerGroup = L.layerGroup().addTo(map);
-    let manualJumpLayerGroup = L.layerGroup().addTo(map);
     let circuitLayerGroup = L.layerGroup().addTo(map);
     circuitLayerGroup.addTo(map);
 
@@ -739,7 +678,6 @@
       }
     })();
 
-    let isJumpManual = false;
     let isLandingManual = false;
     let cachedWeatherData = [248, 18, 30, 248, 20, 30, 248, 18, 33];
     let liveWindOverride = { dir: 250, spd: 12, gst: 18 };
@@ -807,26 +745,6 @@
       return Math.max(1000, baseAGL);
     }
 
-    function toggleJumpMode() {
-      isJumpManual = !isJumpManual;
-      const btn = document.getElementById('toggle-jump-btn');
-      const controls = document.getElementById('jump-manual-controls');
-
-      if (isJumpManual) {
-        btn.innerText = "MANUAL";
-        btn.style.borderColor = "#ff5252";
-        btn.style.color = "#ff5252";
-        if (controls) controls.style.display = "flex";
-      } else {
-        btn.innerText = "AUTO";
-        btn.style.borderColor = "#ffee58";
-        btn.style.color = "#ffee58";
-        if (controls) controls.style.display = "none";
-        manualJumpLayerGroup.clearLayers();
-      }
-      updateDashboardMap();
-    }
-
     function toggleLandingMode() {
       isLandingManual = !isLandingManual;
       const btn = document.getElementById('toggle-landing-btn');
@@ -871,19 +789,8 @@
       return 'SW';
     }
 
-    function setRunInDisplay(headingDeg, offsetNM, manual) {
-      const h = Math.round(headingDeg);
-      const elHdg = document.getElementById('ov-heading');
-      const elDrop = document.getElementById('ov-drop');
-      const elMode = document.getElementById('ov-jump-mode');
-      if (elHdg) elHdg.innerText = `${String(h).padStart(3, '0')}° ${getCompassLetter(h)}`;
-      if (elDrop) elDrop.innerText = offsetNM.toFixed(2);
-      if (elMode) elMode.innerText = manual ? '(manual)' : '';
-    }
-
     function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
       windRoseLayerGroup.clearLayers();
-      manualJumpLayerGroup.clearLayers();
       circuitLayerGroup.clearLayers();
 
       L.circleMarker([lat, lon], {
@@ -902,77 +809,10 @@
         effectiveGust = (aromeGst + gfsGst + ecmwfGst) / 3;
       }
 
-      let runInHeading = effectiveWindDir;
       let spotOffset = Math.min(0.28, Math.max(0.12, (effectiveSpeed / 100) * 1.2));
 
-      function renderJumpRunLine(startPt, endPt, spotPt, redDotPt, lineColor, isManual, labelText = "Run In") {
-        const targetGroup = isManual ? manualJumpLayerGroup : windRoseLayerGroup;
-
-        const labelLat = startPt.lat + 0.10 * (endPt.lat - startPt.lat);
-        const labelLon = startPt.lon + 0.10 * (endPt.lon - startPt.lon);
-
-        L.polyline([[startPt.lat, startPt.lon], [endPt.lat, endPt.lon]], {
-          color: lineColor, weight: 3, dashArray: '4,4', opacity: 0.95
-        }).addTo(targetGroup);
-
-        let textAngle = (runInHeading - 90 + 360) % 360;
-        if (textAngle > 90 && textAngle < 270) {
-          textAngle = (textAngle + 180) % 360;
-        }
-
-        L.marker([labelLat, labelLon], {
-          icon: L.divIcon({
-            html: `<div class="runin-line-text" style="transform: rotate(${textAngle}deg); ${labelText.includes("JJ") ? 'color: #e040fb;' : ''}">${labelText}</div>`,
-            className: '', iconSize: [65, 20], iconAnchor: [32, 10]
-          })
-        }).addTo(targetGroup);
-
-        let arrowAngle = (runInHeading - 90 + 360) % 360;
-        L.marker([endPt.lat, endPt.lon], {
-          icon: L.divIcon({
-            html: `<div class="jumprun-arrow" style="color: ${isManual ? '#00d8ff' : lineColor}; transform: rotate(${arrowAngle}deg);">▶</div>`,
-            className: '', iconSize: [24, 24], iconAnchor: [12, 12]
-          })
-        }).addTo(targetGroup);
-
-        L.circleMarker([redDotPt.lat, redDotPt.lon], {
-          pane: 'topSpotPane', radius: 8, 
-          fillColor: '#ff2a2a', 
-          color: '#ffffff', weight: 2.5, fillOpacity: 1
-        }).addTo(targetGroup);
-
-        L.circleMarker([spotPt.lat, spotPt.lon], {
-          pane: 'topSpotPane', radius: 8, 
-          fillColor: '#00e676', 
-          color: '#ffffff', weight: 2.5, fillOpacity: 1
-        }).addTo(targetGroup);
-      }
-
-      if (isJumpManual) {
-        const sliderHdg = document.getElementById('slider-jump-heading');
-        const sliderDist = document.getElementById('slider-jump-dist');
-        runInHeading = sliderHdg ? parseFloat(sliderHdg.value) : 144;
-        spotOffset = sliderDist ? parseFloat(sliderDist.value) : 0.20;
-
-        const manSpotPt = computeDestinationPoint(lat, lon, runInHeading, spotOffset);
-        const manRedDotPt = computeDestinationPoint(lat, lon, runInHeading, spotOffset - 0.2);
-        const startManRun = computeDestinationPoint(lat, lon, (runInHeading + 180) % 360, 0.45);
-        const endManRun = computeDestinationPoint(lat, lon, runInHeading, Math.max(0.45, spotOffset + 0.15));
-
-        renderJumpRunLine(startManRun, endManRun, manSpotPt, manRedDotPt, '#00d8ff', true);
-        setRunInDisplay(runInHeading, spotOffset, true);
-      } else {
-        const autoSpotPt = computeDestinationPoint(lat, lon, runInHeading, spotOffset);
-        const autoRedDotPt = computeDestinationPoint(lat, lon, runInHeading, spotOffset - 0.2);
-        const startAutoRun = computeDestinationPoint(lat, lon, (runInHeading + 180) % 360, 0.45);
-        const endAutoRun = computeDestinationPoint(lat, lon, runInHeading, Math.max(0.45, spotOffset + 0.15));
-
-        renderJumpRunLine(startAutoRun, endAutoRun, autoSpotPt, autoRedDotPt, '#ffffff', false);
-        setRunInDisplay(runInHeading, spotOffset, false);
-      }
-
       // ==========================================
-      // JJ'S JUMP RUN LOGIC (REV 10.1 - Rounded 1-Decimal Offset)
+      // RUN-IN LOGIC (REV 10.2 - Into-Wind Runway Selector & Rounded 1-Decimal Offset)
       // ==========================================
       const runwayEnds = [42, 222, 170, 350];
       let bestRunwayHdg = 42;
@@ -988,7 +828,6 @@
 
       const jjRunwayHdg = bestRunwayHdg;
 
-      // 15k Wind Speed & Rounded 1-Decimal Lateral Offset Calculation
       const wind15kSpd = effectiveSpeed * 3.4;
       let jjOffsetDist = Math.max(0.1, parseFloat(((wind15kSpd / 10) * 0.1).toFixed(1)));
 
@@ -1017,7 +856,7 @@
 
       L.marker([jjLabelLat, jjLabelLon], {
         icon: L.divIcon({
-          html: `<div class="runin-line-text" style="transform: rotate(${jjTextAngle}deg); color: #e040fb;">JJ's Run</div>`,
+          html: `<div class="runin-line-text" style="transform: rotate(${jjTextAngle}deg);">Run-In</div>`,
           className: '', iconSize: [65, 20], iconAnchor: [32, 10]
         })
       }).addTo(jjTargetGroup);
