@@ -1,4 +1,4 @@
-<!-- REV: 10.5 - SKYDIVE SOUTHWEST FLIGHTLINE -->
+<!-- REV: 10.7 - SKYDIVE SOUTHWEST FLIGHTLINE -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -91,7 +91,7 @@
     #map { width: 100%; height: 100%; z-index: 1; }
 
     /* ==========================================================
-        SIDEBAR (REV 10.5)
+        SIDEBAR (REV 10.7)
         ========================================================== */
     .map-info-overlay {
       --w: clamp(460px, 34vw, 720px);
@@ -170,7 +170,7 @@
     .ov-hero .ov-big { font-size: calc(var(--u) * 6.2); }
     .ov-land .ov-big { font-size: calc(var(--u) * 4.6); }
     .ov-jump .ov-big { font-size: calc(var(--u) * 4.2); }
-    .ov-jj-big       { font-size: calc(var(--u) * 3.6); }
+    .ov-jj-big       { font-size: calc(var(--u) * 2.8); }
 
     .turn-glyph { font-size: 0.7em; vertical-align: 0.08em; }
 
@@ -468,7 +468,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Skydive Southwest Flightline</span>
-      <span class="rev-badge">REV: 10.5</span>
+      <span class="rev-badge">REV: 10.7</span>
     </div>
     <div class="header-right-meta">
       <div class="meta-item">Current: <span id="clock-current">--:--:--</span></div>
@@ -513,7 +513,7 @@
 
     </div>
 
-    <!-- SIDEBAR (REV 10.5) -->
+    <!-- SIDEBAR (REV 10.7) -->
     <div class="map-info-overlay" id="sidebar">
       <div class="ov-header">
         <span>⚡ Live ops</span>
@@ -555,7 +555,7 @@
         </div>
       </div>
 
-      <!-- RUN-IN INFO BOX -->
+      <!-- RUN-IN 2-COLUMN INFO BOX (REV 10.7) -->
       <div class="ov-row ov-jump">
         <div class="ov-cell" style="background: linear-gradient(135deg, rgba(40, 20, 60, 0.85) 0%, rgba(15, 10, 26, 0.95) 100%); border-color: rgba(224, 64, 251, 0.4);">
           <div class="ov-label" style="color: #ea80fc;">Run-In Heading</div>
@@ -669,7 +669,7 @@
     let isLandingManual = false;
     let cachedWeatherData = [248, 18, 30, 248, 20, 30, 248, 18, 33];
     let liveWindOverride = { dir: 250, spd: 12, gst: 18 };
-    let latest15kWind = { dir: 248, spd: 61 }; // fallback default
+    let latest15kWind = { dir: 248, spd: 61 };
 
     function getArrow(deg) {
       if (deg === undefined || deg === null) return '↑';
@@ -799,7 +799,7 @@
       }
 
       // ==========================================
-      // RUN-IN & SPOT LOGIC (REV 10.5 - 15k Wind Formula)
+      // RUN-IN & SPOT LOGIC (REV 10.7)
       // ==========================================
       const runwayEnds = [42, 222, 170, 350];
       let bestRunwayHdg = 42;
@@ -815,9 +815,6 @@
 
       const jjRunwayHdg = bestRunwayHdg;
 
-      // 15k Wind Formula Rule:
-      // For every 10mph at 15k -> move spot upwind 0.05 and offset 0.05 left/right.
-      // Rounded up/to nearest single decimal.
       const wind15kSpd = latest15kWind.spd;
       const wind15kDir = latest15kWind.dir;
 
@@ -878,7 +875,7 @@
       const elJjHdg = document.getElementById('ov-jj-heading');
       const elJjOff = document.getElementById('ov-jj-offset');
       if (elJjHdg) elJjHdg.innerText = `${String(jjRunwayHdg).padStart(3, '0')}°`;
-      if (elJjOff) elJjOff.innerText = `${jjOffsetDist.toFixed(1)} ${jjSideName}`;
+      if (elJjOff) elJjOff.innerText = `${spotOffset.toFixed(1)} Past, ${jjOffsetDist.toFixed(1)} ${jjSideName}`;
 
       // ==========================================
       // LANDING CIRCUIT
@@ -909,229 +906,3 @@
       const finalLegDist = 120; 
       const finalStart = [
         activeLandingLat + (finalLegDist * Math.cos(circuitRad)) / 111320,
-        activeLandingLon + (finalLegDist * Math.sin(circuitRad)) / (111320 * Math.cos(activeLandingLat * Math.PI / 180))
-      ];
-
-      const perpRad = circuitRad + (circuitSide === 'left' ? Math.PI / 2 : -Math.PI / 2);
-      const baseWidth = 140; 
-      const baseStart = [
-        finalStart[0] + (baseWidth * Math.cos(perpRad)) / 111320,
-        finalStart[1] + (baseWidth * Math.sin(perpRad)) / (111320 * Math.cos(activeLandingLat * Math.PI / 180))
-      ];
-
-      const downwindLength = 350; 
-      const downwindEnd = [
-        baseStart[0] - (downwindLength * Math.cos(circuitRad)) / 111320,
-        baseStart[1] - (downwindLength * Math.sin(circuitRad)) / (111320 * Math.cos(activeLandingLat * Math.PI / 180))
-      ];
-
-      const circuitCoords = [[activeLandingLat, activeLandingLon], finalStart, baseStart, downwindEnd];
-
-      L.polyline(circuitCoords, {
-        color: '#ff9800', weight: 3, dashArray: '5,5', opacity: 0.95
-      }).addTo(circuitLayerGroup);
-
-      const dLatSpot = activeLandingLat - finalStart[0];
-      const dLonSpot = (activeLandingLon - finalStart[1]) * Math.cos(activeLandingLat * Math.PI / 180);
-      let spotBearingDeg = (Math.atan2(dLonSpot, dLatSpot) * 180 / Math.PI + 360) % 360;
-      let finalArrowAngle = (spotBearingDeg - 90 + 360) % 360;
-
-      L.marker([activeLandingLat, activeLandingLon], {
-        icon: L.divIcon({
-          html: `<div class="circuit-arrow" style="transform: rotate(${finalArrowAngle}deg);">▶</div>`,
-          className: '', iconSize: [24, 24], iconAnchor: [12, 12]
-        })
-      }).addTo(circuitLayerGroup);
-
-      const elPattern = document.getElementById('ov-pattern');
-      if (elPattern) {
-        elPattern.innerHTML = circuitSide === 'left' ? '<span class="turn-glyph">◀</span> LEFT' : 'RIGHT <span class="turn-glyph">▶</span>';
-      }
-      
-      const roundedDir = Math.round(effectiveWindDir);
-      const elWindDir = document.getElementById('ov-winddir');
-      const elWindComp = document.getElementById('ov-windcompass');
-      const elOvArrow = document.getElementById('ov-arrow');
-      if (elWindDir) elWindDir.innerText = `${String(roundedDir).padStart(3, '0')}°`;
-      if (elWindComp) elWindComp.innerText = getCompassLetter(roundedDir);
-      if (elOvArrow) elOvArrow.setAttribute('transform', `rotate(${(effectiveWindDir + 180) % 360} 50 50)`);
-
-      const peak = Math.max(effectiveSpeed, effectiveGust);
-      const speedEl = document.getElementById('ov-windspd');
-      const gustEl = document.getElementById('ov-gust');
-      if (speedEl) {
-        speedEl.innerText = Math.round(effectiveSpeed);
-        speedEl.style.color = getStatusColor(peak);
-      }
-      if (gustEl) {
-        gustEl.innerText = `Gust ${Math.round(effectiveGust)}`;
-        gustEl.style.color = getStatusColor(peak);
-      }
-      
-      setTimeout(() => { map.invalidateSize(); }, 250);
-    }
-
-    updateDashboardMap();
-
-    map.on('zoomend', () => {
-      updateDashboardMap();
-    });
-
-    async function fetchLiveWeatherFeed() {
-      try {
-        const liveRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=mph`);
-        if (!liveRes.ok) return;
-        const liveData = await liveRes.json();
-
-        if (liveData && liveData.current) {
-          const cur = liveData.current;
-          liveWindOverride = {
-            dir: cur.wind_direction_10m,
-            spd: cur.wind_speed_10m,
-            gst: cur.wind_gusts_10m !== undefined ? cur.wind_gusts_10m : cur.wind_speed_10m
-          };
-
-          if (cur.time) {
-            const dataTime = new Date(cur.time);
-            const elDataTime = document.getElementById('live-data-time');
-            if (elDataTime) {
-              elDataTime.innerText = dataTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            }
-          }
-
-          updateDashboardMap();
-        }
-      } catch (err) {
-        console.warn("Live feed fallback active:", err);
-      }
-    }
-
-    async function fetchModelData() {
-      const surfaceParams = `latitude=${lat}&longitude=${lon}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,temperature_2m,dewpoint_2m,cloud_cover&wind_speed_unit=mph&forecast_days=1`;
-      
-      try {
-        const [ecmwfRes, gfsRes, iconRes, aromeRes] = await Promise.all([
-          fetch(`https://api.open-meteo.com/v1/ecmwf?${surfaceParams}`),
-          fetch(`https://api.open-meteo.com/v1/gfs?${surfaceParams}`),
-          fetch(`https://api.open-meteo.com/v1/forecast?models=icon_eu&${surfaceParams}`),
-          fetch(`https://api.open-meteo.com/v1/forecast?models=meteofrance_arome_france&${surfaceParams}`)
-        ]);
-
-        const ecmwf = await ecmwfRes.json();
-        const gfs = await gfsRes.json();
-        const icon = await iconRes.json();
-        const arome = await aromeRes.json();
-
-        const times = ecmwf.hourly.time;
-        const models = [
-          { name: 'ECMWF', data: ecmwf },
-          { name: 'GFS', data: gfs },
-          { name: 'ICON-EU', data: icon },
-          { name: 'AROME', data: arome }
-        ];
-
-        const nowHour = new Date().getHours();
-        let currentIdx = 12;
-
-        for (let i = 0; i < times.length; i++) {
-          const timeDate = new Date(times[i]);
-          if (timeDate.getHours() === nowHour) {
-            currentIdx = i;
-            break;
-          }
-        }
-
-        const sampleTimeDate = new Date(times[currentIdx]);
-        const elHourLabel = document.getElementById('current-hour-label');
-        if (elHourLabel) {
-          elHourLabel.innerText = sampleTimeDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        }
-
-        let forecastCardsHTML = '';
-        models.forEach(model => {
-          const dataset = model.data;
-          if (!dataset || !dataset.hourly) return;
-
-          const speed = Math.round(dataset.hourly.wind_speed_10m[currentIdx] || 0);
-          const gust = Math.round(dataset.hourly.wind_gusts_10m ? (dataset.hourly.wind_gusts_10m[currentIdx] || 0) : speed);
-          const dir = dataset.hourly.wind_direction_10m[currentIdx];
-          const peak = Math.max(speed, gust);
-          const statusClass = getStatusClass(peak);
-
-          const temp = dataset.hourly.temperature_2m ? dataset.hourly.temperature_2m[currentIdx] : 18;
-          const dew = dataset.hourly.dewpoint_2m ? dataset.hourly.dewpoint_2m[currentIdx] : 11;
-          const cover = dataset.hourly.cloud_cover ? dataset.hourly.cloud_cover[currentIdx] : 50;
-
-          const baseAgl = calculateCloudBase(temp, dew, cover);
-          const baseStr = (baseAgl !== null && baseAgl < 25000) ? `${baseAgl.toLocaleString()}'` : 'CLR';
-
-          const dirRounded = Math.round(dir);
-          forecastCardsHTML += `
-            <div class="model-card-item ${statusClass}">
-              <div class="model-card-top">
-                <span class="model-name">${model.name}</span>
-                <span class="cloud-badge">☁ ${baseStr}</span>
-              </div>
-              <div class="model-card-wind">
-                <span class="mc-arrow" style="transform: rotate(${(dir + 180) % 360}deg);">↑</span>
-                <span class="mc-speed">${speed}</span>
-                <span class="mc-gust">G${gust}</span>
-                <span class="mc-dir" style="margin-left: auto;">${String(dirRounded).padStart(3, '0')}° ${getCompassLetter(dirRounded)}</span>
-              </div>
-            </div>
-          `;
-        });
-        const elModelRows = document.getElementById('current-model-forecast-rows');
-        if (elModelRows) elModelRows.innerHTML = forecastCardsHTML;
-
-        const aromeDir = arome.hourly ? arome.hourly.wind_direction_10m[currentIdx] : 248;
-        const aromeSpd = arome.hourly ? Math.round(arome.hourly.wind_speed_10m[currentIdx]) : 18;
-        const aromeGst = arome.hourly ? Math.round(arome.hourly.wind_gusts_10m[currentIdx]) : 30;
-
-        const gfsDir = gfs.hourly ? gfs.hourly.wind_direction_10m[currentIdx] : 248;
-        const gfsSpd = gfs.hourly ? Math.round(gfs.hourly.wind_speed_10m[currentIdx]) : 20;
-        const gfsGst = gfs.hourly ? Math.round(gfs.hourly.wind_gusts_10m[currentIdx]) : 30;
-
-        const ecmwfDir = ecmwf.hourly ? ecmwf.hourly.wind_direction_10m[currentIdx] : 248;
-        const ecmwfSpd = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_speed_10m[currentIdx]) : 18;
-        const ecmwfGst = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_gusts_10m[currentIdx] || 33) : 33;
-
-        cachedWeatherData = [aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst];
-
-        // Store 15k simulated/fetched wind values for spot calculation (scaling surface speed by 3.4x)
-        latest15kWind = {
-          dir: (ecmwfDir + 30) % 360,
-          spd: Math.round(ecmwfSpd * 3.4)
-        };
-
-        updateDashboardMap();
-
-        const elUwindSfc = document.getElementById('uwind-sfc');
-        const elUwind3k = document.getElementById('uwind-3k');
-        const elUwind7k = document.getElementById('uwind-7k');
-        const elUwind10k = document.getElementById('uwind-10k');
-        const elUwind15k = document.getElementById('uwind-15k');
-
-        if (elUwindSfc) elUwindSfc.innerHTML = windAloftHTML(ecmwfDir, ecmwfSpd);
-        if (elUwind3k)  elUwind3k.innerHTML  = windAloftHTML(ecmwfDir + 10, Math.round(ecmwfSpd * 1.8));
-        if (elUwind7k)  elUwind7k.innerHTML  = windAloftHTML(ecmwfDir + 18, Math.round(ecmwfSpd * 2.3));
-        if (elUwind10k) elUwind10k.innerHTML = windAloftHTML(ecmwfDir + 25, Math.round(ecmwfSpd * 2.8));
-        if (elUwind15k) elUwind15k.innerHTML = windAloftHTML(latest15kWind.dir, latest15kWind.spd);
-
-      } catch (err) {
-        console.error("Fetch error:", err);
-      }
-    }
-
-    fetchLiveWeatherFeed();
-    fetchModelData();
-
-    setInterval(fetchLiveWeatherFeed, 120000);
-
-    setTimeout(() => {
-      window.location.reload(true);
-    }, 300 * 1000);
-  </script>
-
-</body>
-</html>
