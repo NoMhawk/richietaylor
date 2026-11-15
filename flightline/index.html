@@ -1,1031 +1,1126 @@
-<!-- ========================================================================= -->
-<!-- REVISION: v4.2                                                            -->
-<!-- SYSTEM: RichBot - Skydive Southwest Flight Line Forecast                  -->
-<!-- TARGET FILE: forecast/index.html                                          -->
-<!-- ========================================================================= -->
-
+<!-- REV: 10.4 - SKYDIVE SOUTHWEST FLIGHTLINE -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- [SUB-SECTION: HTML HEAD & METADATA] -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 4.2)</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="utf-8">
+  <title>Skydive Southwest Flightline</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    html, body {
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      background: #0b0f19;
+      color: #f0f4f8;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding: 6px 10px;
+    }
 
-    <!-- [SECTION: CORE STYLESHEET] -->
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
-        :root {
-            --bg-primary: #f1f5f9;
-            --bg-card: #ffffff;
-            --border-color: #cbd5e1;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --accent-sky: #0284c7;
-            --accent-emerald: #059669;
-            --accent-amber: #d97706;
-            --accent-orange: #ea580c;
-            --accent-red: #dc2626;
-        }
+    .top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 100%;
+      margin-bottom: 4px;
+      padding-bottom: 2px;
+      border-bottom: 1px solid #1e2d4a;
+      height: 22px;
+    }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-primary); color: var(--text-main); min-height: 100vh; line-height: 1.5; }
+    .site-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #00d8ff;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-        /* [SUB-SECTION: HEADER STYLES] */
-        header { background-color: var(--bg-card); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 50; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); }
-        .header-container { max-width: 1500px; margin: 0 auto; padding: 1rem 1.5rem; display: flex; flex-direction: column; gap: 1rem; align-items: center; justify-content: space-between; }
-        @media(min-width: 640px) { .header-container { flex-direction: row; } }
+    .header-right-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: monospace;
+      font-size: 0.72rem;
+      color: #a9b9d0;
+    }
 
-        .logo-box { display: flex; align-items: center; gap: 0.75rem; }
-        .logo-icon { background-color: var(--accent-sky); color: white; padding: 0.6rem; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
-        .logo-title { font-size: 1.125rem; font-weight: 700; letter-spacing: -0.025em; display: flex; align-items: center; gap: 0.5rem; color: #0f172a; }
-        .rev-badge { font-size: 0.65rem; background: rgba(2, 132, 199, 0.1); color: #0284c7; border: 1px solid rgba(2, 132, 199, 0.3); padding: 0.1rem 0.4rem; border-radius: 0.25rem; font-weight: 600; }
-        .logo-sub { font-size: 0.75rem; color: var(--text-muted); }
+    .meta-item span {
+      color: #00d8ff;
+      font-weight: bold;
+    }
 
-        .header-actions { display: flex; align-items: center; gap: 1rem; }
-        .last-updated { font-size: 0.75rem; color: var(--text-muted); background-color: #f8fafc; padding: 0.375rem 0.75rem; border-radius: 0.5rem; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 0.35rem; }
-        .btn-refresh { background-color: var(--accent-sky); color: white; border: none; font-size: 0.75rem; font-weight: 600; padding: 0.5rem 0.875rem; border-radius: 0.5rem; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; gap: 0.375rem; }
-        .btn-refresh:hover { background-color: #0369a1; }
+    .rev-badge {
+      background: #9c27b0;
+      color: #fff;
+      font-weight: 800;
+      font-family: monospace;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      box-shadow: 0 0 10px rgba(156, 39, 176, 0.4);
+    }
 
-        main { max-width: 1500px; margin: 0 auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 2rem; }
+    .dashboard-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+      height: calc(100vh - 36px);
+      position: relative;
+    }
 
-        .error-banner { background-color: #fee2e2; border: 1px solid #f87171; color: #991b1b; padding: 0.85rem 1.25rem; border-radius: 0.75rem; font-size: 0.875rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 1rem; }
-        .hidden { display: none !important; }
+    .map-card {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #1e2d4a;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      background: #131b2e;
+    }
 
-        section { display: flex; flex-direction: column; gap: 1.5rem; }
-        .section-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem; }
-        .section-title-wrap { display: flex; align-items: center; gap: 0.625rem; }
-        .section-dot { width: 0.75rem; height: 0.75rem; border-radius: 9999px; background-color: var(--accent-sky); box-shadow: 0 0 8px rgba(2, 132, 199, 0.4); }
-        .section-title { font-size: 1.15rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #0f172a; }
-        .section-date { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
+    #map { width: 100%; height: 100%; z-index: 1; }
 
-        .panel { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 1rem; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .panel-header { display: flex; justify-content: space-between; align-items: center; }
-        .panel-title { font-size: 0.9rem; font-weight: 700; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 0.5rem; }
-        .badge { font-size: 0.7rem; background-color: #f1f5f9; color: #334155; padding: 0.25rem 0.625rem; border-radius: 0.375rem; border: 1px solid var(--border-color); font-weight: 600; }
+    /* ==========================================================
+        SIDEBAR (REV 10.4)
+        ========================================================== */
+    .map-info-overlay {
+      --w: clamp(460px, 34vw, 720px);
+      --u: min(1vh, calc(var(--w) / 55));
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1000;
+      width: var(--w);
+      background: rgba(8, 12, 22, 0.97);
+      backdrop-filter: blur(16px);
+      border-left: 1px solid rgba(0, 216, 255, 0.4);
+      border-radius: 0 8px 8px 0;
+      padding: calc(var(--u) * 1.1) calc(var(--u) * 1.4);
+      box-shadow: -10px 0 40px rgba(0,0,0,0.85);
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--u) * 0.9);
+      overflow-y: auto;
+      font-variant-numeric: tabular-nums;
+    }
 
-        /* [SUB-SECTION: 7-DAY OUTLOOK CARD STYLES] */
-        .outlook-days-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 1rem; align-items: stretch; }
-        @media(min-width: 640px) { .outlook-days-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media(min-width: 1024px) { .outlook-days-grid { grid-template-columns: repeat(4, 1fr); } }
-        @media(min-width: 1400px) { .outlook-days-grid { grid-template-columns: repeat(7, 1fr); } }
+    .ov-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex: 0 0 auto;
+      font-size: calc(var(--u) * 2.3);
+      font-weight: 800;
+      color: #00d8ff;
+      letter-spacing: 0.02em;
+    }
 
-        .outlook-day-card { border: 2px solid var(--border-color); border-radius: 1rem; padding: 0.85rem; display: flex; flex-direction: column; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.05); height: 100%; }
-        .outlook-day-card:hover { border-color: var(--accent-sky); box-shadow: 0 4px 6px rgba(0,0,0,0.08); }
-        .outlook-day-card.active { border-color: var(--accent-sky); box-shadow: 0 0 15px rgba(2, 132, 199, 0.2); }
+    .ov-row {
+      display: grid;
+      gap: calc(var(--u) * 0.9);
+      min-height: 0;
+    }
 
-        .card-top-content { display: flex; flex-direction: column; gap: 0.5rem; flex: 0 0 auto; }
+    .ov-hero    { flex: 2.6 1 0; min-height: calc(var(--u) * 12); grid-template-columns: 1.3fr 1fr; }
+    .ov-land    { flex: 1.7 1 0; min-height: calc(var(--u) * 8);  grid-template-columns: 1fr; }
+    .ov-jump    { flex: 1.7 1 0; min-height: calc(var(--u) * 8);  grid-template-columns: 1.3fr 1fr; }
 
-        .card-bg-green { background-color: #f0fdf4; border-color: #86efac; }
-        .card-bg-yellow { background-color: #fefce8; border-color: #fde047; }
-        .card-bg-orange { background-color: #fff7ed; border-color: #fdba74; }
-        .card-bg-red { background-color: #fef2f2; border-color: #fca5a5; }
+    .ov-cell {
+      background: linear-gradient(135deg, rgba(22, 32, 54, 0.85) 0%, rgba(10, 15, 26, 0.95) 100%);
+      border: 1px solid rgba(40, 58, 92, 0.95);
+      border-radius: 10px;
+      padding: calc(var(--u) * 0.8) calc(var(--u) * 1.1);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+    }
 
-        .outlook-section { background: rgba(255, 255, 255, 0.7); border: 1px solid rgba(0, 0, 0, 0.08); border-radius: 0.5rem; padding: 0.35rem 0.5rem; display: flex; flex-direction: column; gap: 0.25rem; margin-top: 0.5rem; }
-        
-        .outlook-matrix-mini { display: flex; flex-direction: column; gap: 0.15rem; font-size: 0.7rem; background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(0, 0, 0, 0.08); border-radius: 0.5rem; padding: 0.35rem; margin-top: 0.5rem; }
-        .wf-row { display: grid; grid-template-columns: 42px repeat(5, 1fr); align-items: center; text-align: center; gap: 1px; padding: 0.1rem 0; border-bottom: 1px solid rgba(0, 0, 0, 0.05); }
-        .wf-row:last-child { border-bottom: none; }
-        .wf-label { text-align: left; font-weight: 700; color: #64748b; font-size: 0.6rem; padding-left: 2px; }
-        .wf-cell { display: flex; align-items: center; justify-content: center; }
-        .wf-arrow { font-size: 0.7rem; color: #0284c7; }
+    .ov-label {
+      font-size: calc(var(--u) * 1.6);
+      font-weight: 600;
+      color: #a9b9d0;
+      margin-bottom: calc(var(--u) * 0.3);
+      white-space: nowrap;
+    }
 
-        .cloudbase-warning-badge { background-color: #fef2f2; color: #991b1b; border: 1px solid #f87171; padding: 0.2rem 0.25rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.6rem; display: block; text-transform: uppercase; width: 100%; margin-top: 0.25rem; letter-spacing: 0.025em; }
-        .diagnosis-box { background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(2, 132, 199, 0.2); border-radius: 0.5rem; padding: 0.5rem; font-size: 0.7rem; color: #0369a1; line-height: 1.35; font-weight: 500; margin-top: 0.75rem; flex: 1 1 auto; display: flex; flex-direction: column; justify-content: flex-start; }
+    .ov-big {
+      font-size: calc(var(--u) * 5.2);
+      font-weight: 900;
+      line-height: 1;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-        /* [SUB-SECTION: TRAFFIC BADGE & COLOR UTILITIES] */
-        .text-green { color: #059669 !important; font-weight: 700; }
-        .text-yellow { color: #d97706 !important; font-weight: 700; }
-        .text-orange { color: #ea580c !important; font-weight: 700; }
-        .text-red { color: #dc2626 !important; font-weight: 700; }
+    .ov-hero .ov-big { font-size: calc(var(--u) * 6.2); }
+    .ov-land .ov-big { font-size: calc(var(--u) * 4.6); }
+    .ov-jump .ov-big { font-size: calc(var(--u) * 4.2); }
+    .ov-jj-big       { font-size: calc(var(--u) * 3.6); }
 
-        .traffic-badge-green { background-color: #ecfdf5; color: #065f46; border: 1px solid #10b981; padding: 0.2rem 0.15rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.65rem; display: block; text-transform: uppercase; width: 100%; white-space: nowrap; }
-        .traffic-badge-yellow { background-color: #fefce8; color: #854d0e; border: 1px solid #eab308; padding: 0.2rem 0.15rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.65rem; display: block; text-transform: uppercase; width: 100%; white-space: nowrap; }
-        .traffic-badge-orange { background-color: #fff7ed; color: #c2410c; border: 1px solid #f97316; padding: 0.2rem 0.15rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.65rem; display: block; text-transform: uppercase; width: 100%; white-space: nowrap; }
-        .traffic-badge-red { background-color: #fef2f2; color: #991b1b; border: 1px solid #ef4444; padding: 0.2rem 0.15rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.65rem; display: block; text-transform: uppercase; width: 100%; white-space: nowrap; }
+    .turn-glyph { font-size: 0.7em; vertical-align: 0.08em; }
 
-        /* [SUB-SECTION: MASTER MATRIX STYLES] */
-        .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid #e2e8f0; border-radius: 0.75rem; background: #fff; }
-        .master-traffic-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; text-align: center; white-space: nowrap; }
-        .master-traffic-table th, .master-traffic-table td { padding: 0.5rem 0.6rem; border: 1px solid #e2e8f0; min-width: 68px; }
-        .master-traffic-table th { font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 0.7rem; background: #f8fafc; }
-        .master-traffic-table th.param-label, .master-traffic-table td.param-label { text-align: left; font-weight: 700; color: #475569; background: #f8fafc; padding-left: 0.75rem; position: sticky; left: 0; z-index: 10; min-width: 95px; width: 95px; font-size: 0.68rem; }
-        .master-traffic-table th.param-label { z-index: 20; }
+    .ov-sub {
+      font-size: calc(var(--u) * 2.6);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-top: calc(var(--u) * 0.3);
+      white-space: nowrap;
+    }
 
-        .master-traffic-table th.current-col, .master-traffic-table td.current-col { background-color: #f0f9ff !important; border-left: 2px solid var(--accent-sky) !important; border-right: 2px solid var(--accent-sky) !important; }
-        .master-traffic-table th.current-col { border-top: 2px solid var(--accent-sky) !important; color: var(--accent-sky) !important; }
-        .master-traffic-table tr:last-child td.current-col { border-bottom: 2px solid var(--accent-sky) !important; }
+    .accent-orange { color: #ffa726; }
+    .accent-cyan    { color: #00d8ff; }
+    .accent-green  { color: #00e676; }
+    .accent-purple { color: #e040fb; }
 
-        /* [SUB-SECTION: MAP & WEBCAM STYLES] */
-        .map-container { position: relative; width: 100%; height: 500px; border-radius: 0.75rem; overflow: hidden; border: 1px solid var(--border-color); background: #e2e8f0; }
-        .map-container iframe { width: 100%; height: 100%; border: none; }
+    .ov-wind { flex-direction: row; align-items: center; gap: calc(var(--u) * 1.2); }
+    .ov-dial { flex: 0 0 auto; height: 100%; max-height: calc(var(--u) * 8.5); aspect-ratio: 1 / 1; }
+    .ov-dial svg { width: 100%; height: 100%; display: block; }
+    .ov-wind-text { min-width: 0; display: flex; flex-direction: column; }
 
-        .webcam-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-        @media(min-width: 768px) { .webcam-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media(min-width: 1200px) { .webcam-grid { grid-template-columns: repeat(4, 1fr); } }
+    .ov-speed-line { display: flex; align-items: baseline; gap: calc(var(--u) * 0.6); }
+    .ov-unit { font-size: calc(var(--u) * 2.4); font-weight: 700; color: #a9b9d0; }
 
-        .webcam-card { background: #f8fafc; border: 1px solid var(--border-color); border-radius: 0.75rem; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
-        .webcam-title { font-size: 0.85rem; font-weight: 700; color: #0f172a; display: flex; align-items: center; justify-content: space-between; }
+    .ov-section {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      gap: calc(var(--u) * 0.6);
+    }
 
-        footer { background-color: var(--bg-card); border-top: 1px solid var(--border-color); margin-top: 3rem; padding: 1.5rem; text-align: center; font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
-    </style>
+    .ov-models { flex: 5 1 0; min-height: calc(var(--u) * 22); }
+    .ov-aloft   { flex: 5.6 1 0; min-height: calc(var(--u) * 24); }
+
+    .section-title {
+      flex: 0 0 auto;
+      font-size: calc(var(--u) * 1.9);
+      font-weight: 700;
+      color: #a9b9d0;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .model-forecast-grid {
+      flex: 1 1 0;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: calc(var(--u) * 0.8);
+    }
+
+    .model-card-item {
+      border-radius: 10px;
+      padding: calc(var(--u) * 0.5) calc(var(--u) * 0.9);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .model-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: calc(var(--u) * 0.5);
+    }
+
+    .model-name { font-size: calc(var(--u) * 1.7); font-weight: 800; color: #fff; }
+
+    .cloud-badge {
+      font-size: calc(var(--u) * 1.5);
+      font-weight: 800;
+      color: #00d8ff;
+      background: rgba(0, 216, 255, 0.12);
+      border: 1px solid rgba(0, 216, 255, 0.35);
+      border-radius: 4px;
+      padding: 0 calc(var(--u) * 0.5);
+      white-space: nowrap;
+    }
+
+    .model-card-wind {
+      display: flex;
+      align-items: baseline;
+      gap: calc(var(--u) * 0.4);
+      white-space: nowrap;
+    }
+
+    .mc-arrow { font-size: calc(var(--u) * 2.8); font-weight: 900; display: inline-block; line-height: 1; }
+    .mc-speed { font-size: calc(var(--u) * 3.8); font-weight: 900; line-height: 1; }
+    .mc-gust  { font-size: calc(var(--u) * 2.1); font-weight: 800; opacity: 0.9; }
+    .mc-dir   { font-size: calc(var(--u) * 1.7); font-weight: 700; opacity: 0.9; }
+
+    .status-green  { background: rgba(0, 230, 118, 0.14); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.5); }
+    .status-yellow { background: rgba(255, 235, 59, 0.14); color: #ffee58; border: 1px solid rgba(255, 235, 59, 0.5); }
+    .status-orange { background: rgba(255, 152, 0, 0.16);  color: #ffb74d; border: 1px solid rgba(255, 152, 0, 0.55); }
+    .status-red    { background: rgba(255, 82, 82, 0.2);   color: #ff6b6b; border: 1px solid rgba(255, 82, 82, 0.6); }
+
+    .aloft-grid {
+      flex: 1 1 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      background: rgba(15, 22, 36, 0.7);
+      border: 1px solid rgba(40, 58, 92, 0.95);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .aloft-head, .aloft-row {
+      display: grid;
+      grid-template-columns: 0.8fr 2.4fr 1fr;
+      align-items: center;
+      padding: 0 calc(var(--u) * 1.2);
+      column-gap: calc(var(--u) * 0.6);
+    }
+
+    .aloft-head {
+      flex: 0 0 auto;
+      height: calc(var(--u) * 3);
+      background: rgba(28, 40, 64, 0.95);
+      font-size: calc(var(--u) * 1.5);
+      font-weight: 700;
+      color: #a9b9d0;
+    }
+    .aloft-head span:last-child { text-align: right; }
+
+    .aloft-row {
+      flex: 1 1 0;
+      min-height: 0;
+      border-top: 1px solid rgba(40, 58, 92, 0.6);
+    }
+
+    .aloft-row, .aloft-row * { line-height: 1; }
+    .aloft-alt  { font-size: calc(var(--u) * 3.1); font-weight: 900; color: #fff; }
+    .aloft-wind { display: flex; align-items: baseline; gap: calc(var(--u) * 0.9); color: #00d8ff; white-space: nowrap; min-width: 0; }
+    .aloft-wind .dir-arrow { font-size: calc(var(--u) * 2.8); }
+    .aw-dir { font-size: calc(var(--u) * 2.5); font-weight: 700; color: #cfe6ff; }
+    .aw-spd { font-size: calc(var(--u) * 3.4); font-weight: 900; color: #fff; }
+    .aw-spd small { font-size: calc(var(--u) * 1.6); font-weight: 700; color: #a9b9d0; margin-left: calc(var(--u) * 0.3); }
+    .aloft-row:first-of-type .aw-spd { color: #00d8ff; }
+    .aloft-temp { font-size: calc(var(--u) * 3); font-weight: 800; text-align: right; color: #ffd9a0; }
+
+    .dir-arrow { display: inline-block; font-weight: bold; margin-right: 2px; }
+
+    /* DZ CONTROL PANEL OVERLAY (BOTTOM-LEFT OF MAP) */
+    .spot-overlay-card {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      z-index: 1000;
+      background: rgba(11, 15, 25, 0.94);
+      backdrop-filter: blur(8px);
+      border: 1px solid #1e2d4a;
+      border-radius: 8px;
+      padding: 10px 14px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+      font-family: monospace;
+      width: 320px;
+    }
+
+    .spot-overlay-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+      padding-bottom: 3px;
+      border-bottom: 1px solid #1e2d4a;
+    }
+
+    .spot-overlay-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #00d8ff;
+      text-transform: uppercase;
+    }
+
+    .mode-toggle-btn {
+      background: #1e2d4a;
+      color: #ffee58;
+      border: 1px solid #ffee58;
+      border-radius: 3px;
+      font-size: 0.6rem;
+      font-weight: bold;
+      padding: 2px 8px;
+      cursor: pointer;
+    }
+
+    .control-slider-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px dashed rgba(255,255,255,0.1);
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.68rem;
+    }
+
+    .slider-row input[type=range] {
+      width: 150px;
+      accent-color: #00d8ff;
+    }
+
+    .jumprun-arrow {
+      font-size: 24px;
+      font-weight: bold;
+      text-shadow: 0 0 6px #000;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .circuit-arrow {
+      color: #ff9800;
+      font-size: 24px;
+      font-weight: bold;
+      text-shadow: 0 0 6px #000;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    /* EXACT START-ANCHORED RUN IN LABEL */
+    .runin-line-text {
+      background: #0b0f19;
+      color: #e040fb;
+      font-family: monospace;
+      font-size: 9px;
+      font-weight: 900;
+      padding: 1px 4px;
+      border-radius: 3px;
+      white-space: nowrap;
+      pointer-events: none;
+      letter-spacing: 0.5px;
+      box-shadow: 0 0 4px rgba(0,0,0,0.8);
+    }
+
+    /* MOBILE RESPONSIVE STYLING */
+    @media (max-width: 768px) {
+      html, body {
+        height: auto;
+        overflow-y: auto;
+        padding: 4px;
+      }
+      .dashboard-container {
+        height: auto;
+        gap: 8px;
+      }
+      .map-card {
+        height: 480px !important;
+      }
+      .map-info-overlay {
+        --w: 100vw;
+        --u: min(2.3vw, 10px);
+        position: relative !important;
+        top: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        width: 100% !important;
+        border-left: none !important;
+        border-radius: 8px !important;
+        margin-bottom: 8px;
+        overflow: visible;
+      }
+      .ov-row, .ov-section { flex: none; }
+      .ov-hero { min-height: calc(var(--u) * 14); }
+      .ov-land, .ov-jump { min-height: calc(var(--u) * 9); }
+      .ov-models, .ov-aloft { min-height: 0; }
+      .model-forecast-grid { grid-template-rows: none; }
+      .model-card-item { min-height: calc(var(--u) * 12); }
+      .aloft-row { min-height: calc(var(--u) * 6); }
+      .spot-overlay-card {
+        position: relative !important;
+        bottom: auto !important;
+        left: auto !important;
+        width: 100% !important;
+        margin-top: 8px;
+      }
+      .slider-row input[type=range], .slider-row select {
+        width: 180px !important;
+      }
+    }
+  </style>
 </head>
 <body>
 
-    <!-- [SECTION: CONFIGURATION & SETTINGS BLOCK] -->
-    <script>
-        const CONFIG = {
-            revision: "v4.2",
-            systemName: "RichBot",
-            locationName: "Skydive Southwest, Dunkeswell Airfield",
-            latitude: 50.880,
-            longitude: -3.230,
-            elevation: 254,
-            timezone: "Europe/London",
-            refreshIntervalMinutes: 5
-        };
-    </script>
+  <!-- HEADER -->
+  <div class="top-header">
+    <div class="site-title">
+      <span>🪂 Skydive Southwest Flightline</span>
+      <span class="rev-badge">REV: 10.4</span>
+    </div>
+    <div class="header-right-meta">
+      <div class="meta-item">Current: <span id="clock-current">--:--:--</span></div>
+      <div class="meta-item">Live Data: <span id="live-data-time">--:--</span></div>
+    </div>
+  </div>
 
-    <!-- [SECTION: PAGE HEADER] -->
-    <header>
-        <div class="header-container">
-            <div class="logo-box">
-                <div class="logo-icon">
-                    <i class="fa-solid fa-plane-departure"></i>
-                </div>
-                <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 4.2</span></h1>
-                    <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
-                </div>
-            </div>
-            <div class="header-actions">
-                <span id="last-updated" class="last-updated">
-                    <i class="fa-solid fa-sync fa-spin" style="color: var(--accent-sky);"></i> Loading...
-                </span>
-                <button onclick="fetchAllData()" class="btn-refresh">
-                    <i class="fa-solid fa-rotate"></i> Refresh
-                </button>
-            </div>
-        </div>
-    </header>
+  <div class="dashboard-container">
+    
+    <!-- MAP CARD -->
+    <div class="map-card">
+      <div id="map"></div>
 
-    <!-- [SECTION: MAIN PAGE BODY CONTAINER] -->
-    <main>
-
-        <!-- [SUB-SECTION: ERROR BANNER] -->
-        <div id="error-banner" class="error-banner hidden">
-            <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.125rem;"></i>
-                <span id="error-message">Weather service temporarily busy. Retrying automatically...</span>
-            </div>
-            <button onclick="fetchAllData()" style="background: #dc2626; color: white; border: 1px solid #f87171; padding: 0.3rem 0.75rem; border-radius: 0.375rem; cursor: pointer; font-weight: 600; font-size: 0.75rem;">Retry Now</button>
+      <!-- COMPACT LANDING CONTROLS PANEL (BOTTOM-LEFT OF MAP) -->
+      <div class="spot-overlay-card">
+        <div class="spot-overlay-header">
+          <span class="spot-overlay-title">⚙️ DZ Override Controls</span>
         </div>
 
-        <!-- [SECTION: OPERATIONAL VIEW & OUTLOOK] -->
-        <section class="space-y-6">
-
-            <!-- [SUB-SECTION: 1. MASTER ALL-DAY HOURLY TRAFFIC LIGHT MATRIX] -->
-            <div class="panel">
-                <div class="panel-header">
-                    <h3 class="panel-title" id="matrix-section-title"><i class="fa-solid fa-traffic-light" style="color: var(--accent-sky);"></i>Hourly Overview</h3>
-                    <span class="badge" id="live-obs-timestamp">Obs: --:--</span>
-                </div>
-                <div class="table-wrapper">
-                    <table class="master-traffic-table" id="master-traffic-matrix">
-                        <!-- Populated dynamically via JS -->
-                    </table>
-                </div>
+        <div class="control-slider-group" style="border-top:none; margin-top:0; padding-top:0;">
+          <div class="slider-row">
+            <span style="color:#ff9800; font-weight:bold;">Landing Mode:</span>
+            <button class="mode-toggle-btn" id="toggle-landing-btn" onclick="toggleLandingMode()" style="border-color:#ff9800; color:#ff9800;">AUTO</button>
+          </div>
+          <div id="landing-manual-controls" style="display: none; flex-direction: column; gap: 5px; margin-top: 5px;">
+            <div class="slider-row">
+              <span>Wind Sector:</span>
+              <select id="select-wind-sector" onchange="updateDashboardMap()" style="background:#131b2e; color:#ff9800; border:1px solid #ff9800; font-size:0.7rem; font-weight:bold; border-radius:3px; width:150px;">
+                <option value="0" selected>N (337.5° - 022.5°)</option>
+                <option value="45">NE (022.5° - 067.5°)</option>
+                <option value="90">E (067.5° - 112.5°)</option>
+                <option value="135">SE (112.5° - 157.5°)</option>
+                <option value="180">S (157.5° - 202.5°)</option>
+                <option value="225">SW (202.5° - 247.5°)</option>
+                <option value="270">W (247.5° - 292.5°)</option>
+                <option value="315">NW (292.5° - 337.5°)</option>
+              </select>
             </div>
+          </div>
+        </div>
+      </div>
 
-            <!-- [SUB-SECTION: 2. 7-DAY DROPZONE OUTLOOK CARDS] -->
-            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                <div class="section-header">
-                    <div class="section-title-wrap">
-                        <div class="section-dot" style="background-color: var(--accent-emerald);"></div>
-                        <h2 class="section-title">7-Day Dropzone Outlook</h2>
-                    </div>
-                    <span class="section-date" id="selected-day-header-label">Click Day Box to View Detailed Schedule</span>
-                </div>
-                <div class="outlook-days-grid" id="outlook-days-container">
-                    <!-- Populated dynamically via JS -->
-                </div>
+    </div>
+
+    <!-- SIDEBAR (REV 10.4) -->
+    <div class="map-info-overlay" id="sidebar">
+      <div class="ov-header">
+        <span>⚡ Live ops</span>
+      </div>
+
+      <!-- HERO: WIND DIRECTION + SPEED -->
+      <div class="ov-row ov-hero">
+        <div class="ov-cell ov-wind">
+          <div class="ov-dial">
+            <svg viewBox="0 0 100 100" aria-hidden="true">
+              <circle cx="50" cy="50" r="47" fill="rgba(0,216,255,0.06)" stroke="#2c4a6e" stroke-width="3"/>
+              <text x="50" y="15" text-anchor="middle" font-size="12" font-weight="800" fill="#7c8ea6" font-family="sans-serif">N</text>
+              <g id="ov-arrow" transform="rotate(324 50 50)">
+                <polygon points="50,22 72,56 57,56 57,84 43,84 43,56 28,56" fill="#00d8ff"/>
+              </g>
+            </svg>
+          </div>
+          <div class="ov-wind-text">
+            <div class="ov-label">Wind from (Live EGTU)</div>
+            <div class="ov-big accent-cyan" id="ov-winddir">--°</div>
+            <div class="ov-sub accent-cyan" id="ov-windcompass">--</div>
+          </div>
+        </div>
+        <div class="ov-cell">
+          <div class="ov-label">Actual / Average wind</div>
+          <div class="ov-speed-line">
+            <span class="ov-big accent-green" id="ov-windspd">--</span>
+            <span class="ov-unit">mph</span>
+          </div>
+          <div class="ov-sub accent-green" id="ov-gust">Gust --</div>
+        </div>
+      </div>
+
+      <!-- LANDING PATTERN -->
+      <div class="ov-row ov-land">
+        <div class="ov-cell">
+          <div class="ov-label">Landing Pattern</div>
+          <div class="ov-big accent-orange" id="ov-pattern" style="font-size: calc(var(--u) * 4.2);">--</div>
+        </div>
+      </div>
+
+      <!-- RUN-IN INFO BOX -->
+      <div class="ov-row ov-jump">
+        <div class="ov-cell" style="background: linear-gradient(135deg, rgba(40, 20, 60, 0.85) 0%, rgba(15, 10, 26, 0.95) 100%); border-color: rgba(224, 64, 251, 0.4);">
+          <div class="ov-label" style="color: #ea80fc;">Run-In Heading</div>
+          <div class="ov-big accent-purple" id="ov-jj-heading">--°</div>
+        </div>
+        <div class="ov-cell" style="background: linear-gradient(135deg, rgba(40, 20, 60, 0.85) 0%, rgba(15, 10, 26, 0.95) 100%); border-color: rgba(224, 64, 251, 0.4);">
+          <div class="ov-label" style="color: #ea80fc;">Offset</div>
+          <div class="ov-big accent-purple ov-jj-big" id="ov-jj-offset">--</div>
+        </div>
+      </div>
+
+      <!-- CURRENT HOUR MODEL FORECAST SECTION -->
+      <div class="ov-section ov-models">
+        <div class="section-title">
+          <span>Model forecast</span>
+          <span id="current-hour-label" style="color: #00d8ff;">--:--</span>
+        </div>
+        <div class="model-forecast-grid" id="current-model-forecast-rows">
+          <div style="grid-column: span 2; text-align: center; padding: 10px; color: #7c8ea6;">Loading forecast...</div>
+        </div>
+      </div>
+
+      <!-- WINDS ALOFT SECTION -->
+      <div class="ov-section ov-aloft">
+        <div class="section-title">
+          <span>Winds aloft</span>
+          <span style="color:#7c8ea6;">EGTU 839'</span>
+        </div>
+        <div class="aloft-grid" id="upper-winds-rows">
+          <div class="aloft-head"><span>Alt</span><span>Direction / speed</span><span>Temp</span></div>
+          <div class="aloft-row">
+            <div class="aloft-alt">Sfc</div>
+            <div class="aloft-wind" id="uwind-sfc">--</div>
+            <div class="aloft-temp" id="utemp-sfc">18°C</div>
+          </div>
+          <div class="aloft-row">
+            <div class="aloft-alt">3k'</div>
+            <div class="aloft-wind" id="uwind-3k">--</div>
+            <div class="aloft-temp" id="utemp-3k">12°C</div>
+          </div>
+          <div class="aloft-row">
+            <div class="aloft-alt">7k'</div>
+            <div class="aloft-wind" id="uwind-7k">--</div>
+            <div class="aloft-temp" id="utemp-7k">4°C</div>
+          </div>
+          <div class="aloft-row">
+            <div class="aloft-alt">10k'</div>
+            <div class="aloft-wind" id="uwind-10k">--</div>
+            <div class="aloft-temp" id="utemp-10k">-2°C</div>
+          </div>
+          <div class="aloft-row">
+            <div class="aloft-alt">15k'</div>
+            <div class="aloft-wind" id="uwind-15k">--</div>
+            <div class="aloft-temp" id="utemp-15k">-12°C</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const lat = 50.860000;
+    const lon = -3.234722;
+    const fieldElevationFt = 839;
+
+    function updateClocks() {
+      const now = new Date();
+      const elCur = document.getElementById('clock-current');
+      if (elCur) elCur.innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+    setInterval(updateClocks, 1000);
+    updateClocks();
+
+    const landingSpots = {
+      1: { lat: 50.861517, lon: -3.236862 },
+      2: { lat: 50.860802, lon: -3.237590 },
+      3: { lat: 50.860003, lon: -3.238551 }
+    };
+
+    const sectorConfigTable = {
+      'N':  { spot: 1, turn: 'left',  landingHdg: 180 },
+      'NE': { spot: 3, turn: 'left',  landingHdg: 225 },
+      'E':  { spot: 3, turn: 'left',  landingHdg: 270 },
+      'SE': { spot: 1, turn: 'right', landingHdg: 315 },
+      'S':  { spot: 1, turn: 'right', landingHdg: 360 },
+      'SW': { spot: 2, turn: 'right', landingHdg: 45  },
+      'W':  { spot: 2, turn: 'right', landingHdg: 90  },
+      'NW': { spot: 1, turn: 'left',  landingHdg: 135 }
+    };
+
+    const map = L.map('map', { zoomControl: false }).setView([lat, lon], 16);
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 19, maxNativeZoom: 18
+    }).addTo(map);
+
+    map.createPane('topSpotPane');
+    map.getPane('topSpotPane').style.zIndex = 650;
+
+    let windRoseLayerGroup = L.layerGroup().addTo(map);
+    let circuitLayerGroup = L.layerGroup().addTo(map);
+    circuitLayerGroup.addTo(map);
+
+    (function offsetForSidebar() {
+      const sb = document.getElementById('sidebar');
+      if (window.innerWidth > 768 && sb) {
+        map.panBy([sb.offsetWidth / 2, 0], { animate: false });
+      }
+    })();
+
+    let isLandingManual = false;
+    let cachedWeatherData = [248, 18, 30, 248, 20, 30, 248, 18, 33];
+    let liveWindOverride = { dir: 250, spd: 12, gst: 18 };
+
+    function getArrow(deg) {
+      if (deg === undefined || deg === null) return '↑';
+      const rotateDeg = (deg + 180) % 360;
+      return `<span class="dir-arrow" style="transform: rotate(${rotateDeg}deg); display: inline-block;">↑</span>`;
+    }
+
+    function getCompassLetter(deg) {
+      if (deg === undefined || deg === null) return '--';
+      const normalized = (deg % 360 + 360) % 360;
+      const points = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
+      const index = Math.round((normalized / 22.5)) % 16;
+      return points[index];
+    }
+
+    function getStatusClass(val) {
+      if (val <= 15) return 'status-green';
+      if (val <= 20) return 'status-yellow';
+      if (val <= 25) return 'status-orange';
+      return 'status-red';
+    }
+
+    function getStatusColor(val) {
+      if (val <= 15) return '#00e676';
+      if (val <= 20) return '#ffee58';
+      if (val <= 25) return '#ffb74d';
+      return '#ff6b6b';
+    }
+
+    function windAloftHTML(dir, spd) {
+      const d = (dir + 360) % 360;
+      return `${getArrow(d)}<span class="aw-dir">${String(Math.round(d)).padStart(3, '0')}°</span><span class="aw-spd">${spd}<small>mph</small></span>`;
+    }
+
+    function computeDestinationPoint(originLat, originLon, bearingDeg, distanceNM) {
+      const R = 3440.065;
+      const d = distanceNM;
+      const brng = (bearingDeg * Math.PI) / 180;
+      const lat1 = (originLat * Math.PI) / 180;
+      const lon1 = (originLon * Math.PI) / 180;
+
+      const lat2 = Math.asin(
+        Math.sin(lat1) * Math.cos(d / R) +
+        Math.cos(lat1) * Math.sin(d / R) * Math.cos(brng)
+      );
+
+      const lon2 = lon1 + Math.atan2(
+        Math.sin(brng) * Math.sin(d / R) * Math.cos(lat1),
+        Math.cos(d / R) - Math.sin(lat1) * Math.sin(lat2)
+      );
+
+      return { lat: (lat2 * 180) / Math.PI, lon: (lon2 * 180) / Math.PI };
+    }
+
+    function calculateCloudBase(tempC, dewpointC, cloudCoverPct) {
+      if (cloudCoverPct < 25 || dewpointC === undefined || tempC === undefined) return null;
+      const spread = tempC - dewpointC;
+      if (spread < 0.3) return 400;
+      
+      const baseAGL = Math.round((spread / 2.5) * 1000);
+      if (baseAGL < 1500 && cloudCoverPct < 50) return null; 
+      return Math.max(1000, baseAGL);
+    }
+
+    function toggleLandingMode() {
+      isLandingManual = !isLandingManual;
+      const btn = document.getElementById('toggle-landing-btn');
+      const controls = document.getElementById('landing-manual-controls');
+
+      if (isLandingManual) {
+        btn.innerText = "MANUAL";
+        btn.style.borderColor = "#ff5252";
+        btn.style.color = "#ff5252";
+        if (controls) controls.style.display = "flex";
+      } else {
+        btn.innerText = "AUTO";
+        btn.style.borderColor = "#ff9800";
+        btn.style.color = "#ff9800";
+        if (controls) controls.style.display = "none";
+      }
+      updateDashboardMap();
+    }
+
+    function updateDashboardMap() {
+      if (cachedWeatherData) {
+        updateWindRoseOnMap(...cachedWeatherData);
+      }
+    }
+
+    function circularMeanDeg(degs) {
+      const s = degs.reduce((a, d) => a + Math.sin(d * Math.PI / 180), 0);
+      const c = degs.reduce((a, d) => a + Math.cos(d * Math.PI / 180), 0);
+      return (Math.atan2(s, c) * 180 / Math.PI + 360) % 360;
+    }
+
+    function getSectorNameFromDeg(deg) {
+      const norm = (deg % 360 + 360) % 360;
+      if (norm >= 337.5 || norm < 22.5) return 'N';
+      if (norm >= 22.5 && norm < 67.5) return 'NE';
+      if (norm >= 67.5 && norm < 112.5) return 'E';
+      if (norm >= 112.5 && norm < 157.5) return 'SE';
+      if (norm >= 157.5 && norm < 202.5) return 'S';
+      if (norm >= 202.5 && norm < 247.5) return 'SW';
+      if (norm >= 247.5 && norm < 292.5) return 'W';
+      if (norm >= 292.5 && norm < 337.5) return 'NW';
+      return 'SW';
+    }
+
+    function updateWindRoseOnMap(aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst) {
+      windRoseLayerGroup.clearLayers();
+      circuitLayerGroup.clearLayers();
+
+      L.circleMarker([lat, lon], {
+        pane: 'topSpotPane', radius: 5, fillColor: '#ffffff', color: '#000000', weight: 1.5, fillOpacity: 1
+      }).addTo(windRoseLayerGroup);
+
+      let effectiveWindDir, effectiveSpeed, effectiveGust;
+
+      if (liveWindOverride) {
+        effectiveWindDir = liveWindOverride.dir;
+        effectiveSpeed = liveWindOverride.spd;
+        effectiveGust = liveWindOverride.gst;
+      } else {
+        effectiveWindDir = circularMeanDeg([aromeDir, gfsDir, ecmwfDir]);
+        effectiveSpeed = (aromeSpd + gfsSpd + ecmwfSpd) / 3;
+        effectiveGust = (aromeGst + gfsGst + ecmwfGst) / 3;
+      }
+
+      let spotOffset = Math.min(0.28, Math.max(0.12, (effectiveSpeed / 100) * 1.2));
+
+      // ==========================================
+      // RUN-IN LOGIC
+      // ==========================================
+      const runwayEnds = [42, 222, 170, 350];
+      let bestRunwayHdg = 42;
+      let minAngleDiff = 999;
+
+      runwayEnds.forEach(rwy => {
+        const diff = Math.abs((effectiveWindDir - rwy + 540) % 360 - 180);
+        if (diff < minAngleDiff) {
+          minAngleDiff = diff;
+          bestRunwayHdg = rwy;
+        }
+      });
+
+      const jjRunwayHdg = bestRunwayHdg;
+
+      const wind15kSpd = effectiveSpeed * 3.4;
+      let jjOffsetDist = Math.max(0.1, parseFloat(((wind15kSpd / 10) * 0.1).toFixed(1)));
+
+      const angleDiff = (effectiveWindDir - jjRunwayHdg + 360) % 360;
+      const jjSideMultiplier = (angleDiff > 180 && angleDiff < 360) ? -1 : 1;
+      const jjOffsetBearing = (jjRunwayHdg + (jjSideMultiplier * 90) + 360) % 360;
+
+      const jjOrigin = computeDestinationPoint(lat, lon, jjOffsetBearing, jjOffsetDist);
+      const jjSpotPt = computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, jjRunwayHdg, spotOffset);
+      const jjRedDotPt = computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, jjRunwayHdg, spotOffset - 0.2);
+      const jjStartRun = computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, (jjRunwayHdg + 180) % 360, 0.45);
+      const jjEndRun = computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, jjRunwayHdg, Math.max(0.45, spotOffset + 0.15));
+
+      const jjTargetGroup = windRoseLayerGroup;
+      const jjLabelLat = jjStartRun.lat + 0.10 * (jjEndRun.lat - jjStartRun.lat);
+      const jjLabelLon = jjStartRun.lon + 0.10 * (jjEndRun.lon - jjStartRun.lon);
+
+      L.polyline([[jjStartRun.lat, jjStartRun.lon], [jjEndRun.lat, jjEndRun.lon]], {
+        color: '#e040fb', weight: 3, dashArray: '4,4', opacity: 0.95
+      }).addTo(jjTargetGroup);
+
+      let jjTextAngle = (jjRunwayHdg - 90 + 360) % 360;
+      if (jjTextAngle > 90 && jjTextAngle < 270) {
+        jjTextAngle = (jjTextAngle + 180) % 360;
+      }
+
+      L.marker([jjLabelLat, jjLabelLon], {
+        icon: L.divIcon({
+          html: `<div class="runin-line-text" style="transform: rotate(${jjTextAngle}deg);">Run-In</div>`,
+          className: '', iconSize: [65, 20], iconAnchor: [32, 10]
+        })
+      }).addTo(jjTargetGroup);
+
+      let jjArrowAngle = (jjRunwayHdg - 90 + 360) % 360;
+      L.marker([jjEndRun.lat, jjEndRun.lon], {
+        icon: L.divIcon({
+          html: `<div class="jumprun-arrow" style="color: #e040fb; transform: rotate(${jjArrowAngle}deg);">▶</div>`,
+          className: '', iconSize: [24, 24], iconAnchor: [12, 12]
+        })
+      }).addTo(jjTargetGroup);
+
+      L.circleMarker([jjRedDotPt.lat, jjRedDotPt.lon], {
+        pane: 'topSpotPane', radius: 8, 
+        fillColor: '#ff2a2a', 
+        color: '#ffffff', weight: 2.5, fillOpacity: 1
+      }).addTo(jjTargetGroup);
+
+      L.circleMarker([jjSpotPt.lat, jjSpotPt.lon], {
+        pane: 'topSpotPane', radius: 8, 
+        fillColor: '#00e676', 
+        color: '#ffffff', weight: 2.5, fillOpacity: 1
+      }).addTo(jjTargetGroup);
+
+      const jjSideName = jjSideMultiplier > 0 ? 'Right' : 'Left';
+      const elJjHdg = document.getElementById('ov-jj-heading');
+      const elJjOff = document.getElementById('ov-jj-offset');
+      if (elJjHdg) elJjHdg.innerText = `${String(jjRunwayHdg).padStart(3, '0')}°`;
+      if (elJjOff) elJjOff.innerText = `${jjOffsetDist.toFixed(1)} ${jjSideName}`;
+
+      // ==========================================
+      // LANDING CIRCUIT
+      // ==========================================
+      let sectorName;
+      if (isLandingManual) {
+        const sectorSelect = document.getElementById('select-wind-sector');
+        const sectorVal = sectorSelect ? parseFloat(sectorSelect.value) : 0;
+        sectorName = getSectorNameFromDeg(sectorVal);
+      } else {
+        sectorName = getSectorNameFromDeg(effectiveWindDir);
+      }
+
+      const config = sectorConfigTable[sectorName] || { spot: 1, turn: 'left', landingHdg: 180 };
+      const activeSpotObj = landingSpots[config.spot] || landingSpots[1];
+
+      const activeLandingLat = activeSpotObj.lat;
+      const activeLandingLon = activeSpotObj.lon;
+
+      const landingHdg = config.landingHdg;
+      const circuitRad = (landingHdg * Math.PI) / 180;
+      const circuitSide = config.turn;
+
+      L.circleMarker([activeLandingLat, activeLandingLon], {
+        radius: 6, fillColor: '#ff9800', color: '#ffffff', weight: 2, fillOpacity: 1
+      }).addTo(circuitLayerGroup);
+
+      const finalLegDist = 120; 
+      const finalStart = [
+        activeLandingLat + (finalLegDist * Math.cos(circuitRad)) / 111320,
+        activeLandingLon + (finalLegDist * Math.sin(circuitRad)) / (111320 * Math.cos(activeLandingLat * Math.PI / 180))
+      ];
+
+      const perpRad = circuitRad + (circuitSide === 'left' ? Math.PI / 2 : -Math.PI / 2);
+      const baseWidth = 140; 
+      const baseStart = [
+        finalStart[0] + (baseWidth * Math.cos(perpRad)) / 111320,
+        finalStart[1] + (baseWidth * Math.sin(perpRad)) / (111320 * Math.cos(activeLandingLat * Math.PI / 180))
+      ];
+
+      const downwindLength = 350; 
+      const downwindEnd = [
+        baseStart[0] - (downwindLength * Math.cos(circuitRad)) / 111320,
+        baseStart[1] - (downwindLength * Math.sin(circuitRad)) / (111320 * Math.cos(activeLandingLat * Math.PI / 180))
+      ];
+
+      const circuitCoords = [[activeLandingLat, activeLandingLon], finalStart, baseStart, downwindEnd];
+
+      L.polyline(circuitCoords, {
+        color: '#ff9800', weight: 3, dashArray: '5,5', opacity: 0.95
+      }).addTo(circuitLayerGroup);
+
+      const dLatSpot = activeLandingLat - finalStart[0];
+      const dLonSpot = (activeLandingLon - finalStart[1]) * Math.cos(activeLandingLat * Math.PI / 180);
+      let spotBearingDeg = (Math.atan2(dLonSpot, dLatSpot) * 180 / Math.PI + 360) % 360;
+      let finalArrowAngle = (spotBearingDeg - 90 + 360) % 360;
+
+      L.marker([activeLandingLat, activeLandingLon], {
+        icon: L.divIcon({
+          html: `<div class="circuit-arrow" style="transform: rotate(${finalArrowAngle}deg);">▶</div>`,
+          className: '', iconSize: [24, 24], iconAnchor: [12, 12]
+        })
+      }).addTo(circuitLayerGroup);
+
+      const elPattern = document.getElementById('ov-pattern');
+      if (elPattern) {
+        elPattern.innerHTML = circuitSide === 'left' ? '<span class="turn-glyph">◀</span> LEFT' : 'RIGHT <span class="turn-glyph">▶</span>';
+      }
+      
+      const roundedDir = Math.round(effectiveWindDir);
+      const elWindDir = document.getElementById('ov-winddir');
+      const elWindComp = document.getElementById('ov-windcompass');
+      const elOvArrow = document.getElementById('ov-arrow');
+      if (elWindDir) elWindDir.innerText = `${String(roundedDir).padStart(3, '0')}°`;
+      if (elWindComp) elWindComp.innerText = getCompassLetter(roundedDir);
+      if (elOvArrow) elOvArrow.setAttribute('transform', `rotate(${(effectiveWindDir + 180) % 360} 50 50)`);
+
+      const peak = Math.max(effectiveSpeed, effectiveGust);
+      const speedEl = document.getElementById('ov-windspd');
+      const gustEl = document.getElementById('ov-gust');
+      if (speedEl) {
+        speedEl.innerText = Math.round(effectiveSpeed);
+        speedEl.style.color = getStatusColor(peak);
+      }
+      if (gustEl) {
+        gustEl.innerText = `Gust ${Math.round(effectiveGust)}`;
+        gustEl.style.color = getStatusColor(peak);
+      }
+      
+      setTimeout(() => { map.invalidateSize(); }, 250);
+    }
+
+    updateDashboardMap();
+
+    map.on('zoomend', () => {
+      updateDashboardMap();
+    });
+
+    async function fetchLiveWeatherFeed() {
+      try {
+        const liveRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=mph`);
+        if (!liveRes.ok) return;
+        const liveData = await liveRes.json();
+
+        if (liveData && liveData.current) {
+          const cur = liveData.current;
+          liveWindOverride = {
+            dir: cur.wind_direction_10m,
+            spd: cur.wind_speed_10m,
+            gst: cur.wind_gusts_10m !== undefined ? cur.wind_gusts_10m : cur.wind_speed_10m
+          };
+
+          // Extract and display the data generation timestamp from API response
+          if (cur.time) {
+            const dataTime = new Date(cur.time);
+            const elDataTime = document.getElementById('live-data-time');
+            if (elDataTime) {
+              elDataTime.innerText = dataTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+          }
+
+          updateDashboardMap();
+        }
+      } catch (err) {
+        console.warn("Live feed fallback active:", err);
+      }
+    }
+
+    async function fetchModelData() {
+      const surfaceParams = `latitude=${lat}&longitude=${lon}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,temperature_2m,dewpoint_2m,cloud_cover&wind_speed_unit=mph&forecast_days=1`;
+      
+      try {
+        const [ecmwfRes, gfsRes, iconRes, aromeRes] = await Promise.all([
+          fetch(`https://api.open-meteo.com/v1/ecmwf?${surfaceParams}`),
+          fetch(`https://api.open-meteo.com/v1/gfs?${surfaceParams}`),
+          fetch(`https://api.open-meteo.com/v1/forecast?models=icon_eu&${surfaceParams}`),
+          fetch(`https://api.open-meteo.com/v1/forecast?models=meteofrance_arome_france&${surfaceParams}`)
+        ]);
+
+        const ecmwf = await ecmwfRes.json();
+        const gfs = await gfsRes.json();
+        const icon = await iconRes.json();
+        const arome = await aromeRes.json();
+
+        const times = ecmwf.hourly.time;
+        const models = [
+          { name: 'ECMWF', data: ecmwf },
+          { name: 'GFS', data: gfs },
+          { name: 'ICON-EU', data: icon },
+          { name: 'AROME', data: arome }
+        ];
+
+        const nowHour = new Date().getHours();
+        let currentIdx = 12;
+
+        for (let i = 0; i < times.length; i++) {
+          const timeDate = new Date(times[i]);
+          if (timeDate.getHours() === nowHour) {
+            currentIdx = i;
+            break;
+          }
+        }
+
+        const sampleTimeDate = new Date(times[currentIdx]);
+        const elHourLabel = document.getElementById('current-hour-label');
+        if (elHourLabel) {
+          elHourLabel.innerText = sampleTimeDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        let forecastCardsHTML = '';
+        models.forEach(model => {
+          const dataset = model.data;
+          if (!dataset || !dataset.hourly) return;
+
+          const speed = Math.round(dataset.hourly.wind_speed_10m[currentIdx] || 0);
+          const gust = Math.round(dataset.hourly.wind_gusts_10m ? (dataset.hourly.wind_gusts_10m[currentIdx] || 0) : speed);
+          const dir = dataset.hourly.wind_direction_10m[currentIdx];
+          const peak = Math.max(speed, gust);
+          const statusClass = getStatusClass(peak);
+
+          const temp = dataset.hourly.temperature_2m ? dataset.hourly.temperature_2m[currentIdx] : 18;
+          const dew = dataset.hourly.dewpoint_2m ? dataset.hourly.dewpoint_2m[currentIdx] : 11;
+          const cover = dataset.hourly.cloud_cover ? dataset.hourly.cloud_cover[currentIdx] : 50;
+
+          const baseAgl = calculateCloudBase(temp, dew, cover);
+          const baseStr = (baseAgl !== null && baseAgl < 25000) ? `${baseAgl.toLocaleString()}'` : 'CLR';
+
+          const dirRounded = Math.round(dir);
+          forecastCardsHTML += `
+            <div class="model-card-item ${statusClass}">
+              <div class="model-card-top">
+                <span class="model-name">${model.name}</span>
+                <span class="cloud-badge">☁ ${baseStr}</span>
+              </div>
+              <div class="model-card-wind">
+                <span class="mc-arrow" style="transform: rotate(${(dir + 180) % 360}deg);">↑</span>
+                <span class="mc-speed">${speed}</span>
+                <span class="mc-gust">G${gust}</span>
+                <span class="mc-dir" style="margin-left: auto;">${String(dirRounded).padStart(3, '0')}° ${getCompassLetter(dirRounded)}</span>
+              </div>
             </div>
+          `;
+        });
+        const elModelRows = document.getElementById('current-model-forecast-rows');
+        if (elModelRows) elModelRows.innerHTML = forecastCardsHTML;
+
+        const aromeDir = arome.hourly ? arome.hourly.wind_direction_10m[currentIdx] : 248;
+        const aromeSpd = arome.hourly ? Math.round(arome.hourly.wind_speed_10m[currentIdx]) : 18;
+        const aromeGst = arome.hourly ? Math.round(arome.hourly.wind_gusts_10m[currentIdx]) : 30;
+
+        const gfsDir = gfs.hourly ? gfs.hourly.wind_direction_10m[currentIdx] : 248;
+        const gfsSpd = gfs.hourly ? Math.round(gfs.hourly.wind_speed_10m[currentIdx]) : 20;
+        const gfsGst = gfs.hourly ? Math.round(gfs.hourly.wind_gusts_10m[currentIdx]) : 30;
+
+        const ecmwfDir = ecmwf.hourly ? ecmwf.hourly.wind_direction_10m[currentIdx] : 248;
+        const ecmwfSpd = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_speed_10m[currentIdx]) : 18;
+        const ecmwfGst = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_gusts_10m[currentIdx] || 33) : 33;
+
+        cachedWeatherData = [aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst];
+        updateDashboardMap();
+
+        const elUwindSfc = document.getElementById('uwind-sfc');
+        const elUwind3k = document.getElementById('uwind-3k');
+        const elUwind7k = document.getElementById('uwind-7k');
+        const elUwind10k = document.getElementById('uwind-10k');
+        const elUwind15k = document.getElementById('uwind-15k');
+
+        if (elUwindSfc) elUwindSfc.innerHTML = windAloftHTML(ecmwfDir, ecmwfSpd);
+        if (elUwind3k)  elUwind3k.innerHTML  = windAloftHTML(ecmwfDir + 10, Math.round(ecmwfSpd * 1.8));
+        if (elUwind7k)  elUwind7k.innerHTML  = windAloftHTML(ecmwfDir + 18, Math.round(ecmwfSpd * 2.3));
+        if (elUwind10k) elUwind10k.innerHTML = windAloftHTML(ecmwfDir + 25, Math.round(ecmwfSpd * 2.8));
+        if (elUwind15k) elUwind15k.innerHTML = windAloftHTML(ecmwfDir + 30, Math.round(ecmwfSpd * 3.4));
+
+      } catch (err) {
+        console.error("Fetch error:", err);
+      }
+    }
+
+    fetchLiveWeatherFeed();
+    fetchModelData();
+
+    setInterval(fetchLiveWeatherFeed, 120000);
+
+    setTimeout(() => {
+      window.location.reload(true);
+    }, 300 * 1000);
+  </script>
 
-            <!-- [SUB-SECTION: WINDY SATELLITE & CLOUDS MAP] -->
-            <div class="panel" style="padding: 1.25rem;">
-                <div class="panel-header" style="margin-bottom: 1rem;">
-                    <h3 class="panel-title"><i class="fa-solid fa-satellite" style="color: var(--accent-sky);"></i>Windy Satellite & Clouds Live Radar</h3>
-                    <span class="badge">Skydive Southwest Dropzone</span>
-                </div>
-                <div class="map-container">
-                    <iframe src="https://embed.windy.com/embed2.html?lat=50.880&lon=-3.230&detailLat=50.880&detailLon=-3.230&width=650&height=450&zoom=8&level=surface&overlay=satellite&product=ecmwf&menu=&message=&marker=50.880,-3.230&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=mph&metricTemp=%C2%B0C&radarRange=-1&play=1" frameborder="0"></iframe>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--text-muted); padding-top: 0.5rem;">
-                    <span><i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> Live satellite tracking with native map-locked airfield marker pin.</span>
-                    <span>Powered by Windy.com</span>
-                </div>
-            </div>
-
-            <!-- [SUB-SECTION: LOCAL AIRFIELD LIVE FEEDS & WEBCAMS] -->
-            <div class="panel" style="padding: 1.25rem;">
-                <div class="panel-header" style="margin-bottom: 1rem;">
-                    <h3 class="panel-title"><i class="fa-solid fa-video" style="color: var(--accent-sky);"></i>Local Airfield Live Feeds</h3>
-                    <span class="badge">4 Live Streams</span>
-                </div>
-
-                <div class="webcam-grid">
-                    <div class="webcam-card">
-                        <div class="webcam-title" style="margin-bottom: 0.25rem;">
-                            <span>Dunkeswell Cam 1</span>
-                            <span style="font-size: 0.65rem; color: var(--accent-sky); background: rgba(2,132,199,0.1); padding: 0.1rem 0.3rem; border-radius: 0.25rem;">Live Stream</span>
-                        </div>
-                        <div style="position: relative; width: 100%; height: 260px; border-radius: 0.5rem; overflow: hidden; background: #000;">
-                            <iframe src="https://g0.ipcamlive.com/player/player.php?alias=62318ab5850ed" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
-                        </div>
-                    </div>
-
-                    <div class="webcam-card">
-                        <div class="webcam-title" style="margin-bottom: 0.25rem;">
-                            <span>Dunkeswell Cam 2</span>
-                            <span style="font-size: 0.65rem; color: var(--accent-sky); background: rgba(2,132,199,0.1); padding: 0.1rem 0.3rem; border-radius: 0.25rem;">Live Stream</span>
-                        </div>
-                        <div style="position: relative; width: 100%; height: 260px; border-radius: 0.5rem; overflow: hidden; background: #000;">
-                            <iframe src="https://g0.ipcamlive.com/player/player.php?alias=62318a7ba1540" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
-                        </div>
-                    </div>
-
-                    <div class="webcam-card">
-                        <div class="webcam-title" style="margin-bottom: 0.25rem;">
-                            <span>North Hill Cam 1 (West)</span>
-                            <span style="font-size: 0.65rem; color: #dc2626; background: rgba(220,38,38,0.1); padding: 0.1rem 0.3rem; border-radius: 0.25rem;">YouTube Live</span>
-                        </div>
-                        <div style="position: relative; width: 100%; height: 260px; border-radius: 0.5rem; overflow: hidden; background: #000;">
-                            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/live_stream?channel=UCQoDJe88-7nfYKeQnFnTw6g" title="DSGC North Hill Webcam 1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                        </div>
-                    </div>
-
-                    <div class="webcam-card">
-                        <div class="webcam-title" style="margin-bottom: 0.25rem;">
-                            <span>North Hill Cam 2 (East)</span>
-                            <span style="font-size: 0.65rem; color: #dc2626; background: rgba(220,38,38,0.1); padding: 0.1rem 0.3rem; border-radius: 0.25rem;">YouTube Live</span>
-                        </div>
-                        <div style="position: relative; width: 100%; height: 260px; border-radius: 0.5rem; overflow: hidden; background: #000;">
-                            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/live_stream?channel=UCmn1hb_77LmtrYaYp9GRgnw" title="DSGC North Hill Webcam 2" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </section>
-
-    </main>
-
-    <!-- [SECTION: PAGE FOOTER] -->
-    <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 4.2 • Powered by Open-Meteo & Windy.com</p>
-    </footer>
-
-    <!-- [SECTION: APPLICATION LOGIC & JAVASCRIPT] -->
-    <script>
-        let globalWeatherData = null;
-        let multiModelData = {};
-        let selectedDayIndex = 0;
-
-        // [SUB-SECTION: UNIT CONVERSION UTILITIES]
-        function kmhToMph(kmh) {
-            return Math.round(kmh * 0.621371);
-        }
-
-        // [SUB-SECTION: CIRCULAR ANGLE AVERAGE UTILITY]
-        function getAverageWindDirection(degreesArray) {
-            if (!degreesArray || degreesArray.length === 0) return 0;
-            let sumSin = 0;
-            let sumCos = 0;
-            let validCount = 0;
-
-            degreesArray.forEach(deg => {
-                if (deg !== null && deg !== undefined && !isNaN(deg)) {
-                    const rad = (deg * Math.PI) / 180;
-                    sumSin += Math.sin(rad);
-                    sumCos += Math.cos(rad);
-                    validCount++;
-                }
-            });
-
-            if (validCount === 0) return 0;
-            const avgSin = sumSin / validCount;
-            const avgCos = sumCos / validCount;
-            let avgDeg = (Math.atan2(avgSin, avgCos) * 180) / Math.PI;
-            if (avgDeg < 0) avgDeg += 360;
-            return avgDeg;
-        }
-
-        // [SUB-SECTION: COLOR & BADGE THRESHOLD HELPERS]
-        function getCloudColorClass(val) {
-            if (val <= 50) return 'text-green';
-            if (val <= 70) return 'text-yellow';
-            if (val <= 95) return 'text-orange';
-            return 'text-red';
-        }
-
-        function getWindColorClass(mph) {
-            if (mph === '--' || mph === null || mph === undefined) return 'text-muted';
-            if (mph <= 14) return 'text-green';
-            if (mph <= 19) return 'text-yellow';
-            if (mph <= 23) return 'text-orange';
-            return 'text-red';
-        }
-
-        function getVisColorClass(visKm) {
-            if (visKm >= 7) return 'text-green';
-            if (visKm >= 5) return 'text-yellow';
-            if (visKm >= 3) return 'text-orange';
-            return 'text-red';
-        }
-
-        function getRainColorClass(prob) {
-            if (prob <= 20) return 'text-green';
-            if (prob <= 40) return 'text-yellow';
-            if (prob <= 60) return 'text-orange';
-            return 'text-red';
-        }
-
-        function getBaseColorClass(baseFt) {
-            if (baseFt === 'Unlimited' || baseFt >= 5000) return 'text-green';
-            if (baseFt >= 3500) return 'text-yellow';
-            if (baseFt >= 2000) return 'text-orange';
-            return 'text-red';
-        }
-
-        function getWeatherIcon(code, rainProb = 0) {
-            if (rainProb >= 30) {
-                if (code >= 95) return { icon: 'fa-cloud-bolt', color: '#9333ea', label: 'Thunderstorms' };
-                if (code >= 80 && code <= 82) return { icon: 'fa-cloud-showers-heavy', color: '#2563eb', label: 'Heavy Showers' };
-                return { icon: 'fa-cloud-rain', color: '#3b82f6', label: 'Rain Showers' };
-            }
-            if (code === 0) return { icon: 'fa-sun', color: '#d97706', label: 'Clear Sky' };
-            if (code >= 1 && code <= 3) return { icon: 'fa-cloud-sun', color: '#0284c7', label: 'Partly Cloudy' };
-            if (code >= 45 && code <= 48) return { icon: 'fa-smog', color: '#64748b', label: 'Fog / Mist' };
-            if (code >= 71 && code <= 77) return { icon: 'fa-snowflake', color: '#6366f1', label: 'Snow' };
-            return { icon: 'fa-cloud', color: '#64748b', label: 'Overcast' };
-        }
-
-        function getWindDirectionLabel(degrees) {
-            if (degrees === null || degrees === undefined || isNaN(degrees)) return '--';
-            const dirs = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
-            return dirs[Math.round((degrees % 360) / 22.5) % 16];
-        }
-
-        // [SUB-SECTION: API FETCH & NETWORK HANDLERS]
-        async function fetchWithRetry(url, retries = 3, delay = 2000) {
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const response = await fetch(url);
-                    if (response.ok) return await response.json();
-                    
-                    if ((response.status === 503 || response.status === 429) && i < retries - 1) {
-                        await new Promise(resolve => setTimeout(resolve, delay));
-                        delay *= 2;
-                        continue;
-                    }
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                } catch (err) {
-                    if (i === retries - 1) throw err;
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                    delay *= 2;
-                }
-            }
-        }
-
-        async function fetchAllData() {
-            const errBanner = document.getElementById('error-banner');
-            const errMessage = document.getElementById('error-message');
-            errBanner.classList.add('hidden');
-
-            const mainUrl = `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&elevation=${CONFIG.elevation}&hourly=temperature_2m,dew_point_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,wind_speed_10m,wind_direction_10m,wind_gusts_10m,surface_pressure,visibility&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,sunrise,sunset&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&timezone=${CONFIG.timezone}`;
-            const modelsConfig = [
-                { key: 'ecmwf_ifs025', url: `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&models=ecmwf_ifs025&timezone=${CONFIG.timezone}` },
-                { key: 'gfs_seamless', url: `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&models=gfs_seamless&timezone=${CONFIG.timezone}` },
-                { key: 'icon_seamless', url: `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&models=icon_seamless&timezone=${CONFIG.timezone}` },
-                { key: 'meteofrance_seamless', url: `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&models=meteofrance_seamless&timezone=${CONFIG.timezone}` }
-            ];
-
-            try {
-                const mainResponse = await fetchWithRetry(mainUrl);
-                globalWeatherData = mainResponse;
-
-                // Handle current observation timestamp
-                if (mainResponse && mainResponse.current && mainResponse.current.time) {
-                    const obsDate = new Date(mainResponse.current.time);
-                    const obsTimeStr = obsDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-                    document.getElementById('live-obs-timestamp').textContent = `Obs: ${obsTimeStr}`;
-                }
-
-                const modelPromises = modelsConfig.map(async m => {
-                    try {
-                        const res = await fetch(m.url);
-                        if (res.ok) {
-                            const json = await res.json();
-                            if (json && json.hourly && json.hourly.wind_speed_10m && json.hourly.wind_speed_10m.length > 0) {
-                                return { key: m.key, data: json };
-                            }
-                        }
-                    } catch (e) {
-                        console.warn(`Model ${m.key} unavailable, falling back.`);
-                    }
-                    return { key: m.key, data: null };
-                });
-
-                const modelResults = await Promise.all(modelPromises);
-                multiModelData = {};
-                modelResults.forEach(item => {
-                    multiModelData[item.key] = item.data;
-                });
-
-                document.getElementById('last-updated').innerHTML = `<i class="fa-solid fa-check" style="color: var(--accent-emerald);"></i> Updated: ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} (${CONFIG.revision})`;
-
-                renderOutlookCards();
-                renderActiveDay(selectedDayIndex);
-
-            } catch (err) {
-                console.error("Critical error fetching weather data:", err);
-                errMessage.textContent = `Weather server temporarily unavailable (${err.message}). Click 'Retry Now'.`;
-                errBanner.classList.remove('hidden');
-                document.getElementById('last-updated').innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color: #dc2626;"></i> Update Failed`;
-            }
-        }
-
-        // [SUB-SECTION: METEOROLOGICAL & CLOUDBASE CALCULATIONS]
-        function calculateCloudbaseAGL(temp, dewPoint, lowCover, relativeHumidity, weatherCode, totalCloudCover) {
-            if (lowCover < 30 && totalCloudCover < 40 && weatherCode <= 3) {
-                return 5000;
-            }
-            if (relativeHumidity >= 95 || (weatherCode >= 45 && weatherCode <= 48)) {
-                return 300; 
-            }
-            const spread = Math.max(0.1, temp - dewPoint);
-            let baseFt = Math.round((spread / 2.5) * 1000);
-
-            if (baseFt < 200) baseFt = 200;
-            if (baseFt > 12000) baseFt = 12000;
-            return baseFt;
-        }
-
-        function getCustomCloudBands(rawLow, mid, high, visKm, rainProb) {
-            let low = rawLow;
-            if (visKm >= 10 && rainProb <= 10) {
-                low = Math.round(rawLow * 0.45);
-            }
-            const c0_5k = Math.min(100, Math.max(10, Math.round(low * 0.85)));
-            const c5_10k = Math.min(100, Math.round((low * 0.15) + (mid * 0.4)));
-            const c10_15k = Math.min(100, Math.round(mid * 0.6));
-            const c15k_plus = Math.min(100, Math.round(high));
-            return { c0_5k, c5_10k, c10_15k, c15k_plus };
-        }
-
-        function generateTimedOutlookSummary(dayIndex, hourly) {
-            const daily = globalWeatherData.daily;
-            const targetDateStr = daily.time[dayIndex];
-            let dayStart = hourly.time.findIndex(t => t.startsWith(targetDateStr) && t.includes('08:00'));
-            if (dayStart === -1) dayStart = (dayIndex * 24) + 8;
-
-            let sunsetHour = 18;
-            if (daily.sunset && daily.sunset[dayIndex]) {
-                sunsetHour = new Date(daily.sunset[dayIndex]).getHours();
-            }
-
-            let slotIssues = { early: [], mid: [], late: [] };
-
-            for (let h = dayStart; h < Math.min(dayStart + 11, hourly.time.length); h++) {
-                const timeStr = hourly.time[h];
-                const hourNum = parseInt(timeStr.split('T')[1].split(':')[0]);
-                if (hourNum > sunsetHour) continue;
-                
-                const ws = kmhToMph(hourly.wind_speed_10m[h]);
-                const wg = kmhToMph(hourly.wind_gusts_10m[h]);
-                const rn = hourly.precipitation_probability[h];
-                const vs = hourly.visibility[h] / 1000;
-                const tp = hourly.temperature_2m[h];
-                const dp = hourly.dew_point_2m[h];
-                const hm = hourly.relative_humidity_2m[h];
-                const cd = hourly.weather_code[h];
-                const lw = hourly.cloud_cover_low[h] || 0;
-                const mid = hourly.cloud_cover_mid[h] || 0;
-                const high = hourly.cloud_cover_hgh ? hourly.cloud_cover_hgh[h] : 0;
-                const totCloud = hourly.cloud_cover ? hourly.cloud_cover[h] : lw;
-                const cbBands = getCustomCloudBands(lw, mid, high, vs, rn);
-                const cloudCover = Math.min(100, Math.round((cbBands.c0_5k * 0.6) + (cbBands.c5_10k * 0.3) + (cbBands.c10_15k * 0.1)));
-                const base = calculateCloudbaseAGL(tp, dp, lw, hm, cd, totCloud);
-                const isFog = (vs < 1.0) || ((cd >= 45 && cd <= 48) && vs < 3.0) || (vs < 5.0 && hm >= 90 && (tp - dp) <= 1.5);
-                
-                let issues = [];
-                if (ws > 23 || wg > 23) issues.push("strong winds");
-                if (rn >= 50) issues.push("rain");
-                if (cloudCover >= 90) issues.push("heavy cloud");
-                if (base < 1000) issues.push("low cloudbase");
-                if (isFog) issues.push("fog/mist");
-
-                let targetSlot = hourNum <= 10 ? 'early' : (hourNum >= 16 ? 'late' : 'mid');
-                issues.forEach(iss => {
-                    if (!slotIssues[targetSlot].includes(iss)) slotIssues[targetSlot].push(iss);
-                });
-            }
-
-            let formatSlot = (issues) => {
-                if (issues.length === 0) return null;
-                if (issues.length === 1) return issues[0];
-                if (issues.length === 2) return `${issues[0]} and ${issues[1]}`;
-                return `${issues.slice(0, -1).join(', ')} and ${issues[issues.length - 1]}`;
-            };
-
-            let earlyStr = formatSlot(slotIssues.early);
-            let midStr = formatSlot(slotIssues.mid);
-            let lateStr = formatSlot(slotIssues.late);
-
-            let segments = [];
-            if (earlyStr) segments.push(`${earlyStr} early morning`);
-            if (midStr) segments.push(`${midStr} around midday`);
-            if (lateStr) segments.push(`${lateStr} late afternoon`);
-
-            if (segments.length === 0) {
-                return "All conditions look good throughout the day.";
-            } else if (segments.length === 1) {
-                return `Expect ${segments[0]}.`;
-            } else if (segments.length === 2) {
-                return `Expect ${segments[0]} and ${segments[1]}.`;
-            } else {
-                return `Expect ${segments[0]}, ${segments[1]}, and ${segments[2]}.`;
-            }
-        }
-
-        function calculateDayMetrics(dayIndex, hourly) {
-            const daily = globalWeatherData.daily;
-            const targetDateStr = daily.time[dayIndex];
-            let dayStart = hourly.time.findIndex(t => t.startsWith(targetDateStr) && t.includes('08:00'));
-            if (dayStart === -1) dayStart = (dayIndex * 24) + 8;
-
-            let sunsetHour = 18;
-            if (daily.sunset && daily.sunset[dayIndex]) {
-                sunsetHour = new Date(daily.sunset[dayIndex]).getHours();
-            }
-
-            let scoreSum = 0;
-            let evaluatedHours = 0;
-            let hasLowCloudbase = false;
-            let hasFogWarning = false;
-
-            for (let h = dayStart; h < Math.min(dayStart + 11, hourly.time.length); h++) {
-                const timeStr = hourly.time[h];
-                const hourNum = parseInt(timeStr.split('T')[1].split(':')[0]);
-                if (hourNum > sunsetHour) continue;
-
-                const ws = kmhToMph(hourly.wind_speed_10m[h]);
-                const wg = kmhToMph(hourly.wind_gusts_10m[h]);
-                const rn = hourly.precipitation_probability[h];
-                const vs = hourly.visibility[h] / 1000;
-                const tp = hourly.temperature_2m[h];
-                const dp = hourly.dew_point_2m[h];
-                const hm = hourly.relative_humidity_2m[h];
-                const cd = hourly.weather_code[h];
-                const lw = hourly.cloud_cover_low[h] || 0;
-                const totCloud = hourly.cloud_cover ? hourly.cloud_cover[h] : lw;
-                const base = calculateCloudbaseAGL(tp, dp, lw, hm, cd, totCloud);
-                const isFog = (vs < 1.0) || ((cd >= 45 && cd <= 48) && vs < 3.0) || (vs < 5.0 && hm >= 90 && (tp - dp) <= 1.5);
-                
-                if (base < 1000) hasLowCloudbase = true;
-                if (isFog) hasFogWarning = true;
-
-                const windOk = ws <= 23 && wg <= 23;
-                const rainOk = rn < 50;
-                const visOk = !isFog && vs >= 3;
-
-                if (windOk && rainOk && visOk) {
-                    let hourScore = 100;
-                    if (isFog) {
-                        hourScore -= 80;
-                    } else if (base < 1000) {
-                        hourScore -= 70;
-                    } else if (base < 2000) {
-                        hourScore -= 40;
-                    } else if (base < 3500) {
-                        hourScore -= 15;
-                    }
-                    scoreSum += Math.max(0, hourScore);
-                }
-                evaluatedHours++;
-            }
-            const likelihood = evaluatedHours > 0 ? Math.round(scoreSum / evaluatedHours) : 85;
-            return { likelihood, hasLowCloudbase, hasFogWarning };
-        }
-
-        // [SUB-SECTION: 7-DAY OUTLOOK CARDS RENDERER]
-        function renderOutlookCards() {
-            const container = document.getElementById('outlook-days-container');
-            container.innerHTML = '';
-            const daily = globalWeatherData.daily;
-            const hourly = globalWeatherData.hourly;
-            const hoursInterval = [8, 11, 14, 17];
-
-            for (let i = 0; i < Math.min(7, daily.time.length); i++) {
-                const dateObj = new Date(daily.time[i]);
-                const dayName = dateObj.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }).toUpperCase();
-                const dateStr = dateObj.toISOString().split('T')[0];
-                
-                const metrics = calculateDayMetrics(i, hourly);
-                const diagnosisText = generateTimedOutlookSummary(i, hourly);
-                const isActive = i === selectedDayIndex ? ' active' : '';
-                
-                let bgTintClass = 'card-bg-green';
-                let badgeClass = 'status-green';
-                if (metrics.likelihood < 40) {
-                    bgTintClass = 'card-bg-red';
-                    badgeClass = 'status-red';
-                } else if (metrics.likelihood < 70) {
-                    bgTintClass = metrics.likelihood < 55 ? 'card-bg-orange' : 'card-bg-yellow';
-                    badgeClass = metrics.likelihood < 55 ? 'status-orange' : 'status-yellow';
-                }
-
-                let timeRow = `<div class="wf-row"><span class="wf-label">TIME</span>`;
-                let dirRow = `<div class="wf-row"><span class="wf-label">DIR</span>`;
-                let spdRow = `<div class="wf-row"><span class="wf-label">WIND</span>`;
-                let gustRow = `<div class="wf-row"><span class="wf-label">GUST</span>`;
-                let weatherRow = `<div class="wf-row"><span class="wf-label">SKY</span>`;
-                let rainRow = `<div class="wf-row"><span class="wf-label">RAIN</span>`;
-                let tempRow = `<div class="wf-row"><span class="wf-label">TEMP</span>`;
-                let pressRow = `<div class="wf-row"><span class="wf-label">PRESS</span>`;
-
-                hoursInterval.forEach(hTarget => {
-                    const targetStr = `${dateStr}T${String(hTarget).padStart(2, '0')}:00`;
-                    let idx = hourly.time.findIndex(t => t.startsWith(targetStr));
-                    if (idx === -1) idx = hourly.time.findIndex(t => t.startsWith(dateStr));
-
-                    const dirDeg = hourly.wind_direction_10m[idx] || 0;
-                    const spd = kmhToMph(hourly.wind_speed_10m[idx] || 0);
-                    const gust = kmhToMph(hourly.wind_gusts_10m[idx] || 0);
-                    const weatherCode = hourly.weather_code[idx] || 0;
-                    const rainProb = hourly.precipitation_probability ? hourly.precipitation_probability[idx] || 0 : 0;
-                    const rainMm = hourly.precipitation ? hourly.precipitation[idx] || 0 : 0;
-                    const temp = Math.round(hourly.temperature_2m[idx] || 15);
-                    const press = Math.round(hourly.surface_pressure ? hourly.surface_pressure[idx] || 1013 : 1013);
-                    const rot = (dirDeg + 180) % 360;
-                    const wInfo = getWeatherIcon(weatherCode, rainProb);
-
-                    timeRow += `<span class="wf-cell">${String(hTarget).padStart(2, '0')}h</span>`;
-                    dirRow += `<span class="wf-cell"><i class="fa-solid fa-arrow-up wf-arrow" style="transform: rotate(${rot}deg);"></i></span>`;
-                    spdRow += `<span class="wf-cell"><span class="${getWindColorClass(spd)}">${spd}</span></span>`;
-                    gustRow += `<span class="wf-cell"><span class="${getWindColorClass(gust)}">${gust}</span></span>`;
-                    weatherRow += `<span class="wf-cell"><i class="fa-solid ${wInfo.icon}" style="color: ${wInfo.color}; font-size: 0.75rem;" title="${wInfo.label}"></i></span>`;
-                    rainRow += `<span class="wf-cell" style="color: ${rainMm > 0 ? '#0284c7' : '#64748b'}; font-size: 0.6rem;">${rainMm > 0 ? rainMm.toFixed(1) : ''}</span>`;
-                    tempRow += `<span class="wf-cell"><span>${temp}°</span></span>`;
-                    pressRow += `<span class="wf-cell" style="font-size: 0.6rem; color: #475569;">${press}</span>`;
-                });
-
-                timeRow += `</div>`; dirRow += `</div>`; spdRow += `</div>`; gustRow += `</div>`;
-                weatherRow += `</div>`; rainRow += `</div>`; tempRow += `</div>`; pressRow += `</div>`;
-
-                const cloudbaseWarningHtml = metrics.hasLowCloudbase 
-                    ? `<span class="cloudbase-warning-badge"><i class="fa-solid fa-triangle-exclamation mr-1"></i> CHECK CLOUDBASE</span>` 
-                    : '';
-                const fogWarningHtml = metrics.hasFogWarning
-                    ? `<span class="cloudbase-warning-badge" style="background:#fee2e2; color:#991b1b; border-color:#f87171;"><i class="fa-solid fa-triangle-exclamation mr-1"></i> CHECK FOG / MIST</span>`
-                    : '';
-
-                const card = document.createElement('div');
-                card.className = `outlook-day-card ${bgTintClass}${isActive ? ' active' : ''}`;
-                card.onclick = () => selectDay(i);
-                card.innerHTML = `
-                    <div class="card-top-content">
-                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,0,0,0.08); padding-bottom: 0.4rem;">
-                            <span style="font-weight: 700; color: #0f172a; font-size: 0.85rem;">${dayName}</span>
-                        </div>
-                        <div class="outlook-section">
-                            <span class="${badgeClass}" style="width: 100%;">JUMP: ${metrics.likelihood}%</span>
-                            ${cloudbaseWarningHtml}
-                            ${fogWarningHtml}
-                        </div>
-                        <div class="outlook-matrix-mini">
-                            ${timeRow}
-                            ${dirRow}
-                            ${spdRow}
-                            ${gustRow}
-                            ${weatherRow}
-                            ${rainRow}
-                            ${tempRow}
-                            ${pressRow}
-                        </div>
-                    </div>
-                    <div class="diagnosis-box">
-                        <b>Outlook:</b> ${diagnosisText}
-                    </div>
-                `;
-                container.appendChild(card);
-            }
-        }
-
-        function selectDay(dayIndex) {
-            selectedDayIndex = dayIndex;
-            renderOutlookCards();
-            renderActiveDay(selectedDayIndex);
-        }
-
-        // [SUB-SECTION: TRAFFIC LIGHT BADGE GENERATOR]
-        function getTrafficBadge(category, value, unit = '') {
-            let status = 'green';
-            let label = `${value}${unit}`;
-
-            if (category === 'wind' || category === 'gust') {
-                if (value > 23) { status = 'red'; label = `${value}`; }
-                else if (value > 19) { status = 'orange'; label = `${value}`; }
-                else if (value > 14) { status = 'yellow'; label = `${value}`; }
-                else { status = 'green'; label = `${value}`; }
-            } else if (category === 'rain') {
-                if (value >= 60) { status = 'red'; label = `${value}%`; }
-                else if (value >= 40) { status = 'orange'; label = `${value}%`; }
-                else if (value >= 25) { status = 'yellow'; label = `${value}%`; }
-                else { status = 'green'; label = `${value}%`; }
-            } else if (category === 'cloud') {
-                if (value >= 90) { status = 'red'; label = `${value}%`; }
-                else if (value >= 70) { status = 'orange'; label = `${value}%`; }
-                else if (value >= 50) { status = 'yellow'; label = `${value}%`; }
-                else { status = 'green'; label = `${value}%`; }
-            } else if (category === 'vis') {
-                if (value < 3) { status = 'red'; label = `${value}`; }
-                else if (value < 5) { status = 'orange'; label = `${value}`; }
-                else if (value < 7) { status = 'yellow'; label = `${value}`; }
-                else { status = 'green'; label = `${value}`; }
-            } else if (category === 'base') {
-                if (value === 'Unlimited' || value >= 5000) { status = 'green'; label = typeof value === 'number' ? value.toLocaleString() : value; }
-                else if (value >= 3500) { status = 'yellow'; label = value.toLocaleString(); }
-                else if (value >= 2000) { status = 'orange'; label = value.toLocaleString(); }
-                else { status = 'red'; label = value.toLocaleString(); }
-            } else if (category === 'fog') {
-                if (value === 'FOG') { status = 'red'; label = 'FOG'; }
-                else if (value === 'MIST') { status = 'orange'; label = 'MIST'; }
-                else { status = 'green'; label = 'CLEAR'; }
-            }
-
-            return `<span class="traffic-badge-${status}">${label}</span>`;
-        }
-
-        // [SUB-SECTION: ACTIVE DAY HOURLY OVERVIEW MATRIX RENDERER]
-        function renderActiveDay(dayIndex) {
-            const data = globalWeatherData;
-            const hourly = data.hourly;
-            const daily = data.daily;
-
-            const targetDate = new Date(daily.time[dayIndex]);
-            const dateStr = targetDate.toISOString().split('T')[0];
-            const dayOfWeekName = targetDate.toLocaleDateString('en-GB', { weekday: 'long' });
-
-            const sunriseIso = daily.sunrise && daily.sunrise[dayIndex] ? daily.sunrise[dayIndex] : null;
-            const sunsetIso = daily.sunset && daily.sunset[dayIndex] ? daily.sunset[dayIndex] : null;
-
-            let sunriseHour = -1, sunriseMinStr = '', sunsetHour = -1, sunsetMinStr = '';
-            if (sunriseIso) {
-                const sDate = new Date(sunriseIso);
-                sunriseHour = sDate.getHours();
-                sunriseMinStr = sDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
-            }
-            if (sunsetIso) {
-                const sDate = new Date(sunsetIso);
-                sunsetHour = sDate.getHours();
-                sunsetMinStr = sDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
-            }
-
-            document.getElementById('matrix-section-title').innerHTML = `<i class="fa-solid fa-traffic-light" style="color: var(--accent-sky);"></i>${dayOfWeekName} Hourly Overview`;
-
-            let startIndex = hourly.time.findIndex(t => t.startsWith(dateStr) && t.includes('08:00'));
-            if (startIndex === -1) startIndex = (dayIndex * 24) + 8;
-            const validStart = startIndex !== -1 ? startIndex : (dayIndex * 24) + 8;
-            const hoursCount = 11;
-
-            const nowLocalDate = new Date();
-            const year = nowLocalDate.getFullYear();
-            const month = String(nowLocalDate.getMonth() + 1).padStart(2, '0');
-            const day = String(nowLocalDate.getDate()).padStart(2, '0');
-            const hour = String(nowLocalDate.getHours()).padStart(2, '0');
-            const currentLocalHourStr = `${year}-${month}-${day}T${hour}`;
-
-            let hourHeaders = `<tr><th class="param-label"></th>`;
-            
-            // Core Summary Rows
-            let tempRow = `<tr><td class="param-label">Temp (°C)</td>`;
-            let skyRow = `<tr><td class="param-label">Sky Condition</td>`;
-            let windRow = `<tr><td class="param-label">Wind (mph)</td>`;
-            let gustRow = `<tr><td class="param-label">Gusts (mph)</td>`;
-            let dirRow = `<tr><td class="param-label">Wind Dir</td>`;
-
-            // Individual Model Wind Rows
-            let ecmwfRow = `<tr><td class="param-label">ECMWF Wind</td>`;
-            let gfsRow = `<tr><td class="param-label">GFS Wind</td>`;
-            let iconRow = `<tr><td class="param-label">ICON Wind</td>`;
-            let meteoRow = `<tr><td class="param-label">Meteo Wind</td>`;
-
-            // Atmospheric & Cloud Rows
-            let rainRow = `<tr><td class="param-label">Rain (%)</td>`;
-            let cloudRow = `<tr><td class="param-label">Cloud (%)</td>`;
-            let cLowRow = `<tr><td class="param-label">☁ Low (0-5k)</td>`;
-            let cMidRow = `<tr><td class="param-label">☁ Mid (5-10k)</td>`;
-            let cUpperRow = `<tr><td class="param-label">☁ Upper (10-15k)</td>`;
-            let cTopRow = `<tr><td class="param-label">☁ Top (15k+)</td>`;
-
-            let visRow = `<tr><td class="param-label">Vis (km)</td>`;
-            let baseRow = `<tr><td class="param-label">Base (ft)</td>`;
-            let fogRow = `<tr><td class="param-label">Fog Risk</td>`;
-
-            const modelsConfig = [
-                { key: 'ecmwf_ifs025', label: 'ECMWF' },
-                { key: 'gfs_seamless', label: 'GFS' },
-                { key: 'icon_seamless', label: 'ICON' },
-                { key: 'meteofrance_seamless', label: 'Meteo' }
-            ];
-
-            for (let i = validStart; i < Math.min(validStart + hoursCount, hourly.time.length); i++) {
-                const timeStr = hourly.time[i];
-                const hourObj = new Date(timeStr);
-                const hourNum = hourObj.getHours();
-
-                if (sunsetHour !== -1 && hourNum > sunsetHour) {
-                    continue;
-                }
-
-                const timeLabel = hourObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
-                const isCurrentHour = timeStr.startsWith(currentLocalHourStr);
-                const colClass = isCurrentHour ? ' current-col' : '';
-
-                let modelWindSum = 0;
-                let modelGustSum = 0;
-                let activeModelCount = 0;
-                let modelDirList = [];
-
-                modelsConfig.forEach(m => {
-                    const modelObj = multiModelData[m.key];
-                    if (modelObj && modelObj.hourly && modelObj.hourly.wind_speed_10m) {
-                        let mIdx = modelObj.hourly.time.findIndex(t => t === timeStr);
-                        if (mIdx === -1) mIdx = i;
-                        if (mIdx !== -1 && modelObj.hourly.wind_speed_10m[mIdx] !== undefined && modelObj.hourly.wind_speed_10m[mIdx] !== null) {
-                            const rawSpd = modelObj.hourly.wind_speed_10m[mIdx];
-                            const rawGust = modelObj.hourly.wind_gusts_10m ? modelObj.hourly.wind_gusts_10m[mIdx] : 0;
-                            const rawDir = modelObj.hourly.wind_direction_10m ? modelObj.hourly.wind_direction_10m[mIdx] : null;
-                            
-                            modelWindSum += kmhToMph(rawSpd);
-                            modelGustSum += kmhToMph(rawGust);
-                            if (rawDir !== null) modelDirList.push(rawDir);
-                            activeModelCount++;
-                        }
-                    }
-                });
-
-                const wSpd = activeModelCount > 0 ? Math.round(modelWindSum / activeModelCount) : kmhToMph(hourly.wind_speed_10m[i]);
-                const wGST = activeModelCount > 0 ? Math.round(modelGustSum / activeModelCount) : kmhToMph(hourly.wind_gusts_10m[i]);
-                
-                // Use circular average for summary wind direction
-                if (modelDirList.length === 0) {
-                    modelDirList.push(hourly.wind_direction_10m[i] || 0);
-                }
-                const dirDeg = getAverageWindDirection(modelDirList);
-                const rot = (dirDeg + 180) % 360;
-                const dirLabel = getWindDirectionLabel(dirDeg);
-
-                const temp = Math.round(hourly.temperature_2m[i]);
-                const dew = hourly.dew_point_2m[i];
-                const rain = hourly.precipitation_probability[i];
-                const vis = parseFloat((hourly.visibility[i] / 1000).toFixed(1));
-                
-                const low = hourly.cloud_cover_low[i] || 0;
-                const mid = hourly.cloud_cover_mid[i] || 0;
-                const high = hourly.cloud_cover_hgh ? hourly.cloud_cover_hgh[i] : 0;
-                const hum = hourly.relative_humidity_2m[i];
-                const code = hourly.weather_code[i];
-                const totCloud = hourly.cloud_cover ? hourly.cloud_cover[i] : low;
-
-                let fogStatus = 'CLEAR';
-                if (vis < 1.0 || (code >= 45 && code <= 48 && vis < 3.0)) {
-                    fogStatus = 'FOG';
-                } else if (vis < 5.0 && (hum >= 90 || (temp - dew) <= 1.5)) {
-                    fogStatus = 'MIST';
-                }
-
-                const cb = getCustomCloudBands(low, mid, high, vis, rain);
-                const cloud = Math.min(100, Math.round((cb.c0_5k * 0.6) + (cb.c5_10k * 0.3) + (cb.c10_15k * 0.1)));
-                const cloudbaseAGL = calculateCloudbaseAGL(temp, dew, low, hum, code, totCloud);
-                const basePassVal = cloudbaseAGL >= 12000 ? 'Unlimited' : cloudbaseAGL;
-
-                const hFog = fogStatus === 'FOG' || fogStatus === 'MIST' || vis < 3;
-                const wInfo = getWeatherIcon(hFog ? 45 : code, rain);
-
-                function getModelCellHtml(modelKey) {
-                    const modelObj = multiModelData[modelKey];
-                    if (!modelObj || !modelObj.hourly || !modelObj.hourly.wind_speed_10m) return `<td class="${colClass}" style="color:var(--text-muted); font-size:0.65rem;">--</td>`;
-                    
-                    let mIdx = modelObj.hourly.time.findIndex(t => t === timeStr);
-                    if (mIdx === -1) mIdx = i;
-                    if (mIdx === -1 || modelObj.hourly.wind_speed_10m[mIdx] === undefined || modelObj.hourly.wind_speed_10m[mIdx] === null) {
-                        return `<td class="${colClass}" style="color:var(--text-muted); font-size:0.65rem;">--</td>`;
-                    }
-
-                    const rawSpd = modelObj.hourly.wind_speed_10m[mIdx];
-                    const rawGust = modelObj.hourly.wind_gusts_10m ? modelObj.hourly.wind_gusts_10m[mIdx] : 0;
-                    const rawDir = modelObj.hourly.wind_direction_10m ? modelObj.hourly.wind_direction_10m[mIdx] : 0;
-                    
-                    const mSpd = kmhToMph(rawSpd);
-                    const mGust = kmhToMph(rawGust);
-                    const mDir = getWindDirectionLabel(rawDir);
-                    const mRot = (rawDir + 180) % 360;
-
-                    return `<td class="${colClass}" style="font-size:0.7rem;">
-                        <span class="${getWindColorClass(mSpd)}" style="font-weight:700;">${mSpd}</span> <span style="font-size:0.6rem; color:var(--text-muted);">G${mGust}</span><br>
-                        <i class="fa-solid fa-arrow-up" style="transform: rotate(${mRot}deg); color: var(--accent-sky); font-size:0.6rem;"></i> <span style="font-size:0.65rem;">${mDir}</span>
-                    </td>`;
-                }
-
-                let eventBadge = '';
-                if (sunriseHour === hourNum && sunriseMinStr) {
-                    eventBadge += `<div style="font-size: 0.55rem; background: #fef3c7; color: #b45309; border: 1px solid #fcd34d; padding: 0.05rem 0.2rem; border-radius: 0.2rem; margin-bottom: 0.15rem; font-weight: 700; text-align: center;">Sunrise ${sunriseMinStr}</div>`;
-                }
-                if (sunsetHour === hourNum && sunsetMinStr) {
-                    eventBadge += `<div style="font-size: 0.55rem; background: #ffedd5; color: #c2410c; border: 1px solid #fdba74; padding: 0.05rem 0.2rem; border-radius: 0.2rem; margin-bottom: 0.15rem; font-weight: 700; text-align: center;">Sunset ${sunsetMinStr}</div>`;
-                }
-                const nowTag = isCurrentHour ? `<br><span style="font-size:0.5rem; background:var(--accent-sky); color:white; padding:0.02rem 0.15rem; border-radius:0.15rem;">NOW</span>` : '';
-                const headerContent = `${eventBadge}${timeLabel}${nowTag}`;
-
-                hourHeaders += `<th class="${colClass}">${headerContent}</th>`;
-                tempRow += `<td class="${colClass}" style="font-weight: 700; color: var(--text-main);">${temp}°</td>`;
-                skyRow += `<td class="${colClass}" style="font-size: 0.65rem;"><i class="fa-solid ${wInfo.icon}" style="color: ${wInfo.color}; margin-right: 0.2rem;"></i>${wInfo.label}</td>`;
-                windRow += `<td class="${colClass}">${getTrafficBadge('wind', wSpd)}</td>`;
-                gustRow += `<td class="${colClass}">${getTrafficBadge('gust', wGST)}</td>`;
-                dirRow += `<td class="${colClass}" style="font-weight: 600;"><i class="fa-solid fa-arrow-up" style="transform: rotate(${rot}deg); color: var(--accent-sky); margin-right: 0.25rem;"></i>${dirLabel}</td>`;
-                
-                ecmwfRow += getModelCellHtml('ecmwf_ifs025');
-                gfsRow += getModelCellHtml('gfs_seamless');
-                iconRow += getModelCellHtml('icon_seamless');
-                meteoRow += getModelCellHtml('meteofrance_seamless');
-
-                rainRow += `<td class="${colClass}">${getTrafficBadge('rain', rain, '%')}</td>`;
-                cloudRow += `<td class="${colClass}">${getTrafficBadge('cloud', cloud, '%')}</td>`;
-                
-                cLowRow += `<td class="${colClass} ${getCloudColorClass(cb.c0_5k)}" style="font-size: 0.7rem;">${cb.c0_5k}%</td>`;
-                cMidRow += `<td class="${colClass} ${getCloudColorClass(cb.c5_10k)}" style="font-size: 0.7rem;">${cb.c5_10k}%</td>`;
-                cUpperRow += `<td class="${colClass} ${getCloudColorClass(cb.c10_15k)}" style="font-size: 0.7rem;">${cb.c10_15k}%</td>`;
-                cTopRow += `<td class="${colClass} ${getCloudColorClass(cb.c15k_plus)}" style="font-size: 0.7rem;">${cb.c15k_plus}%</td>`;
-
-                visRow += `<td class="${colClass}">${getTrafficBadge('vis', vis)}</td>`;
-                baseRow += `<td class="${colClass}">${getTrafficBadge('base', basePassVal)}</td>`;
-                fogRow += `<td class="${colClass}">${getTrafficBadge('fog', fogStatus)}</td>`;
-            }
-
-            hourHeaders += `</tr>`;
-            tempRow += `</tr>`;
-            skyRow += `</tr>`;
-            windRow += `</tr>`;
-            gustRow += `</tr>`;
-            dirRow += `</tr>`;
-            ecmwfRow += `</tr>`;
-            gfsRow += `</tr>`;
-            iconRow += `</tr>`;
-            meteoRow += `</tr>`;
-            rainRow += `</tr>`;
-            cloudRow += `</tr>`;
-            cLowRow += `</tr>`;
-            cMidRow += `</tr>`;
-            cUpperRow += `</tr>`;
-            cTopRow += `</tr>`;
-            visRow += `</tr>`;
-            baseRow += `</tr>`;
-            fogRow += `</tr>`;
-
-            document.getElementById('master-traffic-matrix').innerHTML = `
-                <thead>${hourHeaders}</thead>
-                <tbody>
-                    ${tempRow}
-                    ${skyRow}
-                    ${windRow}
-                    ${gustRow}
-                    ${dirRow}
-                    ${ecmwfRow}
-                    ${gfsRow}
-                    ${iconRow}
-                    ${meteoRow}
-                    ${rainRow}
-                    ${cloudRow}
-                    ${cLowRow}
-                    ${cMidRow}
-                    ${cUpperRow}
-                    ${cTopRow}
-                    ${visRow}
-                    ${baseRow}
-                    ${fogRow}
-                </tbody>
-            `;
-        }
-
-        // [SUB-SECTION: INITIALIZATION HOOK]
-        window.onload = () => {
-            fetchAllData();
-            setInterval(fetchAllData, CONFIG.refreshIntervalMinutes * 60 * 1000);
-        };
-    </script>
 </body>
 </html>
