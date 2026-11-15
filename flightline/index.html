@@ -1,4 +1,4 @@
-<!-- REV: 10.4 - SKYDIVE SOUTHWEST FLIGHTLINE -->
+<!-- REV: 10.5 - SKYDIVE SOUTHWEST FLIGHTLINE -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -91,7 +91,7 @@
     #map { width: 100%; height: 100%; z-index: 1; }
 
     /* ==========================================================
-        SIDEBAR (REV 10.4)
+        SIDEBAR (REV 10.5)
         ========================================================== */
     .map-info-overlay {
       --w: clamp(460px, 34vw, 720px);
@@ -468,7 +468,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Skydive Southwest Flightline</span>
-      <span class="rev-badge">REV: 10.4</span>
+      <span class="rev-badge">REV: 10.5</span>
     </div>
     <div class="header-right-meta">
       <div class="meta-item">Current: <span id="clock-current">--:--:--</span></div>
@@ -513,7 +513,7 @@
 
     </div>
 
-    <!-- SIDEBAR (REV 10.4) -->
+    <!-- SIDEBAR (REV 10.5) -->
     <div class="map-info-overlay" id="sidebar">
       <div class="ov-header">
         <span>⚡ Live ops</span>
@@ -669,6 +669,7 @@
     let isLandingManual = false;
     let cachedWeatherData = [248, 18, 30, 248, 20, 30, 248, 18, 33];
     let liveWindOverride = { dir: 250, spd: 12, gst: 18 };
+    let latest15kWind = { dir: 248, spd: 61 }; // fallback default
 
     function getArrow(deg) {
       if (deg === undefined || deg === null) return '↑';
@@ -797,10 +798,8 @@
         effectiveGust = (aromeGst + gfsGst + ecmwfGst) / 3;
       }
 
-      let spotOffset = Math.min(0.28, Math.max(0.12, (effectiveSpeed / 100) * 1.2));
-
       // ==========================================
-      // RUN-IN LOGIC
+      // RUN-IN & SPOT LOGIC (REV 10.5 - 15k Wind Formula)
       // ==========================================
       const runwayEnds = [42, 222, 170, 350];
       let bestRunwayHdg = 42;
@@ -816,16 +815,22 @@
 
       const jjRunwayHdg = bestRunwayHdg;
 
-      const wind15kSpd = effectiveSpeed * 3.4;
-      let jjOffsetDist = Math.max(0.1, parseFloat(((wind15kSpd / 10) * 0.1).toFixed(1)));
+      // 15k Wind Formula Rule:
+      // For every 10mph at 15k -> move spot upwind 0.05 and offset 0.05 left/right.
+      // Rounded up/to nearest single decimal.
+      const wind15kSpd = latest15kWind.spd;
+      const wind15kDir = latest15kWind.dir;
 
-      const angleDiff = (effectiveWindDir - jjRunwayHdg + 360) % 360;
+      let spotOffset = Math.max(0.05, parseFloat(((wind15kSpd / 10) * 0.05).toFixed(1)));
+      let jjOffsetDist = Math.max(0.05, parseFloat(((wind15kSpd / 10) * 0.05).toFixed(1)));
+
+      const angleDiff = (wind15kDir - jjRunwayHdg + 360) % 360;
       const jjSideMultiplier = (angleDiff > 180 && angleDiff < 360) ? -1 : 1;
       const jjOffsetBearing = (jjRunwayHdg + (jjSideMultiplier * 90) + 360) % 360;
 
       const jjOrigin = computeDestinationPoint(lat, lon, jjOffsetBearing, jjOffsetDist);
       const jjSpotPt = computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, jjRunwayHdg, spotOffset);
-      const jjRedDotPt = computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, jjRunwayHdg, spotOffset - 0.2);
+      const jjRedDotPt = computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, jjRunwayHdg, Math.max(0.05, spotOffset - 0.2));
       const jjStartRun = computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, (jjRunwayHdg + 180) % 360, 0.45);
       const jjEndRun = computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, jjRunwayHdg, Math.max(0.45, spotOffset + 0.15));
 
@@ -986,7 +991,6 @@
             gst: cur.wind_gusts_10m !== undefined ? cur.wind_gusts_10m : cur.wind_speed_10m
           };
 
-          // Extract and display the data generation timestamp from API response
           if (cur.time) {
             const dataTime = new Date(cur.time);
             const elDataTime = document.getElementById('live-data-time');
@@ -1093,6 +1097,13 @@
         const ecmwfGst = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_gusts_10m[currentIdx] || 33) : 33;
 
         cachedWeatherData = [aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst];
+
+        // Store 15k simulated/fetched wind values for spot calculation (scaling surface speed by 3.4x)
+        latest15kWind = {
+          dir: (ecmwfDir + 30) % 360,
+          spd: Math.round(ecmwfSpd * 3.4)
+        };
+
         updateDashboardMap();
 
         const elUwindSfc = document.getElementById('uwind-sfc');
@@ -1105,7 +1116,7 @@
         if (elUwind3k)  elUwind3k.innerHTML  = windAloftHTML(ecmwfDir + 10, Math.round(ecmwfSpd * 1.8));
         if (elUwind7k)  elUwind7k.innerHTML  = windAloftHTML(ecmwfDir + 18, Math.round(ecmwfSpd * 2.3));
         if (elUwind10k) elUwind10k.innerHTML = windAloftHTML(ecmwfDir + 25, Math.round(ecmwfSpd * 2.8));
-        if (elUwind15k) elUwind15k.innerHTML = windAloftHTML(ecmwfDir + 30, Math.round(ecmwfSpd * 3.4));
+        if (elUwind15k) elUwind15k.innerHTML = windAloftHTML(latest15kWind.dir, latest15kWind.spd);
 
       } catch (err) {
         console.error("Fetch error:", err);
