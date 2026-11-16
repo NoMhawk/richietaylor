@@ -1,4 +1,4 @@
-<!-- REV: 10.7 - SKYDIVE SOUTHWEST FLIGHTLINE -->
+<!-- REV: 10.9 - SKYDIVE SOUTHWEST FLIGHTLINE -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,11 +25,11 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      max-width: 100%;
+      width: 100%;
       margin-bottom: 4px;
       padding-bottom: 2px;
       border-bottom: 1px solid #1e2d4a;
-      height: 22px;
+      height: 26px;
     }
 
     .site-title {
@@ -41,15 +41,17 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      white-space: nowrap;
     }
 
     .header-right-meta {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 16px;
       font-family: monospace;
       font-size: 0.72rem;
       color: #a9b9d0;
+      white-space: nowrap;
     }
 
     .meta-item span {
@@ -71,9 +73,8 @@
     .dashboard-container {
       display: flex;
       flex-direction: column;
-      gap: 8px;
       width: 100%;
-      height: calc(100vh - 36px);
+      height: calc(100vh - 38px);
       position: relative;
     }
 
@@ -91,10 +92,10 @@
     #map { width: 100%; height: 100%; z-index: 1; }
 
     /* ==========================================================
-        SIDEBAR (REV 10.7)
+        SIDEBAR OVERLAY (REV 10.9)
         ========================================================== */
     .map-info-overlay {
-      --w: clamp(460px, 34vw, 720px);
+      --w: clamp(420px, 32vw, 520px);
       --u: min(1vh, calc(var(--w) / 55));
       position: absolute;
       top: 0;
@@ -169,8 +170,7 @@
 
     .ov-hero .ov-big { font-size: calc(var(--u) * 6.2); }
     .ov-land .ov-big { font-size: calc(var(--u) * 4.6); }
-    .ov-jump .ov-big { font-size: calc(var(--u) * 4.2); }
-    .ov-jj-big       { font-size: calc(var(--u) * 2.8); }
+    .ov-jump .ov-big { font-size: calc(var(--u) * 3.4); }
 
     .turn-glyph { font-size: 0.7em; vertical-align: 0.08em; }
 
@@ -332,7 +332,7 @@
       padding: 10px 14px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.6);
       font-family: monospace;
-      width: 320px;
+      width: 280px;
     }
 
     .spot-overlay-header {
@@ -367,8 +367,6 @@
       flex-direction: column;
       gap: 5px;
       margin-top: 6px;
-      padding-top: 6px;
-      border-top: 1px dashed rgba(255,255,255,0.1);
     }
 
     .slider-row {
@@ -378,9 +376,14 @@
       font-size: 0.68rem;
     }
 
-    .slider-row input[type=range] {
+    .slider-row select {
+      background: #131b2e;
+      color: #ff9800;
+      border: 1px solid #ff9800;
+      font-size: 0.7rem;
+      font-weight: bold;
+      border-radius: 3px;
       width: 150px;
-      accent-color: #00d8ff;
     }
 
     .jumprun-arrow {
@@ -400,7 +403,6 @@
       pointer-events: none;
     }
 
-    /* EXACT START-ANCHORED RUN IN LABEL */
     .runin-line-text {
       background: #0b0f19;
       color: #e040fb;
@@ -424,14 +426,12 @@
       }
       .dashboard-container {
         height: auto;
-        gap: 8px;
       }
       .map-card {
         height: 480px !important;
       }
       .map-info-overlay {
         --w: 100vw;
-        --u: min(2.3vw, 10px);
         position: relative !important;
         top: auto !important;
         right: auto !important;
@@ -439,25 +439,7 @@
         width: 100% !important;
         border-left: none !important;
         border-radius: 8px !important;
-        margin-bottom: 8px;
-        overflow: visible;
-      }
-      .ov-row, .ov-section { flex: none; }
-      .ov-hero { min-height: calc(var(--u) * 14); }
-      .ov-land, .ov-jump { min-height: calc(var(--u) * 9); }
-      .ov-models, .ov-aloft { min-height: 0; }
-      .model-forecast-grid { grid-template-rows: none; }
-      .model-card-item { min-height: calc(var(--u) * 12); }
-      .aloft-row { min-height: calc(var(--u) * 6); }
-      .spot-overlay-card {
-        position: relative !important;
-        bottom: auto !important;
-        left: auto !important;
-        width: 100% !important;
         margin-top: 8px;
-      }
-      .slider-row input[type=range], .slider-row select {
-        width: 180px !important;
       }
     }
   </style>
@@ -468,7 +450,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Skydive Southwest Flightline</span>
-      <span class="rev-badge">REV: 10.7</span>
+      <span class="rev-badge">REV: 10.9</span>
     </div>
     <div class="header-right-meta">
       <div class="meta-item">Current: <span id="clock-current">--:--:--</span></div>
@@ -482,7 +464,7 @@
     <div class="map-card">
       <div id="map"></div>
 
-      <!-- COMPACT LANDING CONTROLS PANEL (BOTTOM-LEFT OF MAP) -->
+      <!-- COMPACT LANDING CONTROLS PANEL -->
       <div class="spot-overlay-card">
         <div class="spot-overlay-header">
           <span class="spot-overlay-title">⚙️ DZ Override Controls</span>
@@ -496,7 +478,7 @@
           <div id="landing-manual-controls" style="display: none; flex-direction: column; gap: 5px; margin-top: 5px;">
             <div class="slider-row">
               <span>Wind Sector:</span>
-              <select id="select-wind-sector" onchange="updateDashboardMap()" style="background:#131b2e; color:#ff9800; border:1px solid #ff9800; font-size:0.7rem; font-weight:bold; border-radius:3px; width:150px;">
+              <select id="select-wind-sector" onchange="updateDashboardMap()">
                 <option value="0" selected>N (337.5° - 022.5°)</option>
                 <option value="45">NE (022.5° - 067.5°)</option>
                 <option value="90">E (067.5° - 112.5°)</option>
@@ -511,110 +493,110 @@
         </div>
       </div>
 
+      <!-- SIDEBAR OVERLAY (REV 10.9) -->
+      <div class="map-info-overlay" id="sidebar">
+        <div class="ov-header">
+          <span>⚡ Live ops</span>
+        </div>
+
+        <!-- HERO: WIND DIRECTION + SPEED -->
+        <div class="ov-row ov-hero">
+          <div class="ov-cell ov-wind">
+            <div class="ov-dial">
+              <svg viewBox="0 0 100 100" aria-hidden="true">
+                <circle cx="50" cy="50" r="47" fill="rgba(0,216,255,0.06)" stroke="#2c4a6e" stroke-width="3"/>
+                <text x="50" y="15" text-anchor="middle" font-size="12" font-weight="800" fill="#7c8ea6" font-family="sans-serif">N</text>
+                <g id="ov-arrow" transform="rotate(324 50 50)">
+                  <polygon points="50,22 72,56 57,56 57,84 43,84 43,56 28,56" fill="#00d8ff"/>
+                </g>
+              </svg>
+            </div>
+            <div class="ov-wind-text">
+              <div class="ov-label">Wind from (Live EGTU)</div>
+              <div class="ov-big accent-cyan" id="ov-winddir">--°</div>
+              <div class="ov-sub accent-cyan" id="ov-windcompass">--</div>
+            </div>
+          </div>
+          <div class="ov-cell">
+            <div class="ov-label">Actual / Average wind</div>
+            <div class="ov-speed-line">
+              <span class="ov-big accent-green" id="ov-windspd">--</span>
+              <span class="ov-unit">mph</span>
+            </div>
+            <div class="ov-sub accent-green" id="ov-gust">Gust --</div>
+          </div>
+        </div>
+
+        <!-- LANDING PATTERN -->
+        <div class="ov-row ov-land">
+          <div class="ov-cell">
+            <div class="ov-label">Landing Pattern</div>
+            <div class="ov-big accent-orange" id="ov-pattern">--</div>
+          </div>
+        </div>
+
+        <!-- RUN-IN INFO BOX -->
+        <div class="ov-row ov-jump">
+          <div class="ov-cell" style="background: linear-gradient(135deg, rgba(40, 20, 60, 0.85) 0%, rgba(15, 10, 26, 0.95) 100%); border-color: rgba(224, 64, 251, 0.4);">
+            <div class="ov-label" style="color: #ea80fc;">Run-In Heading</div>
+            <div class="ov-big accent-purple" id="ov-jj-heading">--°</div>
+          </div>
+          <div class="ov-cell" style="background: linear-gradient(135deg, rgba(40, 20, 60, 0.85) 0%, rgba(15, 10, 26, 0.95) 100%); border-color: rgba(224, 64, 251, 0.4);">
+            <div class="ov-label" style="color: #ea80fc;">Offset</div>
+            <div class="ov-big accent-purple" id="ov-jj-offset" style="font-size: calc(var(--u) * 2.2);">--</div>
+          </div>
+        </div>
+
+        <!-- CURRENT HOUR MODEL FORECAST SECTION -->
+        <div class="ov-section ov-models">
+          <div class="section-title">
+            <span>Model forecast</span>
+            <span id="current-hour-label" style="color: #00d8ff;">--:--</span>
+          </div>
+          <div class="model-forecast-grid" id="current-model-forecast-rows">
+            <div style="grid-column: span 2; text-align: center; padding: 10px; color: #7c8ea6;">Loading forecast...</div>
+          </div>
+        </div>
+
+        <!-- WINDS ALOFT SECTION -->
+        <div class="ov-section ov-aloft">
+          <div class="section-title">
+            <span>Winds aloft</span>
+            <span style="color:#7c8ea6;">EGTU 839'</span>
+          </div>
+          <div class="aloft-grid" id="upper-winds-rows">
+            <div class="aloft-head"><span>Alt</span><span>Direction / speed</span><span>Temp</span></div>
+            <div class="aloft-row">
+              <div class="aloft-alt">Sfc</div>
+              <div class="aloft-wind" id="uwind-sfc">--</div>
+              <div class="aloft-temp" id="utemp-sfc">18°C</div>
+            </div>
+            <div class="aloft-row">
+              <div class="aloft-alt">3k'</div>
+              <div class="aloft-wind" id="uwind-3k">--</div>
+              <div class="aloft-temp" id="utemp-3k">12°C</div>
+            </div>
+            <div class="aloft-row">
+              <div class="aloft-alt">7k'</div>
+              <div class="aloft-wind" id="uwind-7k">--</div>
+              <div class="aloft-temp" id="utemp-7k">4°C</div>
+            </div>
+            <div class="aloft-row">
+              <div class="aloft-alt">10k'</div>
+              <div class="aloft-wind" id="uwind-10k">--</div>
+              <div class="aloft-temp" id="utemp-10k">-2°C</div>
+            </div>
+            <div class="aloft-row">
+              <div class="aloft-alt">15k'</div>
+              <div class="aloft-wind" id="uwind-15k">--</div>
+              <div class="aloft-temp" id="utemp-15k">-12°C</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
 
-    <!-- SIDEBAR (REV 10.7) -->
-    <div class="map-info-overlay" id="sidebar">
-      <div class="ov-header">
-        <span>⚡ Live ops</span>
-      </div>
-
-      <!-- HERO: WIND DIRECTION + SPEED -->
-      <div class="ov-row ov-hero">
-        <div class="ov-cell ov-wind">
-          <div class="ov-dial">
-            <svg viewBox="0 0 100 100" aria-hidden="true">
-              <circle cx="50" cy="50" r="47" fill="rgba(0,216,255,0.06)" stroke="#2c4a6e" stroke-width="3"/>
-              <text x="50" y="15" text-anchor="middle" font-size="12" font-weight="800" fill="#7c8ea6" font-family="sans-serif">N</text>
-              <g id="ov-arrow" transform="rotate(324 50 50)">
-                <polygon points="50,22 72,56 57,56 57,84 43,84 43,56 28,56" fill="#00d8ff"/>
-              </g>
-            </svg>
-          </div>
-          <div class="ov-wind-text">
-            <div class="ov-label">Wind from (Live EGTU)</div>
-            <div class="ov-big accent-cyan" id="ov-winddir">--°</div>
-            <div class="ov-sub accent-cyan" id="ov-windcompass">--</div>
-          </div>
-        </div>
-        <div class="ov-cell">
-          <div class="ov-label">Actual / Average wind</div>
-          <div class="ov-speed-line">
-            <span class="ov-big accent-green" id="ov-windspd">--</span>
-            <span class="ov-unit">mph</span>
-          </div>
-          <div class="ov-sub accent-green" id="ov-gust">Gust --</div>
-        </div>
-      </div>
-
-      <!-- LANDING PATTERN -->
-      <div class="ov-row ov-land">
-        <div class="ov-cell">
-          <div class="ov-label">Landing Pattern</div>
-          <div class="ov-big accent-orange" id="ov-pattern" style="font-size: calc(var(--u) * 4.2);">--</div>
-        </div>
-      </div>
-
-      <!-- RUN-IN 2-COLUMN INFO BOX (REV 10.7) -->
-      <div class="ov-row ov-jump">
-        <div class="ov-cell" style="background: linear-gradient(135deg, rgba(40, 20, 60, 0.85) 0%, rgba(15, 10, 26, 0.95) 100%); border-color: rgba(224, 64, 251, 0.4);">
-          <div class="ov-label" style="color: #ea80fc;">Run-In Heading</div>
-          <div class="ov-big accent-purple" id="ov-jj-heading">--°</div>
-        </div>
-        <div class="ov-cell" style="background: linear-gradient(135deg, rgba(40, 20, 60, 0.85) 0%, rgba(15, 10, 26, 0.95) 100%); border-color: rgba(224, 64, 251, 0.4);">
-          <div class="ov-label" style="color: #ea80fc;">Offset</div>
-          <div class="ov-big accent-purple ov-jj-big" id="ov-jj-offset">--</div>
-        </div>
-      </div>
-
-      <!-- CURRENT HOUR MODEL FORECAST SECTION -->
-      <div class="ov-section ov-models">
-        <div class="section-title">
-          <span>Model forecast</span>
-          <span id="current-hour-label" style="color: #00d8ff;">--:--</span>
-        </div>
-        <div class="model-forecast-grid" id="current-model-forecast-rows">
-          <div style="grid-column: span 2; text-align: center; padding: 10px; color: #7c8ea6;">Loading forecast...</div>
-        </div>
-      </div>
-
-      <!-- WINDS ALOFT SECTION -->
-      <div class="ov-section ov-aloft">
-        <div class="section-title">
-          <span>Winds aloft</span>
-          <span style="color:#7c8ea6;">EGTU 839'</span>
-        </div>
-        <div class="aloft-grid" id="upper-winds-rows">
-          <div class="aloft-head"><span>Alt</span><span>Direction / speed</span><span>Temp</span></div>
-          <div class="aloft-row">
-            <div class="aloft-alt">Sfc</div>
-            <div class="aloft-wind" id="uwind-sfc">--</div>
-            <div class="aloft-temp" id="utemp-sfc">18°C</div>
-          </div>
-          <div class="aloft-row">
-            <div class="aloft-alt">3k'</div>
-            <div class="aloft-wind" id="uwind-3k">--</div>
-            <div class="aloft-temp" id="utemp-3k">12°C</div>
-          </div>
-          <div class="aloft-row">
-            <div class="aloft-alt">7k'</div>
-            <div class="aloft-wind" id="uwind-7k">--</div>
-            <div class="aloft-temp" id="utemp-7k">4°C</div>
-          </div>
-          <div class="aloft-row">
-            <div class="aloft-alt">10k'</div>
-            <div class="aloft-wind" id="uwind-10k">--</div>
-            <div class="aloft-temp" id="utemp-10k">-2°C</div>
-          </div>
-          <div class="aloft-row">
-            <div class="aloft-alt">15k'</div>
-            <div class="aloft-wind" id="uwind-15k">--</div>
-            <div class="aloft-temp" id="utemp-15k">-12°C</div>
-          </div>
-        </div>
-      </div>
-
-    </div>
   </div>
 
   <script>
@@ -658,13 +640,6 @@
     let windRoseLayerGroup = L.layerGroup().addTo(map);
     let circuitLayerGroup = L.layerGroup().addTo(map);
     circuitLayerGroup.addTo(map);
-
-    (function offsetForSidebar() {
-      const sb = document.getElementById('sidebar');
-      if (window.innerWidth > 768 && sb) {
-        map.panBy([sb.offsetWidth / 2, 0], { animate: false });
-      }
-    })();
 
     let isLandingManual = false;
     let cachedWeatherData = [248, 18, 30, 248, 20, 30, 248, 18, 33];
@@ -798,9 +773,6 @@
         effectiveGust = (aromeGst + gfsGst + ecmwfGst) / 3;
       }
 
-      // ==========================================
-      // RUN-IN & SPOT LOGIC (REV 10.7)
-      // ==========================================
       const runwayEnds = [42, 222, 170, 350];
       let bestRunwayHdg = 42;
       let minAngleDiff = 999;
@@ -814,7 +786,6 @@
       });
 
       const jjRunwayHdg = bestRunwayHdg;
-
       const wind15kSpd = latest15kWind.spd;
       const wind15kDir = latest15kWind.dir;
 
@@ -877,9 +848,6 @@
       if (elJjHdg) elJjHdg.innerText = `${String(jjRunwayHdg).padStart(3, '0')}°`;
       if (elJjOff) elJjOff.innerText = `${spotOffset.toFixed(1)} Past, ${jjOffsetDist.toFixed(1)} ${jjSideName}`;
 
-      // ==========================================
-      // LANDING CIRCUIT
-      // ==========================================
       let sectorName;
       if (isLandingManual) {
         const sectorSelect = document.getElementById('select-wind-sector');
@@ -906,3 +874,228 @@
       const finalLegDist = 120; 
       const finalStart = [
         activeLandingLat + (finalLegDist * Math.cos(circuitRad)) / 111320,
+        activeLandingLon + (finalLegDist * Math.sin(circuitRad)) / (111320 * Math.cos(activeLandingLat * Math.PI / 180))
+      ];
+
+      const perpRad = circuitRad + (circuitSide === 'left' ? Math.PI / 2 : -Math.PI / 2);
+      const baseWidth = 140; 
+      const baseStart = [
+        finalStart[0] + (baseWidth * Math.cos(perpRad)) / 111320,
+        finalStart[1] + (baseWidth * Math.sin(perpRad)) / (111320 * Math.cos(activeLandingLat * Math.PI / 180))
+      ];
+
+      const downwindLength = 350; 
+      const downwindEnd = [
+        baseStart[0] - (downwindLength * Math.cos(circuitRad)) / 111320,
+        baseStart[1] - (downwindLength * Math.sin(circuitRad)) / (111320 * Math.cos(activeLandingLat * Math.PI / 180))
+      ];
+
+      const circuitCoords = [[activeLandingLat, activeLandingLon], finalStart, baseStart, downwindEnd];
+
+      L.polyline(circuitCoords, {
+        color: '#ff9800', weight: 3, dashArray: '5,5', opacity: 0.95
+      }).addTo(circuitLayerGroup);
+
+      const dLatSpot = activeLandingLat - finalStart[0];
+      const dLonSpot = (activeLandingLon - finalStart[1]) * Math.cos(activeLandingLat * Math.PI / 180);
+      let spotBearingDeg = (Math.atan2(dLonSpot, dLatSpot) * 180 / Math.PI + 360) % 360;
+      let finalArrowAngle = (spotBearingDeg - 90 + 360) % 360;
+
+      L.marker([activeLandingLat, activeLandingLon], {
+        icon: L.divIcon({
+          html: `<div class="circuit-arrow" style="transform: rotate(${finalArrowAngle}deg);">▶</div>`,
+          className: '', iconSize: [24, 24], iconAnchor: [12, 12]
+        })
+      }).addTo(circuitLayerGroup);
+
+      const elPattern = document.getElementById('ov-pattern');
+      if (elPattern) {
+        elPattern.innerHTML = circuitSide === 'left' ? '<span class="turn-glyph">◀</span> LEFT' : 'RIGHT <span class="turn-glyph">▶</span>';
+      }
+      
+      const roundedDir = Math.round(effectiveWindDir);
+      const elWindDir = document.getElementById('ov-winddir');
+      const elWindComp = document.getElementById('ov-windcompass');
+      const elOvArrow = document.getElementById('ov-arrow');
+      if (elWindDir) elWindDir.innerText = `${String(roundedDir).padStart(3, '0')}°`;
+      if (elWindComp) elWindComp.innerText = getCompassLetter(roundedDir);
+      if (elOvArrow) elOvArrow.setAttribute('transform', `rotate(${(effectiveWindDir + 180) % 360} 50 50)`);
+
+      const peak = Math.max(effectiveSpeed, effectiveGust);
+      const speedEl = document.getElementById('ov-windspd');
+      const gustEl = document.getElementById('ov-gust');
+      if (speedEl) {
+        speedEl.innerText = Math.round(effectiveSpeed);
+        speedEl.style.color = getStatusColor(peak);
+      }
+      if (gustEl) {
+        gustEl.innerText = `Gust ${Math.round(effectiveGust)}`;
+        gustEl.style.color = getStatusColor(peak);
+      }
+      
+      setTimeout(() => { map.invalidateSize(); }, 250);
+    }
+
+    updateDashboardMap();
+
+    map.on('zoomend', () => {
+      updateDashboardMap();
+    });
+
+    async function fetchLiveWeatherFeed() {
+      try {
+        const liveRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=mph`);
+        if (!liveRes.ok) return;
+        const liveData = await liveRes.json();
+
+        if (liveData && liveData.current) {
+          const cur = liveData.current;
+          liveWindOverride = {
+            dir: cur.wind_direction_10m,
+            spd: cur.wind_speed_10m,
+            gst: cur.wind_gusts_10m !== undefined ? cur.wind_gusts_10m : cur.wind_speed_10m
+          };
+
+          if (cur.time) {
+            const dataTime = new Date(cur.time);
+            const elDataTime = document.getElementById('live-data-time');
+            if (elDataTime) {
+              elDataTime.innerText = dataTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+          }
+
+          updateDashboardMap();
+        }
+      } catch (err) {
+        console.warn("Live feed fallback active:", err);
+      }
+    }
+
+    async function fetchModelData() {
+      const surfaceParams = `latitude=${lat}&longitude=${lon}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,temperature_2m,dewpoint_2m,cloud_cover&wind_speed_unit=mph&forecast_days=1`;
+      
+      try {
+        const [ecmwfRes, gfsRes, iconRes, aromeRes] = await Promise.all([
+          fetch(`https://api.open-meteo.com/v1/ecmwf?${surfaceParams}`),
+          fetch(`https://api.open-meteo.com/v1/gfs?${surfaceParams}`),
+          fetch(`https://api.open-meteo.com/v1/forecast?models=icon_eu&${surfaceParams}`),
+          fetch(`https://api.open-meteo.com/v1/forecast?models=meteofrance_arome_france&${surfaceParams}`)
+        ]);
+
+        const ecmwf = await ecmwfRes.json();
+        const gfs = await gfsRes.json();
+        const icon = await iconRes.json();
+        const arome = await aromeRes.json();
+
+        const times = ecmwf.hourly.time;
+        const models = [
+          { name: 'ECMWF', data: ecmwf },
+          { name: 'GFS', data: gfs },
+          { name: 'ICON-EU', data: icon },
+          { name: 'AROME', data: arome }
+        ];
+
+        const nowHour = new Date().getHours();
+        let currentIdx = 12;
+
+        for (let i = 0; i < times.length; i++) {
+          const timeDate = new Date(times[i]);
+          if (timeDate.getHours() === nowHour) {
+            currentIdx = i;
+            break;
+          }
+        }
+
+        const sampleTimeDate = new Date(times[currentIdx]);
+        const elHourLabel = document.getElementById('current-hour-label');
+        if (elHourLabel) {
+          elHourLabel.innerText = sampleTimeDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        let forecastCardsHTML = '';
+        models.forEach(model => {
+          const dataset = model.data;
+          if (!dataset || !dataset.hourly) return;
+
+          const speed = Math.round(dataset.hourly.wind_speed_10m[currentIdx] || 0);
+          const gust = Math.round(dataset.hourly.wind_gusts_10m ? (dataset.hourly.wind_gusts_10m[currentIdx] || 0) : speed);
+          const dir = dataset.hourly.wind_direction_10m[currentIdx];
+          const peak = Math.max(speed, gust);
+          const statusClass = getStatusClass(peak);
+
+          const temp = dataset.hourly.temperature_2m ? dataset.hourly.temperature_2m[currentIdx] : 18;
+          const dew = dataset.hourly.dewpoint_2m ? dataset.hourly.dewpoint_2m[currentIdx] : 11;
+          const cover = dataset.hourly.cloud_cover ? dataset.hourly.cloud_cover[currentIdx] : 50;
+
+          const baseAgl = calculateCloudBase(temp, dew, cover);
+          const baseStr = (baseAgl !== null && baseAgl < 25000) ? `${baseAgl.toLocaleString()}'` : 'CLR';
+
+          const dirRounded = Math.round(dir);
+          forecastCardsHTML += `
+            <div class="model-card-item ${statusClass}">
+              <div class="model-card-top">
+                <span class="model-name">${model.name}</span>
+                <span class="cloud-badge">☁ ${baseStr}</span>
+              </div>
+              <div class="model-card-wind">
+                <span class="mc-arrow" style="transform: rotate(${(dir + 180) % 360}deg);">↑</span>
+                <span class="mc-speed">${speed}</span>
+                <span class="mc-gust">G${gust}</span>
+                <span class="mc-dir" style="margin-left: auto;">${String(dirRounded).padStart(3, '0')}° ${getCompassLetter(dirRounded)}</span>
+              </div>
+            </div>
+          `;
+        });
+        const elModelRows = document.getElementById('current-model-forecast-rows');
+        if (elModelRows) elModelRows.innerHTML = forecastCardsHTML;
+
+        const aromeDir = arome.hourly ? arome.hourly.wind_direction_10m[currentIdx] : 248;
+        const aromeSpd = arome.hourly ? Math.round(arome.hourly.wind_speed_10m[currentIdx]) : 18;
+        const aromeGst = arome.hourly ? Math.round(arome.hourly.wind_gusts_10m[currentIdx]) : 30;
+
+        const gfsDir = gfs.hourly ? gfs.hourly.wind_direction_10m[currentIdx] : 248;
+        const gfsSpd = gfs.hourly ? Math.round(gfs.hourly.wind_speed_10m[currentIdx]) : 20;
+        const gfsGst = gfs.hourly ? Math.round(gfs.hourly.wind_gusts_10m[currentIdx]) : 30;
+
+        const ecmwfDir = ecmwf.hourly ? ecmwf.hourly.wind_direction_10m[currentIdx] : 248;
+        const ecmwfSpd = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_speed_10m[currentIdx]) : 18;
+        const ecmwfGst = ecmwf.hourly ? Math.round(ecmwf.hourly.wind_gusts_10m[currentIdx] || 33) : 33;
+
+        cachedWeatherData = [aromeDir, aromeSpd, aromeGst, gfsDir, gfsSpd, gfsGst, ecmwfDir, ecmwfSpd, ecmwfGst];
+
+        latest15kWind = {
+          dir: (ecmwfDir + 30) % 360,
+          spd: Math.round(ecmwfSpd * 3.4)
+        };
+
+        updateDashboardMap();
+
+        const elUwindSfc = document.getElementById('uwind-sfc');
+        const elUwind3k = document.getElementById('uwind-3k');
+        const elUwind7k = document.getElementById('uwind-7k');
+        const elUwind10k = document.getElementById('uwind-10k');
+        const elUwind15k = document.getElementById('uwind-15k');
+
+        if (elUwindSfc) elUwindSfc.innerHTML = windAloftHTML(ecmwfDir, ecmwfSpd);
+        if (elUwind3k)  elUwind3k.innerHTML  = windAloftHTML(ecmwfDir + 10, Math.round(ecmwfSpd * 1.8));
+        if (elUwind7k)  elUwind7k.innerHTML  = windAloftHTML(ecmwfDir + 18, Math.round(ecmwfSpd * 2.3));
+        if (elUwind10k) elUwind10k.innerHTML = windAloftHTML(ecmwfDir + 25, Math.round(ecmwfSpd * 2.8));
+        if (elUwind15k) elUwind15k.innerHTML = windAloftHTML(latest15kWind.dir, latest15kWind.spd);
+
+      } catch (err) {
+        console.error("Fetch error:", err);
+      }
+    }
+
+    fetchLiveWeatherFeed();
+    fetchModelData();
+
+    setInterval(fetchLiveWeatherFeed, 120000);
+
+    setTimeout(() => {
+      window.location.reload(true);
+    }, 300 * 1000);
+  </script>
+
+</body>
+</html>
