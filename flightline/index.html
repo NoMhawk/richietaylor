@@ -1,4 +1,4 @@
-<!-- REV: 10.17 - SKYDIVE SOUTHWEST FLIGHTLINE -->
+<!-- REV: 10.18 - SKYDIVE SOUTHWEST FLIGHTLINE -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -604,6 +604,23 @@
   .forecast-zone .ov-aloft  { flex: 26 1 0; padding: 0.7cqh 1.5cqw; min-height: 0; }
 }
     
+
+    /* ===== REV 10.18: RUN-IN / OFFSET FILL THEIR BOXES ===== */
+@media (min-width: 769px) {
+  /* give the run-in row more height, taken from landing pattern + forecast panel */
+  .ov-land      { flex: 1 1 9cqh; }
+  .ov-jump      { flex: 1 1 14cqh; }
+  .forecast-zone { flex: 1 1 51cqh; }
+
+  .ov-jump .ov-label { font-size: min(2.2cqh, 3.8cqw); }
+  .ov-jump #ov-jj-heading { font-size: min(8.5cqh, 14cqw); line-height: 1; }
+  #ov-jj-offset {
+    font-size: min(4.2cqh, 8.2cqw) !important;
+    line-height: 1.08;
+    white-space: normal;
+    font-weight: 900 !important;
+  }
+}
   </style>
 </head>
 <body>
@@ -612,7 +629,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Skydive Southwest Flightline</span>
-      <span class="rev-badge">REV: 10.17</span>
+      <span class="rev-badge">REV: 10.18</span>
     </div>
     <div class="header-right-meta">
       <div class="meta-item">Current: <span id="clock-current">--:--:--</span></div>
@@ -714,7 +731,7 @@
 
         <!-- ============ FORECAST ZONE (opens) ============ -->
         <div class="forecast-zone">
-          <div class="fz-banner">Forecast · not live</div>
+          <div class="fz-banner">Forecasted Weather Below</div>
 
           <!-- MODEL FORECAST -->
           <div class="ov-section ov-models">
@@ -1017,7 +1034,7 @@
       const elJjHdg = document.getElementById('ov-jj-heading');
       const elJjOff = document.getElementById('ov-jj-offset');
       if (elJjHdg) elJjHdg.innerText = `${String(jjRunwayHdg).padStart(3, '0')}°`;
-      if (elJjOff) elJjOff.innerText = `${spotOffset.toFixed(1)} Past, ${jjOffsetDist.toFixed(1)} ${jjSideName}`;
+      if (elJjOff) elJjOff.innerHTML = `${spotOffset.toFixed(1)} Past,<br>${jjOffsetDist.toFixed(1)} ${jjSideName}`;
 
       let sectorName;
       if (isLandingManual) {
