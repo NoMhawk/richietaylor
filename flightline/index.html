@@ -1,4 +1,4 @@
-<!-- REV: 10.29 - SKYDIVE SOUTHWEST FLIGHTLINE -->
+<!-- REV: 10.30 - SKYDIVE SOUTHWEST FLIGHTLINE -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -642,7 +642,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Skydive Southwest Flightline</span>
-      <span class="rev-badge">REV: 10.29</span>
+      <span class="rev-badge">REV: 10.30</span>
     </div>
     <div class="header-right-meta">
       <div class="meta-item">Current: <span id="clock-current">--:--:--</span></div>
@@ -1028,11 +1028,12 @@
       const groupSpacingNM = (jumpRunGsKt * groupSepSec) / 3600;
       const stringHalfNM = ((GROUPS_ON_LOAD - 1) / 2) * groupSpacingNM;
       const lightWindFactor = Math.max(0, 1 - wind15kSpd / LIGHT_WIND_FADE_MPH);   // 1 = calm, 0 = at/above fade wind
-      const greenOffsetNM = spotOffset - lightWindFactor * stringHalfNM;           // negative = before centre
+      const round1 = (x) => Math.round(x * 10) / 10;                              // one decimal place
+      const greenOffsetNM = round1(spotOffset - lightWindFactor * stringHalfNM);   // negative = before centre
 
       // Red light: GREEN_LIGHT_DELAY_SEC of ground speed before the green spot
       const redLeadNM = (jumpRunGsKt * GREEN_LIGHT_DELAY_SEC) / 3600;
-      const redOffsetNM = greenOffsetNM - redLeadNM;
+      const redOffsetNM = round1(greenOffsetNM - redLeadNM);
 
       const pointOnRun = (distNM) => distNM >= 0
         ? computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, jjRunwayHdg, distNM)
