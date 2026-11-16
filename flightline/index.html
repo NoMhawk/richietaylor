@@ -1,4 +1,4 @@
-<!-- REV: 10.23 - SKYDIVE SOUTHWEST FLIGHTLINE -->
+<!-- REV: 10.24 - SKYDIVE SOUTHWEST FLIGHTLINE -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -621,6 +621,14 @@
     font-weight: 900 !important;
   }
 }
+
+    /* ===== REV 10.24: LANDING PATTERN + GROUP SEPARATION SIDE BY SIDE ===== */
+.ov-land { grid-template-columns: 1fr 1fr; }
+@media (min-width: 769px) {
+  .ov-land       { flex: 1 1 10cqh; }
+  .forecast-zone { flex: 1 1 50cqh; }
+  .ov-land .ov-big { font-size: min(5.2cqh, 8.5cqw); }
+}
   </style>
 </head>
 <body>
@@ -629,7 +637,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Skydive Southwest Flightline</span>
-      <span class="rev-badge">REV: 10.23</span>
+      <span class="rev-badge">REV: 10.24</span>
     </div>
     <div class="header-right-meta">
       <div class="meta-item">Current: <span id="clock-current">--:--:--</span></div>
@@ -714,6 +722,10 @@
           <div class="ov-cell">
             <div class="ov-label">Landing Pattern</div>
             <div class="ov-big accent-orange" id="ov-pattern">--</div>
+          </div>
+          <div class="ov-cell">
+            <div class="ov-label">Group Sep · GS <span id="ov-sep-gs">--</span> kt</div>
+            <div class="ov-big accent-cyan" id="ov-groupsep">--</div>
           </div>
         </div>
 
@@ -996,6 +1008,17 @@
       const jumpRunGsKt = Math.min(130, Math.max(30, JUMP_RUN_TAS_KT - headwindKt));
       const redLeadNM = (jumpRunGsKt * GREEN_LIGHT_DELAY_SEC) / 3600;
       const redOffsetNM = spotOffset - redLeadNM;
+
+      // Group separation (seconds) by jump-run ground speed
+      let groupSepStr;
+      if (jumpRunGsKt < 60)      groupSepStr = '8';
+      else if (jumpRunGsKt < 75) groupSepStr = '7';
+      else if (jumpRunGsKt < 85) groupSepStr = '5-6';
+      else                       groupSepStr = '5';
+      const elSep = document.getElementById('ov-groupsep');
+      const elSepGs = document.getElementById('ov-sep-gs');
+      if (elSep) elSep.innerText = `${groupSepStr} sec`;
+      if (elSepGs) elSepGs.innerText = Math.round(jumpRunGsKt);
       const jjRedDotPt = redOffsetNM >= 0
         ? computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, jjRunwayHdg, redOffsetNM)
         : computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, (jjRunwayHdg + 180) % 360, -redOffsetNM);
