@@ -1,4 +1,4 @@
-<!-- REV: 10.19 - SKYDIVE SOUTHWEST FLIGHTLINE -->
+<!-- REV: 10.20 - SKYDIVE SOUTHWEST FLIGHTLINE -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -629,7 +629,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Skydive Southwest Flightline</span>
-      <span class="rev-badge">REV: 10.19</span>
+      <span class="rev-badge">REV: 10.20</span>
     </div>
     <div class="header-right-meta">
       <div class="meta-item">Current: <span id="clock-current">--:--:--</span></div>
@@ -791,6 +791,10 @@
     const lat = 50.860000;
     const lon = -3.234722;
     const fieldElevationFt = 839;
+
+    // Red light = green light minus (ground speed x delay). Adjust these two to suit the aircraft.
+    const GREEN_LIGHT_DELAY_SEC = 30;   // seconds between red and green
+    const JUMP_RUN_TAS_KT = 85;         // jump-run true airspeed in knots (ASSUMED - set to your aircraft)
 
     function updateClocks() {
       const now = new Date();
@@ -986,8 +990,16 @@
 
       const jjOrigin = computeDestinationPoint(lat, lon, jjOffsetBearing, jjOffsetDist);
       const jjSpotPt = computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, jjRunwayHdg, spotOffset);
-      const jjRedDotPt = computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, jjRunwayHdg, Math.max(0.05, spotOffset - 0.2));
-      const jjStartRun = computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, (jjRunwayHdg + 180) % 360, 0.45);
+      // Red light: GREEN_LIGHT_DELAY_SEC of ground speed before the green spot
+      const wind15kKt = wind15kSpd * 0.868976;   // mph -> kt
+      const headwindKt = wind15kKt * Math.cos(((wind15kDir - jjRunwayHdg) * Math.PI) / 180);
+      const jumpRunGsKt = Math.min(130, Math.max(30, JUMP_RUN_TAS_KT - headwindKt));
+      const redLeadNM = (jumpRunGsKt * GREEN_LIGHT_DELAY_SEC) / 3600;
+      const redOffsetNM = spotOffset - redLeadNM;
+      const jjRedDotPt = redOffsetNM >= 0
+        ? computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, jjRunwayHdg, redOffsetNM)
+        : computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, (jjRunwayHdg + 180) % 360, -redOffsetNM);
+      const jjStartRun = computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, (jjRunwayHdg + 180) % 360, Math.max(0.45, redLeadNM - spotOffset + 0.15));
       const jjEndRun = computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, jjRunwayHdg, Math.max(0.45, spotOffset + 0.15));
 
       const jjTargetGroup = windRoseLayerGroup;
