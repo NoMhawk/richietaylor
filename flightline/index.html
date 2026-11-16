@@ -1,4 +1,4 @@
-<!-- REV: 10.9 - SKYDIVE SOUTHWEST FLIGHTLINE -->
+<!-- REV: 10.10 - SKYDIVE SOUTHWEST FLIGHTLINE -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -92,26 +92,24 @@
     #map { width: 100%; height: 100%; z-index: 1; }
 
     /* ==========================================================
-        SIDEBAR OVERLAY (REV 10.9)
+        SIDEBAR OVERLAY (REV 10.10)
         ========================================================== */
     .map-info-overlay {
-      --w: clamp(420px, 32vw, 520px);
-      --u: min(1vh, calc(var(--w) / 55));
       position: absolute;
       top: 0;
       right: 0;
       bottom: 0;
       z-index: 1000;
-      width: var(--w);
+      width: 440px;
       background: rgba(8, 12, 22, 0.97);
       backdrop-filter: blur(16px);
       border-left: 1px solid rgba(0, 216, 255, 0.4);
       border-radius: 0 8px 8px 0;
-      padding: calc(var(--u) * 1.1) calc(var(--u) * 1.4);
+      padding: 12px 14px;
       box-shadow: -10px 0 40px rgba(0,0,0,0.85);
       display: flex;
       flex-direction: column;
-      gap: calc(var(--u) * 0.9);
+      gap: 10px;
       overflow-y: auto;
       font-variant-numeric: tabular-nums;
     }
@@ -121,7 +119,7 @@
       justify-content: space-between;
       align-items: center;
       flex: 0 0 auto;
-      font-size: calc(var(--u) * 2.3);
+      font-size: 1rem;
       font-weight: 800;
       color: #00d8ff;
       letter-spacing: 0.02em;
@@ -129,56 +127,54 @@
 
     .ov-row {
       display: grid;
-      gap: calc(var(--u) * 0.9);
-      min-height: 0;
+      gap: 10px;
     }
 
-    .ov-hero    { flex: 2.6 1 0; min-height: calc(var(--u) * 12); grid-template-columns: 1.3fr 1fr; }
-    .ov-land    { flex: 1.7 1 0; min-height: calc(var(--u) * 8);  grid-template-columns: 1fr; }
-    .ov-jump    { flex: 1.7 1 0; min-height: calc(var(--u) * 8);  grid-template-columns: 1.3fr 1fr; }
+    .ov-hero    { grid-template-columns: 1.3fr 1fr; }
+    .ov-land    { grid-template-columns: 1fr; }
+    .ov-jump    { grid-template-columns: 1.3fr 1fr; }
 
     .ov-cell {
       background: linear-gradient(135deg, rgba(22, 32, 54, 0.85) 0%, rgba(10, 15, 26, 0.95) 100%);
       border: 1px solid rgba(40, 58, 92, 0.95);
       border-radius: 10px;
-      padding: calc(var(--u) * 0.8) calc(var(--u) * 1.1);
+      padding: 10px 12px;
       display: flex;
       flex-direction: column;
       justify-content: center;
       min-width: 0;
-      min-height: 0;
       overflow: hidden;
     }
 
     .ov-label {
-      font-size: calc(var(--u) * 1.6);
+      font-size: 0.72rem;
       font-weight: 600;
       color: #a9b9d0;
-      margin-bottom: calc(var(--u) * 0.3);
+      margin-bottom: 4px;
       white-space: nowrap;
     }
 
     .ov-big {
-      font-size: calc(var(--u) * 5.2);
+      font-size: 1.8rem;
       font-weight: 900;
-      line-height: 1;
+      line-height: 1.1;
       color: #fff;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .ov-hero .ov-big { font-size: calc(var(--u) * 6.2); }
-    .ov-land .ov-big { font-size: calc(var(--u) * 4.6); }
-    .ov-jump .ov-big { font-size: calc(var(--u) * 3.4); }
+    .ov-hero .ov-big { font-size: 2.1rem; }
+    .ov-land .ov-big { font-size: 1.5rem; }
+    .ov-jump .ov-big { font-size: 1.25rem; }
 
     .turn-glyph { font-size: 0.7em; vertical-align: 0.08em; }
 
     .ov-sub {
-      font-size: calc(var(--u) * 2.6);
+      font-size: 0.85rem;
       font-weight: 800;
       line-height: 1.1;
-      margin-top: calc(var(--u) * 0.3);
+      margin-top: 4px;
       white-space: nowrap;
     }
 
@@ -187,27 +183,22 @@
     .accent-green  { color: #00e676; }
     .accent-purple { color: #e040fb; }
 
-    .ov-wind { flex-direction: row; align-items: center; gap: calc(var(--u) * 1.2); }
-    .ov-dial { flex: 0 0 auto; height: 100%; max-height: calc(var(--u) * 8.5); aspect-ratio: 1 / 1; }
+    .ov-wind { flex-direction: row; align-items: center; gap: 12px; }
+    .ov-dial { flex: 0 0 auto; height: 54px; aspect-ratio: 1 / 1; }
     .ov-dial svg { width: 100%; height: 100%; display: block; }
     .ov-wind-text { min-width: 0; display: flex; flex-direction: column; }
 
-    .ov-speed-line { display: flex; align-items: baseline; gap: calc(var(--u) * 0.6); }
-    .ov-unit { font-size: calc(var(--u) * 2.4); font-weight: 700; color: #a9b9d0; }
+    .ov-speed-line { display: flex; align-items: baseline; gap: 6px; }
+    .ov-unit { font-size: 0.85rem; font-weight: 700; color: #a9b9d0; }
 
     .ov-section {
       display: flex;
       flex-direction: column;
-      min-height: 0;
-      gap: calc(var(--u) * 0.6);
+      gap: 6px;
     }
 
-    .ov-models { flex: 5 1 0; min-height: calc(var(--u) * 22); }
-    .ov-aloft   { flex: 5.6 1 0; min-height: calc(var(--u) * 24); }
-
     .section-title {
-      flex: 0 0 auto;
-      font-size: calc(var(--u) * 1.9);
+      font-size: 0.78rem;
       font-weight: 700;
       color: #a9b9d0;
       display: flex;
@@ -216,22 +207,17 @@
     }
 
     .model-forecast-grid {
-      flex: 1 1 0;
-      min-height: 0;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr 1fr;
-      gap: calc(var(--u) * 0.8);
+      gap: 8px;
     }
 
     .model-card-item {
-      border-radius: 10px;
-      padding: calc(var(--u) * 0.5) calc(var(--u) * 0.9);
+      border-radius: 8px;
+      padding: 8px 10px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      min-width: 0;
-      min-height: 0;
       overflow: hidden;
     }
 
@@ -239,33 +225,34 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: calc(var(--u) * 0.5);
+      gap: 4px;
     }
 
-    .model-name { font-size: calc(var(--u) * 1.7); font-weight: 800; color: #fff; }
+    .model-name { font-size: 0.75rem; font-weight: 800; color: #fff; }
 
     .cloud-badge {
-      font-size: calc(var(--u) * 1.5);
+      font-size: 0.7rem;
       font-weight: 800;
       color: #00d8ff;
       background: rgba(0, 216, 255, 0.12);
       border: 1px solid rgba(0, 216, 255, 0.35);
       border-radius: 4px;
-      padding: 0 calc(var(--u) * 0.5);
+      padding: 1px 5px;
       white-space: nowrap;
     }
 
     .model-card-wind {
       display: flex;
       align-items: baseline;
-      gap: calc(var(--u) * 0.4);
+      gap: 5px;
       white-space: nowrap;
+      margin-top: 6px;
     }
 
-    .mc-arrow { font-size: calc(var(--u) * 2.8); font-weight: 900; display: inline-block; line-height: 1; }
-    .mc-speed { font-size: calc(var(--u) * 3.8); font-weight: 900; line-height: 1; }
-    .mc-gust  { font-size: calc(var(--u) * 2.1); font-weight: 800; opacity: 0.9; }
-    .mc-dir   { font-size: calc(var(--u) * 1.7); font-weight: 700; opacity: 0.9; }
+    .mc-arrow { font-size: 1.1rem; font-weight: 900; display: inline-block; line-height: 1; }
+    .mc-speed { font-size: 1.4rem; font-weight: 900; line-height: 1; }
+    .mc-gust  { font-size: 0.8rem; font-weight: 800; opacity: 0.9; }
+    .mc-dir   { font-size: 0.75rem; font-weight: 700; opacity: 0.9; }
 
     .status-green  { background: rgba(0, 230, 118, 0.14); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.5); }
     .status-yellow { background: rgba(255, 235, 59, 0.14); color: #ffee58; border: 1px solid rgba(255, 235, 59, 0.5); }
@@ -273,13 +260,11 @@
     .status-red    { background: rgba(255, 82, 82, 0.2);   color: #ff6b6b; border: 1px solid rgba(255, 82, 82, 0.6); }
 
     .aloft-grid {
-      flex: 1 1 0;
-      min-height: 0;
       display: flex;
       flex-direction: column;
       background: rgba(15, 22, 36, 0.7);
       border: 1px solid rgba(40, 58, 92, 0.95);
-      border-radius: 10px;
+      border-radius: 8px;
       overflow: hidden;
     }
 
@@ -287,35 +272,29 @@
       display: grid;
       grid-template-columns: 0.8fr 2.4fr 1fr;
       align-items: center;
-      padding: 0 calc(var(--u) * 1.2);
-      column-gap: calc(var(--u) * 0.6);
+      padding: 6px 12px;
+      column-gap: 8px;
     }
 
     .aloft-head {
-      flex: 0 0 auto;
-      height: calc(var(--u) * 3);
       background: rgba(28, 40, 64, 0.95);
-      font-size: calc(var(--u) * 1.5);
+      font-size: 0.72rem;
       font-weight: 700;
       color: #a9b9d0;
     }
     .aloft-head span:last-child { text-align: right; }
 
     .aloft-row {
-      flex: 1 1 0;
-      min-height: 0;
       border-top: 1px solid rgba(40, 58, 92, 0.6);
     }
 
-    .aloft-row, .aloft-row * { line-height: 1; }
-    .aloft-alt  { font-size: calc(var(--u) * 3.1); font-weight: 900; color: #fff; }
-    .aloft-wind { display: flex; align-items: baseline; gap: calc(var(--u) * 0.9); color: #00d8ff; white-space: nowrap; min-width: 0; }
-    .aloft-wind .dir-arrow { font-size: calc(var(--u) * 2.8); }
-    .aw-dir { font-size: calc(var(--u) * 2.5); font-weight: 700; color: #cfe6ff; }
-    .aw-spd { font-size: calc(var(--u) * 3.4); font-weight: 900; color: #fff; }
-    .aw-spd small { font-size: calc(var(--u) * 1.6); font-weight: 700; color: #a9b9d0; margin-left: calc(var(--u) * 0.3); }
+    .aloft-alt  { font-size: 0.85rem; font-weight: 900; color: #fff; }
+    .aloft-wind { display: flex; align-items: baseline; gap: 8px; color: #00d8ff; white-space: nowrap; min-width: 0; }
+    .aw-dir { font-size: 0.8rem; font-weight: 700; color: #cfe6ff; }
+    .aw-spd { font-size: 1rem; font-weight: 900; color: #fff; }
+    .aw-spd small { font-size: 0.7rem; font-weight: 700; color: #a9b9d0; margin-left: 2px; }
     .aloft-row:first-of-type .aw-spd { color: #00d8ff; }
-    .aloft-temp { font-size: calc(var(--u) * 3); font-weight: 800; text-align: right; color: #ffd9a0; }
+    .aloft-temp { font-size: 0.85rem; font-weight: 800; text-align: right; color: #ffd9a0; }
 
     .dir-arrow { display: inline-block; font-weight: bold; margin-right: 2px; }
 
@@ -431,7 +410,6 @@
         height: 480px !important;
       }
       .map-info-overlay {
-        --w: 100vw;
         position: relative !important;
         top: auto !important;
         right: auto !important;
@@ -450,7 +428,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Skydive Southwest Flightline</span>
-      <span class="rev-badge">REV: 10.9</span>
+      <span class="rev-badge">REV: 10.10</span>
     </div>
     <div class="header-right-meta">
       <div class="meta-item">Current: <span id="clock-current">--:--:--</span></div>
@@ -493,7 +471,7 @@
         </div>
       </div>
 
-      <!-- SIDEBAR OVERLAY (REV 10.9) -->
+      <!-- SIDEBAR OVERLAY (REV 10.10) -->
       <div class="map-info-overlay" id="sidebar">
         <div class="ov-header">
           <span>⚡ Live ops</span>
@@ -543,7 +521,7 @@
           </div>
           <div class="ov-cell" style="background: linear-gradient(135deg, rgba(40, 20, 60, 0.85) 0%, rgba(15, 10, 26, 0.95) 100%); border-color: rgba(224, 64, 251, 0.4);">
             <div class="ov-label" style="color: #ea80fc;">Offset</div>
-            <div class="ov-big accent-purple" id="ov-jj-offset" style="font-size: calc(var(--u) * 2.2);">--</div>
+            <div class="ov-big accent-purple" id="ov-jj-offset" style="font-size: 1rem; font-weight: 800;">--</div>
           </div>
         </div>
 
