@@ -507,6 +507,53 @@
   .aw-spd small { font-size: min(1.8cqh, 3.2cqw); }
   .aloft-temp { font-size: min(3cqh, 5.2cqw); }
 }
+
+    /* ===== REV 10.16: LIVE vs FORECAST SEPARATION ===== */
+
+/* Divider banner */
+.ov-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #8fa3bf;
+}
+.ov-divider::before,
+.ov-divider::after {
+  content: "";
+  flex: 1;
+  border-top: 2px dashed rgba(143, 163, 191, 0.45);
+}
+
+/* Dashed, muted frame around both forecast sections */
+.ov-models,
+.ov-aloft {
+  background: rgba(70, 95, 140, 0.10);
+  border: 1px dashed rgba(143, 163, 191, 0.4);
+  border-radius: 12px;
+  padding: 8px 10px;
+}
+
+/* Cooler, muted titles */
+.ov-models .section-title,
+.ov-aloft .section-title { color: #8fa3bf; }
+.ov-models .section-title span:last-child { color: #8fa3bf !important; }
+
+/* Make the forecast tables look "calmer" than the live boxes */
+.aloft-grid { border-style: dashed; border-color: rgba(143, 163, 191, 0.35); }
+.aloft-head { background: rgba(50, 70, 110, 0.55); }
+.aloft-temp { color: #b8c7de; }
+
+@media (min-width: 769px) {
+  /* Re-balance the height budget to make room for the divider */
+  .ov-divider  { flex: 0 0 3.6cqh; margin: 0; gap: 1.5cqw; font-size: min(1.9cqh, 3.4cqw); }
+  .ov-models   { flex: 1 1 23cqh; padding: 0.7cqh 1.5cqw; }
+  .ov-aloft    { flex: 1 1 26cqh; padding: 0.7cqh 1.5cqw; }
+}
     
   </style>
 </head>
