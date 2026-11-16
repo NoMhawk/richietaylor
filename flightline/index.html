@@ -1,4 +1,4 @@
-<!-- REV: 10.27 - SKYDIVE SOUTHWEST FLIGHTLINE -->
+<!-- REV: 10.28 - SKYDIVE SOUTHWEST FLIGHTLINE -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -642,7 +642,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Skydive Southwest Flightline</span>
-      <span class="rev-badge">REV: 10.27</span>
+      <span class="rev-badge">REV: 10.28</span>
     </div>
     <div class="header-right-meta">
       <div class="meta-item">Current: <span id="clock-current">--:--:--</span></div>
@@ -1023,7 +1023,7 @@
       const elSep = document.getElementById('ov-groupsep');
       const elSepGs = document.getElementById('ov-sep-gs');
       if (elSep) elSep.innerText = `${groupSepStr} sec`;
-      if (elSepGs) elSepGs.innerText = `${Math.round(jumpRunGsKt)} kt ${headwindKt < 0 ? 'tail' : 'head'}`;
+      if (elSepGs) elSepGs.innerText = `${Math.round(jumpRunGsKt)} kt ${headwindKt < 0 ? 'with' : 'into'}`;
       const jjRedDotPt = redOffsetNM >= 0
         ? computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, jjRunwayHdg, redOffsetNM)
         : computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, (jjRunwayHdg + 180) % 360, -redOffsetNM);
