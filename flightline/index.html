@@ -554,6 +554,55 @@
   .ov-models   { flex: 1 1 23cqh; padding: 0.7cqh 1.5cqw; }
   .ov-aloft    { flex: 1 1 26cqh; padding: 0.7cqh 1.5cqw; }
 }
+
+    /* ===== REV 10.17: FORECAST ZONE AS ONE FILLED PANEL ===== */
+.forecast-zone {
+  background: linear-gradient(180deg, #223256 0%, #1a2645 100%);
+  border: 1px solid rgba(143, 163, 191, 0.5);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+}
+
+.fz-banner {
+  flex: 0 0 auto;
+  background: #3a4f80;
+  color: #e3ecfa;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 5px 0;
+}
+
+/* Sections inside the panel: remove the dashed frames from 10.16 */
+.forecast-zone .ov-models,
+.forecast-zone .ov-aloft {
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: 8px 10px;
+  margin: 0;
+}
+
+.forecast-zone .section-title,
+.forecast-zone .section-title span:last-child { color: #b7c6e0 !important; }
+
+.forecast-zone .aloft-grid {
+  border: 1px solid rgba(143, 163, 191, 0.3);
+  background: rgba(10, 16, 32, 0.45);
+}
+.forecast-zone .aloft-head { background: rgba(70, 95, 150, 0.6); }
+
+@media (min-width: 769px) {
+  .forecast-zone { flex: 1 1 53cqh; min-height: 0; margin-top: 0; }
+  .fz-banner     { flex: 0 0 3.6cqh; display: flex; align-items: center; justify-content: center; padding: 0; font-size: min(1.9cqh, 3.4cqw); }
+  .forecast-zone .ov-models { flex: 23 1 0; padding: 0.7cqh 1.5cqw; min-height: 0; }
+  .forecast-zone .ov-aloft  { flex: 26 1 0; padding: 0.7cqh 1.5cqw; min-height: 0; }
+}
     
   </style>
 </head>
@@ -608,6 +657,7 @@
 
       <!-- SIDEBAR OVERLAY (REV 10.13) -->
       <div class="map-info-overlay" id="sidebar">
+      </div>
         <div class="ov-header">
           <span>⚡ Live ops</span>
         </div>
@@ -659,8 +709,11 @@
             <div class="ov-big accent-purple" id="ov-jj-offset" style="font-size: 1.15rem; font-weight: 800;">--</div>
           </div>
         </div>
+
+        
         <!-- LIVE / FORECAST DIVIDER -->
-        <div class="ov-divider"><span>Forecast</span></div>
+        <div class="forecast-zone">
+          <div class="ov-divider"><span>Forecast</span></div>
         <!-- CURRENT HOUR MODEL FORECAST SECTION -->
         <div class="ov-section ov-models">
           <div class="section-title">
@@ -671,6 +724,9 @@
             <div style="grid-column: span 2; text-align: center; padding: 10px; color: #7c8ea6;">Loading forecast...</div>
           </div>
         </div>
+                  </div>  <!-- end ov-aloft -->
+        </div>  <!-- end forecast-zone: NEW -->
+      </div>    <!-- end sidebar -->
 
         <!-- WINDS ALOFT SECTION -->
         <div class="ov-section ov-aloft">
