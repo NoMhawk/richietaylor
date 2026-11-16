@@ -655,9 +655,11 @@
         </div>
       </div>
 
-      <!-- SIDEBAR OVERLAY (REV 10.13) -->
+
+
+            <!-- SIDEBAR OVERLAY -->
       <div class="map-info-overlay" id="sidebar">
-      </div>
+
         <div class="ov-header">
           <span>⚡ Live ops</span>
         </div>
@@ -710,64 +712,63 @@
           </div>
         </div>
 
-        
-        <!-- LIVE / FORECAST DIVIDER -->
+        <!-- ============ FORECAST ZONE (opens) ============ -->
         <div class="forecast-zone">
-          <div class="ov-divider"><span>Forecast</span></div>
-        <!-- CURRENT HOUR MODEL FORECAST SECTION -->
-        <div class="ov-section ov-models">
-          <div class="section-title">
-            <span>Model forecast</span>
-            <span id="current-hour-label" style="color: #00d8ff;">--:--</span>
+          <div class="fz-banner">Forecast · not live</div>
+
+          <!-- MODEL FORECAST -->
+          <div class="ov-section ov-models">
+            <div class="section-title">
+              <span>Model forecast</span>
+              <span id="current-hour-label">--:--</span>
+            </div>
+            <div class="model-forecast-grid" id="current-model-forecast-rows">
+              <div style="grid-column: span 2; text-align: center; padding: 10px; color: #7c8ea6;">Loading forecast...</div>
+            </div>
           </div>
-          <div class="model-forecast-grid" id="current-model-forecast-rows">
-            <div style="grid-column: span 2; text-align: center; padding: 10px; color: #7c8ea6;">Loading forecast...</div>
+
+          <!-- WINDS ALOFT -->
+          <div class="ov-section ov-aloft">
+            <div class="section-title">
+              <span>Winds aloft (forecast)</span>
+              <span>EGTU 839'</span>
+            </div>
+            <div class="aloft-grid" id="upper-winds-rows">
+              <div class="aloft-head"><span>Alt</span><span>Direction / speed</span><span>Temp</span></div>
+              <div class="aloft-row">
+                <div class="aloft-alt">Sfc</div>
+                <div class="aloft-wind" id="uwind-sfc">--</div>
+                <div class="aloft-temp" id="utemp-sfc">18°C</div>
+              </div>
+              <div class="aloft-row">
+                <div class="aloft-alt">3k'</div>
+                <div class="aloft-wind" id="uwind-3k">--</div>
+                <div class="aloft-temp" id="utemp-3k">12°C</div>
+              </div>
+              <div class="aloft-row">
+                <div class="aloft-alt">7k'</div>
+                <div class="aloft-wind" id="uwind-7k">--</div>
+                <div class="aloft-temp" id="utemp-7k">4°C</div>
+              </div>
+              <div class="aloft-row">
+                <div class="aloft-alt">10k'</div>
+                <div class="aloft-wind" id="uwind-10k">--</div>
+                <div class="aloft-temp" id="utemp-10k">-2°C</div>
+              </div>
+              <div class="aloft-row">
+                <div class="aloft-alt">15k'</div>
+                <div class="aloft-wind" id="uwind-15k">--</div>
+                <div class="aloft-temp" id="utemp-15k">-12°C</div>
+              </div>
+            </div>
           </div>
+
         </div>
-                  </div>  <!-- end ov-aloft -->
-        </div>  <!-- end forecast-zone: NEW -->
-      </div>    <!-- end sidebar -->
+        <!-- ============ FORECAST ZONE (closes) ============ -->
 
-        <!-- WINDS ALOFT SECTION -->
-        <div class="ov-section ov-aloft">
-          <div class="section-title">
-            <span>Winds aloft</span>
-            <span style="color:#7c8ea6;">EGTU 839'</span>
-          </div>
-          <div class="aloft-grid" id="upper-winds-rows">
-            <div class="aloft-head"><span>Alt</span><span>Direction / speed</span><span>Temp</span></div>
-            <div class="aloft-row">
-              <div class="aloft-alt">Sfc</div>
-              <div class="aloft-wind" id="uwind-sfc">--</div>
-              <div class="aloft-temp" id="utemp-sfc">18°C</div>
-            </div>
-            <div class="aloft-row">
-              <div class="aloft-alt">3k'</div>
-              <div class="aloft-wind" id="uwind-3k">--</div>
-              <div class="aloft-temp" id="utemp-3k">12°C</div>
-            </div>
-            <div class="aloft-row">
-              <div class="aloft-alt">7k'</div>
-              <div class="aloft-wind" id="uwind-7k">--</div>
-              <div class="aloft-temp" id="utemp-7k">4°C</div>
-            </div>
-            <div class="aloft-row">
-              <div class="aloft-alt">10k'</div>
-              <div class="aloft-wind" id="uwind-10k">--</div>
-              <div class="aloft-temp" id="utemp-10k">-2°C</div>
-            </div>
-            <div class="aloft-row">
-              <div class="aloft-alt">15k'</div>
-              <div class="aloft-wind" id="uwind-15k">--</div>
-              <div class="aloft-temp" id="utemp-15k">-12°C</div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-  </div>
+      </div> <!-- end sidebar -->
+    </div>   <!-- end map-card -->
+  </div>     <!-- end dashboard-container -->
 
   <script>
     const lat = 50.860000;
