@@ -1,4 +1,4 @@
-<!-- REV: 10.26 - SKYDIVE SOUTHWEST FLIGHTLINE -->
+<!-- REV: 10.27 - SKYDIVE SOUTHWEST FLIGHTLINE -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -629,6 +629,11 @@
   .forecast-zone { flex: 1 1 50cqh; }
   .ov-land .ov-big { font-size: min(5.2cqh, 8.5cqw); }
 }
+
+    /* ===== REV 10.27: HEAD/TAIL LABEL FITS ===== */
+@media (min-width: 769px) {
+  .ov-land .ov-label { font-size: min(1.7cqh, 2.8cqw); }
+}
   </style>
 </head>
 <body>
@@ -637,7 +642,7 @@
   <div class="top-header">
     <div class="site-title">
       <span>🪂 Skydive Southwest Flightline</span>
-      <span class="rev-badge">REV: 10.26</span>
+      <span class="rev-badge">REV: 10.27</span>
     </div>
     <div class="header-right-meta">
       <div class="meta-item">Current: <span id="clock-current">--:--:--</span></div>
@@ -724,7 +729,7 @@
             <div class="ov-big accent-orange" id="ov-pattern">--</div>
           </div>
           <div class="ov-cell">
-            <div class="ov-label">Group Sep · GS <span id="ov-sep-gs">--</span> kt</div>
+            <div class="ov-label">Group Sep · GS <span id="ov-sep-gs">--</span></div>
             <div class="ov-big accent-cyan" id="ov-groupsep">--</div>
           </div>
         </div>
@@ -1005,7 +1010,7 @@
       // Red light: GREEN_LIGHT_DELAY_SEC of ground speed before the green spot
       const wind15kKt = wind15kSpd * 0.868976;   // mph -> kt
       const headwindKt = wind15kKt * Math.cos(((wind15kDir - jjRunwayHdg) * Math.PI) / 180);
-      const jumpRunGsKt = Math.min(130, Math.max(30, JUMP_RUN_TAS_KT - headwindKt));
+      const jumpRunGsKt = Math.min(180, Math.max(30, JUMP_RUN_TAS_KT - headwindKt));
       const redLeadNM = (jumpRunGsKt * GREEN_LIGHT_DELAY_SEC) / 3600;
       const redOffsetNM = spotOffset - redLeadNM;
 
@@ -1018,7 +1023,7 @@
       const elSep = document.getElementById('ov-groupsep');
       const elSepGs = document.getElementById('ov-sep-gs');
       if (elSep) elSep.innerText = `${groupSepStr} sec`;
-      if (elSepGs) elSepGs.innerText = Math.round(jumpRunGsKt);
+      if (elSepGs) elSepGs.innerText = `${Math.round(jumpRunGsKt)} kt ${headwindKt < 0 ? 'tail' : 'head'}`;
       const jjRedDotPt = redOffsetNM >= 0
         ? computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, jjRunwayHdg, redOffsetNM)
         : computeDestinationPoint(jjOrigin.lat, jjOrigin.lon, (jjRunwayHdg + 180) % 360, -redOffsetNM);
