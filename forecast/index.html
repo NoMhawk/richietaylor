@@ -479,7 +479,9 @@
             return { c0_5k, c5_10k, c10_15k, c15k_plus };
         }
 
-        function generateTimedOutlookSummary(dayIndex, hourly) {
+        // Plain-English day summary for office staff: says how the day looks, what the
+        // problems are and when, and when the best window is. Same thresholds as the scoring.
+        function generateTimedOutlookSummary(dayIndex, hourly, metrics) {
             const daily = globalWeatherData.daily;
             const targetDateStr = daily.time[dayIndex];
             let dayStart = hourly.time.findIndex(t => t.startsWith(targetDateStr) && t.includes('08:00'));
@@ -490,13 +492,12 @@
                 sunsetHour = new Date(daily.sunset[dayIndex]).getHours();
             }
 
-            let slotIssues = { early: [], mid: [], late: [] };
-
+            // ---- 1. One record per daylight hour ----
+            const hours = [];
             for (let h = dayStart; h < Math.min(dayStart + 11, hourly.time.length); h++) {
-                const timeStr = hourly.time[h];
-                const hourNum = parseInt(timeStr.split('T')[1].split(':')[0]);
+                const hourNum = parseInt(hourly.time[h].split('T')[1].split(':')[0]);
                 if (hourNum > sunsetHour) continue;
-                
+
                 const ws = kmhToMph(hourly.wind_speed_10m[h]);
                 const wg = kmhToMph(hourly.wind_gusts_10m[h]);
                 const rn = hourly.precipitation_probability[h];
@@ -507,51 +508,119 @@
                 const cd = hourly.weather_code[h];
                 const lw = hourly.cloud_cover_low[h] || 0;
                 const mid = hourly.cloud_cover_mid[h] || 0;
-                const high = hourly.cloud_cover_hgh ? hourly.cloud_cover_hgh[h] : 0;
+                const high = hourly.cloud_cover_high ? hourly.cloud_cover_high[h] : 0;
                 const totCloud = hourly.cloud_cover ? hourly.cloud_cover[h] : lw;
                 const cbBands = getCustomCloudBands(lw, mid, high, vs, rn);
                 const cloudCover = Math.min(100, Math.round((cbBands.c0_5k * 0.6) + (cbBands.c5_10k * 0.3) + (cbBands.c10_15k * 0.1)));
                 const base = calculateCloudbaseAGL(tp, dp, lw, hm, cd, totCloud);
                 const isFog = (vs < 1.0) || ((cd >= 45 && cd <= 48) && vs < 3.0) || (vs < 5.0 && hm >= 90 && (tp - dp) <= 1.5);
-                
-                let issues = [];
-                if (ws > 23 || wg > 23) issues.push("strong winds");
-                if (rn >= 50) issues.push("rain");
-                if (cloudCover >= 90) issues.push("heavy cloud");
-                if (base < 1000) issues.push("low cloudbase");
-                if (isFog) issues.push("fog/mist");
 
-                let targetSlot = hourNum <= 10 ? 'early' : (hourNum >= 16 ? 'late' : 'mid');
-                issues.forEach(iss => {
-                    if (!slotIssues[targetSlot].includes(iss)) slotIssues[targetSlot].push(iss);
-                });
+                const issues = [];
+                if (ws > 23 || wg > 23) issues.push('wind');
+                if (rn >= 50) issues.push('rain');
+                if (cloudCover >= 90) issues.push('cloud');
+                if (base < 1000) issues.push('lowbase');
+                if (isFog) issues.push('fog');
+
+                hours.push({ hour: hourNum, issues, ws, wg, dir: hourly.wind_direction_10m[h] || 0, cloudCover });
             }
+            if (hours.length === 0) return 'No forecast available for this day.';
 
-            let formatSlot = (issues) => {
-                if (issues.length === 0) return null;
-                if (issues.length === 1) return issues[0];
-                if (issues.length === 2) return `${issues[0]} and ${issues[1]}`;
-                return `${issues.slice(0, -1).join(', ')} and ${issues[issues.length - 1]}`;
+            // ---- 2. Wording helpers ----
+            const fmtHour = (h) => `${((h + 11) % 12) + 1}${h >= 12 ? 'pm' : 'am'}`;
+            const fmtRange = (a, b) => `${fmtHour(a.hour)} until about ${fmtHour(b.hour + 1)}`;
+            const issueWords = {
+                wind: 'strong winds',
+                rain: 'rain',
+                cloud: 'heavy cloud',
+                lowbase: 'low cloud',
+                fog: 'fog or mist'
+            };
+            const joinList = (items) => {
+                if (items.length <= 1) return items.join('');
+                return `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`;
+            };
+            const compass = (deg) => {
+                const names = ['north', 'north-east', 'east', 'south-east', 'south', 'south-west', 'west', 'north-west'];
+                return names[Math.round((((deg % 360) + 360) % 360) / 45) % 8];
+            };
+            const describeWind = (slice) => {
+                const avg = Math.round(slice.reduce((s, x) => s + x.ws, 0) / slice.length);
+                const maxGust = Math.max(...slice.map(x => x.wg));
+                const sx = slice.reduce((s, x) => s + Math.sin(x.dir * Math.PI / 180), 0);
+                const cy = slice.reduce((s, x) => s + Math.cos(x.dir * Math.PI / 180), 0);
+                const dir = compass((Math.atan2(sx, cy) * 180 / Math.PI + 360) % 360);
+                const strength = avg <= 8 ? 'light' : (avg <= 15 ? 'moderate' : 'fresh');
+                const gustBit = maxGust >= avg + 6 ? `, gusting to ${maxGust} mph` : '';
+                return `${strength} winds from the ${dir} (around ${avg} mph${gustBit})`;
+            };
+            const describeSky = (slice) => {
+                const avg = slice.reduce((s, x) => s + x.cloudCover, 0) / slice.length;
+                if (avg < 25) return 'mostly clear skies';
+                if (avg < 60) return 'some cloud about';
+                return 'quite a lot of cloud';
             };
 
-            let earlyStr = formatSlot(slotIssues.early);
-            let midStr = formatSlot(slotIssues.mid);
-            let lateStr = formatSlot(slotIssues.late);
+            // ---- 3. Split the day into "problem" runs and "good" runs ----
+            const badRuns = [];
+            let bestRun = null;
+            let cur = null;
+            let curGood = null;
+            hours.forEach((x, i) => {
+                const consecutive = i > 0 && x.hour === hours[i - 1].hour + 1;
+                if (x.issues.length) {
+                    if (!cur || !consecutive) { cur = { start: x, end: x, issues: new Set() }; badRuns.push(cur); }
+                    cur.end = x;
+                    x.issues.forEach(k => cur.issues.add(k));
+                    curGood = null;
+                } else {
+                    cur = null;
+                    if (!curGood || !consecutive) curGood = { items: [] };
+                    curGood.items.push(x);
+                    if (!bestRun || curGood.items.length > bestRun.items.length) bestRun = curGood;
+                }
+            });
 
-            let segments = [];
-            if (earlyStr) segments.push(`${earlyStr} early morning`);
-            if (midStr) segments.push(`${midStr} around midday`);
-            if (lateStr) segments.push(`${lateStr} late afternoon`);
+            // ---- 4. Build the sentences ----
+            const lines = [];
+            const lk = metrics ? metrics.likelihood : 70;
 
-            if (segments.length === 0) {
-                return "All conditions look good throughout the day.";
-            } else if (segments.length === 1) {
-                return `Expect ${segments[0]}.`;
-            } else if (segments.length === 2) {
-                return `Expect ${segments[0]} and ${segments[1]}.`;
+            if (lk >= 85) lines.push('Looking very good for jumping.');
+            else if (lk >= 70) lines.push('Looking good for jumping.');
+            else if (lk >= 55) lines.push('A mixed day. Jumping is possible but may be delayed or interrupted.');
+            else if (lk >= 40) lines.push('Doubtful. Expect delays and a real chance of being weathered off.');
+            else lines.push('Unlikely to be able to jump.');
+
+            if (badRuns.length === 0) {
+                lines.push(`Conditions look fine all day with ${describeWind(hours)} and ${describeSky(hours)}.`);
             } else {
-                return `Expect ${segments[0]}, ${segments[1]}, and ${segments[2]}.`;
+                let prevNames = null;
+                const parts = badRuns.map(r => {
+                    const order = ['wind', 'rain', 'fog', 'lowbase', 'cloud'];
+                    const names = joinList(order.filter(k => r.issues.has(k)).map(k => issueWords[k]));
+                    const whole = r.start === hours[0] && r.end === hours[hours.length - 1];
+                    const again = prevNames === names;
+                    prevNames = names;
+                    return `${names}${again ? ' again' : ''} ${whole ? 'all day' : 'from ' + fmtRange(r.start, r.end)}`;
+                });
+                lines.push(`Expect ${parts.join(', then ')}.`);
+
+                if (bestRun && bestRun.items.length >= 2) {
+                    const a = bestRun.items[0];
+                    const b = bestRun.items[bestRun.items.length - 1];
+                    lines.push(`Best window is roughly ${fmtHour(a.hour)} to ${fmtHour(b.hour + 1)}, with ${describeWind(bestRun.items)}.`);
+                } else if (bestRun) {
+                    lines.push(`Only a brief gap around ${fmtHour(bestRun.items[0].hour)}.`);
+                } else {
+                    lines.push('No decent gap in the weather expected.');
+                }
             }
+
+            if (dayIndex >= 3) lines.push('This is further out, so check again nearer the day as it may change.');
+
+            return lines
+                .map((l, i) => i === 0 ? `<b>${l}</b>` : `<span style="display:block; margin-top:0.3rem;">${l}</span>`)
+                .join('');
         }
 
         function calculateDayMetrics(dayIndex, hourly) {
@@ -628,7 +697,7 @@
                 const dateStr = dateObj.toISOString().split('T')[0];
                 
                 const metrics = calculateDayMetrics(i, hourly);
-                const diagnosisText = generateTimedOutlookSummary(i, hourly);
+                const diagnosisText = generateTimedOutlookSummary(i, hourly, metrics);
                 const isActive = i === selectedDayIndex ? ' active' : '';
                 
                 let bgTintClass = 'card-bg-green';
