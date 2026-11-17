@@ -481,7 +481,7 @@
 
         // Plain-English day summary for office staff: says how the day looks, what the
         // problems are and when, and when the best window is. Same thresholds as the scoring.
-        function generateTimedOutlookSummary(dayIndex, hourly, metrics) {
+        function generateTimedOutlookSummary(dayIndex, hourly) {
             const daily = globalWeatherData.daily;
             const targetDateStr = daily.time[dayIndex];
             let dayStart = hourly.time.findIndex(t => t.startsWith(targetDateStr) && t.includes('08:00'));
@@ -583,13 +583,6 @@
 
             // ---- 4. Build the sentences ----
             const lines = [];
-            const lk = metrics ? metrics.likelihood : 70;
-
-            if (lk >= 85) lines.push('Looking very good for jumping.');
-            else if (lk >= 70) lines.push('Looking good for jumping.');
-            else if (lk >= 55) lines.push('A mixed day. Jumping is possible but may be delayed or interrupted.');
-            else if (lk >= 40) lines.push('Doubtful. Expect delays and a real chance of being weathered off.');
-            else lines.push('Unlikely to be able to jump.');
 
             if (badRuns.length === 0) {
                 lines.push(`Conditions look fine all day with ${describeWind(hours)} and ${describeSky(hours)}.`);
@@ -616,10 +609,8 @@
                 }
             }
 
-            if (dayIndex >= 3) lines.push('This is further out, so check again nearer the day as it may change.');
-
             return lines
-                .map((l, i) => i === 0 ? `<b>${l}</b>` : `<span style="display:block; margin-top:0.3rem;">${l}</span>`)
+                .map((l, i) => `<span style="display:block;${i > 0 ? ' margin-top:0.3rem;' : ''}">${l}</span>`)
                 .join('');
         }
 
@@ -697,7 +688,7 @@
                 const dateStr = dateObj.toISOString().split('T')[0];
                 
                 const metrics = calculateDayMetrics(i, hourly);
-                const diagnosisText = generateTimedOutlookSummary(i, hourly, metrics);
+                const diagnosisText = generateTimedOutlookSummary(i, hourly);
                 const isActive = i === selectedDayIndex ? ' active' : '';
                 
                 let bgTintClass = 'card-bg-green';
