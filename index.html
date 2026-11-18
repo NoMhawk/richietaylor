@@ -271,6 +271,7 @@
             align-items: start;
         }
         .enquiry { display: grid; gap: 1.25rem; }
+        .enquiry[hidden] { display: none; }
         .enquiry label { display: grid; gap: .35rem; font-family: var(--display); font-weight: 700; font-size: 1rem; }
         .enquiry .optional { font-weight: 500; color: var(--slate); }
         .enquiry input, .enquiry select, .enquiry textarea {
@@ -298,6 +299,21 @@
         .form-status.ok { color: var(--slate); }
         .form-status.err { color: var(--pen); }
         .fine { font-size: .95rem; color: var(--slate); margin: 0; }
+        .sent { border-top: 4px solid var(--pen); padding-top: .9rem; }
+        .sent[hidden] { display: none; }
+        .sent h3 {
+            font-family: var(--display); font-stretch: 70%; font-weight: 900;
+            font-size: clamp(2.4rem, 7vw, 3.6rem); line-height: .95;
+            text-transform: uppercase; margin: 0 0 1rem;
+        }
+        .sent p { max-width: 26em; }
+        .sent button {
+            font-family: var(--display); font-weight: 700; font-size: 1rem;
+            background: none; color: var(--ink);
+            border: 2px solid var(--ink); border-radius: 0;
+            padding: .8rem 1.4rem; cursor: pointer;
+        }
+        .sent button:hover { background: var(--ink); color: var(--paper); }
         .direct h3 {
             font-family: var(--display); font-stretch: 75%; font-weight: 800;
             font-size: 1.9rem; line-height: 1.1; margin: 0 0 1rem;
@@ -497,6 +513,11 @@
                         <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
                         <p class="fine">I’ll only use your details to reply to you. See the <a href="privacy.html">privacy policy</a>.</p>
                     </form>
+                    <div class="sent" id="sent" role="status" tabindex="-1" hidden>
+                        <h3>Message sent</h3>
+                        <p>Thanks, I’ve got it. I’ll reply within 24 hours, so there’s no need to send it again.</p>
+                        <button type="button" id="send-another">Send another message</button>
+                    </div>
                     <div class="direct">
                         <h3>Rather not use a form?</h3>
                         <a class="mail" href="mailto:lifecoaching@richietaylor.net">lifecoaching@richietaylor.net</a>
@@ -527,12 +548,21 @@
                     status.textContent = 'Sending…';
                 });
             }
-            if (status && /[?&]sent=1/.test(location.search)) {
-                status.className = 'form-status ok';
-                status.textContent = 'Message sent. I’ll reply within 24 hours.';
+            var sent = document.getElementById('sent');
+            if (form && sent && /[?&]sent=1/.test(location.search)) {
+                form.hidden = true;
+                sent.hidden = false;
                 if (window.history && history.replaceState) {
                     history.replaceState(null, '', location.pathname + '#contact');
                 }
+                sent.scrollIntoView({ block: 'center' });
+                sent.focus({ preventScroll: true });
+                document.getElementById('send-another').addEventListener('click', function () {
+                    sent.hidden = true;
+                    form.hidden = false;
+                    status.textContent = '';
+                    form.querySelector('input[name="name"]').focus();
+                });
             }
         })();
     </script>
