@@ -299,21 +299,30 @@
         .form-status.ok { color: var(--slate); }
         .form-status.err { color: var(--pen); }
         .fine { font-size: .95rem; color: var(--slate); margin: 0; }
-        .sent { border-top: 4px solid var(--pen); padding-top: .9rem; }
+        .sent {
+            background: var(--slate); color: var(--paper);
+            border-top: 8px solid var(--pen);
+            padding: clamp(1.75rem, 5vw, 3.5rem);
+        }
         .sent[hidden] { display: none; }
         .sent h3 {
-            font-family: var(--display); font-stretch: 70%; font-weight: 900;
-            font-size: clamp(2.4rem, 7vw, 3.6rem); line-height: .95;
-            text-transform: uppercase; margin: 0 0 1rem;
+            font-family: var(--display); font-stretch: 68%; font-weight: 900;
+            font-size: clamp(3.4rem, 11vw, 7rem); line-height: .9;
+            text-transform: uppercase; margin: 0 0 1.25rem;
         }
-        .sent p { max-width: 26em; }
+        .sent p { max-width: 24em; font-size: 1.4rem; line-height: 1.45; margin: 0 0 1.75rem; }
         .sent button {
             font-family: var(--display); font-weight: 700; font-size: 1rem;
-            background: none; color: var(--ink);
-            border: 2px solid var(--ink); border-radius: 0;
+            background: none; color: var(--paper);
+            border: 2px solid var(--paper); border-radius: 0;
             padding: .8rem 1.4rem; cursor: pointer;
         }
-        .sent button:hover { background: var(--ink); color: var(--paper); }
+        .sent button:hover { background: var(--paper); color: var(--ink); }
+        /* After sending, the confirmation is the only thing that matters. */
+        .contact.is-sent h2,
+        .contact.is-sent .wrap > .measure { display: none; }
+        .contact.is-sent .contact-grid { grid-template-columns: 1fr; margin-top: 0; }
+        .contact.is-sent .direct { max-width: 30rem; }
         .direct h3 {
             font-family: var(--display); font-stretch: 75%; font-weight: 800;
             font-size: 1.9rem; line-height: 1.1; margin: 0 0 1rem;
@@ -552,6 +561,7 @@
             if (form && sent && /[?&]sent=1/.test(location.search)) {
                 form.hidden = true;
                 sent.hidden = false;
+                document.getElementById('contact').classList.add('is-sent');
                 if (window.history && history.replaceState) {
                     history.replaceState(null, '', location.pathname + '#contact');
                 }
@@ -560,6 +570,7 @@
                 document.getElementById('send-another').addEventListener('click', function () {
                     sent.hidden = true;
                     form.hidden = false;
+                    document.getElementById('contact').classList.remove('is-sent');
                     status.textContent = '';
                     form.querySelector('input[name="name"]').focus();
                 });
