@@ -12,7 +12,32 @@
     <!-- Open Graph for Social Sharing -->
     <meta property="og:title" content="The Brutal Truth Life Coaching - Yeovil, UK">
     <meta property="og:description" content="Your No-BS Guide to Real Change. Face your truths with a direct coach—local in Somerset or global online.">
-    <meta property="og:image" content="https://richietaylor.net/banner.jpg">
+    <meta property="og:image" content="https://richietaylor.net/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Stop lying to yourself. The Brutal Truth Life Coaching, Yeovil, UK.">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "ProfessionalService",
+        "name": "The Brutal Truth Life Coaching",
+        "description": "Brutally honest life coaching by phone, Skype, Teams or in person.",
+        "url": "https://richietaylor.net/",
+        "image": "https://richietaylor.net/og-image.jpg",
+        "email": "lifecoaching@richietaylor.net",
+        "telephone": "+447817976703",
+        "priceRange": "£90 per hour",
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Yeovil",
+            "addressRegion": "Somerset",
+            "addressCountry": "GB"
+        },
+        "areaServed": ["Yeovil", "Somerset", "Worldwide"],
+        "founder": { "@type": "Person", "name": "Richie Taylor" }
+    }
+    </script>
     <meta property="og:url" content="https://richietaylor.net/">
     <meta property="og:type" content="website">
 
@@ -20,7 +45,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="The Brutal Truth Life Coaching - Yeovil, UK">
     <meta name="twitter:description" content="Stop the excuses. Get brutally honest coaching for real progress—Yeovil-based, worldwide reach.">
-    <meta name="twitter:image" content="https://richietaylor.net/banner.jpg">
+    <meta name="twitter:image" content="https://richietaylor.net/og-image.jpg">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -196,7 +221,47 @@
         }
         .formats p { margin: 0; max-width: 30em; opacity: .9; }
 
+        /* ---------- Who it's for ---------- */
+        .fit { border-top: 1px solid var(--rule); }
+        .fit-cols {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: clamp(2rem, 6vw, 5rem);
+            margin-top: 2rem;
+        }
+        .fit-cols h3 {
+            font-family: var(--display); font-stretch: 75%; font-weight: 800;
+            font-size: 1.9rem; line-height: 1.1; margin: 0 0 1rem;
+            padding-top: .9rem; border-top: 4px solid var(--ink);
+        }
+        .fit-cols .no h3 { border-top-color: var(--pen); }
+        .fit-cols ul { list-style: none; margin: 0; padding: 0; }
+        .fit-cols li { padding: .7rem 0; border-bottom: 1px solid var(--rule); max-width: 30em; }
+
+        /* ---------- How it works ---------- */
+        .steps {
+            list-style: none; margin: 2rem 0 0; padding: 0;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: clamp(1.5rem, 4vw, 3rem);
+            counter-reset: step;
+        }
+        .steps li { counter-increment: step; border-top: 4px solid var(--ink); padding-top: .75rem; }
+        .steps li::before {
+            content: counter(step);
+            display: block;
+            font-family: var(--display); font-stretch: 68%; font-weight: 900;
+            font-size: 4.5rem; line-height: .9; color: var(--pen);
+            margin-bottom: .5rem;
+        }
+        .steps h3 {
+            font-family: var(--display); font-stretch: 75%; font-weight: 800;
+            font-size: 1.6rem; line-height: 1.1; margin: 0 0 .4rem;
+        }
+        .steps p { margin: 0; }
+
         /* ---------- Contact ---------- */
+        .contact { border-top: 1px solid var(--rule); }
         .contact h2 { max-width: 12em; }
         .mail {
             display: inline-block;
@@ -228,6 +293,7 @@
             .hero-photo img { object-position: 80% 60%; }
             .about .wrap, .sessions .wrap { grid-template-columns: 1fr; }
             .portrait { max-width: 18rem; }
+            .fit-cols, .steps { grid-template-columns: 1fr; }
         }
         @media (max-width: 480px) {
             .bar nav a:first-child { display: none; }
@@ -287,6 +353,31 @@
             </div>
         </section>
 
+        <section id="fit" class="fit">
+            <div class="wrap">
+                <h2>Who this is for</h2>
+                <p class="measure">I’m direct, and that doesn’t suit everyone. Better to find out now.</p>
+                <div class="fit-cols">
+                    <div class="yes">
+                        <h3>A good fit</h3>
+                        <ul>
+                            <li>You know what needs to change and keep putting it off.</li>
+                            <li>You want someone to say what your friends won’t.</li>
+                            <li>You’re ready to do the work between sessions.</li>
+                        </ul>
+                    </div>
+                    <div class="no">
+                        <h3>Not a good fit</h3>
+                        <ul>
+                            <li>You want reassurance more than results.</li>
+                            <li>You’d rather be agreed with than challenged.</li>
+                            <li>You’re looking for therapy or treatment for a mental health condition.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section id="sessions" class="sessions">
             <div class="wrap">
                 <div>
@@ -309,6 +400,26 @@
                         <p>In-person sessions in Yeovil, Somerset, for those who thrive on real-world intensity.</p>
                     </li>
                 </ul>
+            </div>
+        </section>
+
+        <section id="how" class="how">
+            <div class="wrap">
+                <h2>How it works</h2>
+                <ol class="steps">
+                    <li>
+                        <h3>Get in touch</h3>
+                        <p>Email or WhatsApp me and tell me what you’re stuck on.</p>
+                    </li>
+                    <li>
+                        <h3>Have a first chat</h3>
+                        <p>I reply within 24 hours with a no-obligation chat to see if we’re a fit.</p>
+                    </li>
+                    <li>
+                        <h3>Book a session</h3>
+                        <p>If we’re a fit, we book 60 minutes by phone, video or in person.</p>
+                    </li>
+                </ol>
             </div>
         </section>
 
