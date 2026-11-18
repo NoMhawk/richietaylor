@@ -468,7 +468,7 @@
                 <h2>Get started, or keep stalling</h2>
                 <p class="measure">Ready for the truth? Tell me what you’re stuck on and I’ll reply within 24 hours with a no-obligation chat to see if we’re a fit.</p>
                 <div class="contact-grid">
-                    <form class="enquiry" id="enquiry" action="https://formsubmit.co/lifecoaching@richietaylor.net" method="POST">
+                    <form class="enquiry" id="enquiry" action="https://api.web3forms.com/submit" method="POST">
                         <label>Your name
                             <input type="text" name="name" autocomplete="name" required>
                         </label>
@@ -487,12 +487,12 @@
                             <textarea name="message" required></textarea>
                         </label>
                         <div class="trap" aria-hidden="true">
-                            <label>Leave this empty <input type="text" name="_honey" tabindex="-1" autocomplete="off"></label>
+                            <label>Leave this unticked <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off"></label>
                         </div>
-                        <input type="hidden" name="_subject" value="New enquiry from richietaylor.net">
-                        <input type="hidden" name="_template" value="table">
-                        <input type="hidden" name="_captcha" value="false">
-                        <input type="hidden" name="_next" value="https://richietaylor.net/?sent=1#contact">
+                        <input type="hidden" name="access_key" value="383b92cb-0b5d-41ad-b4b9-e750919b50a8">
+                        <input type="hidden" name="subject" value="New enquiry from richietaylor.net">
+                        <input type="hidden" name="from_name" value="richietaylor.net contact form">
+                        <input type="hidden" name="redirect" value="https://richietaylor.net/?sent=1#contact">
                         <button type="submit">Send message</button>
                         <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
                         <p class="fine">I’ll only use your details to reply to you. See the <a href="privacy.html">privacy policy</a>.</p>
@@ -514,7 +514,7 @@
     </footer>
 
     <script>
-        // The form posts normally to FormSubmit, which sends the message on and
+        // The form posts normally to Web3Forms, which sends the message on and
         // then returns visitors here with ?sent=1. This shows the confirmation.
         (function () {
             var status = document.getElementById('form-status');
