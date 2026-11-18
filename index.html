@@ -263,18 +263,58 @@
         /* ---------- Contact ---------- */
         .contact { border-top: 1px solid var(--rule); }
         .contact h2 { max-width: 12em; }
+        .contact-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr);
+            gap: clamp(2rem, 6vw, 5rem);
+            margin-top: 2rem;
+            align-items: start;
+        }
+        .enquiry { display: grid; gap: 1.25rem; }
+        .enquiry label { display: grid; gap: .35rem; font-family: var(--display); font-weight: 700; font-size: 1rem; }
+        .enquiry .optional { font-weight: 500; color: var(--slate); }
+        .enquiry input, .enquiry select, .enquiry textarea {
+            font: inherit; font-family: var(--text); font-weight: 400; font-size: 1.1rem;
+            color: var(--ink);
+            background: #f7f7f3;
+            border: 2px solid var(--ink);
+            border-radius: 0;
+            padding: .7rem .8rem;
+            width: 100%;
+        }
+        .enquiry textarea { min-height: 9rem; resize: vertical; }
+        .enquiry .trap { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+        .enquiry button {
+            justify-self: start;
+            font-family: var(--display); font-weight: 700; font-size: 1rem;
+            background: var(--ink); color: var(--paper);
+            border: 2px solid var(--ink); border-radius: 0;
+            padding: .9rem 1.6rem; cursor: pointer;
+            transition: background .2s, border-color .2s;
+        }
+        .enquiry button:hover { background: var(--pen); border-color: var(--pen); }
+        .enquiry button[disabled] { opacity: .6; cursor: wait; }
+        .form-status { margin: 0; min-height: 1.6em; font-weight: 500; }
+        .form-status.ok { color: var(--slate); }
+        .form-status.err { color: var(--pen); }
+        .fine { font-size: .95rem; color: var(--slate); margin: 0; }
+        .direct h3 {
+            font-family: var(--display); font-stretch: 75%; font-weight: 800;
+            font-size: 1.9rem; line-height: 1.1; margin: 0 0 1rem;
+            padding-top: .9rem; border-top: 4px solid var(--ink);
+        }
         .mail {
             display: inline-block;
             font-family: var(--display); font-stretch: 78%; font-weight: 800;
-            font-size: clamp(1.1rem, 5vw, 3.4rem);
-            line-height: 1.1;
+            font-size: clamp(1.1rem, 4.2vw, 1.7rem);
+            line-height: 1.2;
             text-decoration: none;
-            border-bottom: 4px solid var(--pen);
+            border-bottom: 3px solid var(--pen);
             overflow-wrap: anywhere;
-            margin: .5rem 0 1.75rem;
+            margin: 0 0 1.25rem;
         }
         .mail:hover { background: var(--pen); color: var(--paper); }
-        .contact .or { display: flex; flex-wrap: wrap; align-items: baseline; gap: .5rem 1rem; }
+        .contact .or { margin: 0; }
         .contact .or a { font-family: var(--display); font-weight: 700; }
 
         footer { border-top: 1px solid var(--rule); padding: 1.5rem 0 2rem; font-size: 1rem; color: var(--slate); }
@@ -293,7 +333,7 @@
             .hero-photo img { object-position: 80% 60%; }
             .about .wrap, .sessions .wrap { grid-template-columns: 1fr; }
             .portrait { max-width: 18rem; }
-            .fit-cols, .steps { grid-template-columns: 1fr; }
+            .fit-cols, .steps, .contact-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 480px) {
             .bar nav a:first-child { display: none; }
@@ -426,17 +466,83 @@
         <section id="contact" class="contact">
             <div class="wrap">
                 <h2>Get started, or keep stalling</h2>
-                <p class="measure">Ready for the truth? Email me and I’ll reply within 24 hours with a no-obligation chat to see if we’re a fit.</p>
-                <a class="mail" href="mailto:lifecoaching@richietaylor.net">lifecoaching@richietaylor.net</a>
-                <p class="or">Prefer WhatsApp? <a href="https://wa.me/447817976703">07817 976703</a></p>
+                <p class="measure">Ready for the truth? Tell me what you’re stuck on and I’ll reply within 24 hours with a no-obligation chat to see if we’re a fit.</p>
+                <div class="contact-grid">
+                    <form class="enquiry" id="enquiry" action="https://formsubmit.co/lifecoaching@richietaylor.net" method="POST">
+                        <label>Your name
+                            <input type="text" name="name" autocomplete="name" required>
+                        </label>
+                        <label>Your email
+                            <input type="email" name="email" autocomplete="email" required>
+                        </label>
+                        <label>How would you like to work?
+                            <select name="format">
+                                <option value="Not sure yet">Not sure yet</option>
+                                <option value="Phone">Phone</option>
+                                <option value="Skype or Teams video">Skype or Teams video</option>
+                                <option value="Face-to-face in Yeovil">Face-to-face in Yeovil</option>
+                            </select>
+                        </label>
+                        <label>What are you stuck on?
+                            <textarea name="message" required></textarea>
+                        </label>
+                        <div class="trap" aria-hidden="true">
+                            <label>Leave this empty <input type="text" name="_honey" tabindex="-1" autocomplete="off"></label>
+                        </div>
+                        <input type="hidden" name="_subject" value="New enquiry from richietaylor.net">
+                        <input type="hidden" name="_template" value="table">
+                        <input type="hidden" name="_captcha" value="false">
+                        <button type="submit">Send message</button>
+                        <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+                        <p class="fine">I’ll only use your details to reply to you. See the <a href="privacy.html">privacy policy</a>.</p>
+                    </form>
+                    <div class="direct">
+                        <h3>Rather not use a form?</h3>
+                        <a class="mail" href="mailto:lifecoaching@richietaylor.net">lifecoaching@richietaylor.net</a>
+                        <p class="or">WhatsApp: <a href="https://wa.me/447817976703">07817 976703</a></p>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
 
     <footer>
         <div class="wrap">
-            &copy; 2026 The Brutal Truth Life Coaching. Yeovil, Somerset, UK. All rights reserved.
+            &copy; 2026 The Brutal Truth Life Coaching. Yeovil, Somerset, UK. All rights reserved. <a href="privacy.html">Privacy policy</a>
         </div>
     </footer>
+
+    <script>
+        // Send the enquiry without leaving the page. If this script fails,
+        // the form still posts normally to the same address.
+        (function () {
+            var form = document.getElementById('enquiry');
+            var status = document.getElementById('form-status');
+            if (!form || !window.fetch) return;
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                var btn = form.querySelector('button[type="submit"]');
+                btn.disabled = true;
+                status.className = 'form-status';
+                status.textContent = 'Sending…';
+                fetch('https://formsubmit.co/ajax/lifecoaching@richietaylor.net', {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' },
+                    body: new FormData(form)
+                }).then(function (r) {
+                    if (!r.ok) throw new Error('bad response');
+                    return r.json();
+                }).then(function (data) {
+                    if (data && data.success === 'false') throw new Error('rejected');
+                    form.reset();
+                    status.className = 'form-status ok';
+                    status.textContent = 'Message sent. I’ll reply within 24 hours.';
+                }).catch(function () {
+                    status.className = 'form-status err';
+                    status.textContent = 'That didn’t send. Email me at lifecoaching@richietaylor.net instead.';
+                }).then(function () { btn.disabled = false; });
+            });
+        })();
+    </script>
 </body>
 </html>
