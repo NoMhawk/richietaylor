@@ -411,6 +411,12 @@
         .contact.is-sent .wrap > .measure { display: none; }
         .contact.is-sent .contact-grid { grid-template-columns: 1fr; margin-top: 0; }
         .contact.is-sent .direct { max-width: 30rem; }
+        .direct-photo { margin: 2rem 0 0; }
+        .direct-photo img {
+            display: block; width: 100%; height: auto;
+            aspect-ratio: 4 / 3; object-fit: cover; object-position: 100% 40%;
+        }
+        .contact.is-sent .direct-photo { display: none; }
         .direct h3 {
             font-family: var(--display); font-stretch: 75%; font-weight: 800;
             font-size: 1.9rem; line-height: 1.1; margin: 0 0 1rem;
@@ -627,6 +633,13 @@
                         <h3>Rather not use a form?</h3>
                         <a class="mail" href="mailto:lifecoaching@richietaylor.net">lifecoaching@richietaylor.net</a>
                         <p class="or">WhatsApp: <a href="https://wa.me/447817976703">07817 976703</a></p>
+                        <figure class="direct-photo">
+                            <img src="paraglide-1440.jpg"
+                                 srcset="paraglide-720.jpg 720w, paraglide-1440.jpg 1440w"
+                                 sizes="(max-width: 820px) 100vw, 420px"
+                                 alt="Richie Taylor paragliding above coastal cliffs and the sea on a clear day, smiling at the camera"
+                                 width="1440" height="809" loading="lazy">
+                        </figure>
                     </div>
                 </div>
             </div>
