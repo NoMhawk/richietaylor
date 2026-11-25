@@ -1,0 +1,3233 @@
+{
+ "days": [
+  {
+   "date": "2026-11-25",
+   "likelihood": 5
+  },
+  {
+   "date": "2026-11-26",
+   "likelihood": 0
+  },
+  {
+   "date": "2026-11-27",
+   "likelihood": 0
+  },
+  {
+   "date": "2026-11-28",
+   "likelihood": 0
+  },
+  {
+   "date": "2026-11-29",
+   "likelihood": 100
+  },
+  {
+   "date": "2026-11-30",
+   "likelihood": 89
+  },
+  {
+   "date": "2026-12-01",
+   "likelihood": 0
+  }
+ ],
+ "hours": [
+  {
+   "affOk": false,
+   "baseEstimated": false,
+   "baseFt": 900,
+   "baseState": "ft",
+   "dir": 35,
+   "fog": false,
+   "high": 0,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "low": 58,
+   "mid": 100,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 35,
+     "wg": 15,
+     "ws": 8
+    },
+    "gfs_seamless": {
+     "dir": 39,
+     "wg": 19,
+     "ws": 10
+    },
+    "icon_seamless": {
+     "dir": 37,
+     "wg": 18,
+     "ws": 11
+    },
+    "meteofrance_seamless": {
+     "dir": 28,
+     "wg": 18,
+     "ws": 10
+    }
+   },
+   "rain": 0,
+   "score": 0,
+   "t": "2026-11-25T08:00",
+   "total": 100,
+   "vis": 16.5,
+   "wg": 18,
+   "ws": 10
+  },
+  {
+   "affOk": false,
+   "baseEstimated": false,
+   "baseFt": 900,
+   "baseState": "ft",
+   "dir": 38,
+   "fog": false,
+   "high": 0,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "low": 86,
+   "mid": 100,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 34,
+     "wg": 17,
+     "ws": 9
+    },
+    "gfs_seamless": {
+     "dir": 39,
+     "wg": 19,
+     "ws": 11
+    },
+    "icon_seamless": {
+     "dir": 32,
+     "wg": 21,
+     "ws": 12
+    },
+    "meteofrance_seamless": {
+     "dir": 49,
+     "wg": 19,
+     "ws": 10
+    }
+   },
+   "rain": 0,
+   "score": 0,
+   "t": "2026-11-25T09:00",
+   "total": 100,
+   "vis": 17.8,
+   "wg": 19,
+   "ws": 10
+  },
+  {
+   "affOk": false,
+   "baseEstimated": false,
+   "baseFt": 900,
+   "baseState": "ft",
+   "dir": 43,
+   "fog": false,
+   "high": 0,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "low": 78,
+   "mid": 100,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 38,
+     "wg": 18,
+     "ws": 9
+    },
+    "gfs_seamless": {
+     "dir": 45,
+     "wg": 20,
+     "ws": 13
+    },
+    "icon_seamless": {
+     "dir": 38,
+     "wg": 24,
+     "ws": 14
+    },
+    "meteofrance_seamless": {
+     "dir": 52,
+     "wg": 18,
+     "ws": 10
+    }
+   },
+   "rain": 0,
+   "score": 0,
+   "t": "2026-11-25T10:00",
+   "total": 100,
+   "vis": 19.7,
+   "wg": 20,
+   "ws": 12
+  },
+  {
+   "affOk": false,
+   "baseEstimated": false,
+   "baseFt": 1200,
+   "baseState": "ft",
+   "dir": 45,
+   "fog": false,
+   "high": 100,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "low": 84,
+   "mid": 100,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 44,
+     "wg": 20,
+     "ws": 10
+    },
+    "gfs_seamless": {
+     "dir": 46,
+     "wg": 18,
+     "ws": 13
+    },
+    "icon_seamless": {
+     "dir": 43,
+     "wg": 26,
+     "ws": 15
+    },
+    "meteofrance_seamless": {
+     "dir": 47,
+     "wg": 19,
+     "ws": 11
+    }
+   },
+   "rain": 0,
+   "score": 0,
+   "t": "2026-11-25T11:00",
+   "total": 100,
+   "vis": 24.3,
+   "wg": 21,
+   "ws": 12
+  },
+  {
+   "affOk": false,
+   "baseEstimated": false,
+   "baseFt": 1400,
+   "baseState": "ft",
+   "dir": 47,
+   "fog": false,
+   "high": 100,
+   "issues": [
+    "lowbase"
+   ],
+   "low": 84,
+   "mid": 0,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 48,
+     "wg": 21,
+     "ws": 11
+    },
+    "gfs_seamless": {
+     "dir": 48,
+     "wg": 18,
+     "ws": 13
+    },
+    "icon_seamless": {
+     "dir": 43,
+     "wg": 26,
+     "ws": 14
+    },
+    "meteofrance_seamless": {
+     "dir": 49,
+     "wg": 18,
+     "ws": 10
+    }
+   },
+   "rain": 0,
+   "score": 0,
+   "t": "2026-11-25T12:00",
+   "total": 100,
+   "vis": 28.2,
+   "wg": 21,
+   "ws": 12
+  },
+  {
+   "affOk": false,
+   "baseEstimated": false,
+   "baseFt": 1600,
+   "baseState": "ft",
+   "dir": 43,
+   "fog": false,
+   "high": 2,
+   "issues": [
+    "lowbase"
+   ],
+   "low": 82,
+   "mid": 17,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 48,
+     "wg": 21,
+     "ws": 11
+    },
+    "gfs_seamless": {
+     "dir": 48,
+     "wg": 17,
+     "ws": 13
+    },
+    "icon_seamless": {
+     "dir": 38,
+     "wg": 25,
+     "ws": 14
+    },
+    "meteofrance_seamless": {
+     "dir": 39,
+     "wg": 18,
+     "ws": 10
+    }
+   },
+   "rain": 0,
+   "score": 0,
+   "t": "2026-11-25T13:00",
+   "total": 87,
+   "vis": 28.3,
+   "wg": 20,
+   "ws": 12
+  },
+  {
+   "affOk": false,
+   "baseEstimated": false,
+   "baseFt": 2200,
+   "baseState": "ft",
+   "dir": 41,
+   "fog": false,
+   "high": 0,
+   "issues": [
+    "cloud"
+   ],
+   "low": 94,
+   "mid": 17,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 43,
+     "wg": 20,
+     "ws": 10
+    },
+    "gfs_seamless": {
+     "dir": 47,
+     "wg": 17,
+     "ws": 12
+    },
+    "icon_seamless": {
+     "dir": 35,
+     "wg": 23,
+     "ws": 13
+    },
+    "meteofrance_seamless": {
+     "dir": 40,
+     "wg": 20,
+     "ws": 11
+    }
+   },
+   "rain": 0,
+   "score": 0,
+   "t": "2026-11-25T14:00",
+   "total": 95,
+   "vis": 30.6,
+   "wg": 20,
+   "ws": 12
+  },
+  {
+   "affOk": false,
+   "baseEstimated": false,
+   "baseFt": 2200,
+   "baseState": "ft",
+   "dir": 38,
+   "fog": false,
+   "high": 0,
+   "issues": [],
+   "low": 84,
+   "mid": 0,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 40,
+     "wg": 19,
+     "ws": 10
+    },
+    "gfs_seamless": {
+     "dir": 40,
+     "wg": 17,
+     "ws": 10
+    },
+    "icon_seamless": {
+     "dir": 33,
+     "wg": 22,
+     "ws": 12
+    },
+    "meteofrance_seamless": {
+     "dir": 39,
+     "wg": 19,
+     "ws": 10
+    }
+   },
+   "rain": 0,
+   "score": 42,
+   "t": "2026-11-25T15:00",
+   "total": 86,
+   "vis": 29.1,
+   "wg": 19,
+   "ws": 10
+  },
+  {
+   "affOk": false,
+   "baseEstimated": false,
+   "baseFt": 1900,
+   "baseState": "ft",
+   "dir": 33,
+   "fog": false,
+   "high": 0,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "low": 93,
+   "mid": 0,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 39,
+     "wg": 19,
+     "ws": 9
+    },
+    "gfs_seamless": {
+     "dir": 35,
+     "wg": 17,
+     "ws": 9
+    },
+    "icon_seamless": {
+     "dir": 32,
+     "wg": 20,
+     "ws": 11
+    },
+    "meteofrance_seamless": {
+     "dir": 27,
+     "wg": 18,
+     "ws": 9
+    }
+   },
+   "rain": 0,
+   "score": 0,
+   "t": "2026-11-25T16:00",
+   "total": 93,
+   "vis": 27.8,
+   "wg": 18,
+   "ws": 9
+  },
+  {
+   "affOk": true,
+   "baseEstimated": false,
+   "baseFt": 1900,
+   "baseState": "ft",
+   "dir": 33,
+   "fog": false,
+   "high": 0,
+   "issues": [
+    "lowbase"
+   ],
+   "low": 69,
+   "mid": 0,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 40,
+     "wg": 18,
+     "ws": 9
+    },
+    "gfs_seamless": {
+     "dir": 29,
+     "wg": 18,
+     "ws": 8
+    },
+    "icon_seamless": {
+     "dir": 32,
+     "wg": 19,
+     "ws": 11
+    },
+    "meteofrance_seamless": {
+     "dir": 30,
+     "wg": 15,
+     "ws": 8
+    }
+   },
+   "rain": 0,
+   "score": 0,
+   "t": "2026-11-25T17:00",
+   "total": 69,
+   "vis": 26.2,
+   "wg": 17,
+   "ws": 9
+  },
+  {
+   "affOk": true,
+   "baseEstimated": false,
+   "baseFt": 1900,
+   "baseState": "ft",
+   "dir": 32,
+   "fog": false,
+   "high": 0,
+   "issues": [
+    "lowbase"
+   ],
+   "low": 78,
+   "mid": 0,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 41,
+     "wg": 18,
+     "ws": 8
+    },
+    "gfs_seamless": {
+     "dir": 29,
+     "wg": 18,
+     "ws": 8
+    },
+    "icon_seamless": {
+     "dir": 33,
+     "wg": 19,
+     "ws": 11
+    },
+    "meteofrance_seamless": {
+     "dir": 27,
+     "wg": 14,
+     "ws": 8
+    }
+   },
+   "rain": 0,
+   "score": 0,
+   "t": "2026-11-25T18:00",
+   "total": 78,
+   "vis": 27,
+   "wg": 17,
+   "ws": 9
+  },
+  {
+   "affOk": true,
+   "baseEstimated": false,
+   "baseFt": 1900,
+   "baseState": "ft",
+   "dir": 54,
+   "fog": false,
+   "high": 0,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "low": 98,
+   "mid": 0,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 54,
+     "wg": 12,
+     "ws": 6
+    },
+    "gfs_seamless": {
+     "dir": 42,
+     "wg": 6,
+     "ws": 3
+    },
+    "icon_seamless": {
+     "dir": 45,
+     "wg": 10,
+     "ws": 5
+    },
+    "meteofrance_seamless": {
+     "dir": 77,
+     "wg": 10,
+     "ws": 5
+    }
+   },
+   "rain": 0,
+   "score": 0,
+   "t": "2026-11-26T08:00",
+   "total": 99,
+   "vis": 16.6,
+   "wg": 10,
+   "ws": 5
+  },
+  {
+   "affOk": true,
+   "baseEstimated": false,
+   "baseFt": 1900,
+   "baseState": "ft",
+   "dir": 67,
+   "fog": false,
+   "high": 39,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "low": 99,
+   "mid": 0,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 64,
+     "wg": 11,
+     "ws": 6
+    },
+    "gfs_seamless": {
+     "dir": 62,
+     "wg": 10,
+     "ws": 5
+    },
+    "icon_seamless": {
+     "dir": 58,
+     "wg": 10,
+     "ws": 5
+    },
+    "meteofrance_seamless": {
+     "dir": 83,
+     "wg": 9,
+     "ws": 5
+    }
+   },
+   "rain": 0,
+   "score": 0,
+   "t": "2026-11-26T09:00",
+   "total": 100,
+   "vis": 17.8,
+   "wg": 10,
+   "ws": 5
+  },
+  {
+   "affOk": true,
+   "baseEstimated": false,
+   "baseFt": 1900,
+   "baseState": "ft",
+   "dir": 84,
+   "fog": false,
+   "high": 89,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "low": 98,
+   "mid": 0,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 83,
+     "wg": 13,
+     "ws": 5
+    },
+    "gfs_seamless": {
+     "dir": 84,
+     "wg": 11,
+     "ws": 6
+    },
+    "icon_seamless": {
+     "dir": 65,
+     "wg": 10,
+     "ws": 6
+    },
+    "meteofrance_seamless": {
+     "dir": 103,
+     "wg": 14,
+     "ws": 8
+    }
+   },
+   "rain": 0,
+   "score": 0,
+   "t": "2026-11-26T10:00",
+   "total": 100,
+   "vis": 19.5,
+   "wg": 12,
+   "ws": 6
+  },
+  {
+   "affOk": true,
+   "baseEstimated": false,
+   "baseFt": 2200,
+   "baseState": "ft",
+   "dir": 100,
+   "fog": false,
+   "high": 77,
+   "issues": [
+    "cloud"
+   ],
+   "low": 100,
+   "mid": 0,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 105,
+     "wg": 14,
+     "ws": 5
+    },
+    "gfs_seamless": {
+     "dir": 97,
+     "wg": 10,
+     "ws": 7
+    },
+    "icon_seamless": {
+     "dir": 83,
+     "wg": 12,
+     "ws": 7
+    },
+    "meteofrance_seamless": {
+     "dir": 113,
+     "wg": 15,
+     "ws": 9
+    }
+   },
+   "rain": 0,
+   "score": 0,
+   "t": "2026-11-26T11:00",
+   "total": 100,
+   "vis": 19.9,
+   "wg": 13,
+   "ws": 7
+  },
+  {
+   "affOk": true,
+   "baseEstimated": false,
+   "baseFt": 1400,
+   "baseState": "ft",
+   "dir": 114,
+   "fog": false,
+   "high": 89,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "low": 100,
+   "mid": 0,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 118,
+     "wg": 15,
+     "ws": 6
+    },
+    "gfs_seamless": {
+     "dir": 108,
+     "wg": 10,
+     "ws": 7
+    },
+    "icon_seamless": {
+     "dir": 105,
+     "wg": 13,
+     "ws": 6
+    },
+    "meteofrance_seamless": {
+     "dir": 124,
+     "wg": 14,
+     "ws": 6
+    }
+   },
+   "rain": 0,
+   "score": 0,
+   "t": "2026-11-26T12:00",
+   "total": 100,
+   "vis": 19.5,
+   "wg": 13,
+   "ws": 6
+  },
+  {
+   "affOk": true,
+   "baseEstimated": false,
+   "baseFt": 1400,
+   "baseState": "ft",
+   "dir": 128,
+   "fog": false,
+   "high": 100,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "low": 95,
+   "mid": 0,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 121,
+     "wg": 13,
+     "ws": 6
+    },
+    "gfs_seamless": {
+     "dir": 117,
+     "wg": 9,
+     "ws": 7
+    },
+    "icon_seamless": {
+     "dir": 121,
+     "wg": 11,
+     "ws": 5
+    },
+    "meteofrance_seamless": {
+     "dir": 153,
+     "wg": 11,
+     "ws": 3
+    }
+   },
+   "rain": 0,
+   "score": 0,
+   "t": "2026-11-26T13:00",
+   "total": 100,
+   "vis": 18.7,
+   "wg": 11,
+   "ws": 5
+  },
+  {
+   "affOk": true,
+   "baseEstimated": false,
+   "baseFt": 1600,
+   "baseState": "ft",
+   "dir": 134,
+   "fog": false,
+   "high": 100,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "low": 98,
+   "mid": 63,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 118,
+     "wg": 11,
+     "ws": 5
+    },
+    "gfs_seamless": {
+     "dir": 125,
+     "wg": 9,
+     "ws": 7
+    },
+    "icon_seamless": {
+     "dir": 130,
+     "wg": 9,
+     "ws": 4
+    },
+    "meteofrance_seamless": {
+     "dir": 166,
+     "wg": 7,
+     "ws": 3
+    }
+   },
+   "rain": 0,
+   "score": 0,
+   "t": "2026-11-26T14:00",
+   "total": 100,
+   "vis": 19.2,
+   "wg": 9,
+   "ws": 5
+  },
+  {
+   "affOk": true,
+   "baseEstimated": false,
+   "baseFt": 2200,
+   "baseState": "ft",
+   "dir": 116,
+   "fog": false,
+   "high": 100,
+   "issues": [
+    "cloud"
+   ],
+   "low": 82,
+   "mid": 100,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 113,
+     "wg": 10,
+     "ws": 5
+    },
+    "gfs_seamless": {
+     "dir": 114,
+     "wg": 9,
+     "ws": 6
+    },
+    "icon_seamless": {
+     "dir": 110,
+     "wg": 9,
+     "ws": 5
+    },
+    "meteofrance_seamless": {
+     "dir": 128,
+     "wg": 9,
+     "ws": 5
+    }
+   },
+   "rain": 0,
+   "score": 0,
+   "t": "2026-11-26T15:00",
+   "total": 100,
+   "vis": 19.5,
+   "wg": 9,
+   "ws": 5
+  },
+  {
+   "affOk": true,
+   "baseEstimated": false,
+   "baseFt": 3700,
+   "baseState": "ft",
+   "dir": 108,
+   "fog": false,
+   "high": 100,
+   "issues": [
+    "cloud"
+   ],
+   "low": 92,
+   "mid": 6,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 111,
+     "wg": 11,
+     "ws": 6
+    },
+    "gfs_seamless": {
+     "dir": 100,
+     "wg": 4,
+     "ws": 5
+    },
+    "icon_seamless": {
+     "dir": 95,
+     "wg": 10,
+     "ws": 5
+    },
+    "meteofrance_seamless": {
+     "dir": 128,
+     "wg": 11,
+     "ws": 7
+    }
+   },
+   "rain": 0,
+   "score": 0,
+   "t": "2026-11-26T16:00",
+   "total": 100,
+   "vis": 18.2,
+   "wg": 9,
+   "ws": 6
+  },
+  {
+   "affOk": true,
+   "baseEstimated": false,
+   "baseFt": 2900,
+   "baseState": "ft",
+   "dir": 103,
+   "fog": false,
+   "high": 100,
+   "issues": [
+    "cloud"
+   ],
+   "low": 91,
+   "mid": 13,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 109,
+     "wg": 12,
+     "ws": 7
+    },
+    "gfs_seamless": {
+     "dir": 90,
+     "wg": 4,
+     "ws": 6
+    },
+    "icon_seamless": {
+     "dir": 96,
+     "wg": 11,
+     "ws": 4
+    },
+    "meteofrance_seamless": {
+     "dir": 117,
+     "wg": 11,
+     "ws": 7
+    }
+   },
+   "rain": 0,
+   "score": 0,
+   "t": "2026-11-26T17:00",
+   "total": 100,
+   "vis": 16.1,
+   "wg": 10,
+   "ws": 6
+  },
+  {
+   "affOk": true,
+   "baseEstimated": false,
+   "baseFt": 2600,
+   "baseState": "ft",
+   "dir": 106,
+   "fog": false,
+   "high": 100,
+   "issues": [
+    "cloud"
+   ],
+   "low": 58,
+   "mid": 100,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 111,
+     "wg": 14,
+     "ws": 8
+    },
+    "gfs_seamless": {
+     "dir": 95,
+     "wg": 5,
+     "ws": 5
+    },
+    "icon_seamless": {
+     "dir": 100,
+     "wg": 9,
+     "ws": 4
+    },
+    "meteofrance_seamless": {
+     "dir": 117,
+     "wg": 12,
+     "ws": 8
+    }
+   },
+   "rain": 0,
+   "score": 0,
+   "t": "2026-11-26T18:00",
+   "total": 100,
+   "vis": 15,
+   "wg": 10,
+   "ws": 6
+  },
+  {
+   "affOk": false,
+   "baseEstimated": false,
+   "baseFt": 1400,
+   "baseState": "ft",
+   "dir": 174,
+   "fog": false,
+   "high": 100,
+   "issues": [
+    "rain",
+    "lowbase",
+    "cloud"
+   ],
+   "low": 86,
+   "mid": 97,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 177,
+     "wg": 22,
+     "ws": 12
+    },
+    "gfs_seamless": {
+     "dir": 163,
+     "wg": 25,
+     "ws": 13
+    },
+    "icon_seamless": {
+     "dir": 178,
+     "wg": 14,
+     "ws": 7
+    },
+    "meteofrance_seamless": {
+     "dir": 176,
+     "wg": 21,
+     "ws": 15
+    }
+   },
+   "rain": 82,
+   "score": 0,
+   "t": "2026-11-27T08:00",
+   "total": 100,
+   "vis": 12.2,
+   "wg": 21,
+   "ws": 12
+  },
+  {
+   "affOk": false,
+   "baseEstimated": false,
+   "baseFt": 1600,
+   "baseState": "ft",
+   "dir": 171,
+   "fog": false,
+   "high": 100,
+   "issues": [
+    "rain",
+    "lowbase",
+    "cloud"
+   ],
+   "low": 75,
+   "mid": 96,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 173,
+     "wg": 23,
+     "ws": 13
+    },
+    "gfs_seamless": {
+     "dir": 170,
+     "wg": 25,
+     "ws": 12
+    },
+    "icon_seamless": {
+     "dir": 171,
+     "wg": 15,
+     "ws": 9
+    },
+    "meteofrance_seamless": {
+     "dir": 168,
+     "wg": 22,
+     "ws": 15
+    }
+   },
+   "rain": 82,
+   "score": 0,
+   "t": "2026-11-27T09:00",
+   "total": 100,
+   "vis": 9.1,
+   "wg": 21,
+   "ws": 12
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": 300,
+   "baseState": "ft",
+   "dir": 168,
+   "fog": false,
+   "high": 96,
+   "issues": [
+    "rain",
+    "lowbase",
+    "cloud"
+   ],
+   "low": 68,
+   "mid": 95,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 172,
+     "wg": 24,
+     "ws": 13
+    },
+    "gfs_seamless": {
+     "dir": 168,
+     "wg": 24,
+     "ws": 12
+    },
+    "icon_seamless": {
+     "dir": 169,
+     "wg": 17,
+     "ws": 10
+    },
+    "meteofrance_seamless": {
+     "dir": 164,
+     "wg": 23,
+     "ws": 16
+    }
+   },
+   "rain": 80,
+   "score": 0,
+   "t": "2026-11-27T10:00",
+   "total": 100,
+   "vis": 6.7,
+   "wg": 22,
+   "ws": 13
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": 300,
+   "baseState": "ft",
+   "dir": 168,
+   "fog": false,
+   "high": 90,
+   "issues": [
+    "rain",
+    "lowbase",
+    "cloud"
+   ],
+   "low": 72,
+   "mid": 97,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 171,
+     "wg": 24,
+     "ws": 13
+    },
+    "gfs_seamless": {
+     "dir": 165,
+     "wg": 24,
+     "ws": 13
+    },
+    "icon_seamless": {
+     "dir": 171,
+     "wg": 19,
+     "ws": 11
+    },
+    "meteofrance_seamless": {
+     "dir": 165,
+     "wg": 22,
+     "ws": 15
+    }
+   },
+   "rain": 75,
+   "score": 0,
+   "t": "2026-11-27T11:00",
+   "total": 100,
+   "vis": 7.4,
+   "wg": 22,
+   "ws": 13
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": 300,
+   "baseState": "ft",
+   "dir": 166,
+   "fog": false,
+   "high": 86,
+   "issues": [
+    "wind",
+    "rain",
+    "lowbase",
+    "cloud"
+   ],
+   "low": 77,
+   "mid": 97,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 170,
+     "wg": 24,
+     "ws": 12
+    },
+    "gfs_seamless": {
+     "dir": 161,
+     "wg": 25,
+     "ws": 13
+    },
+    "icon_seamless": {
+     "dir": 170,
+     "wg": 22,
+     "ws": 13
+    },
+    "meteofrance_seamless": {
+     "dir": 162,
+     "wg": 25,
+     "ws": 17
+    }
+   },
+   "rain": 71,
+   "score": 0,
+   "t": "2026-11-27T12:00",
+   "total": 100,
+   "vis": 8.2,
+   "wg": 24,
+   "ws": 14
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": 300,
+   "baseState": "ft",
+   "dir": 162,
+   "fog": false,
+   "high": 86,
+   "issues": [
+    "wind",
+    "rain",
+    "lowbase",
+    "cloud"
+   ],
+   "low": 81,
+   "mid": 94,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 167,
+     "wg": 24,
+     "ws": 13
+    },
+    "gfs_seamless": {
+     "dir": 155,
+     "wg": 24,
+     "ws": 13
+    },
+    "icon_seamless": {
+     "dir": 164,
+     "wg": 23,
+     "ws": 13
+    },
+    "meteofrance_seamless": {
+     "dir": 161,
+     "wg": 25,
+     "ws": 17
+    }
+   },
+   "rain": 68,
+   "score": 0,
+   "t": "2026-11-27T13:00",
+   "total": 100,
+   "vis": 7.5,
+   "wg": 24,
+   "ws": 14
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": 200,
+   "baseState": "ft",
+   "dir": 159,
+   "fog": false,
+   "high": 87,
+   "issues": [
+    "wind",
+    "rain",
+    "lowbase"
+   ],
+   "low": 85,
+   "mid": 89,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 163,
+     "wg": 24,
+     "ws": 13
+    },
+    "gfs_seamless": {
+     "dir": 159,
+     "wg": 23,
+     "ws": 12
+    },
+    "icon_seamless": {
+     "dir": 161,
+     "wg": 23,
+     "ws": 13
+    },
+    "meteofrance_seamless": {
+     "dir": 154,
+     "wg": 26,
+     "ws": 18
+    }
+   },
+   "rain": 66,
+   "score": 0,
+   "t": "2026-11-27T14:00",
+   "total": 100,
+   "vis": 6.8,
+   "wg": 24,
+   "ws": 14
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": 200,
+   "baseState": "ft",
+   "dir": 157,
+   "fog": false,
+   "high": 88,
+   "issues": [
+    "wind",
+    "rain",
+    "lowbase"
+   ],
+   "low": 89,
+   "mid": 86,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 160,
+     "wg": 24,
+     "ws": 13
+    },
+    "gfs_seamless": {
+     "dir": 162,
+     "wg": 22,
+     "ws": 11
+    },
+    "icon_seamless": {
+     "dir": 152,
+     "wg": 25,
+     "ws": 14
+    },
+    "meteofrance_seamless": {
+     "dir": 154,
+     "wg": 26,
+     "ws": 18
+    }
+   },
+   "rain": 63,
+   "score": 0,
+   "t": "2026-11-27T15:00",
+   "total": 100,
+   "vis": 6.1,
+   "wg": 24,
+   "ws": 14
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": 200,
+   "baseState": "ft",
+   "dir": 157,
+   "fog": false,
+   "high": 88,
+   "issues": [
+    "wind",
+    "rain",
+    "lowbase",
+    "cloud"
+   ],
+   "low": 93,
+   "mid": 88,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 160,
+     "wg": 23,
+     "ws": 13
+    },
+    "gfs_seamless": {
+     "dir": 159,
+     "wg": 22,
+     "ws": 11
+    },
+    "icon_seamless": {
+     "dir": 154,
+     "wg": 26,
+     "ws": 15
+    },
+    "meteofrance_seamless": {
+     "dir": 154,
+     "wg": 26,
+     "ws": 16
+    }
+   },
+   "rain": 60,
+   "score": 0,
+   "t": "2026-11-27T16:00",
+   "total": 100,
+   "vis": 5.3,
+   "wg": 24,
+   "ws": 14
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": 200,
+   "baseState": "ft",
+   "dir": 157,
+   "fog": true,
+   "high": 87,
+   "issues": [
+    "wind",
+    "rain",
+    "fog",
+    "lowbase",
+    "cloud"
+   ],
+   "low": 97,
+   "mid": 92,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 160,
+     "wg": 23,
+     "ws": 13
+    },
+    "gfs_seamless": {
+     "dir": 158,
+     "wg": 22,
+     "ws": 11
+    },
+    "icon_seamless": {
+     "dir": 151,
+     "wg": 27,
+     "ws": 15
+    },
+    "meteofrance_seamless": {
+     "dir": 159,
+     "wg": 24,
+     "ws": 17
+    }
+   },
+   "rain": 58,
+   "score": 0,
+   "t": "2026-11-27T17:00",
+   "total": 100,
+   "vis": 4.5,
+   "wg": 24,
+   "ws": 14
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": 200,
+   "baseState": "ft",
+   "dir": 157,
+   "fog": true,
+   "high": 88,
+   "issues": [
+    "wind",
+    "rain",
+    "fog",
+    "lowbase",
+    "cloud"
+   ],
+   "low": 100,
+   "mid": 95,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 161,
+     "wg": 23,
+     "ws": 13
+    },
+    "gfs_seamless": {
+     "dir": 162,
+     "wg": 23,
+     "ws": 12
+    },
+    "icon_seamless": {
+     "dir": 145,
+     "wg": 30,
+     "ws": 17
+    },
+    "meteofrance_seamless": {
+     "dir": 159,
+     "wg": 27,
+     "ws": 18
+    }
+   },
+   "rain": 55,
+   "score": 0,
+   "t": "2026-11-27T18:00",
+   "total": 100,
+   "vis": 3.8,
+   "wg": 26,
+   "ws": 15
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": 200,
+   "baseState": "ft",
+   "dir": 161,
+   "fog": true,
+   "high": 87,
+   "issues": [
+    "rain",
+    "fog",
+    "lowbase",
+    "cloud"
+   ],
+   "low": 95,
+   "mid": 96,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 179,
+     "wg": 19,
+     "ws": 9
+    },
+    "gfs_seamless": {
+     "dir": 167,
+     "wg": 27,
+     "ws": 14
+    },
+    "icon_seamless": {
+     "dir": 174,
+     "wg": 43,
+     "ws": 23
+    },
+    "meteofrance_seamless": {
+     "dir": 20,
+     "wg": 3,
+     "ws": 3
+    }
+   },
+   "rain": 50,
+   "score": 0,
+   "t": "2026-11-28T08:00",
+   "total": 100,
+   "vis": 3.2,
+   "wg": 23,
+   "ws": 12
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": 200,
+   "baseState": "ft",
+   "dir": 172,
+   "fog": true,
+   "high": 83,
+   "issues": [
+    "rain",
+    "fog",
+    "lowbase",
+    "cloud"
+   ],
+   "low": 94,
+   "mid": 100,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 186,
+     "wg": 19,
+     "ws": 9
+    },
+    "gfs_seamless": {
+     "dir": 180,
+     "wg": 28,
+     "ws": 15
+    },
+    "icon_seamless": {
+     "dir": 178,
+     "wg": 43,
+     "ws": 22
+    },
+    "meteofrance_seamless": {
+     "dir": 20,
+     "wg": 3,
+     "ws": 3
+    }
+   },
+   "rain": 51,
+   "score": 0,
+   "t": "2026-11-28T09:00",
+   "total": 100,
+   "vis": 3.1,
+   "wg": 23,
+   "ws": 12
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": 200,
+   "baseState": "ft",
+   "dir": 168,
+   "fog": true,
+   "high": 90,
+   "issues": [
+    "wind",
+    "rain",
+    "fog",
+    "lowbase",
+    "cloud"
+   ],
+   "low": 99,
+   "mid": 100,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 189,
+     "wg": 25,
+     "ws": 13
+    },
+    "gfs_seamless": {
+     "dir": 181,
+     "wg": 29,
+     "ws": 15
+    },
+    "icon_seamless": {
+     "dir": 181,
+     "wg": 43,
+     "ws": 23
+    },
+    "meteofrance_seamless": {
+     "dir": 42,
+     "wg": 3,
+     "ws": 3
+    }
+   },
+   "rain": 56,
+   "score": 0,
+   "t": "2026-11-28T10:00",
+   "total": 100,
+   "vis": 3,
+   "wg": 25,
+   "ws": 14
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": 100,
+   "baseState": "ft",
+   "dir": 184,
+   "fog": true,
+   "high": 100,
+   "issues": [
+    "wind",
+    "rain",
+    "fog",
+    "lowbase",
+    "cloud"
+   ],
+   "low": 100,
+   "mid": 100,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 191,
+     "wg": 33,
+     "ws": 18
+    },
+    "gfs_seamless": {
+     "dir": 175,
+     "wg": 33,
+     "ws": 18
+    },
+    "icon_seamless": {
+     "dir": 181,
+     "wg": 42,
+     "ws": 22
+    },
+    "meteofrance_seamless": {
+     "dir": 360,
+     "wg": 4,
+     "ws": 0
+    }
+   },
+   "rain": 63,
+   "score": 0,
+   "t": "2026-11-28T11:00",
+   "total": 100,
+   "vis": 2.8,
+   "wg": 28,
+   "ws": 15
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": 1000,
+   "baseState": "ft",
+   "dir": 203,
+   "fog": true,
+   "high": 100,
+   "issues": [
+    "wind",
+    "rain",
+    "fog",
+    "lowbase",
+    "cloud"
+   ],
+   "low": 100,
+   "mid": 100,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 193,
+     "wg": 39,
+     "ws": 21
+    },
+    "gfs_seamless": {
+     "dir": 177,
+     "wg": 33,
+     "ws": 19
+    },
+    "icon_seamless": {
+     "dir": 182,
+     "wg": 44,
+     "ws": 23
+    },
+    "meteofrance_seamless": {
+     "dir": 302,
+     "wg": 11,
+     "ws": 6
+    }
+   },
+   "rain": 67,
+   "score": 0,
+   "t": "2026-11-28T12:00",
+   "total": 100,
+   "vis": 2.6,
+   "wg": 32,
+   "ws": 17
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": 1200,
+   "baseState": "ft",
+   "dir": 205,
+   "fog": false,
+   "high": 72,
+   "issues": [
+    "wind",
+    "rain",
+    "lowbase"
+   ],
+   "low": 72,
+   "mid": 81,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 199,
+     "wg": 38,
+     "ws": 18
+    },
+    "gfs_seamless": {
+     "dir": 178,
+     "wg": 35,
+     "ws": 19
+    },
+    "icon_seamless": {
+     "dir": 183,
+     "wg": 45,
+     "ws": 22
+    },
+    "meteofrance_seamless": {
+     "dir": 318,
+     "wg": 13,
+     "ws": 9
+    }
+   },
+   "rain": 65,
+   "score": 0,
+   "t": "2026-11-28T13:00",
+   "total": 83,
+   "vis": 7.7,
+   "wg": 33,
+   "ws": 17
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": 1800,
+   "baseState": "ft",
+   "dir": 208,
+   "fog": false,
+   "high": 30,
+   "issues": [
+    "wind",
+    "rain",
+    "lowbase"
+   ],
+   "low": 34,
+   "mid": 55,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 209,
+     "wg": 35,
+     "ws": 13
+    },
+    "gfs_seamless": {
+     "dir": 181,
+     "wg": 36,
+     "ws": 20
+    },
+    "icon_seamless": {
+     "dir": 183,
+     "wg": 45,
+     "ws": 22
+    },
+    "meteofrance_seamless": {
+     "dir": 329,
+     "wg": 28,
+     "ws": 7
+    }
+   },
+   "rain": 61,
+   "score": 0,
+   "t": "2026-11-28T14:00",
+   "total": 60,
+   "vis": 12.7,
+   "wg": 36,
+   "ws": 16
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": 4600,
+   "baseState": "ft",
+   "dir": 177,
+   "fog": false,
+   "high": 0,
+   "issues": [
+    "wind",
+    "rain"
+   ],
+   "low": 5,
+   "mid": 33,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 223,
+     "wg": 30,
+     "ws": 10
+    },
+    "gfs_seamless": {
+     "dir": 184,
+     "wg": 33,
+     "ws": 18
+    },
+    "icon_seamless": {
+     "dir": 184,
+     "wg": 44,
+     "ws": 20
+    },
+    "meteofrance_seamless": {
+     "dir": 75,
+     "wg": 13,
+     "ws": 6
+    }
+   },
+   "rain": 57,
+   "score": 0,
+   "t": "2026-11-28T15:00",
+   "total": 39,
+   "vis": 17.8,
+   "wg": 30,
+   "ws": 14
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": null,
+   "baseState": "clear",
+   "dir": 221,
+   "fog": false,
+   "high": 0,
+   "issues": [
+    "wind",
+    "rain"
+   ],
+   "low": 0,
+   "mid": 18,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 231,
+     "wg": 23,
+     "ws": 9
+    },
+    "gfs_seamless": {
+     "dir": 184,
+     "wg": 32,
+     "ws": 17
+    },
+    "icon_seamless": {
+     "dir": 188,
+     "wg": 40,
+     "ws": 18
+    },
+    "meteofrance_seamless": {
+     "dir": 302,
+     "wg": 8,
+     "ws": 3
+    }
+   },
+   "rain": 57,
+   "score": 0,
+   "t": "2026-11-28T16:00",
+   "total": 23,
+   "vis": 17.4,
+   "wg": 26,
+   "ws": 12
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": null,
+   "baseState": "clear",
+   "dir": 225,
+   "fog": false,
+   "high": 0,
+   "issues": [
+    "rain"
+   ],
+   "low": 0,
+   "mid": 7,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 232,
+     "wg": 16,
+     "ws": 7
+    },
+    "gfs_seamless": {
+     "dir": 187,
+     "wg": 30,
+     "ws": 15
+    },
+    "icon_seamless": {
+     "dir": 196,
+     "wg": 34,
+     "ws": 15
+    },
+    "meteofrance_seamless": {
+     "dir": 304,
+     "wg": 4,
+     "ws": 2
+    }
+   },
+   "rain": 59,
+   "score": 0,
+   "t": "2026-11-28T17:00",
+   "total": 11,
+   "vis": 17,
+   "wg": 21,
+   "ws": 10
+  },
+  {
+   "affOk": true,
+   "baseEstimated": true,
+   "baseFt": null,
+   "baseState": "clear",
+   "dir": 221,
+   "fog": false,
+   "high": 0,
+   "issues": [
+    "rain"
+   ],
+   "low": 2,
+   "mid": 0,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 232,
+     "wg": 12,
+     "ws": 7
+    },
+    "gfs_seamless": {
+     "dir": 192,
+     "wg": 25,
+     "ws": 12
+    },
+    "icon_seamless": {
+     "dir": 203,
+     "wg": 28,
+     "ws": 12
+    },
+    "meteofrance_seamless": {
+     "dir": 256,
+     "wg": 2,
+     "ws": 2
+    }
+   },
+   "rain": 57,
+   "score": 0,
+   "t": "2026-11-28T18:00",
+   "total": 2,
+   "vis": 16.6,
+   "wg": 17,
+   "ws": 8
+  },
+  {
+   "affOk": true,
+   "baseEstimated": true,
+   "baseFt": null,
+   "baseState": "clear",
+   "dir": 236,
+   "fog": false,
+   "high": 0,
+   "issues": [],
+   "low": 0,
+   "mid": 3,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 220,
+     "wg": 19,
+     "ws": 7
+    },
+    "gfs_seamless": {
+     "dir": 249,
+     "wg": 20,
+     "ws": 6
+    },
+    "icon_seamless": {
+     "dir": 239,
+     "wg": 8,
+     "ws": 3
+    }
+   },
+   "rain": 21,
+   "score": 100,
+   "t": "2026-11-29T08:00",
+   "total": 3,
+   "vis": 19.8,
+   "wg": 16,
+   "ws": 5
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": null,
+   "baseState": "clear",
+   "dir": 231,
+   "fog": false,
+   "high": 0,
+   "issues": [],
+   "low": 0,
+   "mid": 0,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 220,
+     "wg": 23,
+     "ws": 8
+    },
+    "gfs_seamless": {
+     "dir": 239,
+     "wg": 22,
+     "ws": 6
+    },
+    "icon_seamless": {
+     "dir": 235,
+     "wg": 9,
+     "ws": 3
+    }
+   },
+   "rain": 18,
+   "score": 100,
+   "t": "2026-11-29T09:00",
+   "total": 0,
+   "vis": 22.6,
+   "wg": 18,
+   "ws": 6
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": null,
+   "baseState": "clear",
+   "dir": 233,
+   "fog": false,
+   "high": 0,
+   "issues": [],
+   "low": 0,
+   "mid": 0,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 221,
+     "wg": 21,
+     "ws": 9
+    },
+    "gfs_seamless": {
+     "dir": 244,
+     "wg": 23,
+     "ws": 9
+    },
+    "icon_seamless": {
+     "dir": 234,
+     "wg": 9,
+     "ws": 4
+    }
+   },
+   "rain": 15,
+   "score": 100,
+   "t": "2026-11-29T10:00",
+   "total": 0,
+   "vis": 22.8,
+   "wg": 18,
+   "ws": 7
+  },
+  {
+   "affOk": true,
+   "baseEstimated": true,
+   "baseFt": null,
+   "baseState": "clear",
+   "dir": 237,
+   "fog": false,
+   "high": 0,
+   "issues": [],
+   "low": 0,
+   "mid": 0,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 224,
+     "wg": 18,
+     "ws": 11
+    },
+    "gfs_seamless": {
+     "dir": 254,
+     "wg": 22,
+     "ws": 11
+    },
+    "icon_seamless": {
+     "dir": 232,
+     "wg": 10,
+     "ws": 5
+    }
+   },
+   "rain": 12,
+   "score": 100,
+   "t": "2026-11-29T11:00",
+   "total": 0,
+   "vis": 23,
+   "wg": 17,
+   "ws": 9
+  },
+  {
+   "affOk": true,
+   "baseEstimated": true,
+   "baseFt": null,
+   "baseState": "clear",
+   "dir": 240,
+   "fog": false,
+   "high": 0,
+   "issues": [],
+   "low": 0,
+   "mid": 0,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 226,
+     "wg": 16,
+     "ws": 12
+    },
+    "gfs_seamless": {
+     "dir": 259,
+     "wg": 23,
+     "ws": 14
+    },
+    "icon_seamless": {
+     "dir": 234,
+     "wg": 11,
+     "ws": 6
+    }
+   },
+   "rain": 10,
+   "score": 100,
+   "t": "2026-11-29T12:00",
+   "total": 0,
+   "vis": 23.2,
+   "wg": 17,
+   "ws": 11
+  },
+  {
+   "affOk": true,
+   "baseEstimated": true,
+   "baseFt": null,
+   "baseState": "clear",
+   "dir": 245,
+   "fog": false,
+   "high": 0,
+   "issues": [],
+   "low": 0,
+   "mid": 0,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 229,
+     "wg": 16,
+     "ws": 12
+    },
+    "gfs_seamless": {
+     "dir": 269,
+     "wg": 23,
+     "ws": 15
+    },
+    "icon_seamless": {
+     "dir": 237,
+     "wg": 13,
+     "ws": 7
+    }
+   },
+   "rain": 10,
+   "score": 100,
+   "t": "2026-11-29T13:00",
+   "total": 0,
+   "vis": 23.2,
+   "wg": 17,
+   "ws": 11
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": null,
+   "baseState": "clear",
+   "dir": 256,
+   "fog": false,
+   "high": 0,
+   "issues": [],
+   "low": 0,
+   "mid": 0,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 232,
+     "wg": 17,
+     "ws": 12
+    },
+    "gfs_seamless": {
+     "dir": 294,
+     "wg": 22,
+     "ws": 13
+    },
+    "icon_seamless": {
+     "dir": 243,
+     "wg": 16,
+     "ws": 7
+    }
+   },
+   "rain": 10,
+   "score": 100,
+   "t": "2026-11-29T14:00",
+   "total": 0,
+   "vis": 23.3,
+   "wg": 18,
+   "ws": 11
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": null,
+   "baseState": "clear",
+   "dir": 259,
+   "fog": false,
+   "high": 0,
+   "issues": [],
+   "low": 0,
+   "mid": 0,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 234,
+     "wg": 19,
+     "ws": 12
+    },
+    "gfs_seamless": {
+     "dir": 300,
+     "wg": 24,
+     "ws": 13
+    },
+    "icon_seamless": {
+     "dir": 246,
+     "wg": 17,
+     "ws": 6
+    }
+   },
+   "rain": 10,
+   "score": 100,
+   "t": "2026-11-29T15:00",
+   "total": 0,
+   "vis": 23.3,
+   "wg": 20,
+   "ws": 10
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": null,
+   "baseState": "clear",
+   "dir": 256,
+   "fog": false,
+   "high": 30,
+   "issues": [],
+   "low": 0,
+   "mid": 0,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 233,
+     "wg": 24,
+     "ws": 11
+    },
+    "gfs_seamless": {
+     "dir": 298,
+     "wg": 23,
+     "ws": 10
+    },
+    "icon_seamless": {
+     "dir": 240,
+     "wg": 14,
+     "ws": 5
+    }
+   },
+   "rain": 8,
+   "score": 100,
+   "t": "2026-11-29T16:00",
+   "total": 30,
+   "vis": 22.9,
+   "wg": 20,
+   "ws": 8
+  },
+  {
+   "affOk": true,
+   "baseEstimated": true,
+   "baseFt": null,
+   "baseState": "clear",
+   "dir": 239,
+   "fog": false,
+   "high": 70,
+   "issues": [],
+   "low": 0,
+   "mid": 0,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 229,
+     "wg": 30,
+     "ws": 9
+    },
+    "gfs_seamless": {
+     "dir": 268,
+     "wg": 9,
+     "ws": 6
+    },
+    "icon_seamless": {
+     "dir": 222,
+     "wg": 10,
+     "ws": 3
+    }
+   },
+   "rain": 5,
+   "score": 100,
+   "t": "2026-11-29T17:00",
+   "total": 70,
+   "vis": 22.6,
+   "wg": 16,
+   "ws": 6
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": null,
+   "baseState": "clear",
+   "dir": 225,
+   "fog": false,
+   "high": 100,
+   "issues": [],
+   "low": 0,
+   "mid": 0,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 225,
+     "wg": 33,
+     "ws": 8
+    },
+    "gfs_seamless": {
+     "dir": 251,
+     "wg": 13,
+     "ws": 7
+    },
+    "icon_seamless": {
+     "dir": 198,
+     "wg": 8,
+     "ws": 3
+    }
+   },
+   "rain": 2,
+   "score": 100,
+   "t": "2026-11-29T18:00",
+   "total": 100,
+   "vis": 22.2,
+   "wg": 18,
+   "ws": 6
+  },
+  {
+   "affOk": true,
+   "baseEstimated": true,
+   "baseFt": null,
+   "baseState": "clear",
+   "dir": 187,
+   "fog": false,
+   "high": 92,
+   "issues": [],
+   "low": 0,
+   "mid": 0,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 202,
+     "wg": 24,
+     "ws": 8
+    },
+    "gfs_seamless": {
+     "dir": 158,
+     "wg": 5,
+     "ws": 4
+    },
+    "icon_seamless": {
+     "dir": 201,
+     "wg": 9,
+     "ws": 4
+    }
+   },
+   "rain": 3,
+   "score": 100,
+   "t": "2026-11-30T08:00",
+   "total": 91,
+   "vis": 20.5,
+   "wg": 13,
+   "ws": 5
+  },
+  {
+   "affOk": true,
+   "baseEstimated": true,
+   "baseFt": null,
+   "baseState": "clear",
+   "dir": 187,
+   "fog": false,
+   "high": 86,
+   "issues": [],
+   "low": 2,
+   "mid": 0,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 201,
+     "wg": 28,
+     "ws": 9
+    },
+    "gfs_seamless": {
+     "dir": 159,
+     "wg": 6,
+     "ws": 4
+    },
+    "icon_seamless": {
+     "dir": 199,
+     "wg": 11,
+     "ws": 5
+    }
+   },
+   "rain": 4,
+   "score": 100,
+   "t": "2026-11-30T09:00",
+   "total": 86,
+   "vis": 20.7,
+   "wg": 15,
+   "ws": 6
+  },
+  {
+   "affOk": true,
+   "baseEstimated": true,
+   "baseFt": null,
+   "baseState": "clear",
+   "dir": 190,
+   "fog": false,
+   "high": 78,
+   "issues": [],
+   "low": 4,
+   "mid": 0,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 200,
+     "wg": 25,
+     "ws": 10
+    },
+    "gfs_seamless": {
+     "dir": 172,
+     "wg": 11,
+     "ws": 5
+    },
+    "icon_seamless": {
+     "dir": 198,
+     "wg": 14,
+     "ws": 7
+    }
+   },
+   "rain": 5,
+   "score": 100,
+   "t": "2026-11-30T10:00",
+   "total": 79,
+   "vis": 20.7,
+   "wg": 17,
+   "ws": 7
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": null,
+   "baseState": "clear",
+   "dir": 195,
+   "fog": false,
+   "high": 69,
+   "issues": [],
+   "low": 7,
+   "mid": 0,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 201,
+     "wg": 20,
+     "ws": 11
+    },
+    "gfs_seamless": {
+     "dir": 186,
+     "wg": 17,
+     "ws": 7
+    },
+    "icon_seamless": {
+     "dir": 198,
+     "wg": 18,
+     "ws": 10
+    }
+   },
+   "rain": 7,
+   "score": 100,
+   "t": "2026-11-30T11:00",
+   "total": 71,
+   "vis": 20.6,
+   "wg": 18,
+   "ws": 9
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": null,
+   "baseState": "clear",
+   "dir": 197,
+   "fog": false,
+   "high": 56,
+   "issues": [],
+   "low": 14,
+   "mid": 0,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 200,
+     "wg": 17,
+     "ws": 12
+    },
+    "gfs_seamless": {
+     "dir": 191,
+     "wg": 21,
+     "ws": 8
+    },
+    "icon_seamless": {
+     "dir": 199,
+     "wg": 21,
+     "ws": 13
+    }
+   },
+   "rain": 8,
+   "score": 100,
+   "t": "2026-11-30T12:00",
+   "total": 66,
+   "vis": 20.5,
+   "wg": 20,
+   "ws": 11
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": null,
+   "baseState": "clear",
+   "dir": 198,
+   "fog": false,
+   "high": 34,
+   "issues": [],
+   "low": 30,
+   "mid": 2,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 199,
+     "wg": 15,
+     "ws": 13
+    },
+    "gfs_seamless": {
+     "dir": 193,
+     "wg": 23,
+     "ws": 10
+    },
+    "icon_seamless": {
+     "dir": 201,
+     "wg": 23,
+     "ws": 13
+    }
+   },
+   "rain": 8,
+   "score": 100,
+   "t": "2026-11-30T13:00",
+   "total": 65,
+   "vis": 16,
+   "wg": 20,
+   "ws": 12
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": null,
+   "baseState": "check",
+   "dir": 198,
+   "fog": false,
+   "high": 8,
+   "issues": [],
+   "low": 51,
+   "mid": 4,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 196,
+     "wg": 16,
+     "ws": 13
+    },
+    "gfs_seamless": {
+     "dir": 194,
+     "wg": 24,
+     "ws": 10
+    },
+    "icon_seamless": {
+     "dir": 203,
+     "wg": 24,
+     "ws": 14
+    }
+   },
+   "rain": 8,
+   "score": 84,
+   "t": "2026-11-30T14:00",
+   "total": 66,
+   "vis": 11.5,
+   "wg": 21,
+   "ws": 12
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": null,
+   "baseState": "check",
+   "dir": 198,
+   "fog": false,
+   "high": 0,
+   "issues": [],
+   "low": 67,
+   "mid": 5,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 195,
+     "wg": 17,
+     "ws": 13
+    },
+    "gfs_seamless": {
+     "dir": 195,
+     "wg": 24,
+     "ws": 11
+    },
+    "icon_seamless": {
+     "dir": 204,
+     "wg": 24,
+     "ws": 13
+    }
+   },
+   "rain": 10,
+   "score": 64,
+   "t": "2026-11-30T15:00",
+   "total": 70,
+   "vis": 7,
+   "wg": 22,
+   "ws": 12
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": null,
+   "baseState": "check",
+   "dir": 196,
+   "fog": false,
+   "high": 25,
+   "issues": [],
+   "low": 75,
+   "mid": 4,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 195,
+     "wg": 20,
+     "ws": 13
+    },
+    "gfs_seamless": {
+     "dir": 194,
+     "wg": 25,
+     "ws": 10
+    },
+    "icon_seamless": {
+     "dir": 200,
+     "wg": 23,
+     "ws": 13
+    }
+   },
+   "rain": 15,
+   "score": 54,
+   "t": "2026-11-30T16:00",
+   "total": 79,
+   "vis": 11.7,
+   "wg": 22,
+   "ws": 12
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": null,
+   "baseState": "check",
+   "dir": 195,
+   "fog": false,
+   "high": 67,
+   "issues": [],
+   "low": 79,
+   "mid": 2,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 195,
+     "wg": 24,
+     "ws": 13
+    },
+    "gfs_seamless": {
+     "dir": 194,
+     "wg": 25,
+     "ws": 9
+    },
+    "icon_seamless": {
+     "dir": 195,
+     "wg": 21,
+     "ws": 12
+    }
+   },
+   "rain": 21,
+   "score": 49,
+   "t": "2026-11-30T17:00",
+   "total": 91,
+   "vis": 16.4,
+   "wg": 23,
+   "ws": 11
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": null,
+   "baseState": "check",
+   "dir": 192,
+   "fog": false,
+   "high": 98,
+   "issues": [
+    "wind"
+   ],
+   "low": 75,
+   "mid": 0,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 195,
+     "wg": 26,
+     "ws": 13
+    },
+    "gfs_seamless": {
+     "dir": 192,
+     "wg": 25,
+     "ws": 9
+    },
+    "icon_seamless": {
+     "dir": 190,
+     "wg": 20,
+     "ws": 11
+    }
+   },
+   "rain": 25,
+   "score": 0,
+   "t": "2026-11-30T18:00",
+   "total": 100,
+   "vis": 21,
+   "wg": 24,
+   "ws": 11
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": 600,
+   "baseState": "ft",
+   "dir": 196,
+   "fog": false,
+   "high": 74,
+   "issues": [
+    "wind",
+    "lowbase"
+   ],
+   "low": 75,
+   "mid": 36,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 201,
+     "wg": 29,
+     "ws": 18
+    },
+    "gfs_seamless": {
+     "dir": 190,
+     "wg": 30,
+     "ws": 14
+    },
+    "icon_seamless": {
+     "dir": 196,
+     "wg": 29,
+     "ws": 17
+    }
+   },
+   "rain": 36,
+   "score": 0,
+   "t": "2026-12-01T08:00",
+   "total": 98,
+   "vis": 14.7,
+   "wg": 29,
+   "ws": 16
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": 600,
+   "baseState": "ft",
+   "dir": 196,
+   "fog": false,
+   "high": 76,
+   "issues": [
+    "wind",
+    "lowbase"
+   ],
+   "low": 74,
+   "mid": 35,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 202,
+     "wg": 28,
+     "ws": 18
+    },
+    "gfs_seamless": {
+     "dir": 188,
+     "wg": 29,
+     "ws": 14
+    },
+    "icon_seamless": {
+     "dir": 197,
+     "wg": 30,
+     "ws": 17
+    }
+   },
+   "rain": 37,
+   "score": 0,
+   "t": "2026-12-01T09:00",
+   "total": 98,
+   "vis": 12.2,
+   "wg": 29,
+   "ws": 16
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": 600,
+   "baseState": "ft",
+   "dir": 196,
+   "fog": false,
+   "high": 80,
+   "issues": [
+    "wind",
+    "lowbase"
+   ],
+   "low": 73,
+   "mid": 34,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 202,
+     "wg": 30,
+     "ws": 19
+    },
+    "gfs_seamless": {
+     "dir": 189,
+     "wg": 30,
+     "ws": 14
+    },
+    "icon_seamless": {
+     "dir": 197,
+     "wg": 30,
+     "ws": 17
+    }
+   },
+   "rain": 38,
+   "score": 0,
+   "t": "2026-12-01T10:00",
+   "total": 99,
+   "vis": 9.7,
+   "wg": 30,
+   "ws": 17
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": 600,
+   "baseState": "ft",
+   "dir": 197,
+   "fog": false,
+   "high": 83,
+   "issues": [
+    "wind",
+    "lowbase"
+   ],
+   "low": 72,
+   "mid": 34,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 202,
+     "wg": 33,
+     "ws": 19
+    },
+    "gfs_seamless": {
+     "dir": 191,
+     "wg": 31,
+     "ws": 14
+    },
+    "icon_seamless": {
+     "dir": 198,
+     "wg": 30,
+     "ws": 17
+    }
+   },
+   "rain": 38,
+   "score": 0,
+   "t": "2026-12-01T11:00",
+   "total": 100,
+   "vis": 7.3,
+   "wg": 31,
+   "ws": 17
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": 600,
+   "baseState": "ft",
+   "dir": 198,
+   "fog": false,
+   "high": 86,
+   "issues": [
+    "wind",
+    "lowbase"
+   ],
+   "low": 73,
+   "mid": 36,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 203,
+     "wg": 36,
+     "ws": 19
+    },
+    "gfs_seamless": {
+     "dir": 193,
+     "wg": 32,
+     "ws": 14
+    },
+    "icon_seamless": {
+     "dir": 198,
+     "wg": 30,
+     "ws": 17
+    }
+   },
+   "rain": 39,
+   "score": 0,
+   "t": "2026-12-01T12:00",
+   "total": 100,
+   "vis": 4.8,
+   "wg": 32,
+   "ws": 17
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": 600,
+   "baseState": "ft",
+   "dir": 199,
+   "fog": false,
+   "high": 89,
+   "issues": [
+    "wind",
+    "lowbase"
+   ],
+   "low": 76,
+   "mid": 41,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 204,
+     "wg": 36,
+     "ws": 18
+    },
+    "gfs_seamless": {
+     "dir": 195,
+     "wg": 31,
+     "ws": 14
+    },
+    "icon_seamless": {
+     "dir": 198,
+     "wg": 30,
+     "ws": 17
+    }
+   },
+   "rain": 40,
+   "score": 0,
+   "t": "2026-12-01T13:00",
+   "total": 100,
+   "vis": 4.7,
+   "wg": 32,
+   "ws": 16
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": 400,
+   "baseState": "ft",
+   "dir": 200,
+   "fog": false,
+   "high": 92,
+   "issues": [
+    "wind",
+    "lowbase"
+   ],
+   "low": 80,
+   "mid": 48,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 205,
+     "wg": 36,
+     "ws": 18
+    },
+    "gfs_seamless": {
+     "dir": 198,
+     "wg": 30,
+     "ws": 13
+    },
+    "icon_seamless": {
+     "dir": 198,
+     "wg": 30,
+     "ws": 16
+    }
+   },
+   "rain": 42,
+   "score": 0,
+   "t": "2026-12-01T14:00",
+   "total": 100,
+   "vis": 4.7,
+   "wg": 32,
+   "ws": 16
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": 400,
+   "baseState": "ft",
+   "dir": 201,
+   "fog": true,
+   "high": 94,
+   "issues": [
+    "wind",
+    "fog",
+    "lowbase"
+   ],
+   "low": 85,
+   "mid": 56,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 206,
+     "wg": 35,
+     "ws": 17
+    },
+    "gfs_seamless": {
+     "dir": 198,
+     "wg": 29,
+     "ws": 13
+    },
+    "icon_seamless": {
+     "dir": 198,
+     "wg": 30,
+     "ws": 16
+    }
+   },
+   "rain": 43,
+   "score": 0,
+   "t": "2026-12-01T15:00",
+   "total": 100,
+   "vis": 4.6,
+   "wg": 31,
+   "ws": 15
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": 400,
+   "baseState": "ft",
+   "dir": 200,
+   "fog": true,
+   "high": 97,
+   "issues": [
+    "wind",
+    "fog",
+    "lowbase",
+    "cloud"
+   ],
+   "low": 90,
+   "mid": 64,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 207,
+     "wg": 35,
+     "ws": 16
+    },
+    "gfs_seamless": {
+     "dir": 195,
+     "wg": 28,
+     "ws": 12
+    },
+    "icon_seamless": {
+     "dir": 198,
+     "wg": 29,
+     "ws": 16
+    }
+   },
+   "rain": 44,
+   "score": 0,
+   "t": "2026-12-01T16:00",
+   "total": 100,
+   "vis": 4.6,
+   "wg": 31,
+   "ws": 15
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": 300,
+   "baseState": "ft",
+   "dir": 198,
+   "fog": true,
+   "high": 99,
+   "issues": [
+    "wind",
+    "fog",
+    "lowbase",
+    "cloud"
+   ],
+   "low": 95,
+   "mid": 70,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 208,
+     "wg": 35,
+     "ws": 15
+    },
+    "gfs_seamless": {
+     "dir": 188,
+     "wg": 27,
+     "ws": 13
+    },
+    "icon_seamless": {
+     "dir": 197,
+     "wg": 28,
+     "ws": 16
+    }
+   },
+   "rain": 46,
+   "score": 0,
+   "t": "2026-12-01T17:00",
+   "total": 100,
+   "vis": 4.5,
+   "wg": 30,
+   "ws": 15
+  },
+  {
+   "affOk": false,
+   "baseEstimated": true,
+   "baseFt": 300,
+   "baseState": "ft",
+   "dir": 195,
+   "fog": true,
+   "high": 100,
+   "issues": [
+    "wind",
+    "fog",
+    "lowbase",
+    "cloud"
+   ],
+   "low": 98,
+   "mid": 73,
+   "models": {
+    "ecmwf_ifs025": {
+     "dir": 208,
+     "wg": 34,
+     "ws": 15
+    },
+    "gfs_seamless": {
+     "dir": 181,
+     "wg": 26,
+     "ws": 13
+    },
+    "icon_seamless": {
+     "dir": 197,
+     "wg": 27,
+     "ws": 16
+    }
+   },
+   "rain": 47,
+   "score": 0,
+   "t": "2026-12-01T18:00",
+   "total": 100,
+   "vis": 4.5,
+   "wg": 29,
+   "ws": 14
+  }
+ ],
+ "issued": "2026-11-25T10:01:49.052Z",
+ "revision": "v4.8",
+ "timezone": "Europe/London",
+ "tuning": {
+  "cloudbaseBiasFt": 0,
+  "estCloudbaseBiasFt": 0,
+  "gustBiasMph": 0,
+  "modelWeights": {
+   "ecmwf_ifs025": 1,
+   "gfs_seamless": 1,
+   "icon_seamless": 1,
+   "meteofrance_seamless": 1
+  },
+  "windBiasMph": 0
+ }
+}

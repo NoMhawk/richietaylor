@@ -1,0 +1,1194 @@
+{
+ "airfield_elev_ft": 833,
+ "by_revision": {},
+ "current_revision": "v4.8",
+ "current_tuning": {
+  "cloudbaseBiasFt": 0,
+  "estCloudbaseBiasFt": 0,
+  "gustBiasMph": 0,
+  "modelWeights": {
+   "ecmwf_ifs025": 1,
+   "gfs_seamless": 1,
+   "icon_seamless": 1,
+   "meteofrance_seamless": 1
+  },
+  "windBiasMph": 0
+ },
+ "data_since": null,
+ "generated": "2026-11-25T10:01Z",
+ "reports": [],
+ "rules": {
+  "heavy_cloud_pct": 90,
+  "low_base_ft": 2000,
+  "ops_wind_mph": 23,
+  "poor_vis_km": 3,
+  "rain_prob_pct": 50
+ },
+ "stations": {
+  "EGDY": "Yeovilton",
+  "EGTE": "Exeter"
+ },
+ "windows": {
+  "all_time": {
+   "by_lead": {
+    "day_2": {
+     "cloud_pct": {
+      "n": 0
+     },
+     "cloudbase_ft": {
+      "n": 0
+     },
+     "gust_mph_when_reported": {
+      "n": 0
+     },
+     "hours": 0,
+     "jumpable": {
+      "n": 0
+     },
+     "low_base_under_2000": {
+      "n": 0
+     },
+     "models_gust_mph_when_reported": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "models_wind_mph": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "rain": {
+      "n": 0
+     },
+     "wind_dir_deg_mae": null,
+     "wind_mph": {
+      "n": 0
+     }
+    },
+    "day_3_plus": {
+     "cloud_pct": {
+      "n": 0
+     },
+     "cloudbase_ft": {
+      "n": 0
+     },
+     "gust_mph_when_reported": {
+      "n": 0
+     },
+     "hours": 0,
+     "jumpable": {
+      "n": 0
+     },
+     "low_base_under_2000": {
+      "n": 0
+     },
+     "models_gust_mph_when_reported": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "models_wind_mph": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "rain": {
+      "n": 0
+     },
+     "wind_dir_deg_mae": null,
+     "wind_mph": {
+      "n": 0
+     }
+    },
+    "next_day": {
+     "cloud_pct": {
+      "n": 0
+     },
+     "cloudbase_ft": {
+      "n": 0
+     },
+     "gust_mph_when_reported": {
+      "n": 0
+     },
+     "hours": 0,
+     "jumpable": {
+      "n": 0
+     },
+     "low_base_under_2000": {
+      "n": 0
+     },
+     "models_gust_mph_when_reported": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "models_wind_mph": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "rain": {
+      "n": 0
+     },
+     "wind_dir_deg_mae": null,
+     "wind_mph": {
+      "n": 0
+     }
+    },
+    "same_day": {
+     "cloud_pct": {
+      "n": 0
+     },
+     "cloudbase_ft": {
+      "n": 0
+     },
+     "gust_mph_when_reported": {
+      "n": 0
+     },
+     "hours": 0,
+     "jumpable": {
+      "n": 0
+     },
+     "low_base_under_2000": {
+      "n": 0
+     },
+     "models_gust_mph_when_reported": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "models_wind_mph": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "rain": {
+      "n": 0
+     },
+     "wind_dir_deg_mae": null,
+     "wind_mph": {
+      "n": 0
+     }
+    }
+   },
+   "by_station": {
+    "EGDY": {
+     "cloud_pct": {
+      "n": 0
+     },
+     "cloudbase_ft": {
+      "n": 0
+     },
+     "gust_mph_when_reported": {
+      "n": 0
+     },
+     "hours": 0,
+     "jumpable": {
+      "n": 0
+     },
+     "low_base_under_2000": {
+      "n": 0
+     },
+     "models_gust_mph_when_reported": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "models_wind_mph": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "rain": {
+      "n": 0
+     },
+     "wind_dir_deg_mae": null,
+     "wind_mph": {
+      "n": 0
+     }
+    },
+    "EGTE": {
+     "cloud_pct": {
+      "n": 0
+     },
+     "cloudbase_ft": {
+      "n": 0
+     },
+     "gust_mph_when_reported": {
+      "n": 0
+     },
+     "hours": 0,
+     "jumpable": {
+      "n": 0
+     },
+     "low_base_under_2000": {
+      "n": 0
+     },
+     "models_gust_mph_when_reported": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "models_wind_mph": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "rain": {
+      "n": 0
+     },
+     "wind_dir_deg_mae": null,
+     "wind_mph": {
+      "n": 0
+     }
+    }
+   },
+   "days": {
+    "overall": {
+     "day_verdict_50pct": {
+      "n": 0
+     },
+     "jump_pct": {
+      "n": 0
+     }
+    }
+   },
+   "overall": {
+    "cloud_pct": {
+     "n": 0
+    },
+    "cloudbase_ft": {
+     "n": 0
+    },
+    "gust_mph_when_reported": {
+     "n": 0
+    },
+    "hours": 0,
+    "jumpable": {
+     "n": 0
+    },
+    "low_base_under_2000": {
+     "n": 0
+    },
+    "models_gust_mph_when_reported": {
+     "ecmwf_ifs025": {
+      "n": 0
+     },
+     "gfs_seamless": {
+      "n": 0
+     },
+     "icon_seamless": {
+      "n": 0
+     },
+     "meteofrance_seamless": {
+      "n": 0
+     }
+    },
+    "models_wind_mph": {
+     "ecmwf_ifs025": {
+      "n": 0
+     },
+     "gfs_seamless": {
+      "n": 0
+     },
+     "icon_seamless": {
+      "n": 0
+     },
+     "meteofrance_seamless": {
+      "n": 0
+     }
+    },
+    "rain": {
+     "n": 0
+    },
+    "wind_dir_deg_mae": null,
+    "wind_mph": {
+     "n": 0
+    }
+   }
+  },
+  "last_30_days": {
+   "by_lead": {
+    "day_2": {
+     "cloud_pct": {
+      "n": 0
+     },
+     "cloudbase_ft": {
+      "n": 0
+     },
+     "gust_mph_when_reported": {
+      "n": 0
+     },
+     "hours": 0,
+     "jumpable": {
+      "n": 0
+     },
+     "low_base_under_2000": {
+      "n": 0
+     },
+     "models_gust_mph_when_reported": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "models_wind_mph": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "rain": {
+      "n": 0
+     },
+     "wind_dir_deg_mae": null,
+     "wind_mph": {
+      "n": 0
+     }
+    },
+    "day_3_plus": {
+     "cloud_pct": {
+      "n": 0
+     },
+     "cloudbase_ft": {
+      "n": 0
+     },
+     "gust_mph_when_reported": {
+      "n": 0
+     },
+     "hours": 0,
+     "jumpable": {
+      "n": 0
+     },
+     "low_base_under_2000": {
+      "n": 0
+     },
+     "models_gust_mph_when_reported": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "models_wind_mph": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "rain": {
+      "n": 0
+     },
+     "wind_dir_deg_mae": null,
+     "wind_mph": {
+      "n": 0
+     }
+    },
+    "next_day": {
+     "cloud_pct": {
+      "n": 0
+     },
+     "cloudbase_ft": {
+      "n": 0
+     },
+     "gust_mph_when_reported": {
+      "n": 0
+     },
+     "hours": 0,
+     "jumpable": {
+      "n": 0
+     },
+     "low_base_under_2000": {
+      "n": 0
+     },
+     "models_gust_mph_when_reported": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "models_wind_mph": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "rain": {
+      "n": 0
+     },
+     "wind_dir_deg_mae": null,
+     "wind_mph": {
+      "n": 0
+     }
+    },
+    "same_day": {
+     "cloud_pct": {
+      "n": 0
+     },
+     "cloudbase_ft": {
+      "n": 0
+     },
+     "gust_mph_when_reported": {
+      "n": 0
+     },
+     "hours": 0,
+     "jumpable": {
+      "n": 0
+     },
+     "low_base_under_2000": {
+      "n": 0
+     },
+     "models_gust_mph_when_reported": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "models_wind_mph": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "rain": {
+      "n": 0
+     },
+     "wind_dir_deg_mae": null,
+     "wind_mph": {
+      "n": 0
+     }
+    }
+   },
+   "by_station": {
+    "EGDY": {
+     "cloud_pct": {
+      "n": 0
+     },
+     "cloudbase_ft": {
+      "n": 0
+     },
+     "gust_mph_when_reported": {
+      "n": 0
+     },
+     "hours": 0,
+     "jumpable": {
+      "n": 0
+     },
+     "low_base_under_2000": {
+      "n": 0
+     },
+     "models_gust_mph_when_reported": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "models_wind_mph": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "rain": {
+      "n": 0
+     },
+     "wind_dir_deg_mae": null,
+     "wind_mph": {
+      "n": 0
+     }
+    },
+    "EGTE": {
+     "cloud_pct": {
+      "n": 0
+     },
+     "cloudbase_ft": {
+      "n": 0
+     },
+     "gust_mph_when_reported": {
+      "n": 0
+     },
+     "hours": 0,
+     "jumpable": {
+      "n": 0
+     },
+     "low_base_under_2000": {
+      "n": 0
+     },
+     "models_gust_mph_when_reported": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "models_wind_mph": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "rain": {
+      "n": 0
+     },
+     "wind_dir_deg_mae": null,
+     "wind_mph": {
+      "n": 0
+     }
+    }
+   },
+   "days": {
+    "overall": {
+     "day_verdict_50pct": {
+      "n": 0
+     },
+     "jump_pct": {
+      "n": 0
+     }
+    }
+   },
+   "overall": {
+    "cloud_pct": {
+     "n": 0
+    },
+    "cloudbase_ft": {
+     "n": 0
+    },
+    "gust_mph_when_reported": {
+     "n": 0
+    },
+    "hours": 0,
+    "jumpable": {
+     "n": 0
+    },
+    "low_base_under_2000": {
+     "n": 0
+    },
+    "models_gust_mph_when_reported": {
+     "ecmwf_ifs025": {
+      "n": 0
+     },
+     "gfs_seamless": {
+      "n": 0
+     },
+     "icon_seamless": {
+      "n": 0
+     },
+     "meteofrance_seamless": {
+      "n": 0
+     }
+    },
+    "models_wind_mph": {
+     "ecmwf_ifs025": {
+      "n": 0
+     },
+     "gfs_seamless": {
+      "n": 0
+     },
+     "icon_seamless": {
+      "n": 0
+     },
+     "meteofrance_seamless": {
+      "n": 0
+     }
+    },
+    "rain": {
+     "n": 0
+    },
+    "wind_dir_deg_mae": null,
+    "wind_mph": {
+     "n": 0
+    }
+   }
+  },
+  "last_7_days": {
+   "by_lead": {
+    "day_2": {
+     "cloud_pct": {
+      "n": 0
+     },
+     "cloudbase_ft": {
+      "n": 0
+     },
+     "gust_mph_when_reported": {
+      "n": 0
+     },
+     "hours": 0,
+     "jumpable": {
+      "n": 0
+     },
+     "low_base_under_2000": {
+      "n": 0
+     },
+     "models_gust_mph_when_reported": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "models_wind_mph": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "rain": {
+      "n": 0
+     },
+     "wind_dir_deg_mae": null,
+     "wind_mph": {
+      "n": 0
+     }
+    },
+    "day_3_plus": {
+     "cloud_pct": {
+      "n": 0
+     },
+     "cloudbase_ft": {
+      "n": 0
+     },
+     "gust_mph_when_reported": {
+      "n": 0
+     },
+     "hours": 0,
+     "jumpable": {
+      "n": 0
+     },
+     "low_base_under_2000": {
+      "n": 0
+     },
+     "models_gust_mph_when_reported": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "models_wind_mph": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "rain": {
+      "n": 0
+     },
+     "wind_dir_deg_mae": null,
+     "wind_mph": {
+      "n": 0
+     }
+    },
+    "next_day": {
+     "cloud_pct": {
+      "n": 0
+     },
+     "cloudbase_ft": {
+      "n": 0
+     },
+     "gust_mph_when_reported": {
+      "n": 0
+     },
+     "hours": 0,
+     "jumpable": {
+      "n": 0
+     },
+     "low_base_under_2000": {
+      "n": 0
+     },
+     "models_gust_mph_when_reported": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "models_wind_mph": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "rain": {
+      "n": 0
+     },
+     "wind_dir_deg_mae": null,
+     "wind_mph": {
+      "n": 0
+     }
+    },
+    "same_day": {
+     "cloud_pct": {
+      "n": 0
+     },
+     "cloudbase_ft": {
+      "n": 0
+     },
+     "gust_mph_when_reported": {
+      "n": 0
+     },
+     "hours": 0,
+     "jumpable": {
+      "n": 0
+     },
+     "low_base_under_2000": {
+      "n": 0
+     },
+     "models_gust_mph_when_reported": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "models_wind_mph": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "rain": {
+      "n": 0
+     },
+     "wind_dir_deg_mae": null,
+     "wind_mph": {
+      "n": 0
+     }
+    }
+   },
+   "by_station": {
+    "EGDY": {
+     "cloud_pct": {
+      "n": 0
+     },
+     "cloudbase_ft": {
+      "n": 0
+     },
+     "gust_mph_when_reported": {
+      "n": 0
+     },
+     "hours": 0,
+     "jumpable": {
+      "n": 0
+     },
+     "low_base_under_2000": {
+      "n": 0
+     },
+     "models_gust_mph_when_reported": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "models_wind_mph": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "rain": {
+      "n": 0
+     },
+     "wind_dir_deg_mae": null,
+     "wind_mph": {
+      "n": 0
+     }
+    },
+    "EGTE": {
+     "cloud_pct": {
+      "n": 0
+     },
+     "cloudbase_ft": {
+      "n": 0
+     },
+     "gust_mph_when_reported": {
+      "n": 0
+     },
+     "hours": 0,
+     "jumpable": {
+      "n": 0
+     },
+     "low_base_under_2000": {
+      "n": 0
+     },
+     "models_gust_mph_when_reported": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "models_wind_mph": {
+      "ecmwf_ifs025": {
+       "n": 0
+      },
+      "gfs_seamless": {
+       "n": 0
+      },
+      "icon_seamless": {
+       "n": 0
+      },
+      "meteofrance_seamless": {
+       "n": 0
+      }
+     },
+     "rain": {
+      "n": 0
+     },
+     "wind_dir_deg_mae": null,
+     "wind_mph": {
+      "n": 0
+     }
+    }
+   },
+   "days": {
+    "overall": {
+     "day_verdict_50pct": {
+      "n": 0
+     },
+     "jump_pct": {
+      "n": 0
+     }
+    }
+   },
+   "overall": {
+    "cloud_pct": {
+     "n": 0
+    },
+    "cloudbase_ft": {
+     "n": 0
+    },
+    "gust_mph_when_reported": {
+     "n": 0
+    },
+    "hours": 0,
+    "jumpable": {
+     "n": 0
+    },
+    "low_base_under_2000": {
+     "n": 0
+    },
+    "models_gust_mph_when_reported": {
+     "ecmwf_ifs025": {
+      "n": 0
+     },
+     "gfs_seamless": {
+      "n": 0
+     },
+     "icon_seamless": {
+      "n": 0
+     },
+     "meteofrance_seamless": {
+      "n": 0
+     }
+    },
+    "models_wind_mph": {
+     "ecmwf_ifs025": {
+      "n": 0
+     },
+     "gfs_seamless": {
+      "n": 0
+     },
+     "icon_seamless": {
+      "n": 0
+     },
+     "meteofrance_seamless": {
+      "n": 0
+     }
+    },
+    "rain": {
+     "n": 0
+    },
+    "wind_dir_deg_mae": null,
+    "wind_mph": {
+     "n": 0
+    }
+   }
+  }
+ }
+}
