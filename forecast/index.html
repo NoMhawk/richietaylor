@@ -1,10 +1,20 @@
 <!-- ========================================================================= -->
-<!-- REVISION: v4.7                                                            -->
+<!-- REVISION: v4.8                                                            -->
 <!-- SYSTEM: RichBot - Skydive Southwest Flight Line Forecast                  -->
 <!-- TARGET FILE: forecast/index.html                                          -->
 <!-- BACKUPS: previous versions are kept in forecast/revisions/                -->
 <!-- ========================================================================= -->
 <!-- CHANGE LOG                                                                -->
+<!-- v4.8 (2026-11-25)                                                         -->
+<!--   - Added CONFIG.tuning: model weights for the wind average and bias      -->
+<!--     corrections for wind, gusts and cloudbase. All neutral (weights 1,   -->
+<!--     biases 0), so the forecast is unchanged. These are the only values    -->
+<!--     the weekly accuracy agent is allowed to adjust.                       -->
+<!--   - Added window.richbotSnapshot() and window.richbotReady so the         -->
+<!--     forecast-verification job can record exactly what the page showed.    -->
+<!--     Accuracy results: richietaylor.net/forecast/accuracy/                 -->
+<!--   - Wind direction averaging is now built into the weighted blend;        -->
+<!--     removed the separate getAverageWindDirection() helper.                -->
 <!-- v4.7 (2026-11-25)                                                         -->
 <!--   - Base row now says CLEAR instead of UNLIMITED when there is no         -->
 <!--     cloudbase, matching the Fog Risk row.                                 -->
@@ -201,7 +211,7 @@
     <!-- [SECTION: CONFIGURATION & SETTINGS BLOCK] -->
     <script>
         const CONFIG = {
-            revision: "v4.7",
+            revision: "v4.8",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -211,7 +221,17 @@
             refreshIntervalMinutes: 5,
             affWindLimitMph: 17,            // AFF student limit: 15 knots. Wind OR gusts above this = not AFF suitable
             cloudbaseCoverThreshold: 50,    // % cloud cover at a level that counts as the cloudbase (estimate)
-            minCloudForBase: 25             // ignore a Met Office base if Low and Mid cloud are both below this %
+            minCloudForBase: 25,            // ignore a Met Office base if Low and Mid cloud are both below this %
+
+            // TUNING - the only settings the weekly accuracy agent may change (see forecast/accuracy/).
+            // Neutral values: weights 1, biases 0. Ops limits above (23 mph, AFF) are NOT tuning.
+            tuning: {
+                modelWeights: { ecmwf_ifs025: 1, gfs_seamless: 1, icon_seamless: 1, meteofrance_seamless: 1 },
+                windBiasMph: 0,             // added to the averaged wind speed
+                gustBiasMph: 0,             // added to the averaged gusts
+                cloudbaseBiasFt: 0,         // added to the Met Office cloudbase
+                estCloudbaseBiasFt: 0       // added to the estimated cloudbase (beyond the Met Office range)
+            }
         };
     </script>
 
@@ -366,30 +386,6 @@
         const PRESSURE_LEVELS = [1000, 975, 950, 925, 900, 850, 800, 700, 600, 500];
         const PRESSURE_LEVEL_VARS = PRESSURE_LEVELS.flatMap(p => [`cloud_cover_${p}hPa`, `geopotential_height_${p}hPa`]).join(',');
 
-        // [SUB-SECTION: CIRCULAR ANGLE AVERAGE UTILITY]
-        function getAverageWindDirection(degreesArray) {
-            if (!degreesArray || degreesArray.length === 0) return 0;
-            let sumSin = 0;
-            let sumCos = 0;
-            let validCount = 0;
-
-            degreesArray.forEach(deg => {
-                if (deg !== null && deg !== undefined && !isNaN(deg)) {
-                    const rad = (deg * Math.PI) / 180;
-                    sumSin += Math.sin(rad);
-                    sumCos += Math.cos(rad);
-                    validCount++;
-                }
-            });
-
-            if (validCount === 0) return 0;
-            const avgSin = sumSin / validCount;
-            const avgCos = sumCos / validCount;
-            let avgDeg = (Math.atan2(avgSin, avgCos) * 180) / Math.PI;
-            if (avgDeg < 0) avgDeg += 360;
-            return avgDeg;
-        }
-
         // [SUB-SECTION: UNIT CONVERSION UTILITIES]
         function kmhToMph(kmh) {
             return Math.round(kmh * 0.621371);
@@ -522,6 +518,7 @@
 
                 renderOutlookCards();
                 renderActiveDay(selectedDayIndex);
+                window.richbotReady = true;
 
             } catch (err) {
                 console.error("Critical error fetching weather data:", err);
@@ -567,29 +564,40 @@
         // Falls back to the main forecast for any hour where no model has data.
         function buildBlendedWind() {
             const hourly = globalWeatherData.hourly;
-            const models = Object.values(multiModelData)
-                .filter(m => m && m.hourly && m.hourly.time)
-                .map(m => {
+            const weights = CONFIG.tuning.modelWeights;
+            const models = Object.entries(multiModelData)
+                .filter(([key, m]) => m && m.hourly && m.hourly.time && (weights[key] ?? 1) > 0)
+                .map(([key, m]) => {
                     const index = new Map();
                     m.hourly.time.forEach((t, k) => index.set(t, k));
-                    return { h: m.hourly, index };
+                    return { h: m.hourly, index, w: weights[key] ?? 1 };
                 });
-            const avg = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
+            // weighted average of [value, weight] pairs
+            const wavg = arr => arr.reduce((a, [v, w]) => a + v * w, 0) / arr.reduce((a, [, w]) => a + w, 0);
             const ok = v => v !== null && v !== undefined && !isNaN(v);
 
             blendedWind = { speed: [], gust: [], dir: [], models: [] };
             hourly.time.forEach((t, i) => {
-                const speeds = [], gusts = [], dirs = [];
-                models.forEach(({ h, index }) => {
+                const speeds = [], gusts = [];
+                let sinSum = 0, cosSum = 0;
+                models.forEach(({ h, index, w }) => {
                     const k = index.get(t);
                     if (k === undefined || !ok(h.wind_speed_10m[k])) return;
-                    speeds.push(h.wind_speed_10m[k]);
-                    if (h.wind_gusts_10m && ok(h.wind_gusts_10m[k])) gusts.push(h.wind_gusts_10m[k]);
-                    if (h.wind_direction_10m && ok(h.wind_direction_10m[k])) dirs.push(h.wind_direction_10m[k]);
+                    speeds.push([h.wind_speed_10m[k], w]);
+                    if (h.wind_gusts_10m && ok(h.wind_gusts_10m[k])) gusts.push([h.wind_gusts_10m[k], w]);
+                    if (h.wind_direction_10m && ok(h.wind_direction_10m[k])) {
+                        const rad = h.wind_direction_10m[k] * Math.PI / 180;
+                        sinSum += Math.sin(rad) * w;
+                        cosSum += Math.cos(rad) * w;
+                    }
                 });
-                blendedWind.speed[i] = kmhToMph(speeds.length ? avg(speeds) : (hourly.wind_speed_10m[i] || 0));
-                blendedWind.gust[i] = kmhToMph(gusts.length ? avg(gusts) : (hourly.wind_gusts_10m[i] || 0));
-                blendedWind.dir[i] = dirs.length ? getAverageWindDirection(dirs) : (hourly.wind_direction_10m[i] || 0);
+                const rawSpeed = kmhToMph(speeds.length ? wavg(speeds) : (hourly.wind_speed_10m[i] || 0));
+                const rawGust = kmhToMph(gusts.length ? wavg(gusts) : (hourly.wind_gusts_10m[i] || 0));
+                blendedWind.speed[i] = Math.max(0, Math.round(rawSpeed + CONFIG.tuning.windBiasMph));
+                blendedWind.gust[i] = Math.max(blendedWind.speed[i], Math.round(rawGust + CONFIG.tuning.gustBiasMph));
+                blendedWind.dir[i] = (sinSum || cosSum)
+                    ? ((Math.atan2(sinSum, cosSum) * 180 / Math.PI) + 360) % 360
+                    : (hourly.wind_direction_10m[i] || 0);
                 blendedWind.models[i] = speeds.length;
             });
         }
@@ -626,12 +634,13 @@
         function getCloudbase(i, low, mid) {
             const ukmo = ukmoBase ? ukmoBase[i] : undefined;
             if (ukmo !== undefined) {
-                let base = ukmo;
+                let base = typeof ukmo === 'number' ? Math.max(0, ukmo + CONFIG.tuning.cloudbaseBiasFt) : ukmo;
                 if (typeof base === 'number' && low < CONFIG.minCloudForBase && mid < CONFIG.minCloudForBase) base = null;
                 if (base === null && low >= CONFIG.cloudbaseCoverThreshold) base = 'check';
                 return { base, estimated: false };
             }
             let base = calculateCloudbaseAGL(i);
+            if (typeof base === 'number') base = Math.max(0, base + CONFIG.tuning.estCloudbaseBiasFt);
             if (base === null && low >= CONFIG.cloudbaseCoverThreshold) base = 'check';
             return { base, estimated: true };
         }
@@ -1239,6 +1248,64 @@
                 </tbody>
             `;
         }
+
+        // [SUB-SECTION: SNAPSHOT FOR THE FORECAST-VERIFICATION JOB]
+        // Returns exactly what the page is forecasting for 08:00-18:00 on each of the 7 days,
+        // plus each model's own wind, so it can be checked later against what actually happened.
+        window.richbotSnapshot = function () {
+            const h = globalWeatherData.hourly;
+            const daily = globalWeatherData.daily;
+            const modelKeys = ['ecmwf_ifs025', 'gfs_seamless', 'icon_seamless', 'meteofrance_seamless'];
+            const modelIdx = {};
+            modelKeys.forEach(k => {
+                const m = multiModelData[k];
+                if (!m || !m.hourly) return;
+                const map = new Map();
+                m.hourly.time.forEach((t, j) => map.set(t, j));
+                modelIdx[k] = { h: m.hourly, map };
+            });
+
+            const hours = [];
+            h.time.forEach((t, i) => {
+                const hr = parseInt(t.slice(11, 13), 10);
+                if (hr < 8 || hr > 18) return;
+                const d = getHourData(i);
+                const a = assessHour(d);
+                const models = {};
+                modelKeys.forEach(k => {
+                    const mi = modelIdx[k];
+                    if (!mi) return;
+                    const j = mi.map.get(t);
+                    if (j === undefined || mi.h.wind_speed_10m[j] === null) return;
+                    models[k] = {
+                        ws: kmhToMph(mi.h.wind_speed_10m[j]),
+                        wg: kmhToMph(mi.h.wind_gusts_10m ? (mi.h.wind_gusts_10m[j] || 0) : 0),
+                        dir: mi.h.wind_direction_10m ? mi.h.wind_direction_10m[j] : null
+                    };
+                });
+                hours.push({
+                    t,
+                    ws: d.ws, wg: d.wg, dir: Math.round(d.dir),
+                    rain: d.rain, vis: Math.round(d.vis * 10) / 10,
+                    low: d.low, mid: d.mid, high: d.high, total: d.total,
+                    baseFt: typeof d.base === 'number' ? d.base : null,
+                    baseState: typeof d.base === 'number' ? 'ft' : (d.base === null ? 'clear' : (d.base === 'check' ? 'check' : 'nodata')),
+                    baseEstimated: d.baseEstimated,
+                    fog: d.isFog, affOk: d.affOk,
+                    score: a.score, issues: a.issues,
+                    models
+                });
+            });
+
+            const days = daily.time.slice(0, 7).map((date, i) => ({ date, likelihood: calculateDayMetrics(i, h).likelihood }));
+            return {
+                issued: new Date().toISOString(),
+                revision: CONFIG.revision,
+                timezone: CONFIG.timezone,
+                tuning: CONFIG.tuning,
+                hours, days
+            };
+        };
 
         // [SUB-SECTION: INITIALIZATION HOOK]
         window.onload = () => {
