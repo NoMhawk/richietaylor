@@ -1,10 +1,15 @@
 <!-- ========================================================================= -->
-<!-- REVISION: v4.8                                                            -->
+<!-- REVISION: v4.9                                                            -->
 <!-- SYSTEM: RichBot - Skydive Southwest Flight Line Forecast                  -->
 <!-- TARGET FILE: forecast/index.html                                          -->
 <!-- BACKUPS: previous versions are kept in forecast/revisions/                -->
 <!-- ========================================================================= -->
 <!-- CHANGE LOG                                                                -->
+<!-- v4.9 (2026-11-25)                                                         -->
+<!--   - Added an MPH / KT switch in the header. Changes every wind and gust   -->
+<!--     figure (cards, hourly table, model rows, outlook text, AFF label and  -->
+<!--     the Windy map). Remembered per browser. Display only: limits, colours -->
+<!--     and the JUMP % are still worked out in mph, so nothing else changes.  -->
 <!-- v4.8 (2026-11-25)                                                         -->
 <!--   - Added CONFIG.tuning: model weights for the wind average and bias      -->
 <!--     corrections for wind, gusts and cloudbase. All neutral (weights 1,   -->
@@ -122,6 +127,10 @@
         .last-updated { font-size: 0.75rem; color: var(--text-muted); background-color: #f8fafc; padding: 0.375rem 0.75rem; border-radius: 0.5rem; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 0.35rem; }
         .btn-refresh { background-color: var(--accent-sky); color: white; border: none; font-size: 0.75rem; font-weight: 600; padding: 0.5rem 0.875rem; border-radius: 0.5rem; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; gap: 0.375rem; }
         .btn-refresh:hover { background-color: #0369a1; }
+        .unit-toggle { display: flex; border: 1px solid var(--border-color); border-radius: 0.5rem; overflow: hidden; }
+        .unit-toggle button { background: #f8fafc; color: var(--text-muted); border: none; font-size: 0.75rem; font-weight: 700; padding: 0.45rem 0.7rem; cursor: pointer; font-family: inherit; }
+        .unit-toggle button + button { border-left: 1px solid var(--border-color); }
+        .unit-toggle button.active { background: var(--accent-sky); color: white; }
 
         main { max-width: 1500px; margin: 0 auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 2rem; }
 
@@ -211,7 +220,7 @@
     <!-- [SECTION: CONFIGURATION & SETTINGS BLOCK] -->
     <script>
         const CONFIG = {
-            revision: "v4.8",
+            revision: "v4.9",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -251,6 +260,10 @@
                 <span id="last-updated" class="last-updated">
                     <i class="fa-solid fa-sync fa-spin" style="color: var(--accent-sky);"></i> Loading...
                 </span>
+                <div class="unit-toggle" role="group" aria-label="Wind units" title="Wind speed units">
+                    <button type="button" id="unit-mph" onclick="setWindUnit('mph')">MPH</button>
+                    <button type="button" id="unit-kt" onclick="setWindUnit('kt')">KT</button>
+                </div>
                 <button onclick="fetchAllData()" class="btn-refresh">
                     <i class="fa-solid fa-rotate"></i> Refresh
                 </button>
@@ -307,7 +320,7 @@
                     <span class="badge">Skydive Southwest Dropzone</span>
                 </div>
                 <div class="map-container">
-                    <iframe src="https://embed.windy.com/embed2.html?lat=50.880&lon=-3.230&detailLat=50.880&detailLon=-3.230&width=650&height=450&zoom=8&level=surface&overlay=satellite&product=ecmwf&menu=&message=&marker=50.880,-3.230&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=mph&metricTemp=%C2%B0C&radarRange=-1&play=1" frameborder="0"></iframe>
+                    <iframe id="windy-map" src="https://embed.windy.com/embed2.html?lat=50.880&lon=-3.230&detailLat=50.880&detailLon=-3.230&width=650&height=450&zoom=8&level=surface&overlay=satellite&product=ecmwf&menu=&message=&marker=50.880,-3.230&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=mph&metricTemp=%C2%B0C&radarRange=-1&play=1" frameborder="0"></iframe>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--text-muted); padding-top: 0.5rem;">
                     <span><i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> Live satellite tracking with native map-locked airfield marker pin.</span>
@@ -389,6 +402,33 @@
         // [SUB-SECTION: UNIT CONVERSION UTILITIES]
         function kmhToMph(kmh) {
             return Math.round(kmh * 0.621371);
+        }
+
+        // Wind display units. All calculations stay in mph; only what is shown changes.
+        let windUnit = (() => { try { return localStorage.getItem('richbotWindUnit') === 'kt' ? 'kt' : 'mph'; } catch (e) { return 'mph'; } })();
+        function dispWind(mph) {
+            if (typeof mph !== 'number' || isNaN(mph)) return mph;
+            return windUnit === 'kt' ? Math.round(mph / 1.150779) : mph;
+        }
+        function windUnitLabel() { return windUnit === 'kt' ? 'kt' : 'mph'; }
+        function applyWindUnitUI() {
+            document.getElementById('unit-mph').classList.toggle('active', windUnit === 'mph');
+            document.getElementById('unit-kt').classList.toggle('active', windUnit === 'kt');
+            const map = document.getElementById('windy-map');
+            if (map) {
+                const src = map.src.replace(/metricWind=[^&]*/, `metricWind=${windUnit}`);
+                if (src !== map.src) map.src = src;
+            }
+        }
+        function setWindUnit(unit) {
+            if (unit === windUnit) return;
+            windUnit = unit;
+            try { localStorage.setItem('richbotWindUnit', unit); } catch (e) { }
+            applyWindUnitUI();
+            if (globalWeatherData && blendedWind) {
+                renderOutlookCards();
+                renderActiveDay(selectedDayIndex);
+            }
         }
 
         // [SUB-SECTION: COLOR & BADGE THRESHOLD HELPERS]
@@ -759,8 +799,8 @@
                 const cy = slice.reduce((s, x) => s + Math.cos(x.dir * Math.PI / 180), 0);
                 const dir = compass((Math.atan2(sx, cy) * 180 / Math.PI + 360) % 360);
                 const strength = avg <= 8 ? 'light' : (avg <= 15 ? 'moderate' : 'fresh');
-                const gustBit = maxGust >= avg + 6 ? `, gusting to ${maxGust} mph` : '';
-                return `${strength} winds from the ${dir} (around ${avg} mph${gustBit})`;
+                const gustBit = maxGust >= avg + 6 ? `, gusting to ${dispWind(maxGust)} ${windUnitLabel()}` : '';
+                return `${strength} winds from the ${dir} (around ${dispWind(avg)} ${windUnitLabel()}${gustBit})`;
             };
             const describeSky = (slice) => {
                 const avg = slice.reduce((s, x) => s + x.cloudCover, 0) / slice.length;
@@ -832,7 +872,7 @@
                     }
                 });
                 if (!bestAff) {
-                    lines.push(`Too windy for AFF students (over ${CONFIG.affWindLimitMph} mph).`);
+                    lines.push(`Too windy for AFF students (over ${dispWind(CONFIG.affWindLimitMph)} ${windUnitLabel()}).`);
                 } else if (bestAff.length === 1) {
                     lines.push(`AFF students: only around ${fmtHour(bestAff[0].hour)}.`);
                 } else {
@@ -938,8 +978,8 @@
 
                     timeRow += `<span class="wf-cell">${String(hTarget).padStart(2, '0')}h</span>`;
                     dirRow += `<span class="wf-cell"><i class="fa-solid fa-arrow-up wf-arrow" style="transform: rotate(${rot}deg);"></i></span>`;
-                    spdRow += `<span class="wf-cell"><span class="${getWindColorClass(spd)}">${spd}</span></span>`;
-                    gustRow += `<span class="wf-cell"><span class="${getWindColorClass(gust)}">${gust}</span></span>`;
+                    spdRow += `<span class="wf-cell"><span class="${getWindColorClass(spd)}">${dispWind(spd)}</span></span>`;
+                    gustRow += `<span class="wf-cell"><span class="${getWindColorClass(gust)}">${dispWind(gust)}</span></span>`;
                     weatherRow += `<span class="wf-cell"><i class="fa-solid ${wInfo.icon}" style="color: ${wInfo.color}; font-size: 0.75rem;" title="${wInfo.label}"></i></span>`;
                     rainRow += `<span class="wf-cell" style="color: ${rainMm > 0 ? '#0284c7' : '#64748b'}; font-size: 0.6rem;">${rainMm > 0 ? rainMm.toFixed(1) : ''}</span>`;
                     tempRow += `<span class="wf-cell"><span>${temp}°</span></span>`;
@@ -1008,10 +1048,12 @@
             let label = `${value}${unit}`;
 
             if (category === 'wind' || category === 'gust') {
-                if (value > 23) { status = 'red'; label = `${value}`; }
-                else if (value > 19) { status = 'orange'; label = `${value}`; }
-                else if (value > 14) { status = 'yellow'; label = `${value}`; }
-                else { status = 'green'; label = `${value}`; }
+                // value is mph (colours follow the mph limits); label is in the chosen unit
+                label = `${dispWind(value)}`;
+                if (value > 23) status = 'red';
+                else if (value > 19) status = 'orange';
+                else if (value > 14) status = 'yellow';
+                else status = 'green';
             } else if (category === 'rain') {
                 if (value >= 60) { status = 'red'; label = `${value}%`; }
                 else if (value >= 40) { status = 'orange'; label = `${value}%`; }
@@ -1085,8 +1127,8 @@
             // Core Summary Rows
             let tempRow = `<tr><td class="param-label">Temp (°C)</td>`;
             let skyRow = `<tr><td class="param-label">Sky Condition</td>`;
-            let windRow = `<tr><td class="param-label">Wind (mph)</td>`;
-            let gustRow = `<tr><td class="param-label">Gusts (mph)</td>`;
+            let windRow = `<tr><td class="param-label">Wind (${windUnitLabel()})</td>`;
+            let gustRow = `<tr><td class="param-label">Gusts (${windUnitLabel()})</td>`;
             let dirRow = `<tr><td class="param-label">Wind Dir</td>`;
 
             // Individual Model Wind Rows
@@ -1106,7 +1148,7 @@
             let visRow = `<tr><td class="param-label">Vis (km)</td>`;
             let baseRow = `<tr><td class="param-label" title="Met Office UK 2 km cloud base, about 2.5 days ahead. Beyond that, 'est.' = estimate from cloud cover by height.">Base (ft AGL)</td>`;
             let fogRow = `<tr><td class="param-label">Fog Risk</td>`;
-            let affRow = `<tr><td class="param-label" title="Averaged wind and gusts at or below ${CONFIG.affWindLimitMph} mph">AFF (≤${CONFIG.affWindLimitMph} mph)</td>`;
+            let affRow = `<tr><td class="param-label" title="Averaged wind and gusts at or below ${dispWind(CONFIG.affWindLimitMph)} ${windUnitLabel()}">AFF (≤${dispWind(CONFIG.affWindLimitMph)} ${windUnitLabel()})</td>`;
 
             for (let i = validStart; i < Math.min(validStart + hoursCount, hourly.time.length); i++) {
                 const timeStr = hourly.time[i];
@@ -1157,7 +1199,7 @@
                     const mRot = (rawDir + 180) % 360;
 
                     return `<td class="${colClass}" style="font-size:0.7rem;">
-                        <span class="${getWindColorClass(mSpd)}" style="font-weight:700;">${mSpd}</span> <span style="font-size:0.6rem; color:var(--text-muted);">G${mGust}</span><br>
+                        <span class="${getWindColorClass(mSpd)}" style="font-weight:700;">${dispWind(mSpd)}</span> <span style="font-size:0.6rem; color:var(--text-muted);">G${dispWind(mGust)}</span><br>
                         <i class="fa-solid fa-arrow-up" style="transform: rotate(${mRot}deg); color: var(--accent-sky); font-size:0.6rem;"></i> <span style="font-size:0.65rem;">${mDir}</span>
                     </td>`;
                 }
@@ -1313,6 +1355,7 @@
             document.title = `${document.title} (${revLabel})`;
             document.getElementById('rev-badge').textContent = revLabel;
             document.getElementById('rev-footer').textContent = revLabel;
+            applyWindUnitUI();
             fetchAllData();
             setInterval(fetchAllData, CONFIG.refreshIntervalMinutes * 60 * 1000);
         };
