@@ -1,10 +1,13 @@
 <!-- ========================================================================= -->
-<!-- REVISION: v4.6                                                            -->
+<!-- REVISION: v4.7                                                            -->
 <!-- SYSTEM: RichBot - Skydive Southwest Flight Line Forecast                  -->
 <!-- TARGET FILE: forecast/index.html                                          -->
 <!-- BACKUPS: previous versions are kept in forecast/revisions/                -->
 <!-- ========================================================================= -->
 <!-- CHANGE LOG                                                                -->
+<!-- v4.7 (2026-11-25)                                                         -->
+<!--   - Base row now says CLEAR instead of UNLIMITED when there is no         -->
+<!--     cloudbase, matching the Fog Risk row.                                 -->
 <!-- v4.6 (2026-11-25)                                                         -->
 <!--   - JUMP % reworked. It ignored cloud cover completely (25 Nov showed     -->
 <!--     56% with 82-100% cloud all day). The score and the outlook text now   -->
@@ -198,7 +201,7 @@
     <!-- [SECTION: CONFIGURATION & SETTINGS BLOCK] -->
     <script>
         const CONFIG = {
-            revision: "v4.6",
+            revision: "v4.7",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -423,7 +426,7 @@
         }
 
         function getBaseColorClass(baseFt) {
-            if (baseFt === 'Unlimited' || baseFt >= 5000) return 'text-green';
+            if (baseFt === 'Clear' || baseFt >= 5000) return 'text-green';
             if (baseFt >= 3500) return 'text-yellow';
             if (baseFt >= 2000) return 'text-orange';
             return 'text-red';
@@ -618,7 +621,7 @@
         }
 
         // Cloudbase for one hour: Met Office where available, otherwise the pressure-level estimate.
-        // Returns { base, estimated } where base is a number (ft AGL), null (Unlimited),
+        // Returns { base, estimated } where base is a number (ft AGL), null (Clear),
         // 'check' (cloudy but no clear base) or undefined (no data).
         function getCloudbase(i, low, mid) {
             const ukmo = ukmoBase ? ukmoBase[i] : undefined;
@@ -1016,7 +1019,7 @@
                 else if (value < 7) { status = 'yellow'; label = `${value}`; }
                 else { status = 'green'; label = `${value}`; }
             } else if (category === 'base') {
-                if (value === 'Unlimited' || value >= 5000) { status = 'green'; label = typeof value === 'number' ? value.toLocaleString() : value; }
+                if (value === 'Clear' || value >= 5000) { status = 'green'; label = typeof value === 'number' ? value.toLocaleString() : 'CLEAR'; }
                 else if (value >= 3500) { status = 'yellow'; label = value.toLocaleString(); }
                 else if (value >= 2000) { status = 'orange'; label = value.toLocaleString(); }
                 else { status = 'red'; label = value.toLocaleString(); }
@@ -1186,7 +1189,7 @@
                     baseRow += `<td class="${colClass}" title="Low cloud ${Math.round(d.low)}% but the model doesn't give a clear base"><span class="traffic-badge-yellow">CHECK</span></td>`;
                 } else {
                     const estTag = d.baseEstimated ? `<div style="font-size:0.55rem; color:var(--text-muted); margin-top:0.1rem;">est.</div>` : '';
-                    baseRow += `<td class="${colClass}">${getTrafficBadge('base', d.base === null ? 'Unlimited' : d.base)}${estTag}</td>`;
+                    baseRow += `<td class="${colClass}">${getTrafficBadge('base', d.base === null ? 'Clear' : d.base)}${estTag}</td>`;
                 }
                 fogRow += `<td class="${colClass}">${getTrafficBadge('fog', fogStatus)}</td>`;
                 affRow += `<td class="${colClass}"><span class="traffic-badge-${d.affOk ? 'green' : 'red'}">${d.affOk ? 'OK' : 'NO'}</span></td>`;
