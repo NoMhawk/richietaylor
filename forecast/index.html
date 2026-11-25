@@ -1,10 +1,22 @@
 <!-- ========================================================================= -->
-<!-- REVISION: v4.4                                                            -->
+<!-- REVISION: v4.5                                                            -->
 <!-- SYSTEM: RichBot - Skydive Southwest Flight Line Forecast                  -->
 <!-- TARGET FILE: forecast/index.html                                          -->
 <!-- BACKUPS: previous versions are kept in forecast/revisions/                -->
 <!-- ========================================================================= -->
 <!-- CHANGE LOG                                                                -->
+<!-- v4.5 (2026-11-25)                                                         -->
+<!--   - Cloudbase now comes from the Met Office UK 2 km model's own cloud     -->
+<!--     base forecast (Open-Meteo, models=ukmo_seamless, cloud_base), which   -->
+<!--     resolves the Blackdown Hills. It covers roughly the next 2.5 days.    -->
+<!--     Beyond that the v4.4 pressure-level estimate is used and marked       -->
+<!--     "est." in the matrix and "(EST.)" on the card badge.                  -->
+<!--   - Within the Met Office range: no base reported = Unlimited, unless     -->
+<!--     the Low layer is 50%+ (then CHECK). A base is ignored if Low and Mid  -->
+<!--     cloud are both under 25% (only a few scattered clouds).               -->
+<!--   - Corrected the cloud layer labels to Open-Meteo's documented heights:  -->
+<!--     Low up to 3 km (~10k ft), Mid 3-8 km (~10-26k ft), High 8 km+         -->
+<!--     (~26k ft+). v4.4 labelled them 6.5k / 6.5-20k / 20k+ by mistake.      -->
 <!-- v4.4 (2026-11-25)                                                         -->
 <!--   - Wind: the 7-day cards and plain-English outlook now use the same      -->
 <!--     4-model average (ECMWF, GFS, ICON, Meteo-France) as the hourly        -->
@@ -174,7 +186,7 @@
     <!-- [SECTION: CONFIGURATION & SETTINGS BLOCK] -->
     <script>
         const CONFIG = {
-            revision: "v4.4",
+            revision: "v4.5",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -183,7 +195,8 @@
             timezone: "Europe/London",
             refreshIntervalMinutes: 5,
             affWindLimitMph: 17,            // AFF student limit: 15 knots. Wind OR gusts above this = not AFF suitable
-            cloudbaseCoverThreshold: 50     // % cloud cover at a level that counts as the cloudbase
+            cloudbaseCoverThreshold: 50,    // % cloud cover at a level that counts as the cloudbase (estimate)
+            minCloudForBase: 25             // ignore a Met Office base if Low and Mid cloud are both below this %
         };
     </script>
 
@@ -331,6 +344,7 @@
         let globalWeatherData = null;
         let multiModelData = {};
         let blendedWind = null;   // 4-model average wind, aligned to globalWeatherData.hourly.time (mph)
+        let ukmoBase = null;      // Met Office cloud base (ft AGL), aligned to globalWeatherData.hourly.time
         let selectedDayIndex = 0;
 
         // Pressure levels used to find the real cloudbase (1000 hPa ~ sea level ... 500 hPa ~ 18,000 ft)
@@ -475,7 +489,14 @@
                     return { key: m.key, data: null };
                 });
 
+                const ukmoUrl = `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&hourly=cloud_base&models=ukmo_seamless&timezone=${CONFIG.timezone}`;
+                const ukmoPromise = fetch(ukmoUrl).then(r => r.ok ? r.json() : null).catch(() => {
+                    console.warn('Met Office cloud base unavailable, using estimate.');
+                    return null;
+                });
+
                 const modelResults = await Promise.all(modelPromises);
+                buildUkmoBase(await ukmoPromise);
                 multiModelData = {};
                 modelResults.forEach(item => {
                     multiModelData[item.key] = item.data;
@@ -558,6 +579,48 @@
             });
         }
 
+        // Met Office cloud base, matched to the main forecast hour by time. Each entry is:
+        //   number    = base in ft AGL
+        //   null      = inside the Met Office range but no base reported (no significant cloud)
+        //   undefined = outside the Met Office range (about 2.5 days) or no data
+        function buildUkmoBase(json) {
+            const hourly = globalWeatherData.hourly;
+            ukmoBase = hourly.time.map(() => undefined);
+            if (!json || !json.hourly || !json.hourly.cloud_base) return;
+
+            const t = json.hourly.time;
+            const cb = json.hourly.cloud_base;
+            let lastIdx = -1;   // the model's range ends at its last reported base
+            cb.forEach((v, k) => { if (v !== null && v !== undefined) lastIdx = k; });
+            if (lastIdx === -1) return;
+            const lastTime = t[lastIdx];
+
+            const index = new Map();
+            t.forEach((time, k) => index.set(time, k));
+            hourly.time.forEach((time, i) => {
+                const k = index.get(time);
+                if (k === undefined || time > lastTime) return;
+                const v = cb[k];
+                ukmoBase[i] = (v === null || v === undefined) ? null : Math.round((v * 3.28084) / 100) * 100;
+            });
+        }
+
+        // Cloudbase for one hour: Met Office where available, otherwise the pressure-level estimate.
+        // Returns { base, estimated } where base is a number (ft AGL), null (Unlimited),
+        // 'check' (cloudy but no clear base) or undefined (no data).
+        function getCloudbase(i, low, mid) {
+            const ukmo = ukmoBase ? ukmoBase[i] : undefined;
+            if (ukmo !== undefined) {
+                let base = ukmo;
+                if (typeof base === 'number' && low < CONFIG.minCloudForBase && mid < CONFIG.minCloudForBase) base = null;
+                if (base === null && low >= CONFIG.cloudbaseCoverThreshold) base = 'check';
+                return { base, estimated: false };
+            }
+            let base = calculateCloudbaseAGL(i);
+            if (base === null && low >= CONFIG.cloudbaseCoverThreshold) base = 'check';
+            return { base, estimated: true };
+        }
+
         // Everything the page needs for one hour, worked out in one place so the cards,
         // the outlook text and the hourly matrix always agree.
         function getHourData(i) {
@@ -581,15 +644,13 @@
             else if (vis < 5.0 && (hum >= 90 || spread <= 1.5)) fogStatus = 'MIST';
             const isFog = (vis < 1.0) || ((code >= 45 && code <= 48) && vis < 3.0) || (vis < 5.0 && hum >= 90 && spread <= 1.5);
 
-            // If the low layer is cloudy but no single level reaches the threshold, the model
-            // can't place a base: show CHECK rather than a misleading "Unlimited".
-            let base = calculateCloudbaseAGL(i);
-            if (base === null && low >= CONFIG.cloudbaseCoverThreshold) base = 'check';
+            const cloudbase = getCloudbase(i, low, mid);
 
             return {
                 temp, dew, hum, code, rain, vis, low, mid, high, total, ws, wg,
                 dir: blendedWind.dir[i],
-                base,
+                base: cloudbase.base,
+                baseEstimated: cloudbase.estimated,
                 fogStatus, isFog,
                 affOk: ws <= CONFIG.affWindLimitMph && wg <= CONFIG.affWindLimitMph
             };
@@ -758,6 +819,7 @@
             let evaluatedHours = 0;
             let hasLowCloudbase = false;
             let hasFogWarning = false;
+            let lowBaseFromMetOffice = false;
             let affHours = 0;
 
             for (let h = dayStart; h < Math.min(dayStart + 11, hourly.time.length); h++) {
@@ -768,7 +830,10 @@
                 const d = getHourData(h);
                 const base = typeof d.base === 'number' ? d.base : Infinity;   // no base = no penalty
 
-                if (isLowBase(d.base)) hasLowCloudbase = true;
+                if (isLowBase(d.base)) {
+                    hasLowCloudbase = true;
+                    if (!d.baseEstimated) lowBaseFromMetOffice = true;
+                }
                 if (d.isFog) hasFogWarning = true;
                 if (d.affOk) affHours++;
 
@@ -790,7 +855,7 @@
                 evaluatedHours++;
             }
             const likelihood = evaluatedHours > 0 ? Math.round(scoreSum / evaluatedHours) : 85;
-            return { likelihood, hasLowCloudbase, hasFogWarning, affHours, evaluatedHours };
+            return { likelihood, hasLowCloudbase, lowBaseEstimated: hasLowCloudbase && !lowBaseFromMetOffice, hasFogWarning, affHours, evaluatedHours };
         }
 
         // [SUB-SECTION: 7-DAY OUTLOOK CARDS RENDERER]
@@ -859,7 +924,7 @@
                 weatherRow += `</div>`; rainRow += `</div>`; tempRow += `</div>`; pressRow += `</div>`;
 
                 const cloudbaseWarningHtml = metrics.hasLowCloudbase 
-                    ? `<span class="cloudbase-warning-badge"><i class="fa-solid fa-triangle-exclamation mr-1"></i> CHECK CLOUDBASE</span>` 
+                    ? `<span class="cloudbase-warning-badge"><i class="fa-solid fa-triangle-exclamation mr-1"></i> CHECK CLOUDBASE${metrics.lowBaseEstimated ? ' (EST.)' : ''}</span>` 
                     : '';
                 const fogWarningHtml = metrics.hasFogWarning
                     ? `<span class="cloudbase-warning-badge" style="background:#fee2e2; color:#991b1b; border-color:#f87171;"><i class="fa-solid fa-triangle-exclamation mr-1"></i> CHECK FOG / MIST</span>`
@@ -1008,12 +1073,12 @@
             let rainRow = `<tr><td class="param-label">Rain (%)</td>`;
             let cloudRow = `<tr><td class="param-label">Cloud (%)</td>`;
             // Open-Meteo's own cloud layers (heights are approximate, above sea level)
-            let cLowRow = `<tr><td class="param-label" title="Low cloud and fog, up to about 2 km">☁ Low (to 6.5k)</td>`;
-            let cMidRow = `<tr><td class="param-label" title="Mid-level cloud, about 2 to 6 km">☁ Mid (6.5-20k)</td>`;
-            let cHighRow = `<tr><td class="param-label" title="High cloud, above about 6 km">☁ High (20k+)</td>`;
+            let cLowRow = `<tr><td class="param-label" title="Low cloud and fog, up to about 3 km (above sea level)">☁ Low (to 10k)</td>`;
+            let cMidRow = `<tr><td class="param-label" title="Mid-level cloud, about 3 to 8 km (above sea level)">☁ Mid (10-26k)</td>`;
+            let cHighRow = `<tr><td class="param-label" title="High cloud, above about 8 km (above sea level)">☁ High (26k+)</td>`;
 
             let visRow = `<tr><td class="param-label">Vis (km)</td>`;
-            let baseRow = `<tr><td class="param-label" title="Height above the airfield where cloud cover first reaches ${CONFIG.cloudbaseCoverThreshold}%">Base (ft AGL)</td>`;
+            let baseRow = `<tr><td class="param-label" title="Met Office UK 2 km cloud base, about 2.5 days ahead. Beyond that, 'est.' = estimate from cloud cover by height.">Base (ft AGL)</td>`;
             let fogRow = `<tr><td class="param-label">Fog Risk</td>`;
             let affRow = `<tr><td class="param-label" title="Averaged wind and gusts at or below ${CONFIG.affWindLimitMph} mph">AFF (≤${CONFIG.affWindLimitMph} mph)</td>`;
 
@@ -1106,7 +1171,8 @@
                 } else if (d.base === 'check') {
                     baseRow += `<td class="${colClass}" title="Low cloud ${Math.round(d.low)}% but the model doesn't give a clear base"><span class="traffic-badge-yellow">CHECK</span></td>`;
                 } else {
-                    baseRow += `<td class="${colClass}">${getTrafficBadge('base', d.base === null ? 'Unlimited' : d.base)}</td>`;
+                    const estTag = d.baseEstimated ? `<div style="font-size:0.55rem; color:var(--text-muted); margin-top:0.1rem;">est.</div>` : '';
+                    baseRow += `<td class="${colClass}">${getTrafficBadge('base', d.base === null ? 'Unlimited' : d.base)}${estTag}</td>`;
                 }
                 fogRow += `<td class="${colClass}">${getTrafficBadge('fog', fogStatus)}</td>`;
                 affRow += `<td class="${colClass}"><span class="traffic-badge-${d.affOk ? 'green' : 'red'}">${d.affOk ? 'OK' : 'NO'}</span></td>`;

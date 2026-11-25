@@ -1,0 +1,1171 @@
+<!-- ========================================================================= -->
+<!-- REVISION: v4.4                                                            -->
+<!-- SYSTEM: RichBot - Skydive Southwest Flight Line Forecast                  -->
+<!-- TARGET FILE: forecast/index.html                                          -->
+<!-- BACKUPS: previous versions are kept in forecast/revisions/                -->
+<!-- ========================================================================= -->
+<!-- CHANGE LOG                                                                -->
+<!-- v4.4 (2026-11-25)                                                         -->
+<!--   - Wind: the 7-day cards and plain-English outlook now use the same      -->
+<!--     4-model average (ECMWF, GFS, ICON, Meteo-France) as the hourly        -->
+<!--     matrix, so card and matrix always agree. Model rows still show each   -->
+<!--     model's own figures. Averages are matched hour-by-hour by time.       -->
+<!--   - Cloud layers: removed the custom 0-5k/5-10k/10-15k/15k+ weighting     -->
+<!--     (it was under-reporting low cloud by up to ~60 points). The matrix    -->
+<!--     now shows Open-Meteo's own Low / Mid / High layers and total cover.   -->
+<!--   - Cloudbase: rewritten. Now read from Open-Meteo cloud cover at 10      -->
+<!--     pressure levels (surface to ~18,000 ft): the base is where cover      -->
+<!--     first reaches 50% (CONFIG.cloudbaseCoverThreshold), interpolated      -->
+<!--     between levels, in ft above the airfield. Replaces the old            -->
+<!--     temperature/dew-point estimate, which read far too low on cold days.  -->
+<!--     If the Low layer is 50%+ but no level gives a base, shows CHECK.      -->
+<!--     (Models disagree a lot on cloudbase, so it is not averaged.)          -->
+<!--   - Cloudbase warnings now match the colours: "low cloud" in the outlook  -->
+<!--     and CHECK CLOUDBASE on cards trigger below 2,000 ft (red), not 1,000. -->
+<!--   - "Heavy cloud" in the outlook now means Low or Mid layer >= 90%, so    -->
+<!--     high cirrus alone no longer counts as a problem.                      -->
+<!--   - New AFF check (wind only): averaged wind or gusts over                -->
+<!--     CONFIG.affWindLimitMph (17 mph = 15 kt) = not AFF suitable. Shown as  -->
+<!--     an AFF row in the matrix, a badge on the cards and a line in the      -->
+<!--     outlook text.                                                         -->
+<!-- v4.3 (2026-11-25)                                                         -->
+<!--   - Fixed the "JUMP: x%" badge on the 7-day cards, which had no styling   -->
+<!--     (it used undefined status-* classes; now uses traffic-badge-*).       -->
+<!--   - Fixed the "Top (15k+)" cloud row always showing 0% (typo:             -->
+<!--     cloud_cover_hgh -> cloud_cover_high).                                 -->
+<!--   - PRESS row now shows sea-level pressure (QNH-style, pressure_msl)      -->
+<!--     instead of surface pressure, which read ~30 hPa low at 254 m.         -->
+<!--   - Removed a duplicate copy of getAverageWindDirection().                -->
+<!--   - Revision number now set once in CONFIG and shown in the page title,   -->
+<!--     header badge and footer automatically.                                -->
+<!-- v4.2 - baseline (backed up as revisions/index-v4.2.html)                  -->
+<!-- ========================================================================= -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- [SUB-SECTION: HTML HEAD & METADATA] -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RichBot - Skydive Southwest Flight Line Forecast</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- [SECTION: CORE STYLESHEET] -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --bg-primary: #f1f5f9;
+            --bg-card: #ffffff;
+            --border-color: #cbd5e1;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --accent-sky: #0284c7;
+            --accent-emerald: #059669;
+            --accent-amber: #d97706;
+            --accent-orange: #ea580c;
+            --accent-red: #dc2626;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-primary); color: var(--text-main); min-height: 100vh; line-height: 1.5; }
+
+        /* [SUB-SECTION: HEADER STYLES] */
+        header { background-color: var(--bg-card); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 50; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); }
+        .header-container { max-width: 1500px; margin: 0 auto; padding: 1rem 1.5rem; display: flex; flex-direction: column; gap: 1rem; align-items: center; justify-content: space-between; }
+        @media(min-width: 640px) { .header-container { flex-direction: row; } }
+
+        .logo-box { display: flex; align-items: center; gap: 0.75rem; }
+        .logo-icon { background-color: var(--accent-sky); color: white; padding: 0.6rem; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
+        .logo-title { font-size: 1.125rem; font-weight: 700; letter-spacing: -0.025em; display: flex; align-items: center; gap: 0.5rem; color: #0f172a; }
+        .rev-badge { font-size: 0.65rem; background: rgba(2, 132, 199, 0.1); color: #0284c7; border: 1px solid rgba(2, 132, 199, 0.3); padding: 0.1rem 0.4rem; border-radius: 0.25rem; font-weight: 600; }
+        .logo-sub { font-size: 0.75rem; color: var(--text-muted); }
+
+        .header-actions { display: flex; align-items: center; gap: 1rem; }
+        .last-updated { font-size: 0.75rem; color: var(--text-muted); background-color: #f8fafc; padding: 0.375rem 0.75rem; border-radius: 0.5rem; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 0.35rem; }
+        .btn-refresh { background-color: var(--accent-sky); color: white; border: none; font-size: 0.75rem; font-weight: 600; padding: 0.5rem 0.875rem; border-radius: 0.5rem; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; gap: 0.375rem; }
+        .btn-refresh:hover { background-color: #0369a1; }
+
+        main { max-width: 1500px; margin: 0 auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 2rem; }
+
+        .error-banner { background-color: #fee2e2; border: 1px solid #f87171; color: #991b1b; padding: 0.85rem 1.25rem; border-radius: 0.75rem; font-size: 0.875rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 1rem; }
+        .hidden { display: none !important; }
+
+        section { display: flex; flex-direction: column; gap: 1.5rem; }
+        .section-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem; }
+        .section-title-wrap { display: flex; align-items: center; gap: 0.625rem; }
+        .section-dot { width: 0.75rem; height: 0.75rem; border-radius: 9999px; background-color: var(--accent-sky); box-shadow: 0 0 8px rgba(2, 132, 199, 0.4); }
+        .section-title { font-size: 1.15rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #0f172a; }
+        .section-date { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
+
+        .panel { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 1rem; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; }
+        .panel-title { font-size: 0.9rem; font-weight: 700; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 0.5rem; }
+        .badge { font-size: 0.7rem; background-color: #f1f5f9; color: #334155; padding: 0.25rem 0.625rem; border-radius: 0.375rem; border: 1px solid var(--border-color); font-weight: 600; }
+
+        /* [SUB-SECTION: 7-DAY OUTLOOK CARD STYLES] */
+        .outlook-days-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 1rem; align-items: stretch; }
+        @media(min-width: 640px) { .outlook-days-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media(min-width: 1024px) { .outlook-days-grid { grid-template-columns: repeat(4, 1fr); } }
+        @media(min-width: 1400px) { .outlook-days-grid { grid-template-columns: repeat(7, 1fr); } }
+
+        .outlook-day-card { border: 2px solid var(--border-color); border-radius: 1rem; padding: 0.85rem; display: flex; flex-direction: column; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.05); height: 100%; }
+        .outlook-day-card:hover { border-color: var(--accent-sky); box-shadow: 0 4px 6px rgba(0,0,0,0.08); }
+        .outlook-day-card.active { border-color: var(--accent-sky); box-shadow: 0 0 15px rgba(2, 132, 199, 0.2); }
+
+        .card-top-content { display: flex; flex-direction: column; gap: 0.5rem; flex: 0 0 auto; }
+
+        .card-bg-green { background-color: #f0fdf4; border-color: #86efac; }
+        .card-bg-yellow { background-color: #fefce8; border-color: #fde047; }
+        .card-bg-orange { background-color: #fff7ed; border-color: #fdba74; }
+        .card-bg-red { background-color: #fef2f2; border-color: #fca5a5; }
+
+        .outlook-section { background: rgba(255, 255, 255, 0.7); border: 1px solid rgba(0, 0, 0, 0.08); border-radius: 0.5rem; padding: 0.35rem 0.5rem; display: flex; flex-direction: column; gap: 0.25rem; margin-top: 0.5rem; }
+        
+        .outlook-matrix-mini { display: flex; flex-direction: column; gap: 0.15rem; font-size: 0.7rem; background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(0, 0, 0, 0.08); border-radius: 0.5rem; padding: 0.35rem; margin-top: 0.5rem; }
+        .wf-row { display: grid; grid-template-columns: 42px repeat(5, 1fr); align-items: center; text-align: center; gap: 1px; padding: 0.1rem 0; border-bottom: 1px solid rgba(0, 0, 0, 0.05); }
+        .wf-row:last-child { border-bottom: none; }
+        .wf-label { text-align: left; font-weight: 700; color: #64748b; font-size: 0.6rem; padding-left: 2px; }
+        .wf-cell { display: flex; align-items: center; justify-content: center; }
+        .wf-arrow { font-size: 0.7rem; color: #0284c7; }
+
+        .cloudbase-warning-badge { background-color: #fef2f2; color: #991b1b; border: 1px solid #f87171; padding: 0.2rem 0.25rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.6rem; display: block; text-transform: uppercase; width: 100%; margin-top: 0.25rem; letter-spacing: 0.025em; }
+        .diagnosis-box { background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(2, 132, 199, 0.2); border-radius: 0.5rem; padding: 0.5rem; font-size: 0.7rem; color: #0369a1; line-height: 1.35; font-weight: 500; margin-top: 0.75rem; flex: 1 1 auto; display: flex; flex-direction: column; justify-content: flex-start; }
+
+        /* [SUB-SECTION: TRAFFIC BADGE & COLOR UTILITIES] */
+        .text-green { color: #059669 !important; font-weight: 700; }
+        .text-yellow { color: #d97706 !important; font-weight: 700; }
+        .text-orange { color: #ea580c !important; font-weight: 700; }
+        .text-red { color: #dc2626 !important; font-weight: 700; }
+
+        .traffic-badge-green { background-color: #ecfdf5; color: #065f46; border: 1px solid #10b981; padding: 0.2rem 0.15rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.65rem; display: block; text-transform: uppercase; width: 100%; white-space: nowrap; }
+        .traffic-badge-yellow { background-color: #fefce8; color: #854d0e; border: 1px solid #eab308; padding: 0.2rem 0.15rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.65rem; display: block; text-transform: uppercase; width: 100%; white-space: nowrap; }
+        .traffic-badge-orange { background-color: #fff7ed; color: #c2410c; border: 1px solid #f97316; padding: 0.2rem 0.15rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.65rem; display: block; text-transform: uppercase; width: 100%; white-space: nowrap; }
+        .traffic-badge-red { background-color: #fef2f2; color: #991b1b; border: 1px solid #ef4444; padding: 0.2rem 0.15rem; border-radius: 0.3rem; font-weight: 700; text-align: center; font-size: 0.65rem; display: block; text-transform: uppercase; width: 100%; white-space: nowrap; }
+
+        /* [SUB-SECTION: MASTER MATRIX STYLES] */
+        .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid #e2e8f0; border-radius: 0.75rem; background: #fff; }
+        .master-traffic-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; text-align: center; white-space: nowrap; }
+        .master-traffic-table th, .master-traffic-table td { padding: 0.5rem 0.6rem; border: 1px solid #e2e8f0; min-width: 68px; }
+        .master-traffic-table th { font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 0.7rem; background: #f8fafc; }
+        .master-traffic-table th.param-label, .master-traffic-table td.param-label { text-align: left; font-weight: 700; color: #475569; background: #f8fafc; padding-left: 0.75rem; position: sticky; left: 0; z-index: 10; min-width: 95px; width: 95px; font-size: 0.68rem; }
+        .master-traffic-table th.param-label { z-index: 20; }
+
+        .master-traffic-table th.current-col, .master-traffic-table td.current-col { background-color: #f0f9ff !important; border-left: 2px solid var(--accent-sky) !important; border-right: 2px solid var(--accent-sky) !important; }
+        .master-traffic-table th.current-col { border-top: 2px solid var(--accent-sky) !important; color: var(--accent-sky) !important; }
+        .master-traffic-table tr:last-child td.current-col { border-bottom: 2px solid var(--accent-sky) !important; }
+
+        /* [SUB-SECTION: MAP & WEBCAM STYLES] */
+        .map-container { position: relative; width: 100%; height: 500px; border-radius: 0.75rem; overflow: hidden; border: 1px solid var(--border-color); background: #e2e8f0; }
+        .map-container iframe { width: 100%; height: 100%; border: none; }
+
+        .webcam-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+        @media(min-width: 768px) { .webcam-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media(min-width: 1200px) { .webcam-grid { grid-template-columns: repeat(4, 1fr); } }
+
+        .webcam-card { background: #f8fafc; border: 1px solid var(--border-color); border-radius: 0.75rem; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        .webcam-title { font-size: 0.85rem; font-weight: 700; color: #0f172a; display: flex; align-items: center; justify-content: space-between; }
+
+        footer { background-color: var(--bg-card); border-top: 1px solid var(--border-color); margin-top: 3rem; padding: 1.5rem; text-align: center; font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
+    </style>
+</head>
+<body>
+
+    <!-- [SECTION: CONFIGURATION & SETTINGS BLOCK] -->
+    <script>
+        const CONFIG = {
+            revision: "v4.4",
+            systemName: "RichBot",
+            locationName: "Skydive Southwest, Dunkeswell Airfield",
+            latitude: 50.880,
+            longitude: -3.230,
+            elevation: 254,                 // airfield elevation in metres (cloudbase is shown above this)
+            timezone: "Europe/London",
+            refreshIntervalMinutes: 5,
+            affWindLimitMph: 17,            // AFF student limit: 15 knots. Wind OR gusts above this = not AFF suitable
+            cloudbaseCoverThreshold: 50     // % cloud cover at a level that counts as the cloudbase
+        };
+    </script>
+
+    <!-- [SECTION: PAGE HEADER] -->
+    <header>
+        <div class="header-container">
+            <div class="logo-box">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-plane-departure"></i>
+                </div>
+                <div>
+                    <h1 class="logo-title">RichBot <span class="rev-badge" id="rev-badge"></span></h1>
+                    <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <span id="last-updated" class="last-updated">
+                    <i class="fa-solid fa-sync fa-spin" style="color: var(--accent-sky);"></i> Loading...
+                </span>
+                <button onclick="fetchAllData()" class="btn-refresh">
+                    <i class="fa-solid fa-rotate"></i> Refresh
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- [SECTION: MAIN PAGE BODY CONTAINER] -->
+    <main>
+
+        <!-- [SUB-SECTION: ERROR BANNER] -->
+        <div id="error-banner" class="error-banner hidden">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.125rem;"></i>
+                <span id="error-message">Weather service temporarily busy. Retrying automatically...</span>
+            </div>
+            <button onclick="fetchAllData()" style="background: #dc2626; color: white; border: 1px solid #f87171; padding: 0.3rem 0.75rem; border-radius: 0.375rem; cursor: pointer; font-weight: 600; font-size: 0.75rem;">Retry Now</button>
+        </div>
+
+        <!-- [SECTION: OPERATIONAL VIEW & OUTLOOK] -->
+        <section class="space-y-6">
+
+            <!-- [SUB-SECTION: 1. MASTER ALL-DAY HOURLY TRAFFIC LIGHT MATRIX] -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h3 class="panel-title" id="matrix-section-title"><i class="fa-solid fa-traffic-light" style="color: var(--accent-sky);"></i>Hourly Overview</h3>
+                    <span class="badge">At-a-Glance Flight Line Matrix</span>
+                </div>
+                <div class="table-wrapper">
+                    <table class="master-traffic-table" id="master-traffic-matrix">
+                        <!-- Populated dynamically via JS -->
+                    </table>
+                </div>
+            </div>
+
+            <!-- [SUB-SECTION: 2. 7-DAY DROPZONE OUTLOOK CARDS] -->
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <div class="section-header">
+                    <div class="section-title-wrap">
+                        <div class="section-dot" style="background-color: var(--accent-emerald);"></div>
+                        <h2 class="section-title">7-Day Dropzone Outlook</h2>
+                    </div>
+                    <span class="section-date" id="selected-day-header-label">Click Day Box to View Detailed Schedule</span>
+                </div>
+                <div class="outlook-days-grid" id="outlook-days-container">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </div>
+
+            <!-- [SUB-SECTION: WINDY SATELLITE & CLOUDS MAP] -->
+            <div class="panel" style="padding: 1.25rem;">
+                <div class="panel-header" style="margin-bottom: 1rem;">
+                    <h3 class="panel-title"><i class="fa-solid fa-satellite" style="color: var(--accent-sky);"></i>Windy Satellite & Clouds Live Radar</h3>
+                    <span class="badge">Skydive Southwest Dropzone</span>
+                </div>
+                <div class="map-container">
+                    <iframe src="https://embed.windy.com/embed2.html?lat=50.880&lon=-3.230&detailLat=50.880&detailLon=-3.230&width=650&height=450&zoom=8&level=surface&overlay=satellite&product=ecmwf&menu=&message=&marker=50.880,-3.230&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=mph&metricTemp=%C2%B0C&radarRange=-1&play=1" frameborder="0"></iframe>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--text-muted); padding-top: 0.5rem;">
+                    <span><i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> Live satellite tracking with native map-locked airfield marker pin.</span>
+                    <span>Powered by Windy.com</span>
+                </div>
+            </div>
+
+            <!-- [SUB-SECTION: LOCAL AIRFIELD LIVE FEEDS & WEBCAMS] -->
+            <div class="panel" style="padding: 1.25rem;">
+                <div class="panel-header" style="margin-bottom: 1rem;">
+                    <h3 class="panel-title"><i class="fa-solid fa-video" style="color: var(--accent-sky);"></i>Local Airfield Live Feeds</h3>
+                    <span class="badge">4 Live Streams</span>
+                </div>
+
+                <div class="webcam-grid">
+                    <div class="webcam-card">
+                        <div class="webcam-title" style="margin-bottom: 0.25rem;">
+                            <span>Dunkeswell Cam 1</span>
+                            <span style="font-size: 0.65rem; color: var(--accent-sky); background: rgba(2,132,199,0.1); padding: 0.1rem 0.3rem; border-radius: 0.25rem;">Live Stream</span>
+                        </div>
+                        <div style="position: relative; width: 100%; height: 260px; border-radius: 0.5rem; overflow: hidden; background: #000;">
+                            <iframe src="https://g0.ipcamlive.com/player/player.php?alias=62318ab5850ed" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                        </div>
+                    </div>
+
+                    <div class="webcam-card">
+                        <div class="webcam-title" style="margin-bottom: 0.25rem;">
+                            <span>Dunkeswell Cam 2</span>
+                            <span style="font-size: 0.65rem; color: var(--accent-sky); background: rgba(2,132,199,0.1); padding: 0.1rem 0.3rem; border-radius: 0.25rem;">Live Stream</span>
+                        </div>
+                        <div style="position: relative; width: 100%; height: 260px; border-radius: 0.5rem; overflow: hidden; background: #000;">
+                            <iframe src="https://g0.ipcamlive.com/player/player.php?alias=62318a7ba1540" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                        </div>
+                    </div>
+
+                    <div class="webcam-card">
+                        <div class="webcam-title" style="margin-bottom: 0.25rem;">
+                            <span>North Hill Cam 1 (West)</span>
+                            <span style="font-size: 0.65rem; color: #dc2626; background: rgba(220,38,38,0.1); padding: 0.1rem 0.3rem; border-radius: 0.25rem;">YouTube Live</span>
+                        </div>
+                        <div style="position: relative; width: 100%; height: 260px; border-radius: 0.5rem; overflow: hidden; background: #000;">
+                            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/live_stream?channel=UCQoDJe88-7nfYKeQnFnTw6g" title="DSGC North Hill Webcam 1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                    </div>
+
+                    <div class="webcam-card">
+                        <div class="webcam-title" style="margin-bottom: 0.25rem;">
+                            <span>North Hill Cam 2 (East)</span>
+                            <span style="font-size: 0.65rem; color: #dc2626; background: rgba(220,38,38,0.1); padding: 0.1rem 0.3rem; border-radius: 0.25rem;">YouTube Live</span>
+                        </div>
+                        <div style="position: relative; width: 100%; height: 260px; border-radius: 0.5rem; overflow: hidden; background: #000;">
+                            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/live_stream?channel=UCmn1hb_77LmtrYaYp9GRgnw" title="DSGC North Hill Webcam 2" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- [SECTION: PAGE FOOTER] -->
+    <footer>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • <span id="rev-footer"></span> • Powered by Open-Meteo & Windy.com</p>
+    </footer>
+
+    <!-- [SECTION: APPLICATION LOGIC & JAVASCRIPT] -->
+    <script>
+        let globalWeatherData = null;
+        let multiModelData = {};
+        let blendedWind = null;   // 4-model average wind, aligned to globalWeatherData.hourly.time (mph)
+        let selectedDayIndex = 0;
+
+        // Pressure levels used to find the real cloudbase (1000 hPa ~ sea level ... 500 hPa ~ 18,000 ft)
+        const PRESSURE_LEVELS = [1000, 975, 950, 925, 900, 850, 800, 700, 600, 500];
+        const PRESSURE_LEVEL_VARS = PRESSURE_LEVELS.flatMap(p => [`cloud_cover_${p}hPa`, `geopotential_height_${p}hPa`]).join(',');
+
+        // [SUB-SECTION: CIRCULAR ANGLE AVERAGE UTILITY]
+        function getAverageWindDirection(degreesArray) {
+            if (!degreesArray || degreesArray.length === 0) return 0;
+            let sumSin = 0;
+            let sumCos = 0;
+            let validCount = 0;
+
+            degreesArray.forEach(deg => {
+                if (deg !== null && deg !== undefined && !isNaN(deg)) {
+                    const rad = (deg * Math.PI) / 180;
+                    sumSin += Math.sin(rad);
+                    sumCos += Math.cos(rad);
+                    validCount++;
+                }
+            });
+
+            if (validCount === 0) return 0;
+            const avgSin = sumSin / validCount;
+            const avgCos = sumCos / validCount;
+            let avgDeg = (Math.atan2(avgSin, avgCos) * 180) / Math.PI;
+            if (avgDeg < 0) avgDeg += 360;
+            return avgDeg;
+        }
+
+        // [SUB-SECTION: UNIT CONVERSION UTILITIES]
+        function kmhToMph(kmh) {
+            return Math.round(kmh * 0.621371);
+        }
+
+        // [SUB-SECTION: COLOR & BADGE THRESHOLD HELPERS]
+        function getCloudColorClass(val) {
+            if (val <= 50) return 'text-green';
+            if (val <= 70) return 'text-yellow';
+            if (val <= 95) return 'text-orange';
+            return 'text-red';
+        }
+
+        function getWindColorClass(mph) {
+            if (mph === '--' || mph === null || mph === undefined) return 'text-muted';
+            if (mph <= 14) return 'text-green';
+            if (mph <= 19) return 'text-yellow';
+            if (mph <= 23) return 'text-orange';
+            return 'text-red';
+        }
+
+        function getVisColorClass(visKm) {
+            if (visKm >= 7) return 'text-green';
+            if (visKm >= 5) return 'text-yellow';
+            if (visKm >= 3) return 'text-orange';
+            return 'text-red';
+        }
+
+        function getRainColorClass(prob) {
+            if (prob <= 20) return 'text-green';
+            if (prob <= 40) return 'text-yellow';
+            if (prob <= 60) return 'text-orange';
+            return 'text-red';
+        }
+
+        function getBaseColorClass(baseFt) {
+            if (baseFt === 'Unlimited' || baseFt >= 5000) return 'text-green';
+            if (baseFt >= 3500) return 'text-yellow';
+            if (baseFt >= 2000) return 'text-orange';
+            return 'text-red';
+        }
+
+        function getWeatherIcon(code, rainProb = 0) {
+            if (rainProb >= 30) {
+                if (code >= 95) return { icon: 'fa-cloud-bolt', color: '#9333ea', label: 'Thunderstorms' };
+                if (code >= 80 && code <= 82) return { icon: 'fa-cloud-showers-heavy', color: '#2563eb', label: 'Heavy Showers' };
+                return { icon: 'fa-cloud-rain', color: '#3b82f6', label: 'Rain Showers' };
+            }
+            if (code === 0) return { icon: 'fa-sun', color: '#d97706', label: 'Clear Sky' };
+            if (code >= 1 && code <= 3) return { icon: 'fa-cloud-sun', color: '#0284c7', label: 'Partly Cloudy' };
+            if (code >= 45 && code <= 48) return { icon: 'fa-smog', color: '#64748b', label: 'Fog / Mist' };
+            if (code >= 71 && code <= 77) return { icon: 'fa-snowflake', color: '#6366f1', label: 'Snow' };
+            return { icon: 'fa-cloud', color: '#64748b', label: 'Overcast' };
+        }
+
+        function getWindDirectionLabel(degrees) {
+            if (degrees === null || degrees === undefined || isNaN(degrees)) return '--';
+            const dirs = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+            return dirs[Math.round((degrees % 360) / 22.5) % 16];
+        }
+
+        // [SUB-SECTION: API FETCH & NETWORK HANDLERS]
+        async function fetchWithRetry(url, retries = 3, delay = 2000) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url);
+                    if (response.ok) return await response.json();
+                    
+                    if ((response.status === 503 || response.status === 429) && i < retries - 1) {
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2;
+                        continue;
+                    }
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                } catch (err) {
+                    if (i === retries - 1) throw err;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2;
+                }
+            }
+        }
+
+        async function fetchAllData() {
+            const errBanner = document.getElementById('error-banner');
+            const errMessage = document.getElementById('error-message');
+            errBanner.classList.add('hidden');
+
+            const mainUrl = `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&elevation=${CONFIG.elevation}&hourly=temperature_2m,dew_point_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,wind_speed_10m,wind_direction_10m,wind_gusts_10m,pressure_msl,visibility,${PRESSURE_LEVEL_VARS}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,sunrise,sunset&timezone=${CONFIG.timezone}`;
+            const modelsConfig = [
+                { key: 'ecmwf_ifs025', url: `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&models=ecmwf_ifs025&timezone=${CONFIG.timezone}` },
+                { key: 'gfs_seamless', url: `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&models=gfs_seamless&timezone=${CONFIG.timezone}` },
+                { key: 'icon_seamless', url: `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&models=icon_seamless&timezone=${CONFIG.timezone}` },
+                { key: 'meteofrance_seamless', url: `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&models=meteofrance_seamless&timezone=${CONFIG.timezone}` }
+            ];
+
+            try {
+                const mainResponse = await fetchWithRetry(mainUrl);
+                globalWeatherData = mainResponse;
+
+                const modelPromises = modelsConfig.map(async m => {
+                    try {
+                        const res = await fetch(m.url);
+                        if (res.ok) {
+                            const json = await res.json();
+                            if (json && json.hourly && json.hourly.wind_speed_10m && json.hourly.wind_speed_10m.length > 0) {
+                                return { key: m.key, data: json };
+                            }
+                        }
+                    } catch (e) {
+                        console.warn(`Model ${m.key} unavailable, falling back.`);
+                    }
+                    return { key: m.key, data: null };
+                });
+
+                const modelResults = await Promise.all(modelPromises);
+                multiModelData = {};
+                modelResults.forEach(item => {
+                    multiModelData[item.key] = item.data;
+                });
+                buildBlendedWind();
+
+                document.getElementById('last-updated').innerHTML = `<i class="fa-solid fa-check" style="color: var(--accent-emerald);"></i> Updated: ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} (${CONFIG.revision})`;
+
+                renderOutlookCards();
+                renderActiveDay(selectedDayIndex);
+
+            } catch (err) {
+                console.error("Critical error fetching weather data:", err);
+                errMessage.textContent = `Weather server temporarily unavailable (${err.message}). Click 'Retry Now'.`;
+                errBanner.classList.remove('hidden');
+                document.getElementById('last-updated').innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color: #dc2626;"></i> Update Failed`;
+            }
+        }
+
+        // [SUB-SECTION: METEOROLOGICAL & CLOUDBASE CALCULATIONS]
+        // Cloudbase in ft above the airfield, read from the model's cloud cover at each pressure level.
+        // The base is the height where cover first reaches CONFIG.cloudbaseCoverThreshold,
+        // interpolated between the level below and the level above.
+        // Returns a number (ft AGL, nearest 100), null (no base below ~18,000 ft) or undefined (no data).
+        function calculateCloudbaseAGL(i) {
+            const hourly = globalWeatherData.hourly;
+            const threshold = CONFIG.cloudbaseCoverThreshold;
+            let prevHeight = CONFIG.elevation;
+            let prevCover = 0;
+            let haveData = false;
+
+            for (const p of PRESSURE_LEVELS) {
+                const ghArr = hourly[`geopotential_height_${p}hPa`];
+                const ccArr = hourly[`cloud_cover_${p}hPa`];
+                const height = ghArr ? ghArr[i] : null;
+                const cover = ccArr ? ccArr[i] : null;
+                if (height === null || height === undefined || cover === null || cover === undefined) continue;
+                if (height <= CONFIG.elevation) continue;   // level is below the airfield
+                haveData = true;
+
+                if (cover >= threshold) {
+                    const frac = cover > prevCover ? (threshold - prevCover) / (cover - prevCover) : 0;
+                    const baseMetres = prevHeight + Math.max(0, Math.min(1, frac)) * (height - prevHeight);
+                    return Math.max(0, Math.round(((baseMetres - CONFIG.elevation) * 3.28084) / 100) * 100);
+                }
+                prevHeight = height;
+                prevCover = cover;
+            }
+            return haveData ? null : undefined;
+        }
+
+        // 4-model average wind (speed, gust, direction), matched to the main forecast hour by time.
+        // Falls back to the main forecast for any hour where no model has data.
+        function buildBlendedWind() {
+            const hourly = globalWeatherData.hourly;
+            const models = Object.values(multiModelData)
+                .filter(m => m && m.hourly && m.hourly.time)
+                .map(m => {
+                    const index = new Map();
+                    m.hourly.time.forEach((t, k) => index.set(t, k));
+                    return { h: m.hourly, index };
+                });
+            const avg = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
+            const ok = v => v !== null && v !== undefined && !isNaN(v);
+
+            blendedWind = { speed: [], gust: [], dir: [], models: [] };
+            hourly.time.forEach((t, i) => {
+                const speeds = [], gusts = [], dirs = [];
+                models.forEach(({ h, index }) => {
+                    const k = index.get(t);
+                    if (k === undefined || !ok(h.wind_speed_10m[k])) return;
+                    speeds.push(h.wind_speed_10m[k]);
+                    if (h.wind_gusts_10m && ok(h.wind_gusts_10m[k])) gusts.push(h.wind_gusts_10m[k]);
+                    if (h.wind_direction_10m && ok(h.wind_direction_10m[k])) dirs.push(h.wind_direction_10m[k]);
+                });
+                blendedWind.speed[i] = kmhToMph(speeds.length ? avg(speeds) : (hourly.wind_speed_10m[i] || 0));
+                blendedWind.gust[i] = kmhToMph(gusts.length ? avg(gusts) : (hourly.wind_gusts_10m[i] || 0));
+                blendedWind.dir[i] = dirs.length ? getAverageWindDirection(dirs) : (hourly.wind_direction_10m[i] || 0);
+                blendedWind.models[i] = speeds.length;
+            });
+        }
+
+        // Everything the page needs for one hour, worked out in one place so the cards,
+        // the outlook text and the hourly matrix always agree.
+        function getHourData(i) {
+            const h = globalWeatherData.hourly;
+            const vis = h.visibility[i] / 1000;
+            const temp = h.temperature_2m[i];
+            const dew = h.dew_point_2m[i];
+            const hum = h.relative_humidity_2m[i];
+            const code = h.weather_code[i];
+            const rain = h.precipitation_probability[i];
+            const low = h.cloud_cover_low[i] || 0;
+            const mid = h.cloud_cover_mid[i] || 0;
+            const high = h.cloud_cover_high[i] || 0;
+            const total = h.cloud_cover && h.cloud_cover[i] !== null ? h.cloud_cover[i] : Math.max(low, mid, high);
+            const ws = blendedWind.speed[i];
+            const wg = blendedWind.gust[i];
+            const spread = temp - dew;
+
+            let fogStatus = 'CLEAR';
+            if (vis < 1.0 || (code >= 45 && code <= 48 && vis < 3.0)) fogStatus = 'FOG';
+            else if (vis < 5.0 && (hum >= 90 || spread <= 1.5)) fogStatus = 'MIST';
+            const isFog = (vis < 1.0) || ((code >= 45 && code <= 48) && vis < 3.0) || (vis < 5.0 && hum >= 90 && spread <= 1.5);
+
+            // If the low layer is cloudy but no single level reaches the threshold, the model
+            // can't place a base: show CHECK rather than a misleading "Unlimited".
+            let base = calculateCloudbaseAGL(i);
+            if (base === null && low >= CONFIG.cloudbaseCoverThreshold) base = 'check';
+
+            return {
+                temp, dew, hum, code, rain, vis, low, mid, high, total, ws, wg,
+                dir: blendedWind.dir[i],
+                base,
+                fogStatus, isFog,
+                affOk: ws <= CONFIG.affWindLimitMph && wg <= CONFIG.affWindLimitMph
+            };
+        }
+
+        // Cloudbase below 2,000 ft (red on the matrix) counts as "low cloud".
+        function isLowBase(base) {
+            return typeof base === 'number' && base < 2000;
+        }
+
+        // Plain-English day summary for office staff: says how the day looks, what the
+        // problems are and when, and when the best window is. Same thresholds as the scoring.
+        function generateTimedOutlookSummary(dayIndex, hourly) {
+            const daily = globalWeatherData.daily;
+            const targetDateStr = daily.time[dayIndex];
+            let dayStart = hourly.time.findIndex(t => t.startsWith(targetDateStr) && t.includes('08:00'));
+            if (dayStart === -1) dayStart = (dayIndex * 24) + 8;
+
+            let sunsetHour = 18;
+            if (daily.sunset && daily.sunset[dayIndex]) {
+                sunsetHour = new Date(daily.sunset[dayIndex]).getHours();
+            }
+
+            // ---- 1. One record per daylight hour ----
+            const hours = [];
+            for (let h = dayStart; h < Math.min(dayStart + 11, hourly.time.length); h++) {
+                const hourNum = parseInt(hourly.time[h].split('T')[1].split(':')[0]);
+                if (hourNum > sunsetHour) continue;
+
+                const d = getHourData(h);
+
+                const issues = [];
+                if (d.ws > 23 || d.wg > 23) issues.push('wind');
+                if (d.rain >= 50) issues.push('rain');
+                if (d.low >= 90 || d.mid >= 90) issues.push('cloud');
+                if (isLowBase(d.base)) issues.push('lowbase');
+                if (d.isFog) issues.push('fog');
+
+                hours.push({ hour: hourNum, issues, ws: d.ws, wg: d.wg, dir: d.dir, cloudCover: d.total, affOk: d.affOk });
+            }
+            if (hours.length === 0) return 'No forecast available for this day.';
+
+            // ---- 2. Wording helpers ----
+            const fmtHour = (h) => `${((h + 11) % 12) + 1}${h >= 12 ? 'pm' : 'am'}`;
+            const fmtRange = (a, b) => `${fmtHour(a.hour)} until about ${fmtHour(b.hour + 1)}`;
+            const issueWords = {
+                wind: 'strong winds',
+                rain: 'rain',
+                cloud: 'heavy cloud',
+                lowbase: 'low cloud',
+                fog: 'fog or mist'
+            };
+            const joinList = (items) => {
+                if (items.length <= 1) return items.join('');
+                return `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`;
+            };
+            const compass = (deg) => {
+                const names = ['north', 'north-east', 'east', 'south-east', 'south', 'south-west', 'west', 'north-west'];
+                return names[Math.round((((deg % 360) + 360) % 360) / 45) % 8];
+            };
+            const describeWind = (slice) => {
+                const avg = Math.round(slice.reduce((s, x) => s + x.ws, 0) / slice.length);
+                const maxGust = Math.max(...slice.map(x => x.wg));
+                const sx = slice.reduce((s, x) => s + Math.sin(x.dir * Math.PI / 180), 0);
+                const cy = slice.reduce((s, x) => s + Math.cos(x.dir * Math.PI / 180), 0);
+                const dir = compass((Math.atan2(sx, cy) * 180 / Math.PI + 360) % 360);
+                const strength = avg <= 8 ? 'light' : (avg <= 15 ? 'moderate' : 'fresh');
+                const gustBit = maxGust >= avg + 6 ? `, gusting to ${maxGust} mph` : '';
+                return `${strength} winds from the ${dir} (around ${avg} mph${gustBit})`;
+            };
+            const describeSky = (slice) => {
+                const avg = slice.reduce((s, x) => s + x.cloudCover, 0) / slice.length;
+                if (avg < 25) return 'mostly clear skies';
+                if (avg < 60) return 'some cloud about';
+                return 'quite a lot of cloud';
+            };
+
+            // ---- 3. Split the day into "problem" runs and "good" runs ----
+            const badRuns = [];
+            let bestRun = null;
+            let cur = null;
+            let curGood = null;
+            hours.forEach((x, i) => {
+                const consecutive = i > 0 && x.hour === hours[i - 1].hour + 1;
+                if (x.issues.length) {
+                    if (!cur || !consecutive) { cur = { start: x, end: x, issues: new Set() }; badRuns.push(cur); }
+                    cur.end = x;
+                    x.issues.forEach(k => cur.issues.add(k));
+                    curGood = null;
+                } else {
+                    cur = null;
+                    if (!curGood || !consecutive) curGood = { items: [] };
+                    curGood.items.push(x);
+                    if (!bestRun || curGood.items.length > bestRun.items.length) bestRun = curGood;
+                }
+            });
+
+            // ---- 4. Build the sentences ----
+            const lines = [];
+
+            if (badRuns.length === 0) {
+                lines.push(`Conditions look fine all day with ${describeWind(hours)} and ${describeSky(hours)}.`);
+            } else {
+                let prevNames = null;
+                const parts = badRuns.map(r => {
+                    const order = ['wind', 'rain', 'fog', 'lowbase', 'cloud'];
+                    const names = joinList(order.filter(k => r.issues.has(k)).map(k => issueWords[k]));
+                    const whole = r.start === hours[0] && r.end === hours[hours.length - 1];
+                    const again = prevNames === names;
+                    prevNames = names;
+                    return `${names}${again ? ' again' : ''} ${whole ? 'all day' : 'from ' + fmtRange(r.start, r.end)}`;
+                });
+                lines.push(`Expect ${parts.join(', then ')}.`);
+
+                if (bestRun && bestRun.items.length >= 2) {
+                    const a = bestRun.items[0];
+                    const b = bestRun.items[bestRun.items.length - 1];
+                    lines.push(`Best window is roughly ${fmtHour(a.hour)} to ${fmtHour(b.hour + 1)}, with ${describeWind(bestRun.items)}.`);
+                } else if (bestRun) {
+                    lines.push(`Only a brief gap around ${fmtHour(bestRun.items[0].hour)}.`);
+                } else {
+                    lines.push('No decent gap in the weather expected.');
+                }
+            }
+
+            // ---- 5. AFF students (wind limit only) ----
+            const jumpable = hours.filter(x => x.issues.length === 0);
+            if (jumpable.length > 0 && !jumpable.every(x => x.affOk)) {
+                let bestAff = null, run = null;
+                hours.forEach((x, i) => {
+                    const consecutive = i > 0 && x.hour === hours[i - 1].hour + 1;
+                    if (x.affOk && x.issues.length === 0) {
+                        if (!run || !consecutive) run = [];
+                        run.push(x);
+                        if (!bestAff || run.length > bestAff.length) bestAff = run;
+                    } else {
+                        run = null;
+                    }
+                });
+                if (!bestAff) {
+                    lines.push(`Too windy for AFF students (over ${CONFIG.affWindLimitMph} mph).`);
+                } else if (bestAff.length === 1) {
+                    lines.push(`AFF students: only around ${fmtHour(bestAff[0].hour)}.`);
+                } else {
+                    lines.push(`AFF students: roughly ${fmtHour(bestAff[0].hour)} to ${fmtHour(bestAff[bestAff.length - 1].hour + 1)}.`);
+                }
+            }
+
+            return lines
+                .map((l, i) => `<span style="display:block;${i > 0 ? ' margin-top:0.3rem;' : ''}">${l}</span>`)
+                .join('');
+        }
+
+        function calculateDayMetrics(dayIndex, hourly) {
+            const daily = globalWeatherData.daily;
+            const targetDateStr = daily.time[dayIndex];
+            let dayStart = hourly.time.findIndex(t => t.startsWith(targetDateStr) && t.includes('08:00'));
+            if (dayStart === -1) dayStart = (dayIndex * 24) + 8;
+
+            let sunsetHour = 18;
+            if (daily.sunset && daily.sunset[dayIndex]) {
+                sunsetHour = new Date(daily.sunset[dayIndex]).getHours();
+            }
+
+            let scoreSum = 0;
+            let evaluatedHours = 0;
+            let hasLowCloudbase = false;
+            let hasFogWarning = false;
+            let affHours = 0;
+
+            for (let h = dayStart; h < Math.min(dayStart + 11, hourly.time.length); h++) {
+                const timeStr = hourly.time[h];
+                const hourNum = parseInt(timeStr.split('T')[1].split(':')[0]);
+                if (hourNum > sunsetHour) continue;
+
+                const d = getHourData(h);
+                const base = typeof d.base === 'number' ? d.base : Infinity;   // no base = no penalty
+
+                if (isLowBase(d.base)) hasLowCloudbase = true;
+                if (d.isFog) hasFogWarning = true;
+                if (d.affOk) affHours++;
+
+                const windOk = d.ws <= 23 && d.wg <= 23;
+                const rainOk = d.rain < 50;
+                const visOk = !d.isFog && d.vis >= 3;
+
+                if (windOk && rainOk && visOk) {
+                    let hourScore = 100;
+                    if (base < 1000) {
+                        hourScore -= 70;
+                    } else if (base < 2000) {
+                        hourScore -= 40;
+                    } else if (base < 3500) {
+                        hourScore -= 15;
+                    }
+                    scoreSum += Math.max(0, hourScore);
+                }
+                evaluatedHours++;
+            }
+            const likelihood = evaluatedHours > 0 ? Math.round(scoreSum / evaluatedHours) : 85;
+            return { likelihood, hasLowCloudbase, hasFogWarning, affHours, evaluatedHours };
+        }
+
+        // [SUB-SECTION: 7-DAY OUTLOOK CARDS RENDERER]
+        function renderOutlookCards() {
+            const container = document.getElementById('outlook-days-container');
+            container.innerHTML = '';
+            const daily = globalWeatherData.daily;
+            const hourly = globalWeatherData.hourly;
+            const hoursInterval = [8, 11, 14, 17];
+
+            for (let i = 0; i < Math.min(7, daily.time.length); i++) {
+                const dateObj = new Date(daily.time[i]);
+                const dayName = dateObj.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }).toUpperCase();
+                const dateStr = dateObj.toISOString().split('T')[0];
+                
+                const metrics = calculateDayMetrics(i, hourly);
+                const diagnosisText = generateTimedOutlookSummary(i, hourly);
+                const isActive = i === selectedDayIndex ? ' active' : '';
+                
+                let bgTintClass = 'card-bg-green';
+                let badgeClass = 'traffic-badge-green';
+                if (metrics.likelihood < 40) {
+                    bgTintClass = 'card-bg-red';
+                    badgeClass = 'traffic-badge-red';
+                } else if (metrics.likelihood < 70) {
+                    bgTintClass = metrics.likelihood < 55 ? 'card-bg-orange' : 'card-bg-yellow';
+                    badgeClass = metrics.likelihood < 55 ? 'traffic-badge-orange' : 'traffic-badge-yellow';
+                }
+
+                let timeRow = `<div class="wf-row"><span class="wf-label">TIME</span>`;
+                let dirRow = `<div class="wf-row"><span class="wf-label">DIR</span>`;
+                let spdRow = `<div class="wf-row"><span class="wf-label">WIND</span>`;
+                let gustRow = `<div class="wf-row"><span class="wf-label">GUST</span>`;
+                let weatherRow = `<div class="wf-row"><span class="wf-label">SKY</span>`;
+                let rainRow = `<div class="wf-row"><span class="wf-label">RAIN</span>`;
+                let tempRow = `<div class="wf-row"><span class="wf-label">TEMP</span>`;
+                let pressRow = `<div class="wf-row"><span class="wf-label">PRESS</span>`;
+
+                hoursInterval.forEach(hTarget => {
+                    const targetStr = `${dateStr}T${String(hTarget).padStart(2, '0')}:00`;
+                    let idx = hourly.time.findIndex(t => t.startsWith(targetStr));
+                    if (idx === -1) idx = hourly.time.findIndex(t => t.startsWith(dateStr));
+
+                    const dirDeg = blendedWind.dir[idx] || 0;
+                    const spd = blendedWind.speed[idx] || 0;
+                    const gust = blendedWind.gust[idx] || 0;
+                    const weatherCode = hourly.weather_code[idx] || 0;
+                    const rainProb = hourly.precipitation_probability ? hourly.precipitation_probability[idx] || 0 : 0;
+                    const rainMm = hourly.precipitation ? hourly.precipitation[idx] || 0 : 0;
+                    const temp = Math.round(hourly.temperature_2m[idx] || 15);
+                    const press = Math.round(hourly.pressure_msl ? hourly.pressure_msl[idx] || 1013 : 1013);
+                    const rot = (dirDeg + 180) % 360;
+                    const wInfo = getWeatherIcon(weatherCode, rainProb);
+
+                    timeRow += `<span class="wf-cell">${String(hTarget).padStart(2, '0')}h</span>`;
+                    dirRow += `<span class="wf-cell"><i class="fa-solid fa-arrow-up wf-arrow" style="transform: rotate(${rot}deg);"></i></span>`;
+                    spdRow += `<span class="wf-cell"><span class="${getWindColorClass(spd)}">${spd}</span></span>`;
+                    gustRow += `<span class="wf-cell"><span class="${getWindColorClass(gust)}">${gust}</span></span>`;
+                    weatherRow += `<span class="wf-cell"><i class="fa-solid ${wInfo.icon}" style="color: ${wInfo.color}; font-size: 0.75rem;" title="${wInfo.label}"></i></span>`;
+                    rainRow += `<span class="wf-cell" style="color: ${rainMm > 0 ? '#0284c7' : '#64748b'}; font-size: 0.6rem;">${rainMm > 0 ? rainMm.toFixed(1) : ''}</span>`;
+                    tempRow += `<span class="wf-cell"><span>${temp}°</span></span>`;
+                    pressRow += `<span class="wf-cell" style="font-size: 0.6rem; color: #475569;">${press}</span>`;
+                });
+
+                timeRow += `</div>`; dirRow += `</div>`; spdRow += `</div>`; gustRow += `</div>`;
+                weatherRow += `</div>`; rainRow += `</div>`; tempRow += `</div>`; pressRow += `</div>`;
+
+                const cloudbaseWarningHtml = metrics.hasLowCloudbase 
+                    ? `<span class="cloudbase-warning-badge"><i class="fa-solid fa-triangle-exclamation mr-1"></i> CHECK CLOUDBASE</span>` 
+                    : '';
+                const fogWarningHtml = metrics.hasFogWarning
+                    ? `<span class="cloudbase-warning-badge" style="background:#fee2e2; color:#991b1b; border-color:#f87171;"><i class="fa-solid fa-triangle-exclamation mr-1"></i> CHECK FOG / MIST</span>`
+                    : '';
+                // AFF badge only when wind rules AFF out for some or all of the day (keeps the cards short)
+                let affWarningHtml = '';
+                if (metrics.evaluatedHours > 0 && metrics.affHours === 0) {
+                    affWarningHtml = `<span class="cloudbase-warning-badge"><i class="fa-solid fa-wind mr-1"></i> NOT AFF SUITABLE</span>`;
+                } else if (metrics.affHours < metrics.evaluatedHours) {
+                    affWarningHtml = `<span class="cloudbase-warning-badge" style="background:#fff7ed; color:#c2410c; border-color:#f97316;"><i class="fa-solid fa-wind mr-1"></i> AFF: LIMITED HOURS</span>`;
+                }
+
+                const card = document.createElement('div');
+                card.className = `outlook-day-card ${bgTintClass}${isActive ? ' active' : ''}`;
+                card.onclick = () => selectDay(i);
+                card.innerHTML = `
+                    <div class="card-top-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,0,0,0.08); padding-bottom: 0.4rem;">
+                            <span style="font-weight: 700; color: #0f172a; font-size: 0.85rem;">${dayName}</span>
+                        </div>
+                        <div class="outlook-section">
+                            <span class="${badgeClass}" style="width: 100%;">JUMP: ${metrics.likelihood}%</span>
+                            ${cloudbaseWarningHtml}
+                            ${fogWarningHtml}
+                            ${affWarningHtml}
+                        </div>
+                        <div class="outlook-matrix-mini">
+                            ${timeRow}
+                            ${dirRow}
+                            ${spdRow}
+                            ${gustRow}
+                            ${weatherRow}
+                            ${rainRow}
+                            ${tempRow}
+                            ${pressRow}
+                        </div>
+                    </div>
+                    <div class="diagnosis-box">
+                        <b>Outlook:</b> ${diagnosisText}
+                    </div>
+                `;
+                container.appendChild(card);
+            }
+        }
+
+        function selectDay(dayIndex) {
+            selectedDayIndex = dayIndex;
+            renderOutlookCards();
+            renderActiveDay(selectedDayIndex);
+        }
+
+        // [SUB-SECTION: TRAFFIC LIGHT BADGE GENERATOR]
+        function getTrafficBadge(category, value, unit = '') {
+            let status = 'green';
+            let label = `${value}${unit}`;
+
+            if (category === 'wind' || category === 'gust') {
+                if (value > 23) { status = 'red'; label = `${value}`; }
+                else if (value > 19) { status = 'orange'; label = `${value}`; }
+                else if (value > 14) { status = 'yellow'; label = `${value}`; }
+                else { status = 'green'; label = `${value}`; }
+            } else if (category === 'rain') {
+                if (value >= 60) { status = 'red'; label = `${value}%`; }
+                else if (value >= 40) { status = 'orange'; label = `${value}%`; }
+                else if (value >= 25) { status = 'yellow'; label = `${value}%`; }
+                else { status = 'green'; label = `${value}%`; }
+            } else if (category === 'cloud') {
+                if (value >= 90) { status = 'red'; label = `${value}%`; }
+                else if (value >= 70) { status = 'orange'; label = `${value}%`; }
+                else if (value >= 50) { status = 'yellow'; label = `${value}%`; }
+                else { status = 'green'; label = `${value}%`; }
+            } else if (category === 'vis') {
+                if (value < 3) { status = 'red'; label = `${value}`; }
+                else if (value < 5) { status = 'orange'; label = `${value}`; }
+                else if (value < 7) { status = 'yellow'; label = `${value}`; }
+                else { status = 'green'; label = `${value}`; }
+            } else if (category === 'base') {
+                if (value === 'Unlimited' || value >= 5000) { status = 'green'; label = typeof value === 'number' ? value.toLocaleString() : value; }
+                else if (value >= 3500) { status = 'yellow'; label = value.toLocaleString(); }
+                else if (value >= 2000) { status = 'orange'; label = value.toLocaleString(); }
+                else { status = 'red'; label = value.toLocaleString(); }
+            } else if (category === 'fog') {
+                if (value === 'FOG') { status = 'red'; label = 'FOG'; }
+                else if (value === 'MIST') { status = 'orange'; label = 'MIST'; }
+                else { status = 'green'; label = 'CLEAR'; }
+            }
+
+            return `<span class="traffic-badge-${status}">${label}</span>`;
+        }
+
+        // [SUB-SECTION: ACTIVE DAY HOURLY OVERVIEW MATRIX RENDERER]
+        function renderActiveDay(dayIndex) {
+            const data = globalWeatherData;
+            const hourly = data.hourly;
+            const daily = data.daily;
+
+            const targetDate = new Date(daily.time[dayIndex]);
+            const dateStr = targetDate.toISOString().split('T')[0];
+            const dayOfWeekName = targetDate.toLocaleDateString('en-GB', { weekday: 'long' });
+
+            const sunriseIso = daily.sunrise && daily.sunrise[dayIndex] ? daily.sunrise[dayIndex] : null;
+            const sunsetIso = daily.sunset && daily.sunset[dayIndex] ? daily.sunset[dayIndex] : null;
+
+            let sunriseHour = -1, sunriseMinStr = '', sunsetHour = -1, sunsetMinStr = '';
+            if (sunriseIso) {
+                const sDate = new Date(sunriseIso);
+                sunriseHour = sDate.getHours();
+                sunriseMinStr = sDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
+            }
+            if (sunsetIso) {
+                const sDate = new Date(sunsetIso);
+                sunsetHour = sDate.getHours();
+                sunsetMinStr = sDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
+            }
+
+            document.getElementById('matrix-section-title').innerHTML = `<i class="fa-solid fa-traffic-light" style="color: var(--accent-sky);"></i>${dayOfWeekName} Hourly Overview`;
+
+            let startIndex = hourly.time.findIndex(t => t.startsWith(dateStr) && t.includes('08:00'));
+            if (startIndex === -1) startIndex = (dayIndex * 24) + 8;
+            const validStart = startIndex !== -1 ? startIndex : (dayIndex * 24) + 8;
+            const hoursCount = 11;
+
+            const nowLocalDate = new Date();
+            const year = nowLocalDate.getFullYear();
+            const month = String(nowLocalDate.getMonth() + 1).padStart(2, '0');
+            const day = String(nowLocalDate.getDate()).padStart(2, '0');
+            const hour = String(nowLocalDate.getHours()).padStart(2, '0');
+            const currentLocalHourStr = `${year}-${month}-${day}T${hour}`;
+
+            let hourHeaders = `<tr><th class="param-label"></th>`;
+            
+            // Core Summary Rows
+            let tempRow = `<tr><td class="param-label">Temp (°C)</td>`;
+            let skyRow = `<tr><td class="param-label">Sky Condition</td>`;
+            let windRow = `<tr><td class="param-label">Wind (mph)</td>`;
+            let gustRow = `<tr><td class="param-label">Gusts (mph)</td>`;
+            let dirRow = `<tr><td class="param-label">Wind Dir</td>`;
+
+            // Individual Model Wind Rows
+            let ecmwfRow = `<tr><td class="param-label">ECMWF Wind</td>`;
+            let gfsRow = `<tr><td class="param-label">GFS Wind</td>`;
+            let iconRow = `<tr><td class="param-label">ICON Wind</td>`;
+            let meteoRow = `<tr><td class="param-label">Meteo Wind</td>`;
+
+            // Atmospheric & Cloud Rows
+            let rainRow = `<tr><td class="param-label">Rain (%)</td>`;
+            let cloudRow = `<tr><td class="param-label">Cloud (%)</td>`;
+            // Open-Meteo's own cloud layers (heights are approximate, above sea level)
+            let cLowRow = `<tr><td class="param-label" title="Low cloud and fog, up to about 2 km">☁ Low (to 6.5k)</td>`;
+            let cMidRow = `<tr><td class="param-label" title="Mid-level cloud, about 2 to 6 km">☁ Mid (6.5-20k)</td>`;
+            let cHighRow = `<tr><td class="param-label" title="High cloud, above about 6 km">☁ High (20k+)</td>`;
+
+            let visRow = `<tr><td class="param-label">Vis (km)</td>`;
+            let baseRow = `<tr><td class="param-label" title="Height above the airfield where cloud cover first reaches ${CONFIG.cloudbaseCoverThreshold}%">Base (ft AGL)</td>`;
+            let fogRow = `<tr><td class="param-label">Fog Risk</td>`;
+            let affRow = `<tr><td class="param-label" title="Averaged wind and gusts at or below ${CONFIG.affWindLimitMph} mph">AFF (≤${CONFIG.affWindLimitMph} mph)</td>`;
+
+            for (let i = validStart; i < Math.min(validStart + hoursCount, hourly.time.length); i++) {
+                const timeStr = hourly.time[i];
+                const hourObj = new Date(timeStr);
+                const hourNum = hourObj.getHours();
+
+                if (sunsetHour !== -1 && hourNum > sunsetHour) {
+                    continue;
+                }
+
+                const timeLabel = hourObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
+                const isCurrentHour = timeStr.startsWith(currentLocalHourStr);
+                const colClass = isCurrentHour ? ' current-col' : '';
+
+                const d = getHourData(i);
+                const wSpd = d.ws;
+                const wGST = d.wg;
+                const dirDeg = d.dir;
+                const rot = (dirDeg + 180) % 360;
+                const dirLabel = getWindDirectionLabel(dirDeg);
+
+                const temp = Math.round(d.temp);
+                const rain = d.rain;
+                const vis = parseFloat(d.vis.toFixed(1));
+                const code = d.code;
+                const fogStatus = d.fogStatus;
+                const cloud = Math.round(d.total);
+
+                const hFog = fogStatus === 'FOG' || fogStatus === 'MIST' || vis < 3;
+                const wInfo = getWeatherIcon(hFog ? 45 : code, rain);
+
+                function getModelCellHtml(modelKey) {
+                    const modelObj = multiModelData[modelKey];
+                    if (!modelObj || !modelObj.hourly || !modelObj.hourly.wind_speed_10m) return `<td class="${colClass}" style="color:var(--text-muted); font-size:0.65rem;">--</td>`;
+                    
+                    const mIdx = modelObj.hourly.time.findIndex(t => t === timeStr);
+                    if (mIdx === -1 || modelObj.hourly.wind_speed_10m[mIdx] === undefined || modelObj.hourly.wind_speed_10m[mIdx] === null) {
+                        return `<td class="${colClass}" style="color:var(--text-muted); font-size:0.65rem;">--</td>`;
+                    }
+
+                    const rawSpd = modelObj.hourly.wind_speed_10m[mIdx];
+                    const rawGust = modelObj.hourly.wind_gusts_10m ? modelObj.hourly.wind_gusts_10m[mIdx] : 0;
+                    const rawDir = modelObj.hourly.wind_direction_10m ? modelObj.hourly.wind_direction_10m[mIdx] : 0;
+                    
+                    const mSpd = kmhToMph(rawSpd);
+                    const mGust = kmhToMph(rawGust);
+                    const mDir = getWindDirectionLabel(rawDir);
+                    const mRot = (rawDir + 180) % 360;
+
+                    return `<td class="${colClass}" style="font-size:0.7rem;">
+                        <span class="${getWindColorClass(mSpd)}" style="font-weight:700;">${mSpd}</span> <span style="font-size:0.6rem; color:var(--text-muted);">G${mGust}</span><br>
+                        <i class="fa-solid fa-arrow-up" style="transform: rotate(${mRot}deg); color: var(--accent-sky); font-size:0.6rem;"></i> <span style="font-size:0.65rem;">${mDir}</span>
+                    </td>`;
+                }
+
+                let eventBadge = '';
+                if (sunriseHour === hourNum && sunriseMinStr) {
+                    eventBadge += `<div style="font-size: 0.55rem; background: #fef3c7; color: #b45309; border: 1px solid #fcd34d; padding: 0.05rem 0.2rem; border-radius: 0.2rem; margin-bottom: 0.15rem; font-weight: 700; text-align: center;">Sunrise ${sunriseMinStr}</div>`;
+                }
+                if (sunsetHour === hourNum && sunsetMinStr) {
+                    eventBadge += `<div style="font-size: 0.55rem; background: #ffedd5; color: #c2410c; border: 1px solid #fdba74; padding: 0.05rem 0.2rem; border-radius: 0.2rem; margin-bottom: 0.15rem; font-weight: 700; text-align: center;">Sunset ${sunsetMinStr}</div>`;
+                }
+                const nowTag = isCurrentHour ? `<br><span style="font-size:0.5rem; background:var(--accent-sky); color:white; padding:0.02rem 0.15rem; border-radius:0.15rem;">NOW</span>` : '';
+                const headerContent = `${eventBadge}${timeLabel}${nowTag}`;
+
+                hourHeaders += `<th class="${colClass}">${headerContent}</th>`;
+                tempRow += `<td class="${colClass}" style="font-weight: 700; color: var(--text-main);">${temp}°</td>`;
+                skyRow += `<td class="${colClass}" style="font-size: 0.65rem;"><i class="fa-solid ${wInfo.icon}" style="color: ${wInfo.color}; margin-right: 0.2rem;"></i>${wInfo.label}</td>`;
+                windRow += `<td class="${colClass}">${getTrafficBadge('wind', wSpd)}</td>`;
+                gustRow += `<td class="${colClass}">${getTrafficBadge('gust', wGST)}</td>`;
+                dirRow += `<td class="${colClass}" style="font-weight: 600;"><i class="fa-solid fa-arrow-up" style="transform: rotate(${rot}deg); color: var(--accent-sky); margin-right: 0.25rem;"></i>${dirLabel}</td>`;
+                
+                ecmwfRow += getModelCellHtml('ecmwf_ifs025');
+                gfsRow += getModelCellHtml('gfs_seamless');
+                iconRow += getModelCellHtml('icon_seamless');
+                meteoRow += getModelCellHtml('meteofrance_seamless');
+
+                rainRow += `<td class="${colClass}">${getTrafficBadge('rain', rain, '%')}</td>`;
+                cloudRow += `<td class="${colClass}">${getTrafficBadge('cloud', cloud, '%')}</td>`;
+                
+                cLowRow += `<td class="${colClass} ${getCloudColorClass(d.low)}" style="font-size: 0.7rem;">${Math.round(d.low)}%</td>`;
+                cMidRow += `<td class="${colClass} ${getCloudColorClass(d.mid)}" style="font-size: 0.7rem;">${Math.round(d.mid)}%</td>`;
+                cHighRow += `<td class="${colClass} ${getCloudColorClass(d.high)}" style="font-size: 0.7rem;">${Math.round(d.high)}%</td>`;
+
+                visRow += `<td class="${colClass}">${getTrafficBadge('vis', vis)}</td>`;
+                if (d.base === undefined) {
+                    baseRow += `<td class="${colClass}" style="color:var(--text-muted);">--</td>`;
+                } else if (d.base === 'check') {
+                    baseRow += `<td class="${colClass}" title="Low cloud ${Math.round(d.low)}% but the model doesn't give a clear base"><span class="traffic-badge-yellow">CHECK</span></td>`;
+                } else {
+                    baseRow += `<td class="${colClass}">${getTrafficBadge('base', d.base === null ? 'Unlimited' : d.base)}</td>`;
+                }
+                fogRow += `<td class="${colClass}">${getTrafficBadge('fog', fogStatus)}</td>`;
+                affRow += `<td class="${colClass}"><span class="traffic-badge-${d.affOk ? 'green' : 'red'}">${d.affOk ? 'OK' : 'NO'}</span></td>`;
+            }
+
+            hourHeaders += `</tr>`;
+            tempRow += `</tr>`;
+            skyRow += `</tr>`;
+            windRow += `</tr>`;
+            gustRow += `</tr>`;
+            dirRow += `</tr>`;
+            ecmwfRow += `</tr>`;
+            gfsRow += `</tr>`;
+            iconRow += `</tr>`;
+            meteoRow += `</tr>`;
+            rainRow += `</tr>`;
+            cloudRow += `</tr>`;
+            cLowRow += `</tr>`;
+            cMidRow += `</tr>`;
+            cHighRow += `</tr>`;
+            visRow += `</tr>`;
+            baseRow += `</tr>`;
+            fogRow += `</tr>`;
+            affRow += `</tr>`;
+
+            document.getElementById('master-traffic-matrix').innerHTML = `
+                <thead>${hourHeaders}</thead>
+                <tbody>
+                    ${tempRow}
+                    ${skyRow}
+                    ${windRow}
+                    ${gustRow}
+                    ${dirRow}
+                    ${ecmwfRow}
+                    ${gfsRow}
+                    ${iconRow}
+                    ${meteoRow}
+                    ${rainRow}
+                    ${cloudRow}
+                    ${cLowRow}
+                    ${cMidRow}
+                    ${cHighRow}
+                    ${visRow}
+                    ${baseRow}
+                    ${fogRow}
+                    ${affRow}
+                </tbody>
+            `;
+        }
+
+        // [SUB-SECTION: INITIALIZATION HOOK]
+        window.onload = () => {
+            const revLabel = `Rev ${CONFIG.revision.replace(/^v/, '')}`;
+            document.title = `${document.title} (${revLabel})`;
+            document.getElementById('rev-badge').textContent = revLabel;
+            document.getElementById('rev-footer').textContent = revLabel;
+            fetchAllData();
+            setInterval(fetchAllData, CONFIG.refreshIntervalMinutes * 60 * 1000);
+        };
+    </script>
+</body>
+</html>
