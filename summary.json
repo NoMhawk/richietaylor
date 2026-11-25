@@ -1,6 +1,32 @@
 {
  "airfield_elev_ft": 833,
- "by_revision": {},
+ "by_revision": {
+  "v4.8": {
+   "cloudbase_ft": {
+    "bias": -1863,
+    "mae": 2850,
+    "median_bias": 464,
+    "n": 16
+   },
+   "first_valid": "2026-11-25T11:00",
+   "hours": 16,
+   "jumpable": {
+    "accuracy_pct": 50,
+    "both_no": 8,
+    "both_yes": 0,
+    "n": 16,
+    "said_no_but_yes": 6,
+    "said_yes_but_no": 2
+   },
+   "last_valid": "2026-11-25T18:00",
+   "wind_mph": {
+    "bias": 0.4,
+    "mae": 1.5,
+    "median_bias": 0.5,
+    "n": 16
+   }
+  }
+ },
  "current_revision": "v4.8",
  "current_tuning": {
   "cloudbaseBiasFt": 0,
@@ -14,9 +40,11 @@
   },
   "windBiasMph": 0
  },
- "data_since": null,
- "generated": "2026-11-25T10:01Z",
- "reports": [],
+ "data_since": "2026-11-25T11:00",
+ "generated": "2026-11-25T21:48Z",
+ "reports": [
+  "2026-11-25.md"
+ ],
  "rules": {
   "heavy_cloud_pct": 90,
   "low_base_ft": 2000,
@@ -192,20 +220,36 @@
     },
     "same_day": {
      "cloud_pct": {
-      "n": 0
+      "bias": 15,
+      "mae": 18,
+      "median_bias": 18,
+      "n": 16
      },
      "cloudbase_ft": {
-      "n": 0
+      "bias": -1863,
+      "mae": 2850,
+      "median_bias": 464,
+      "n": 16
      },
      "gust_mph_when_reported": {
       "n": 0
      },
-     "hours": 0,
+     "hours": 16,
      "jumpable": {
-      "n": 0
+      "accuracy_pct": 50,
+      "both_no": 8,
+      "both_yes": 0,
+      "n": 16,
+      "said_no_but_yes": 6,
+      "said_yes_but_no": 2
      },
      "low_base_under_2000": {
-      "n": 0
+      "accuracy_pct": 38,
+      "both_no": 1,
+      "both_yes": 5,
+      "n": 16,
+      "said_no_but_yes": 3,
+      "said_yes_but_no": 7
      },
      "models_gust_mph_when_reported": {
       "ecmwf_ifs025": {
@@ -223,44 +267,80 @@
      },
      "models_wind_mph": {
       "ecmwf_ifs025": {
-       "n": 0
+       "bias": -0.5,
+       "mae": 1.5,
+       "median_bias": 0.0,
+       "n": 16
       },
       "gfs_seamless": {
-       "n": 0
+       "bias": 0.5,
+       "mae": 1.6,
+       "median_bias": 0.5,
+       "n": 16
       },
       "icon_seamless": {
-       "n": 0
+       "bias": 2.4,
+       "mae": 2.8,
+       "median_bias": 2.5,
+       "n": 16
       },
       "meteofrance_seamless": {
-       "n": 0
+       "bias": -0.6,
+       "mae": 1.8,
+       "median_bias": -0.5,
+       "n": 16
       }
      },
      "rain": {
-      "n": 0
+      "accuracy_pct": 100,
+      "both_no": 16,
+      "both_yes": 0,
+      "n": 16,
+      "said_no_but_yes": 0,
+      "said_yes_but_no": 0
      },
-     "wind_dir_deg_mae": null,
+     "wind_dir_deg_mae": 17,
      "wind_mph": {
-      "n": 0
+      "bias": 0.4,
+      "mae": 1.5,
+      "median_bias": 0.5,
+      "n": 16
      }
     }
    },
    "by_station": {
     "EGDY": {
      "cloud_pct": {
-      "n": 0
+      "bias": 12,
+      "mae": 16,
+      "median_bias": 14,
+      "n": 8
      },
      "cloudbase_ft": {
-      "n": 0
+      "bias": -4374,
+      "mae": 5054,
+      "median_bias": 314,
+      "n": 8
      },
      "gust_mph_when_reported": {
       "n": 0
      },
-     "hours": 0,
+     "hours": 8,
      "jumpable": {
-      "n": 0
+      "accuracy_pct": 38,
+      "both_no": 3,
+      "both_yes": 0,
+      "n": 8,
+      "said_no_but_yes": 4,
+      "said_yes_but_no": 1
      },
      "low_base_under_2000": {
-      "n": 0
+      "accuracy_pct": 25,
+      "both_no": 1,
+      "both_yes": 1,
+      "n": 8,
+      "said_no_but_yes": 1,
+      "said_yes_but_no": 5
      },
      "models_gust_mph_when_reported": {
       "ecmwf_ifs025": {
@@ -278,42 +358,78 @@
      },
      "models_wind_mph": {
       "ecmwf_ifs025": {
-       "n": 0
+       "bias": -1.1,
+       "mae": 2.1,
+       "median_bias": -1.5,
+       "n": 8
       },
       "gfs_seamless": {
-       "n": 0
+       "bias": -0.1,
+       "mae": 1.9,
+       "median_bias": 0.0,
+       "n": 8
       },
       "icon_seamless": {
-       "n": 0
+       "bias": 1.8,
+       "mae": 2.5,
+       "median_bias": 1.0,
+       "n": 8
       },
       "meteofrance_seamless": {
-       "n": 0
+       "bias": -1.2,
+       "mae": 2.5,
+       "median_bias": -1.5,
+       "n": 8
       }
      },
      "rain": {
-      "n": 0
+      "accuracy_pct": 100,
+      "both_no": 8,
+      "both_yes": 0,
+      "n": 8,
+      "said_no_but_yes": 0,
+      "said_yes_but_no": 0
      },
-     "wind_dir_deg_mae": null,
+     "wind_dir_deg_mae": 11,
      "wind_mph": {
-      "n": 0
+      "bias": -0.2,
+      "mae": 2.0,
+      "median_bias": -0.5,
+      "n": 8
      }
     },
     "EGTE": {
      "cloud_pct": {
-      "n": 0
+      "bias": 18,
+      "mae": 20,
+      "median_bias": 18,
+      "n": 8
      },
      "cloudbase_ft": {
-      "n": 0
+      "bias": 648,
+      "mae": 648,
+      "median_bias": 735,
+      "n": 8
      },
      "gust_mph_when_reported": {
       "n": 0
      },
-     "hours": 0,
+     "hours": 8,
      "jumpable": {
-      "n": 0
+      "accuracy_pct": 62,
+      "both_no": 5,
+      "both_yes": 0,
+      "n": 8,
+      "said_no_but_yes": 2,
+      "said_yes_but_no": 1
      },
      "low_base_under_2000": {
-      "n": 0
+      "accuracy_pct": 50,
+      "both_no": 0,
+      "both_yes": 4,
+      "n": 8,
+      "said_no_but_yes": 2,
+      "said_yes_but_no": 2
      },
      "models_gust_mph_when_reported": {
       "ecmwf_ifs025": {
@@ -331,24 +447,44 @@
      },
      "models_wind_mph": {
       "ecmwf_ifs025": {
-       "n": 0
+       "bias": 0.1,
+       "mae": 0.9,
+       "median_bias": 0.5,
+       "n": 8
       },
       "gfs_seamless": {
-       "n": 0
+       "bias": 1.1,
+       "mae": 1.4,
+       "median_bias": 1.0,
+       "n": 8
       },
       "icon_seamless": {
-       "n": 0
+       "bias": 3.0,
+       "mae": 3.0,
+       "median_bias": 3.0,
+       "n": 8
       },
       "meteofrance_seamless": {
-       "n": 0
+       "bias": 0.0,
+       "mae": 1.0,
+       "median_bias": 0.0,
+       "n": 8
       }
      },
      "rain": {
-      "n": 0
+      "accuracy_pct": 100,
+      "both_no": 8,
+      "both_yes": 0,
+      "n": 8,
+      "said_no_but_yes": 0,
+      "said_yes_but_no": 0
      },
-     "wind_dir_deg_mae": null,
+     "wind_dir_deg_mae": 23,
      "wind_mph": {
-      "n": 0
+      "bias": 1.0,
+      "mae": 1.0,
+      "median_bias": 1.0,
+      "n": 8
      }
     }
    },
@@ -364,20 +500,36 @@
    },
    "overall": {
     "cloud_pct": {
-     "n": 0
+     "bias": 15,
+     "mae": 18,
+     "median_bias": 18,
+     "n": 16
     },
     "cloudbase_ft": {
-     "n": 0
+     "bias": -1863,
+     "mae": 2850,
+     "median_bias": 464,
+     "n": 16
     },
     "gust_mph_when_reported": {
      "n": 0
     },
-    "hours": 0,
+    "hours": 16,
     "jumpable": {
-     "n": 0
+     "accuracy_pct": 50,
+     "both_no": 8,
+     "both_yes": 0,
+     "n": 16,
+     "said_no_but_yes": 6,
+     "said_yes_but_no": 2
     },
     "low_base_under_2000": {
-     "n": 0
+     "accuracy_pct": 38,
+     "both_no": 1,
+     "both_yes": 5,
+     "n": 16,
+     "said_no_but_yes": 3,
+     "said_yes_but_no": 7
     },
     "models_gust_mph_when_reported": {
      "ecmwf_ifs025": {
@@ -395,24 +547,44 @@
     },
     "models_wind_mph": {
      "ecmwf_ifs025": {
-      "n": 0
+      "bias": -0.5,
+      "mae": 1.5,
+      "median_bias": 0.0,
+      "n": 16
      },
      "gfs_seamless": {
-      "n": 0
+      "bias": 0.5,
+      "mae": 1.6,
+      "median_bias": 0.5,
+      "n": 16
      },
      "icon_seamless": {
-      "n": 0
+      "bias": 2.4,
+      "mae": 2.8,
+      "median_bias": 2.5,
+      "n": 16
      },
      "meteofrance_seamless": {
-      "n": 0
+      "bias": -0.6,
+      "mae": 1.8,
+      "median_bias": -0.5,
+      "n": 16
      }
     },
     "rain": {
-     "n": 0
+     "accuracy_pct": 100,
+     "both_no": 16,
+     "both_yes": 0,
+     "n": 16,
+     "said_no_but_yes": 0,
+     "said_yes_but_no": 0
     },
-    "wind_dir_deg_mae": null,
+    "wind_dir_deg_mae": 17,
     "wind_mph": {
-     "n": 0
+     "bias": 0.4,
+     "mae": 1.5,
+     "median_bias": 0.5,
+     "n": 16
     }
    }
   },
@@ -579,20 +751,36 @@
     },
     "same_day": {
      "cloud_pct": {
-      "n": 0
+      "bias": 15,
+      "mae": 18,
+      "median_bias": 18,
+      "n": 16
      },
      "cloudbase_ft": {
-      "n": 0
+      "bias": -1863,
+      "mae": 2850,
+      "median_bias": 464,
+      "n": 16
      },
      "gust_mph_when_reported": {
       "n": 0
      },
-     "hours": 0,
+     "hours": 16,
      "jumpable": {
-      "n": 0
+      "accuracy_pct": 50,
+      "both_no": 8,
+      "both_yes": 0,
+      "n": 16,
+      "said_no_but_yes": 6,
+      "said_yes_but_no": 2
      },
      "low_base_under_2000": {
-      "n": 0
+      "accuracy_pct": 38,
+      "both_no": 1,
+      "both_yes": 5,
+      "n": 16,
+      "said_no_but_yes": 3,
+      "said_yes_but_no": 7
      },
      "models_gust_mph_when_reported": {
       "ecmwf_ifs025": {
@@ -610,44 +798,80 @@
      },
      "models_wind_mph": {
       "ecmwf_ifs025": {
-       "n": 0
+       "bias": -0.5,
+       "mae": 1.5,
+       "median_bias": 0.0,
+       "n": 16
       },
       "gfs_seamless": {
-       "n": 0
+       "bias": 0.5,
+       "mae": 1.6,
+       "median_bias": 0.5,
+       "n": 16
       },
       "icon_seamless": {
-       "n": 0
+       "bias": 2.4,
+       "mae": 2.8,
+       "median_bias": 2.5,
+       "n": 16
       },
       "meteofrance_seamless": {
-       "n": 0
+       "bias": -0.6,
+       "mae": 1.8,
+       "median_bias": -0.5,
+       "n": 16
       }
      },
      "rain": {
-      "n": 0
+      "accuracy_pct": 100,
+      "both_no": 16,
+      "both_yes": 0,
+      "n": 16,
+      "said_no_but_yes": 0,
+      "said_yes_but_no": 0
      },
-     "wind_dir_deg_mae": null,
+     "wind_dir_deg_mae": 17,
      "wind_mph": {
-      "n": 0
+      "bias": 0.4,
+      "mae": 1.5,
+      "median_bias": 0.5,
+      "n": 16
      }
     }
    },
    "by_station": {
     "EGDY": {
      "cloud_pct": {
-      "n": 0
+      "bias": 12,
+      "mae": 16,
+      "median_bias": 14,
+      "n": 8
      },
      "cloudbase_ft": {
-      "n": 0
+      "bias": -4374,
+      "mae": 5054,
+      "median_bias": 314,
+      "n": 8
      },
      "gust_mph_when_reported": {
       "n": 0
      },
-     "hours": 0,
+     "hours": 8,
      "jumpable": {
-      "n": 0
+      "accuracy_pct": 38,
+      "both_no": 3,
+      "both_yes": 0,
+      "n": 8,
+      "said_no_but_yes": 4,
+      "said_yes_but_no": 1
      },
      "low_base_under_2000": {
-      "n": 0
+      "accuracy_pct": 25,
+      "both_no": 1,
+      "both_yes": 1,
+      "n": 8,
+      "said_no_but_yes": 1,
+      "said_yes_but_no": 5
      },
      "models_gust_mph_when_reported": {
       "ecmwf_ifs025": {
@@ -665,42 +889,78 @@
      },
      "models_wind_mph": {
       "ecmwf_ifs025": {
-       "n": 0
+       "bias": -1.1,
+       "mae": 2.1,
+       "median_bias": -1.5,
+       "n": 8
       },
       "gfs_seamless": {
-       "n": 0
+       "bias": -0.1,
+       "mae": 1.9,
+       "median_bias": 0.0,
+       "n": 8
       },
       "icon_seamless": {
-       "n": 0
+       "bias": 1.8,
+       "mae": 2.5,
+       "median_bias": 1.0,
+       "n": 8
       },
       "meteofrance_seamless": {
-       "n": 0
+       "bias": -1.2,
+       "mae": 2.5,
+       "median_bias": -1.5,
+       "n": 8
       }
      },
      "rain": {
-      "n": 0
+      "accuracy_pct": 100,
+      "both_no": 8,
+      "both_yes": 0,
+      "n": 8,
+      "said_no_but_yes": 0,
+      "said_yes_but_no": 0
      },
-     "wind_dir_deg_mae": null,
+     "wind_dir_deg_mae": 11,
      "wind_mph": {
-      "n": 0
+      "bias": -0.2,
+      "mae": 2.0,
+      "median_bias": -0.5,
+      "n": 8
      }
     },
     "EGTE": {
      "cloud_pct": {
-      "n": 0
+      "bias": 18,
+      "mae": 20,
+      "median_bias": 18,
+      "n": 8
      },
      "cloudbase_ft": {
-      "n": 0
+      "bias": 648,
+      "mae": 648,
+      "median_bias": 735,
+      "n": 8
      },
      "gust_mph_when_reported": {
       "n": 0
      },
-     "hours": 0,
+     "hours": 8,
      "jumpable": {
-      "n": 0
+      "accuracy_pct": 62,
+      "both_no": 5,
+      "both_yes": 0,
+      "n": 8,
+      "said_no_but_yes": 2,
+      "said_yes_but_no": 1
      },
      "low_base_under_2000": {
-      "n": 0
+      "accuracy_pct": 50,
+      "both_no": 0,
+      "both_yes": 4,
+      "n": 8,
+      "said_no_but_yes": 2,
+      "said_yes_but_no": 2
      },
      "models_gust_mph_when_reported": {
       "ecmwf_ifs025": {
@@ -718,24 +978,44 @@
      },
      "models_wind_mph": {
       "ecmwf_ifs025": {
-       "n": 0
+       "bias": 0.1,
+       "mae": 0.9,
+       "median_bias": 0.5,
+       "n": 8
       },
       "gfs_seamless": {
-       "n": 0
+       "bias": 1.1,
+       "mae": 1.4,
+       "median_bias": 1.0,
+       "n": 8
       },
       "icon_seamless": {
-       "n": 0
+       "bias": 3.0,
+       "mae": 3.0,
+       "median_bias": 3.0,
+       "n": 8
       },
       "meteofrance_seamless": {
-       "n": 0
+       "bias": 0.0,
+       "mae": 1.0,
+       "median_bias": 0.0,
+       "n": 8
       }
      },
      "rain": {
-      "n": 0
+      "accuracy_pct": 100,
+      "both_no": 8,
+      "both_yes": 0,
+      "n": 8,
+      "said_no_but_yes": 0,
+      "said_yes_but_no": 0
      },
-     "wind_dir_deg_mae": null,
+     "wind_dir_deg_mae": 23,
      "wind_mph": {
-      "n": 0
+      "bias": 1.0,
+      "mae": 1.0,
+      "median_bias": 1.0,
+      "n": 8
      }
     }
    },
@@ -751,20 +1031,36 @@
    },
    "overall": {
     "cloud_pct": {
-     "n": 0
+     "bias": 15,
+     "mae": 18,
+     "median_bias": 18,
+     "n": 16
     },
     "cloudbase_ft": {
-     "n": 0
+     "bias": -1863,
+     "mae": 2850,
+     "median_bias": 464,
+     "n": 16
     },
     "gust_mph_when_reported": {
      "n": 0
     },
-    "hours": 0,
+    "hours": 16,
     "jumpable": {
-     "n": 0
+     "accuracy_pct": 50,
+     "both_no": 8,
+     "both_yes": 0,
+     "n": 16,
+     "said_no_but_yes": 6,
+     "said_yes_but_no": 2
     },
     "low_base_under_2000": {
-     "n": 0
+     "accuracy_pct": 38,
+     "both_no": 1,
+     "both_yes": 5,
+     "n": 16,
+     "said_no_but_yes": 3,
+     "said_yes_but_no": 7
     },
     "models_gust_mph_when_reported": {
      "ecmwf_ifs025": {
@@ -782,24 +1078,44 @@
     },
     "models_wind_mph": {
      "ecmwf_ifs025": {
-      "n": 0
+      "bias": -0.5,
+      "mae": 1.5,
+      "median_bias": 0.0,
+      "n": 16
      },
      "gfs_seamless": {
-      "n": 0
+      "bias": 0.5,
+      "mae": 1.6,
+      "median_bias": 0.5,
+      "n": 16
      },
      "icon_seamless": {
-      "n": 0
+      "bias": 2.4,
+      "mae": 2.8,
+      "median_bias": 2.5,
+      "n": 16
      },
      "meteofrance_seamless": {
-      "n": 0
+      "bias": -0.6,
+      "mae": 1.8,
+      "median_bias": -0.5,
+      "n": 16
      }
     },
     "rain": {
-     "n": 0
+     "accuracy_pct": 100,
+     "both_no": 16,
+     "both_yes": 0,
+     "n": 16,
+     "said_no_but_yes": 0,
+     "said_yes_but_no": 0
     },
-    "wind_dir_deg_mae": null,
+    "wind_dir_deg_mae": 17,
     "wind_mph": {
-     "n": 0
+     "bias": 0.4,
+     "mae": 1.5,
+     "median_bias": 0.5,
+     "n": 16
     }
    }
   },
@@ -966,20 +1282,36 @@
     },
     "same_day": {
      "cloud_pct": {
-      "n": 0
+      "bias": 15,
+      "mae": 18,
+      "median_bias": 18,
+      "n": 16
      },
      "cloudbase_ft": {
-      "n": 0
+      "bias": -1863,
+      "mae": 2850,
+      "median_bias": 464,
+      "n": 16
      },
      "gust_mph_when_reported": {
       "n": 0
      },
-     "hours": 0,
+     "hours": 16,
      "jumpable": {
-      "n": 0
+      "accuracy_pct": 50,
+      "both_no": 8,
+      "both_yes": 0,
+      "n": 16,
+      "said_no_but_yes": 6,
+      "said_yes_but_no": 2
      },
      "low_base_under_2000": {
-      "n": 0
+      "accuracy_pct": 38,
+      "both_no": 1,
+      "both_yes": 5,
+      "n": 16,
+      "said_no_but_yes": 3,
+      "said_yes_but_no": 7
      },
      "models_gust_mph_when_reported": {
       "ecmwf_ifs025": {
@@ -997,44 +1329,80 @@
      },
      "models_wind_mph": {
       "ecmwf_ifs025": {
-       "n": 0
+       "bias": -0.5,
+       "mae": 1.5,
+       "median_bias": 0.0,
+       "n": 16
       },
       "gfs_seamless": {
-       "n": 0
+       "bias": 0.5,
+       "mae": 1.6,
+       "median_bias": 0.5,
+       "n": 16
       },
       "icon_seamless": {
-       "n": 0
+       "bias": 2.4,
+       "mae": 2.8,
+       "median_bias": 2.5,
+       "n": 16
       },
       "meteofrance_seamless": {
-       "n": 0
+       "bias": -0.6,
+       "mae": 1.8,
+       "median_bias": -0.5,
+       "n": 16
       }
      },
      "rain": {
-      "n": 0
+      "accuracy_pct": 100,
+      "both_no": 16,
+      "both_yes": 0,
+      "n": 16,
+      "said_no_but_yes": 0,
+      "said_yes_but_no": 0
      },
-     "wind_dir_deg_mae": null,
+     "wind_dir_deg_mae": 17,
      "wind_mph": {
-      "n": 0
+      "bias": 0.4,
+      "mae": 1.5,
+      "median_bias": 0.5,
+      "n": 16
      }
     }
    },
    "by_station": {
     "EGDY": {
      "cloud_pct": {
-      "n": 0
+      "bias": 12,
+      "mae": 16,
+      "median_bias": 14,
+      "n": 8
      },
      "cloudbase_ft": {
-      "n": 0
+      "bias": -4374,
+      "mae": 5054,
+      "median_bias": 314,
+      "n": 8
      },
      "gust_mph_when_reported": {
       "n": 0
      },
-     "hours": 0,
+     "hours": 8,
      "jumpable": {
-      "n": 0
+      "accuracy_pct": 38,
+      "both_no": 3,
+      "both_yes": 0,
+      "n": 8,
+      "said_no_but_yes": 4,
+      "said_yes_but_no": 1
      },
      "low_base_under_2000": {
-      "n": 0
+      "accuracy_pct": 25,
+      "both_no": 1,
+      "both_yes": 1,
+      "n": 8,
+      "said_no_but_yes": 1,
+      "said_yes_but_no": 5
      },
      "models_gust_mph_when_reported": {
       "ecmwf_ifs025": {
@@ -1052,42 +1420,78 @@
      },
      "models_wind_mph": {
       "ecmwf_ifs025": {
-       "n": 0
+       "bias": -1.1,
+       "mae": 2.1,
+       "median_bias": -1.5,
+       "n": 8
       },
       "gfs_seamless": {
-       "n": 0
+       "bias": -0.1,
+       "mae": 1.9,
+       "median_bias": 0.0,
+       "n": 8
       },
       "icon_seamless": {
-       "n": 0
+       "bias": 1.8,
+       "mae": 2.5,
+       "median_bias": 1.0,
+       "n": 8
       },
       "meteofrance_seamless": {
-       "n": 0
+       "bias": -1.2,
+       "mae": 2.5,
+       "median_bias": -1.5,
+       "n": 8
       }
      },
      "rain": {
-      "n": 0
+      "accuracy_pct": 100,
+      "both_no": 8,
+      "both_yes": 0,
+      "n": 8,
+      "said_no_but_yes": 0,
+      "said_yes_but_no": 0
      },
-     "wind_dir_deg_mae": null,
+     "wind_dir_deg_mae": 11,
      "wind_mph": {
-      "n": 0
+      "bias": -0.2,
+      "mae": 2.0,
+      "median_bias": -0.5,
+      "n": 8
      }
     },
     "EGTE": {
      "cloud_pct": {
-      "n": 0
+      "bias": 18,
+      "mae": 20,
+      "median_bias": 18,
+      "n": 8
      },
      "cloudbase_ft": {
-      "n": 0
+      "bias": 648,
+      "mae": 648,
+      "median_bias": 735,
+      "n": 8
      },
      "gust_mph_when_reported": {
       "n": 0
      },
-     "hours": 0,
+     "hours": 8,
      "jumpable": {
-      "n": 0
+      "accuracy_pct": 62,
+      "both_no": 5,
+      "both_yes": 0,
+      "n": 8,
+      "said_no_but_yes": 2,
+      "said_yes_but_no": 1
      },
      "low_base_under_2000": {
-      "n": 0
+      "accuracy_pct": 50,
+      "both_no": 0,
+      "both_yes": 4,
+      "n": 8,
+      "said_no_but_yes": 2,
+      "said_yes_but_no": 2
      },
      "models_gust_mph_when_reported": {
       "ecmwf_ifs025": {
@@ -1105,24 +1509,44 @@
      },
      "models_wind_mph": {
       "ecmwf_ifs025": {
-       "n": 0
+       "bias": 0.1,
+       "mae": 0.9,
+       "median_bias": 0.5,
+       "n": 8
       },
       "gfs_seamless": {
-       "n": 0
+       "bias": 1.1,
+       "mae": 1.4,
+       "median_bias": 1.0,
+       "n": 8
       },
       "icon_seamless": {
-       "n": 0
+       "bias": 3.0,
+       "mae": 3.0,
+       "median_bias": 3.0,
+       "n": 8
       },
       "meteofrance_seamless": {
-       "n": 0
+       "bias": 0.0,
+       "mae": 1.0,
+       "median_bias": 0.0,
+       "n": 8
       }
      },
      "rain": {
-      "n": 0
+      "accuracy_pct": 100,
+      "both_no": 8,
+      "both_yes": 0,
+      "n": 8,
+      "said_no_but_yes": 0,
+      "said_yes_but_no": 0
      },
-     "wind_dir_deg_mae": null,
+     "wind_dir_deg_mae": 23,
      "wind_mph": {
-      "n": 0
+      "bias": 1.0,
+      "mae": 1.0,
+      "median_bias": 1.0,
+      "n": 8
      }
     }
    },
@@ -1138,20 +1562,36 @@
    },
    "overall": {
     "cloud_pct": {
-     "n": 0
+     "bias": 15,
+     "mae": 18,
+     "median_bias": 18,
+     "n": 16
     },
     "cloudbase_ft": {
-     "n": 0
+     "bias": -1863,
+     "mae": 2850,
+     "median_bias": 464,
+     "n": 16
     },
     "gust_mph_when_reported": {
      "n": 0
     },
-    "hours": 0,
+    "hours": 16,
     "jumpable": {
-     "n": 0
+     "accuracy_pct": 50,
+     "both_no": 8,
+     "both_yes": 0,
+     "n": 16,
+     "said_no_but_yes": 6,
+     "said_yes_but_no": 2
     },
     "low_base_under_2000": {
-     "n": 0
+     "accuracy_pct": 38,
+     "both_no": 1,
+     "both_yes": 5,
+     "n": 16,
+     "said_no_but_yes": 3,
+     "said_yes_but_no": 7
     },
     "models_gust_mph_when_reported": {
      "ecmwf_ifs025": {
@@ -1169,24 +1609,44 @@
     },
     "models_wind_mph": {
      "ecmwf_ifs025": {
-      "n": 0
+      "bias": -0.5,
+      "mae": 1.5,
+      "median_bias": 0.0,
+      "n": 16
      },
      "gfs_seamless": {
-      "n": 0
+      "bias": 0.5,
+      "mae": 1.6,
+      "median_bias": 0.5,
+      "n": 16
      },
      "icon_seamless": {
-      "n": 0
+      "bias": 2.4,
+      "mae": 2.8,
+      "median_bias": 2.5,
+      "n": 16
      },
      "meteofrance_seamless": {
-      "n": 0
+      "bias": -0.6,
+      "mae": 1.8,
+      "median_bias": -0.5,
+      "n": 16
      }
     },
     "rain": {
-     "n": 0
+     "accuracy_pct": 100,
+     "both_no": 16,
+     "both_yes": 0,
+     "n": 16,
+     "said_no_but_yes": 0,
+     "said_yes_but_no": 0
     },
-    "wind_dir_deg_mae": null,
+    "wind_dir_deg_mae": 17,
     "wind_mph": {
-     "n": 0
+     "bias": 0.4,
+     "mae": 1.5,
+     "median_bias": 0.5,
+     "n": 16
     }
    }
   }
