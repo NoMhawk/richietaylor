@@ -1,0 +1,70 @@
+name: Forecast Verification
+
+# Checks the RichBot forecast (forecast/index.html) against actual airport weather
+# reports (Exeter EGTE, Yeovilton EGDY). Data is kept on the `forecast-data` branch.
+# Results: https://richietaylor.net/forecast/accuracy/
+
+on:
+  schedule:
+    - cron: '20 */3 * * *'   # every 3 hours; forecast snapshots at ~06:00 and ~18:00 UTC
+  workflow_dispatch:
+    inputs:
+      force_snapshot:
+        description: 'Take a forecast snapshot now'
+        type: boolean
+        default: false
+  push:
+    branches: [main]
+    paths:
+      - '.github/scripts/forecast_verify.py'
+      - '.github/workflows/forecast-verify.yml'
+
+concurrency:
+  group: forecast-verify
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout scripts (main)
+        uses: actions/checkout@v4
+        with:
+          path: site
+          sparse-checkout: .github
+
+      - name: Checkout data (forecast-data)
+        uses: actions/checkout@v4
+        with:
+          ref: forecast-data
+          path: data
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Playwright (headless Chromium)
+        run: |
+          pip install playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Run verification
+        run: |
+          FORCE=""
+          if [ "${{ github.event_name }}" = "push" ] || [ "${{ inputs.force_snapshot }}" = "true" ]; then FORCE="--force-snapshot"; fi
+          python site/.github/scripts/forecast_verify.py --data data $FORCE
+
+      - name: Save data
+        if: always()
+        working-directory: data
+        run: |
+          git config user.name "richbot-verify"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && { echo "No changes"; exit 0; }
+          git commit -q -m "Verification data $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push
