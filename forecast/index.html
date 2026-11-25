@@ -1,10 +1,22 @@
 <!-- ========================================================================= -->
-<!-- REVISION: v4.5                                                            -->
+<!-- REVISION: v4.6                                                            -->
 <!-- SYSTEM: RichBot - Skydive Southwest Flight Line Forecast                  -->
 <!-- TARGET FILE: forecast/index.html                                          -->
 <!-- BACKUPS: previous versions are kept in forecast/revisions/                -->
 <!-- ========================================================================= -->
 <!-- CHANGE LOG                                                                -->
+<!-- v4.6 (2026-11-25)                                                         -->
+<!--   - JUMP % reworked. It ignored cloud cover completely (25 Nov showed     -->
+<!--     56% with 82-100% cloud all day). The score and the outlook text now   -->
+<!--     use one shared set of rules, assessHour():                            -->
+<!--       An hour scores 0 if any of: wind or gusts over 23 mph, rain 50%+,   -->
+<!--       fog/mist, visibility under 3 km, cloudbase under 2,000 ft, or       -->
+<!--       Low or Mid cloud 90%+ (heavy cloud).                                -->
+<!--       Otherwise it starts at 100 and loses points for cloud: nothing up   -->
+<!--       to 50% (Low or Mid, whichever is higher), then up to -50 at 89%;    -->
+<!--       -15 for a base of 2,000-3,499 ft or a CHECK base.                   -->
+<!--     The day's JUMP % is the average across the daylight hours 08-18.     -->
+<!--   - Outlook text now also names "poor visibility" (under 3 km).          -->
 <!-- v4.5 (2026-11-25)                                                         -->
 <!--   - Cloudbase now comes from the Met Office UK 2 km model's own cloud     -->
 <!--     base forecast (Open-Meteo, models=ukmo_seamless, cloud_base), which   -->
@@ -186,7 +198,7 @@
     <!-- [SECTION: CONFIGURATION & SETTINGS BLOCK] -->
     <script>
         const CONFIG = {
-            revision: "v4.5",
+            revision: "v4.6",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -661,6 +673,27 @@
             return typeof base === 'number' && base < 2000;
         }
 
+        // One set of rules for the JUMP % and the outlook text.
+        // Returns the problems for the hour and a 0-100 score.
+        function assessHour(d) {
+            const issues = [];
+            const cloud = Math.max(d.low, d.mid);   // cloud up to ~26,000 ft (Low or Mid layer)
+            if (d.ws > 23 || d.wg > 23) issues.push('wind');
+            if (d.rain >= 50) issues.push('rain');
+            if (d.isFog) issues.push('fog');
+            else if (d.vis < 3) issues.push('vis');
+            if (isLowBase(d.base)) issues.push('lowbase');
+            if (cloud >= 90) issues.push('cloud');
+
+            let score = 0;
+            if (issues.length === 0) {
+                score = 100;
+                if (cloud > 50) score -= Math.round(((cloud - 50) * 50) / 40);   // up to -50 at 89%
+                if ((typeof d.base === 'number' && d.base < 3500) || d.base === 'check') score -= 15;
+            }
+            return { issues, score: Math.max(0, score) };
+        }
+
         // Plain-English day summary for office staff: says how the day looks, what the
         // problems are and when, and when the best window is. Same thresholds as the scoring.
         function generateTimedOutlookSummary(dayIndex, hourly) {
@@ -682,12 +715,7 @@
 
                 const d = getHourData(h);
 
-                const issues = [];
-                if (d.ws > 23 || d.wg > 23) issues.push('wind');
-                if (d.rain >= 50) issues.push('rain');
-                if (d.low >= 90 || d.mid >= 90) issues.push('cloud');
-                if (isLowBase(d.base)) issues.push('lowbase');
-                if (d.isFog) issues.push('fog');
+                const { issues } = assessHour(d);
 
                 hours.push({ hour: hourNum, issues, ws: d.ws, wg: d.wg, dir: d.dir, cloudCover: d.total, affOk: d.affOk });
             }
@@ -701,7 +729,8 @@
                 rain: 'rain',
                 cloud: 'heavy cloud',
                 lowbase: 'low cloud',
-                fog: 'fog or mist'
+                fog: 'fog or mist',
+                vis: 'poor visibility'
             };
             const joinList = (items) => {
                 if (items.length <= 1) return items.join('');
@@ -756,7 +785,7 @@
             } else {
                 let prevNames = null;
                 const parts = badRuns.map(r => {
-                    const order = ['wind', 'rain', 'fog', 'lowbase', 'cloud'];
+                    const order = ['wind', 'rain', 'fog', 'vis', 'lowbase', 'cloud'];
                     const names = joinList(order.filter(k => r.issues.has(k)).map(k => issueWords[k]));
                     const whole = r.start === hours[0] && r.end === hours[hours.length - 1];
                     const again = prevNames === names;
@@ -828,7 +857,6 @@
                 if (hourNum > sunsetHour) continue;
 
                 const d = getHourData(h);
-                const base = typeof d.base === 'number' ? d.base : Infinity;   // no base = no penalty
 
                 if (isLowBase(d.base)) {
                     hasLowCloudbase = true;
@@ -837,21 +865,7 @@
                 if (d.isFog) hasFogWarning = true;
                 if (d.affOk) affHours++;
 
-                const windOk = d.ws <= 23 && d.wg <= 23;
-                const rainOk = d.rain < 50;
-                const visOk = !d.isFog && d.vis >= 3;
-
-                if (windOk && rainOk && visOk) {
-                    let hourScore = 100;
-                    if (base < 1000) {
-                        hourScore -= 70;
-                    } else if (base < 2000) {
-                        hourScore -= 40;
-                    } else if (base < 3500) {
-                        hourScore -= 15;
-                    }
-                    scoreSum += Math.max(0, hourScore);
-                }
+                scoreSum += assessHour(d).score;
                 evaluatedHours++;
             }
             const likelihood = evaluatedHours > 0 ? Math.round(scoreSum / evaluatedHours) : 85;
