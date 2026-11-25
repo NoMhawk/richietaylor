@@ -1,7 +1,21 @@
 <!-- ========================================================================= -->
-<!-- REVISION: v4.2                                                            -->
+<!-- REVISION: v4.3                                                            -->
 <!-- SYSTEM: RichBot - Skydive Southwest Flight Line Forecast                  -->
 <!-- TARGET FILE: forecast/index.html                                          -->
+<!-- BACKUPS: previous versions are kept in forecast/revisions/                -->
+<!-- ========================================================================= -->
+<!-- CHANGE LOG                                                                -->
+<!-- v4.3 (2026-11-25)                                                         -->
+<!--   - Fixed the "JUMP: x%" badge on the 7-day cards, which had no styling   -->
+<!--     (it used undefined status-* classes; now uses traffic-badge-*).       -->
+<!--   - Fixed the "Top (15k+)" cloud row always showing 0% (typo:             -->
+<!--     cloud_cover_hgh -> cloud_cover_high).                                 -->
+<!--   - PRESS row now shows sea-level pressure (QNH-style, pressure_msl)      -->
+<!--     instead of surface pressure, which read ~30 hPa low at 254 m.         -->
+<!--   - Removed a duplicate copy of getAverageWindDirection().                -->
+<!--   - Revision number now set once in CONFIG and shown in the page title,   -->
+<!--     header badge and footer automatically.                                -->
+<!-- v4.2 - baseline (backed up as revisions/index-v4.2.html)                  -->
 <!-- ========================================================================= -->
 
 <!DOCTYPE html>
@@ -10,7 +24,7 @@
     <!-- [SUB-SECTION: HTML HEAD & METADATA] -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RichBot - Skydive Southwest Flight Line Forecast (Rev 4.2)</title>
+    <title>RichBot - Skydive Southwest Flight Line Forecast</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- [SECTION: CORE STYLESHEET] -->
@@ -137,7 +151,7 @@
     <!-- [SECTION: CONFIGURATION & SETTINGS BLOCK] -->
     <script>
         const CONFIG = {
-            revision: "v4.2",
+            revision: "v4.3",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -156,7 +170,7 @@
                     <i class="fa-solid fa-plane-departure"></i>
                 </div>
                 <div>
-                    <h1 class="logo-title">RichBot <span class="rev-badge">Rev 4.2</span></h1>
+                    <h1 class="logo-title">RichBot <span class="rev-badge" id="rev-badge"></span></h1>
                     <p class="logo-sub">Skydive Southwest • Dunkeswell Airfield Flight Line Forecast</p>
                 </div>
             </div>
@@ -284,7 +298,7 @@
 
     <!-- [SECTION: PAGE FOOTER] -->
     <footer>
-        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • Rev 4.2 • Powered by Open-Meteo & Windy.com</p>
+        <p>RichBot • Skydive Southwest • Dunkeswell Airfield • <span id="rev-footer"></span> • Powered by Open-Meteo & Windy.com</p>
     </footer>
 
     <!-- [SECTION: APPLICATION LOGIC & JAVASCRIPT] -->
@@ -404,7 +418,7 @@
             const errMessage = document.getElementById('error-message');
             errBanner.classList.add('hidden');
 
-            const mainUrl = `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&elevation=${CONFIG.elevation}&hourly=temperature_2m,dew_point_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,wind_speed_10m,wind_direction_10m,wind_gusts_10m,surface_pressure,visibility&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,sunrise,sunset&timezone=${CONFIG.timezone}`;
+            const mainUrl = `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&elevation=${CONFIG.elevation}&hourly=temperature_2m,dew_point_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,wind_speed_10m,wind_direction_10m,wind_gusts_10m,pressure_msl,visibility&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,sunrise,sunset&timezone=${CONFIG.timezone}`;
             const modelsConfig = [
                 { key: 'ecmwf_ifs025', url: `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&models=ecmwf_ifs025&timezone=${CONFIG.timezone}` },
                 { key: 'gfs_seamless', url: `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&models=gfs_seamless&timezone=${CONFIG.timezone}` },
@@ -692,13 +706,13 @@
                 const isActive = i === selectedDayIndex ? ' active' : '';
                 
                 let bgTintClass = 'card-bg-green';
-                let badgeClass = 'status-green';
+                let badgeClass = 'traffic-badge-green';
                 if (metrics.likelihood < 40) {
                     bgTintClass = 'card-bg-red';
-                    badgeClass = 'status-red';
+                    badgeClass = 'traffic-badge-red';
                 } else if (metrics.likelihood < 70) {
                     bgTintClass = metrics.likelihood < 55 ? 'card-bg-orange' : 'card-bg-yellow';
-                    badgeClass = metrics.likelihood < 55 ? 'status-orange' : 'status-yellow';
+                    badgeClass = metrics.likelihood < 55 ? 'traffic-badge-orange' : 'traffic-badge-yellow';
                 }
 
                 let timeRow = `<div class="wf-row"><span class="wf-label">TIME</span>`;
@@ -722,7 +736,7 @@
                     const rainProb = hourly.precipitation_probability ? hourly.precipitation_probability[idx] || 0 : 0;
                     const rainMm = hourly.precipitation ? hourly.precipitation[idx] || 0 : 0;
                     const temp = Math.round(hourly.temperature_2m[idx] || 15);
-                    const press = Math.round(hourly.surface_pressure ? hourly.surface_pressure[idx] || 1013 : 1013);
+                    const press = Math.round(hourly.pressure_msl ? hourly.pressure_msl[idx] || 1013 : 1013);
                     const rot = (dirDeg + 180) % 360;
                     const wInfo = getWeatherIcon(weatherCode, rainProb);
 
@@ -821,30 +835,6 @@
             }
 
             return `<span class="traffic-badge-${status}">${label}</span>`;
-        }
-
-// [SUB-SECTION: CIRCULAR ANGLE AVERAGE UTILITY]
-        function getAverageWindDirection(degreesArray) {
-            if (!degreesArray || degreesArray.length === 0) return 0;
-            let sumSin = 0;
-            let sumCos = 0;
-            let validCount = 0;
-
-            degreesArray.forEach(deg => {
-                if (deg !== null && deg !== undefined && !isNaN(deg)) {
-                    const rad = (deg * Math.PI) / 180;
-                    sumSin += Math.sin(rad);
-                    sumCos += Math.cos(rad);
-                    validCount++;
-                }
-            });
-
-            if (validCount === 0) return 0;
-            const avgSin = sumSin / validCount;
-            const avgCos = sumCos / validCount;
-            let avgDeg = (Math.atan2(avgSin, avgCos) * 180) / Math.PI;
-            if (avgDeg < 0) avgDeg += 360;
-            return avgDeg;
         }
 
         // [SUB-SECTION: ACTIVE DAY HOURLY OVERVIEW MATRIX RENDERER]
@@ -974,7 +964,7 @@
                 
                 const low = hourly.cloud_cover_low[i] || 0;
                 const mid = hourly.cloud_cover_mid[i] || 0;
-                const high = hourly.cloud_cover_hgh ? hourly.cloud_cover_hgh[i] : 0;
+                const high = hourly.cloud_cover_high ? hourly.cloud_cover_high[i] : 0;
                 const hum = hourly.relative_humidity_2m[i];
                 const code = hourly.weather_code[i];
                 const totCloud = hourly.cloud_cover ? hourly.cloud_cover[i] : low;
@@ -1101,6 +1091,10 @@
 
         // [SUB-SECTION: INITIALIZATION HOOK]
         window.onload = () => {
+            const revLabel = `Rev ${CONFIG.revision.replace(/^v/, '')}`;
+            document.title = `${document.title} (${revLabel})`;
+            document.getElementById('rev-badge').textContent = revLabel;
+            document.getElementById('rev-footer').textContent = revLabel;
             fetchAllData();
             setInterval(fetchAllData, CONFIG.refreshIntervalMinutes * 60 * 1000);
         };
