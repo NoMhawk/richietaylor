@@ -1,0 +1,61 @@
+{
+ "EGDY": {
+  "2026-11-26T00:00Z": {
+   "base": 936,
+   "ceiling": 936,
+   "cloud": 100,
+   "dir": 360,
+   "fog": false,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "lowest": 936,
+   "rain": false,
+   "raw": "METAR EGDY 252350Z AUTO 36006KT 9999 OVC017/// 05/02 Q1017",
+   "station": "EGDY",
+   "time": "2026-11-26T00:00Z",
+   "vis": 9.7,
+   "wg": null,
+   "ws": 7
+  },
+  "2026-11-26T00:20Z": {
+   "base": 1036,
+   "ceiling": 1036,
+   "cloud": 100,
+   "dir": 30,
+   "fog": false,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "lowest": 1036,
+   "rain": false,
+   "raw": "METAR EGDY 260020Z AUTO 03008KT 9999 OVC018/// 05/02 Q1017",
+   "station": "EGDY",
+   "time": "2026-11-26T00:20Z",
+   "vis": 9.7,
+   "wg": null,
+   "ws": 9
+  },
+  "2026-11-26T01:00Z": {
+   "base": 1336,
+   "ceiling": 1336,
+   "cloud": 100,
+   "dir": 40,
+   "fog": false,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "lowest": 1336,
+   "rain": false,
+   "raw": "METAR EGDY 260050Z AUTO 04009KT 9999 OVC021/// 05/02 Q1016",
+   "station": "EGDY",
+   "time": "2026-11-26T01:00Z",
+   "vis": 9.7,
+   "wg": null,
+   "ws": 10
+  }
+ }
+}

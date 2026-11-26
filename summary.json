@@ -27,7 +27,7 @@
    }
   }
  },
- "current_revision": "v4.8",
+ "current_revision": "v5.0",
  "current_tuning": {
   "cloudbaseBiasFt": 0,
   "estCloudbaseBiasFt": 0,
@@ -41,7 +41,7 @@
   "windBiasMph": 0
  },
  "data_since": "2026-11-25T11:00",
- "generated": "2026-11-25T21:48Z",
+ "generated": "2026-11-26T01:20Z",
  "reports": [
   "2026-11-25.md"
  ],
@@ -489,12 +489,36 @@
     }
    },
    "days": {
-    "overall": {
+    "lead_0_days": {
      "day_verdict_50pct": {
-      "n": 0
+      "accuracy_pct": 100,
+      "both_no": 2,
+      "both_yes": 0,
+      "n": 2,
+      "said_no_but_yes": 0,
+      "said_yes_but_no": 0
      },
      "jump_pct": {
-      "n": 0
+      "bias": -28.0,
+      "mae": 28.0,
+      "median_bias": -28.0,
+      "n": 2
+     }
+    },
+    "overall": {
+     "day_verdict_50pct": {
+      "accuracy_pct": 100,
+      "both_no": 2,
+      "both_yes": 0,
+      "n": 2,
+      "said_no_but_yes": 0,
+      "said_yes_but_no": 0
+     },
+     "jump_pct": {
+      "bias": -28.0,
+      "mae": 28.0,
+      "median_bias": -28.0,
+      "n": 2
      }
     }
    },
@@ -1020,12 +1044,36 @@
     }
    },
    "days": {
-    "overall": {
+    "lead_0_days": {
      "day_verdict_50pct": {
-      "n": 0
+      "accuracy_pct": 100,
+      "both_no": 2,
+      "both_yes": 0,
+      "n": 2,
+      "said_no_but_yes": 0,
+      "said_yes_but_no": 0
      },
      "jump_pct": {
-      "n": 0
+      "bias": -28.0,
+      "mae": 28.0,
+      "median_bias": -28.0,
+      "n": 2
+     }
+    },
+    "overall": {
+     "day_verdict_50pct": {
+      "accuracy_pct": 100,
+      "both_no": 2,
+      "both_yes": 0,
+      "n": 2,
+      "said_no_but_yes": 0,
+      "said_yes_but_no": 0
+     },
+     "jump_pct": {
+      "bias": -28.0,
+      "mae": 28.0,
+      "median_bias": -28.0,
+      "n": 2
      }
     }
    },
@@ -1551,12 +1599,36 @@
     }
    },
    "days": {
-    "overall": {
+    "lead_0_days": {
      "day_verdict_50pct": {
-      "n": 0
+      "accuracy_pct": 100,
+      "both_no": 2,
+      "both_yes": 0,
+      "n": 2,
+      "said_no_but_yes": 0,
+      "said_yes_but_no": 0
      },
      "jump_pct": {
-      "n": 0
+      "bias": -28.0,
+      "mae": 28.0,
+      "median_bias": -28.0,
+      "n": 2
+     }
+    },
+    "overall": {
+     "day_verdict_50pct": {
+      "accuracy_pct": 100,
+      "both_no": 2,
+      "both_yes": 0,
+      "n": 2,
+      "said_no_but_yes": 0,
+      "said_yes_but_no": 0
+     },
+     "jump_pct": {
+      "bias": -28.0,
+      "mae": 28.0,
+      "median_bias": -28.0,
+      "n": 2
      }
     }
    },

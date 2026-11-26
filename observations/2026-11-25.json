@@ -763,6 +763,80 @@
    "vis": 9.7,
    "wg": null,
    "ws": 7
+  },
+  "2026-11-25T22:00Z": {
+   "base": 1636,
+   "ceiling": 1636,
+   "cloud": 75,
+   "dir": 20,
+   "fog": false,
+   "issues": [
+    "lowbase"
+   ],
+   "lowest": 436,
+   "rain": false,
+   "raw": "METAR EGDY 252150Z 02005KT 9999 FEW012 BKN024 04/01 Q1016 TEMPO SCT025 RMK WHT TEMPO BLU",
+   "station": "EGDY",
+   "time": "2026-11-25T22:00Z",
+   "vis": 9.7,
+   "wg": null,
+   "ws": 6
+  },
+  "2026-11-25T22:20Z": {
+   "base": 1636,
+   "ceiling": 1636,
+   "cloud": 75,
+   "dir": 10,
+   "fog": false,
+   "issues": [
+    "lowbase"
+   ],
+   "lowest": 436,
+   "rain": false,
+   "raw": "METAR EGDY 252220Z 01005KT 9999 FEW012 BKN024 05/02 Q1016 TEMPO SCT025 RMK WHT TEMPO BLU",
+   "station": "EGDY",
+   "time": "2026-11-25T22:20Z",
+   "vis": 9.7,
+   "wg": null,
+   "ws": 6
+  },
+  "2026-11-25T23:00Z": {
+   "base": 1736,
+   "ceiling": 1736,
+   "cloud": 100,
+   "dir": 10,
+   "fog": false,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "lowest": 1736,
+   "rain": false,
+   "raw": "METAR EGDY 252250Z AUTO 01009KT 9999 OVC025/// 05/02 Q1016",
+   "station": "EGDY",
+   "time": "2026-11-25T23:00Z",
+   "vis": 9.7,
+   "wg": null,
+   "ws": 10
+  },
+  "2026-11-25T23:20Z": {
+   "base": 1036,
+   "ceiling": 1036,
+   "cloud": 100,
+   "dir": 10,
+   "fog": false,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "lowest": 1036,
+   "rain": false,
+   "raw": "METAR EGDY 252320Z AUTO 01007KT 9999 OVC018/// 05/02 Q1017",
+   "station": "EGDY",
+   "time": "2026-11-25T23:20Z",
+   "vis": 9.7,
+   "wg": null,
+   "ws": 8
   }
  },
  "EGTE": {
