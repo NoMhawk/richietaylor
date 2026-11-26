@@ -1,10 +1,22 @@
 <!-- ========================================================================= -->
-<!-- REVISION: v5.0                                                            -->
+<!-- REVISION: v5.1                                                            -->
 <!-- SYSTEM: RichBot - Skydive Southwest Flight Line Forecast                  -->
 <!-- TARGET FILE: forecast/index.html                                          -->
 <!-- BACKUPS: previous versions are kept in forecast/revisions/                -->
 <!-- ========================================================================= -->
 <!-- CHANGE LOG                                                                -->
+<!-- v5.1 (2026-11-26)                                                         -->
+<!--   - Removed the "Cloud <15k" row. The three height bands (0-5k, 5-10k,    -->
+<!--     10-15k ft above the airfield) now use the same coloured boxes as the  -->
+<!--     other rows. "Above 15k" stays greyed out, for information only.       -->
+<!--   - Jump cloud (score, heavy-cloud rule, outlook) is now simply the       -->
+<!--     highest of the three bands shown, so what you see is what is scored. -->
+<!--     (v5.0 also folded in Open-Meteo's Low layer.) Falls back to Low/Mid   -->
+<!--     only if the model gives no pressure-level data.                       -->
+<!--   - Sky icon (cards and hourly table) ignores high cloud: for dry hours   -->
+<!--     it follows the cloud below 15k (under 25% Clear, under 70% Partly     -->
+<!--     Cloudy, else Cloudy). Rain, fog, snow and storms still come from the  -->
+<!--     model's weather code.                                                 -->
 <!-- v5.0 (2026-11-26)                                                         -->
 <!--   - Cloud % now only counts cloud that matters for jumping: below 15,000  -->
 <!--     ft above the airfield (~16k above sea level, CONFIG.cloudTopFt).      -->
@@ -233,7 +245,7 @@
     <!-- [SECTION: CONFIGURATION & SETTINGS BLOCK] -->
     <script>
         const CONFIG = {
-            revision: "v5.0",
+            revision: "v5.1",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -482,6 +494,15 @@
             return 'text-red';
         }
 
+        // Weather code for the sky icon, ignoring high cloud: the model's codes 0-3 (clear to
+        // overcast) count all cloud, so for those use the cloud below CONFIG.cloudTopFt instead.
+        function getSkyCode(code, cloud) {
+            if (code > 3 || typeof cloud !== 'number') return code;
+            if (cloud < 25) return 0;
+            if (cloud < 70) return 2;
+            return 3;
+        }
+
         function getWeatherIcon(code, rainProb = 0) {
             if (rainProb >= 30) {
                 if (code >= 95) return { icon: 'fa-cloud-bolt', color: '#9333ea', label: 'Thunderstorms' };
@@ -489,7 +510,8 @@
                 return { icon: 'fa-cloud-rain', color: '#3b82f6', label: 'Rain Showers' };
             }
             if (code === 0) return { icon: 'fa-sun', color: '#d97706', label: 'Clear Sky' };
-            if (code >= 1 && code <= 3) return { icon: 'fa-cloud-sun', color: '#0284c7', label: 'Partly Cloudy' };
+            if (code >= 1 && code <= 2) return { icon: 'fa-cloud-sun', color: '#0284c7', label: 'Partly Cloudy' };
+            if (code === 3) return { icon: 'fa-cloud', color: '#64748b', label: 'Cloudy' };
             if (code >= 45 && code <= 48) return { icon: 'fa-smog', color: '#64748b', label: 'Fog / Mist' };
             if (code >= 71 && code <= 77) return { icon: 'fa-snowflake', color: '#6366f1', label: 'Snow' };
             return { icon: 'fa-cloud', color: '#64748b', label: 'Overcast' };
@@ -750,7 +772,7 @@
             const bands = getCloudBands(i);
             const haveBands = bands.b0_5 !== null || bands.b5_10 !== null || bands.b10_top !== null;
             const cloud = Math.round(haveBands
-                ? Math.max(low, bands.b0_5 ?? 0, bands.b5_10 ?? 0, bands.b10_top ?? 0)
+                ? Math.max(bands.b0_5 ?? 0, bands.b5_10 ?? 0, bands.b10_top ?? 0)
                 : Math.max(low, mid));
             const cloudAbove = Math.round(Math.max(high, bands.above ?? 0));
 
@@ -1019,7 +1041,7 @@
                     const temp = Math.round(hourly.temperature_2m[idx] || 15);
                     const press = Math.round(hourly.pressure_msl ? hourly.pressure_msl[idx] || 1013 : 1013);
                     const rot = (dirDeg + 180) % 360;
-                    const wInfo = getWeatherIcon(weatherCode, rainProb);
+                    const wInfo = getWeatherIcon(getSkyCode(weatherCode, getHourData(idx).cloud), rainProb);
 
                     timeRow += `<span class="wf-cell">${String(hTarget).padStart(2, '0')}h</span>`;
                     dirRow += `<span class="wf-cell"><i class="fa-solid fa-arrow-up wf-arrow" style="transform: rotate(${rot}deg);"></i></span>`;
@@ -1185,12 +1207,11 @@
             // Atmospheric & Cloud Rows
             let rainRow = `<tr><td class="param-label">Rain (%)</td>`;
             const topK = Math.round(CONFIG.cloudTopFt / 1000);
-            let cloudRow = `<tr><td class="param-label" title="Cloud below ${topK},000 ft above the airfield (about ${topK + 1},000 ft above sea level). Higher cloud is ignored.">Cloud &lt;${topK}k (%)</td>`;
             // Open-Meteo's own cloud layers (heights are approximate, above sea level)
-            let cLowRow = `<tr><td class="param-label" title="Most cloud at any height from the airfield up to 5,000 ft above it">☁ 0-5k ft</td>`;
-            let cMidRow = `<tr><td class="param-label" title="Most cloud at any height from 5,000 to 10,000 ft above the airfield">☁ 5-10k ft</td>`;
-            let cTopRow = `<tr><td class="param-label" title="Most cloud at any height from 10,000 to ${topK},000 ft above the airfield">☁ 10-${topK}k ft</td>`;
-            let cHighRow = `<tr><td class="param-label" title="Cloud above ${topK},000 ft (including high cloud). For information only: not used for the JUMP %." style="color:var(--text-muted);">☁ Above ${topK}k</td>`;
+            let cLowRow = `<tr><td class="param-label" title="Most cloud at any height from the airfield up to 5,000 ft above it">Cloud 0-5k (%)</td>`;
+            let cMidRow = `<tr><td class="param-label" title="Most cloud at any height from 5,000 to 10,000 ft above the airfield">Cloud 5-10k (%)</td>`;
+            let cTopRow = `<tr><td class="param-label" title="Most cloud at any height from 10,000 to ${topK},000 ft above the airfield">Cloud 10-${topK}k (%)</td>`;
+            let cHighRow = `<tr><td class="param-label" title="Cloud above ${topK},000 ft (including high cloud). For information only: not used for the JUMP %." style="color:var(--text-muted);">Above ${topK}k (info)</td>`;
 
             let visRow = `<tr><td class="param-label">Vis (km)</td>`;
             let baseRow = `<tr><td class="param-label" title="Met Office UK 2 km cloud base, about 2.5 days ahead. Beyond that, 'est.' = estimate from cloud cover by height.">Base (ft AGL)</td>`;
@@ -1225,7 +1246,7 @@
                 const cloud = d.cloud;
 
                 const hFog = fogStatus === 'FOG' || fogStatus === 'MIST' || vis < 3;
-                const wInfo = getWeatherIcon(hFog ? 45 : code, rain);
+                const wInfo = getWeatherIcon(hFog ? 45 : getSkyCode(code, cloud), rain);
 
                 function getModelCellHtml(modelKey) {
                     const modelObj = multiModelData[modelKey];
@@ -1274,11 +1295,10 @@
                 meteoRow += getModelCellHtml('meteofrance_seamless');
 
                 rainRow += `<td class="${colClass}">${getTrafficBadge('rain', rain, '%')}</td>`;
-                cloudRow += `<td class="${colClass}">${getTrafficBadge('cloud', cloud, '%')}</td>`;
                 
                 const bandCell = v => v === null
                     ? `<td class="${colClass}" style="font-size: 0.7rem; color: var(--text-muted);">--</td>`
-                    : `<td class="${colClass} ${getCloudColorClass(v)}" style="font-size: 0.7rem;">${Math.round(v)}%</td>`;
+                    : `<td class="${colClass}">${getTrafficBadge('cloud', Math.round(v), '%')}</td>`;
                 cLowRow += bandCell(d.bands.b0_5);
                 cMidRow += bandCell(d.bands.b5_10);
                 cTopRow += bandCell(d.bands.b10_top);
@@ -1308,7 +1328,6 @@
             iconRow += `</tr>`;
             meteoRow += `</tr>`;
             rainRow += `</tr>`;
-            cloudRow += `</tr>`;
             cLowRow += `</tr>`;
             cMidRow += `</tr>`;
             cTopRow += `</tr>`;
@@ -1331,7 +1350,6 @@
                     ${iconRow}
                     ${meteoRow}
                     ${rainRow}
-                    ${cloudRow}
                     ${cLowRow}
                     ${cMidRow}
                     ${cTopRow}
