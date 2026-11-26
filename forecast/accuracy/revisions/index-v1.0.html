@@ -1,0 +1,246 @@
+<!-- ========================================================================= -->
+<!-- RichBot - Forecast Accuracy                                               -->
+<!-- TARGET FILE: forecast/accuracy/index.html                                 -->
+<!-- Reads summary.json from the forecast-data branch, written every 3 hours   -->
+<!-- by .github/workflows/forecast-verify.yml.                                 -->
+<!-- ========================================================================= -->
+<!-- CHANGE LOG                                                                -->
+<!-- v1.0 (2026-11-25) - first version                                         -->
+<!-- ========================================================================= -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>RichBot - Forecast Accuracy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        :root {
+            --bg-primary: #f1f5f9; --bg-card: #ffffff; --border-color: #cbd5e1;
+            --text-main: #0f172a; --text-muted: #64748b; --accent-sky: #0284c7;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-main); line-height: 1.5; }
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .header-container { max-width: 1200px; margin: 0 auto; padding: 1rem 1.5rem; display: flex; gap: 1rem; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+        .logo-box { display: flex; align-items: center; gap: 0.75rem; }
+        .logo-icon { background: var(--accent-sky); color: white; padding: 0.6rem; border-radius: 0.75rem; font-size: 1.25rem; }
+        .logo-title { font-size: 1.125rem; font-weight: 700; }
+        .logo-sub { font-size: 0.75rem; color: var(--text-muted); }
+        .back-link { font-size: 0.8rem; font-weight: 600; color: var(--accent-sky); text-decoration: none; }
+        main { max-width: 1200px; margin: 0 auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+        .panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 1rem; padding: 1.25rem 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .panel h2 { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem; }
+        .panel .sub { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem; }
+        .meta { font-size: 0.8rem; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; }
+        .meta b { color: var(--text-main); font-weight: 600; }
+        .toggle { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .toggle button { font: inherit; font-size: 0.8rem; font-weight: 600; padding: 0.4rem 0.9rem; border-radius: 0.5rem; border: 1px solid var(--border-color); background: #fff; color: var(--text-main); cursor: pointer; }
+        .toggle button[aria-pressed="true"] { background: var(--accent-sky); border-color: var(--accent-sky); color: #fff; }
+        .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+        .tile { border: 1px solid var(--border-color); border-radius: 0.75rem; padding: 1rem; background: #f8fafc; }
+        .tile .label { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+        .tile .value { font-size: 2rem; font-weight: 700; margin: 0.2rem 0; font-variant-numeric: tabular-nums; }
+        .tile .note { font-size: 0.78rem; color: var(--text-muted); }
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; font-variant-numeric: tabular-nums; }
+        th, td { padding: 0.5rem 0.6rem; border-bottom: 1px solid #e2e8f0; text-align: right; white-space: nowrap; }
+        th { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; background: #f8fafc; }
+        th:first-child, td:first-child { text-align: left; font-weight: 600; }
+        .muted { color: var(--text-muted); }
+        .empty { padding: 2rem; text-align: center; color: var(--text-muted); font-size: 0.9rem; }
+        .reports a { color: var(--accent-sky); font-weight: 600; text-decoration: none; }
+        .reports li { margin: 0.25rem 0 0.25rem 1.25rem; font-size: 0.85rem; }
+        .method { font-size: 0.8rem; color: #334155; }
+        .method li { margin: 0.3rem 0 0.3rem 1.25rem; }
+        footer { text-align: center; font-size: 0.75rem; color: var(--text-muted); padding: 1.5rem; }
+    </style>
+</head>
+<body>
+<header>
+    <div class="header-container">
+        <div class="logo-box">
+            <div class="logo-icon"><i class="fa-solid fa-bullseye"></i></div>
+            <div>
+                <h1 class="logo-title">RichBot Forecast Accuracy</h1>
+                <p class="logo-sub">RichBot forecasts checked against actual weather at Exeter and Yeovilton</p>
+            </div>
+        </div>
+        <a class="back-link" href="../"><i class="fa-solid fa-arrow-left"></i> Back to the forecast</a>
+    </div>
+</header>
+
+<main>
+    <div class="panel">
+        <div class="meta" id="meta">Loading accuracy data...</div>
+    </div>
+
+    <div id="content"></div>
+
+    <div class="panel">
+        <h2><i class="fa-solid fa-circle-info" style="color: var(--accent-sky);"></i>How this works</h2>
+        <ul class="method">
+            <li>At about 06:00 and 18:00 UTC each day, a scheduled job saves exactly what the forecast page shows for 08:00-18:00 over the next 7 days.</li>
+            <li>Every 3 hours it collects the actual weather reports (METARs) from Exeter (EGTE) and Yeovilton (EGDY). Dunkeswell has no report of its own, so each forecast hour is checked against both airports.</li>
+            <li>Airport cloud heights are converted to feet above Dunkeswell (833 ft). "Cloudbase" compares RichBot's base with the airport's lowest layer of scattered cloud or more (3+ oktas).</li>
+            <li>"Jumpable" uses the page's rules: wind or gusts over 23 mph, rain, fog, visibility under 3 km, a ceiling under 2,000 ft or overcast cloud = not jumpable.</li>
+            <li>Gusts are only compared when the airport reports a gust (airports only report gusts when they are notable).</li>
+            <li>Bias = forecast minus actual. A positive wind bias means RichBot forecast stronger wind than happened.</li>
+            <li>Each week a review agent reads these results and may make small tuning changes (model weights and bias corrections only). Its reports are listed below.</li>
+        </ul>
+    </div>
+</main>
+<footer>RichBot • Forecast Accuracy • Data: aviationweather.gov METARs, Open-Meteo</footer>
+
+<script>
+    const DATA_URL = 'https://raw.githubusercontent.com/NoMhawk/RichieTaylor/forecast-data/summary.json';
+    const REPORT_URL = 'https://github.com/NoMhawk/RichieTaylor/blob/forecast-data/reports/';
+    const WINDOWS = { last_7_days: 'Last 7 days', last_30_days: 'Last 30 days', all_time: 'All time' };
+    const LEADS = { same_day: 'Same day (06:00 forecast)', next_day: 'Next day', day_2: '2 days ahead', day_3_plus: '3+ days ahead' };
+    const MODEL_NAMES = { ecmwf_ifs025: 'ECMWF', gfs_seamless: 'GFS', icon_seamless: 'ICON', meteofrance_seamless: 'Météo-France' };
+    let summary = null;
+    let windowKey = 'last_30_days';
+
+    const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const fmt = (v, unit = '') => (v === null || v === undefined) ? '<span class="muted">-</span>' : `${v}${unit}`;
+    const signed = v => (v === null || v === undefined) ? '<span class="muted">-</span>' : (v > 0 ? `+${v}` : `${v}`);
+    const pct = v => fmt(v, '%');
+    const err = (s, unit) => (!s || !s.n) ? '<span class="muted">-</span>' : `${s.mae}${unit} <span class="muted">(${signed(s.bias)})</span>`;
+
+    function biasWords(s, unit, high, low) {
+        if (!s || !s.n) return 'Not enough data yet';
+        if (Math.abs(s.bias) < (unit === ' ft' ? 100 : 1)) return `On average about right (${s.n} checks)`;
+        return `On average ${Math.abs(s.bias).toLocaleString()}${unit} ${s.bias > 0 ? high : low} (${s.n} checks)`;
+    }
+
+    function tile(label, value, note) {
+        return `<div class="tile"><div class="label">${label}</div><div class="value">${value}</div><div class="note">${note}</div></div>`;
+    }
+
+    function rowFor(name, s) {
+        const j = s.jumpable || {};
+        return `<tr><td>${name}</td><td>${fmt(s.hours)}</td><td>${pct(j.accuracy_pct)}</td>
+            <td>${fmt(j.said_yes_but_no)}</td><td>${fmt(j.said_no_but_yes)}</td>
+            <td>${err(s.wind_mph, '')}</td><td>${err(s.gust_mph_when_reported, '')}</td>
+            <td>${err(s.cloudbase_ft, '')}</td><td>${pct((s.rain || {}).accuracy_pct)}</td></tr>`;
+    }
+
+    const breakdownHead = `<tr><th></th><th>Hours</th><th>Jump calls right</th><th>Said yes, wasn't</th><th>Said no, was</th>
+        <th>Wind error mph (bias)</th><th>Gust error mph (bias)</th><th>Base error ft (bias)</th><th>Rain call right</th></tr>`;
+
+    function render() {
+        const w = summary.windows[windowKey];
+        const o = w.overall;
+        const content = document.getElementById('content');
+        if (!o || !o.hours) {
+            content.innerHTML = `<div class="panel"><div class="empty"><i class="fa-solid fa-hourglass-half"></i>
+                No results for ${WINDOWS[windowKey].toLowerCase()} yet. Forecasts are checked once the hours they cover have passed,
+                so the first results appear later today, and grow every 3 hours.</div></div>`;
+            return;
+        }
+        const d = (w.days && w.days.overall) || {};
+        const j = o.jumpable;
+
+        const toggle = Object.entries(WINDOWS).map(([k, v]) =>
+            `<button type="button" aria-pressed="${k === windowKey}" onclick="windowKey='${k}'; render();">${v}</button>`).join('');
+
+        const tiles = [
+            tile('Jump / no-jump calls right', pct(j.accuracy_pct),
+                `${j.n} forecast hours checked. Said jumpable but wasn't: ${j.said_yes_but_no}. Said not jumpable but was: ${j.said_no_but_yes}.`),
+            tile('JUMP % error', d.jump_pct && d.jump_pct.n ? `${d.jump_pct.mae} pts` : '<span class="muted">-</span>',
+                d.jump_pct && d.jump_pct.n ? `Average gap between the card's JUMP % and the share of daylight hours that were jumpable (${d.jump_pct.n} day checks, bias ${signed(d.jump_pct.bias)}).` : 'Needs whole days that have finished.'),
+            tile('Wind error', o.wind_mph.n ? `${o.wind_mph.mae} mph` : '<span class="muted">-</span>',
+                biasWords(o.wind_mph, ' mph', 'too strong', 'too light')),
+            tile('Cloudbase error', o.cloudbase_ft.n ? `${o.cloudbase_ft.mae.toLocaleString()} ft` : '<span class="muted">-</span>',
+                biasWords(o.cloudbase_ft, ' ft', 'too high', 'too low'))
+        ].join('');
+
+        const leadRows = Object.entries(LEADS).map(([k, name]) => w.by_lead[k] && w.by_lead[k].hours ? rowFor(name, w.by_lead[k]) : '').join('');
+        const stationRows = Object.entries(w.by_station).map(([k, s]) => s.hours ? rowFor(`${summary.stations[k]} (${k})`, s) : '').join('');
+
+        const models = Object.entries(o.models_wind_mph)
+            .filter(([, s]) => s.n)
+            .map(([k, s]) => ({ name: MODEL_NAMES[k] || k, s, g: o.models_gust_mph_when_reported[k] }));
+        models.push({ name: 'RichBot average (what the page shows)', s: o.wind_mph, g: o.gust_mph_when_reported, blend: true });
+        models.sort((a, b) => a.s.mae - b.s.mae);
+        const modelRows = models.map(m => `<tr><td>${m.blend ? '<i class="fa-solid fa-star" style="color:var(--accent-sky)"></i> ' : ''}${m.name}</td>
+            <td>${m.s.mae}</td><td>${signed(m.s.bias)}</td><td>${err(m.g, '')}</td><td>${m.s.n}</td></tr>`).join('');
+
+        const revRows = Object.entries(summary.by_revision).reverse().map(([rev, s]) => `<tr><td>${esc(rev)}</td>
+            <td>${s.hours}</td><td>${pct(s.jumpable.accuracy_pct)}</td><td>${err(s.wind_mph, '')}</td><td>${err(s.cloudbase_ft, '')}</td>
+            <td class="muted">${esc(s.first_valid.slice(0, 10))} to ${esc(s.last_valid.slice(0, 10))}</td></tr>`).join('');
+
+        const reports = (summary.reports || []).slice().reverse();
+        const reportList = reports.length
+            ? `<ul class="reports">${reports.map(r => `<li><a href="${REPORT_URL}${encodeURIComponent(r)}" target="_blank" rel="noopener">${esc(r.replace(/\.md$/, ''))}</a></li>`).join('')}</ul>`
+            : '<p class="sub">No weekly reviews yet. The first one runs after a week of data.</p>';
+
+        content.innerHTML = `
+        <div style="display:flex; flex-direction:column; gap:1.5rem;">
+            <div class="toggle" role="group" aria-label="Time range">${toggle}</div>
+            <div class="tiles">${tiles}</div>
+
+            <div class="panel">
+                <h2><i class="fa-solid fa-clock" style="color: var(--accent-sky);"></i>By how far ahead the forecast was</h2>
+                <p class="sub">Forecasts usually get worse the further ahead they look. Bias = forecast minus actual.</p>
+                <div class="table-wrapper"><table><thead>${breakdownHead}</thead><tbody>${leadRows}</tbody></table></div>
+            </div>
+
+            <div class="panel">
+                <h2><i class="fa-solid fa-tower-broadcast" style="color: var(--accent-sky);"></i>By airport</h2>
+                <p class="sub">Exeter is lower and nearer the coast; Yeovilton is further east. Dunkeswell's own weather is often somewhere between.</p>
+                <div class="table-wrapper"><table><thead>${breakdownHead}</thead><tbody>${stationRows}</tbody></table></div>
+            </div>
+
+            <div class="panel">
+                <h2><i class="fa-solid fa-wind" style="color: var(--accent-sky);"></i>Wind models, most accurate first</h2>
+                <p class="sub">Each model's wind against the airports. Used by the weekly review to weight the average.</p>
+                <div class="table-wrapper"><table><thead><tr><th>Model</th><th>Wind error mph</th><th>Wind bias</th><th>Gust error mph (bias)</th><th>Checks</th></tr></thead>
+                <tbody>${modelRows}</tbody></table></div>
+            </div>
+
+            <div class="panel">
+                <h2><i class="fa-solid fa-code-branch" style="color: var(--accent-sky);"></i>By forecast version</h2>
+                <p class="sub">Shows whether each change to RichBot made it more accurate (all time).</p>
+                <div class="table-wrapper"><table><thead><tr><th>Version</th><th>Hours</th><th>Jump calls right</th><th>Wind error mph (bias)</th><th>Base error ft (bias)</th><th>Period</th></tr></thead>
+                <tbody>${revRows}</tbody></table></div>
+            </div>
+
+            <div class="panel">
+                <h2><i class="fa-solid fa-clipboard-check" style="color: var(--accent-sky);"></i>Weekly reviews</h2>
+                ${reportList}
+            </div>
+        </div>`;
+    }
+
+    function renderMeta() {
+        const t = summary.current_tuning;
+        let tuning = 'neutral';
+        if (t) {
+            const parts = [];
+            Object.entries(t.modelWeights || {}).forEach(([k, v]) => { if (v !== 1) parts.push(`${MODEL_NAMES[k] || k} weight ${v}`); });
+            if (t.windBiasMph) parts.push(`wind ${signed(t.windBiasMph)} mph`);
+            if (t.gustBiasMph) parts.push(`gusts ${signed(t.gustBiasMph)} mph`);
+            if (t.cloudbaseBiasFt) parts.push(`base ${signed(t.cloudbaseBiasFt)} ft`);
+            if (t.estCloudbaseBiasFt) parts.push(`est. base ${signed(t.estCloudbaseBiasFt)} ft`);
+            if (parts.length) tuning = parts.join(', ');
+        }
+        const generated = new Date(summary.generated.replace('Z', ':00Z'));
+        document.getElementById('meta').innerHTML = `
+            <span>Updated: <b>${generated.toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}</b></span>
+            <span>Checking since: <b>${summary.data_since ? esc(summary.data_since.slice(0, 10)) : 'starting today'}</b></span>
+            <span>Forecast version: <b>${esc(summary.current_revision || '-')}</b></span>
+            <span>Tuning: <b>${esc(tuning)}</b></span>`;
+    }
+
+    fetch(`${DATA_URL}?t=${Date.now()}`)
+        .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(data => { summary = data; renderMeta(); render(); })
+        .catch(() => {
+            document.getElementById('meta').innerHTML = 'Accuracy data isn\'t available yet. The checking job writes its first results within a few hours of starting.';
+        });
+</script>
+</body>
+</html>

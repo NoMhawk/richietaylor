@@ -1,10 +1,20 @@
 <!-- ========================================================================= -->
 <!-- RichBot - Forecast Accuracy                                               -->
+<!-- REVISION: v2.0                                                            -->
 <!-- TARGET FILE: forecast/accuracy/index.html                                 -->
-<!-- Reads summary.json from the forecast-data branch, written every 3 hours   -->
-<!-- by .github/workflows/forecast-verify.yml.                                 -->
+<!-- Reads summary.json, days.csv and pairs/YYYY-MM.csv from the forecast-data -->
+<!-- branch, written every 3 hours by .github/workflows/forecast-verify.yml.   -->
+<!-- BACKUPS: previous versions are kept in forecast/accuracy/revisions/       -->
 <!-- ========================================================================= -->
 <!-- CHANGE LOG                                                                -->
+<!-- v2.0 (2026-11-26)                                                         -->
+<!--   - Re-laid out to be easier to read: plain-English summary at the top,   -->
+<!--     colour-coded headline tiles (green / amber / red), a day-by-day list  -->
+<!--     that opens to show each hour's forecast against Exeter and Yeovilton, -->
+<!--     and slimmer tables (jump calls, wind and cloudbase only).             -->
+<!--   - Wind shown in mph or knots, following the forecast page's MPH / KT    -->
+<!--     switch.                                                               -->
+<!--   - "How this works" folded away; reviews are now daily.                  -->
 <!-- v1.0 (2026-11-25) - first version                                         -->
 <!-- ========================================================================= -->
 <!DOCTYPE html>
@@ -18,44 +28,103 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         :root {
-            --bg-primary: #f1f5f9; --bg-card: #ffffff; --border-color: #cbd5e1;
-            --text-main: #0f172a; --text-muted: #64748b; --accent-sky: #0284c7;
+            --bg-primary: #f1f5f9; --bg-card: #ffffff; --border-color: #cbd5e1; --line: #e2e8f0;
+            --text-main: #0f172a; --text-body: #334155; --text-muted: #64748b; --accent-sky: #0284c7;
+            --good-bg: #dcfce7; --good-fg: #166534; --good-bd: #4ade80;
+            --ok-bg: #fef9c3; --ok-fg: #854d0e; --ok-bd: #facc15;
+            --bad-bg: #fee2e2; --bad-fg: #991b1b; --bad-bd: #f87171;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-main); line-height: 1.5; }
         header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .header-container { max-width: 1200px; margin: 0 auto; padding: 1rem 1.5rem; display: flex; gap: 1rem; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+        .header-container { max-width: 1100px; margin: 0 auto; padding: 1rem 1.5rem; display: flex; gap: 1rem; align-items: center; justify-content: space-between; flex-wrap: wrap; }
         .logo-box { display: flex; align-items: center; gap: 0.75rem; }
         .logo-icon { background: var(--accent-sky); color: white; padding: 0.6rem; border-radius: 0.75rem; font-size: 1.25rem; }
         .logo-title { font-size: 1.125rem; font-weight: 700; }
         .logo-sub { font-size: 0.75rem; color: var(--text-muted); }
         .back-link { font-size: 0.8rem; font-weight: 600; color: var(--accent-sky); text-decoration: none; }
-        main { max-width: 1200px; margin: 0 auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+        main { max-width: 1100px; margin: 0 auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; }
+
         .panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 1rem; padding: 1.25rem 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .panel h2 { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem; }
-        .panel .sub { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem; }
-        .meta { font-size: 0.8rem; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; }
+        .panel h2 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.15rem; display: flex; align-items: center; gap: 0.5rem; }
+        .panel h2 i { color: var(--accent-sky); }
+        .panel .sub { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.9rem; }
+
+        .topbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+        .meta { font-size: 0.78rem; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; }
         .meta b { color: var(--text-main); font-weight: 600; }
-        .toggle { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-        .toggle button { font: inherit; font-size: 0.8rem; font-weight: 600; padding: 0.4rem 0.9rem; border-radius: 0.5rem; border: 1px solid var(--border-color); background: #fff; color: var(--text-main); cursor: pointer; }
-        .toggle button[aria-pressed="true"] { background: var(--accent-sky); border-color: var(--accent-sky); color: #fff; }
-        .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
-        .tile { border: 1px solid var(--border-color); border-radius: 0.75rem; padding: 1rem; background: #f8fafc; }
-        .tile .label { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
-        .tile .value { font-size: 2rem; font-weight: 700; margin: 0.2rem 0; font-variant-numeric: tabular-nums; }
-        .tile .note { font-size: 0.78rem; color: var(--text-muted); }
+        .toggle { display: flex; border: 1px solid var(--border-color); border-radius: 0.5rem; overflow: hidden; }
+        .toggle button { font: inherit; font-size: 0.78rem; font-weight: 600; padding: 0.4rem 0.85rem; border: none; background: #fff; color: var(--text-muted); cursor: pointer; }
+        .toggle button + button { border-left: 1px solid var(--border-color); }
+        .toggle button[aria-pressed="true"] { background: var(--accent-sky); color: #fff; }
+
+        .summary { font-size: 1rem; color: var(--text-body); }
+        .summary p + p { margin-top: 0.4rem; }
+        .summary b { color: var(--text-main); }
+
+        .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); gap: 1rem; }
+        .tile { border-radius: 0.9rem; padding: 1rem 1.1rem; border: 1px solid var(--border-color); background: var(--bg-card); border-left-width: 6px; }
+        .tile.good { border-left-color: var(--good-bd); }
+        .tile.ok { border-left-color: var(--ok-bd); }
+        .tile.bad { border-left-color: var(--bad-bd); }
+        .tile .label { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        .tile .value { font-size: 2rem; font-weight: 700; line-height: 1.2; margin: 0.25rem 0; font-variant-numeric: tabular-nums; }
+        .tile .words { font-size: 0.85rem; font-weight: 600; }
+        .tile .note { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem; }
+
+        .pill { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 0.1rem 0.5rem; border-radius: 999px; border: 1px solid; white-space: nowrap; }
+        .pill.good { background: var(--good-bg); color: var(--good-fg); border-color: var(--good-bd); }
+        .pill.ok { background: var(--ok-bg); color: var(--ok-fg); border-color: var(--ok-bd); }
+        .pill.bad { background: var(--bad-bg); color: var(--bad-fg); border-color: var(--bad-bd); }
+        .pill.none { background: #f1f5f9; color: var(--text-muted); border-color: var(--line); }
+
         .table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; font-variant-numeric: tabular-nums; }
-        th, td { padding: 0.5rem 0.6rem; border-bottom: 1px solid #e2e8f0; text-align: right; white-space: nowrap; }
-        th { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; background: #f8fafc; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.82rem; font-variant-numeric: tabular-nums; }
+        th, td { padding: 0.55rem 0.6rem; border-bottom: 1px solid var(--line); text-align: center; white-space: nowrap; }
+        th { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-muted); font-weight: 700; background: #f8fafc; }
         th:first-child, td:first-child { text-align: left; font-weight: 600; }
+        tr:last-child td { border-bottom: none; }
         .muted { color: var(--text-muted); }
-        .empty { padding: 2rem; text-align: center; color: var(--text-muted); font-size: 0.9rem; }
-        .reports a { color: var(--accent-sky); font-weight: 600; text-decoration: none; }
-        .reports li { margin: 0.25rem 0 0.25rem 1.25rem; font-size: 0.85rem; }
-        .method { font-size: 0.8rem; color: #334155; }
+        .small { font-size: 0.72rem; }
+
+        /* day by day */
+        .days { display: flex; flex-direction: column; gap: 0.5rem; }
+        details.day { border: 1px solid var(--line); border-radius: 0.75rem; overflow: hidden; }
+        details.day summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 1.3fr 1fr 1fr 1.2fr 1rem; gap: 0.75rem; align-items: center; padding: 0.7rem 1rem; background: #f8fafc; font-size: 0.85rem; }
+        details.day summary::-webkit-details-marker { display: none; }
+        details.day summary:hover { background: #f1f5f9; }
+        details.day[open] summary { border-bottom: 1px solid var(--line); }
+        details.day summary .chev { transition: transform 0.15s; color: var(--text-muted); }
+        details.day[open] summary .chev { transform: rotate(90deg); }
+        .day-date { font-weight: 700; }
+        .day-num { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+        .day-val { font-size: 1.05rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+        .day-body { padding: 0.75rem 1rem 1rem; }
+        .day-body .note { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+        .hours th.grp { border-left: 2px solid var(--line); }
+        .hours td.grp { border-left: 2px solid var(--line); }
+        .hours td.fc { font-weight: 700; color: var(--text-main); }
+        .call { font-weight: 700; font-size: 0.72rem; padding: 0.05rem 0.4rem; border-radius: 0.3rem; }
+        .call.yes { background: var(--good-bg); color: var(--good-fg); }
+        .call.no { background: var(--bad-bg); color: var(--bad-fg); }
+        .match { color: var(--good-fg); }
+        .miss { color: var(--bad-fg); }
+
+        .reports { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .reports a { font-size: 0.8rem; font-weight: 600; color: var(--accent-sky); text-decoration: none; border: 1px solid var(--line); border-radius: 0.5rem; padding: 0.3rem 0.7rem; background: #f8fafc; }
+        .reports a:hover { border-color: var(--accent-sky); }
+
+        details.how summary { cursor: pointer; font-size: 0.9rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+        details.how summary i { color: var(--accent-sky); }
+        .method { font-size: 0.8rem; color: var(--text-body); margin-top: 0.75rem; }
         .method li { margin: 0.3rem 0 0.3rem 1.25rem; }
+        .empty { padding: 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.9rem; }
         footer { text-align: center; font-size: 0.75rem; color: var(--text-muted); padding: 1.5rem; }
+
+        @media (max-width: 640px) {
+            details.day summary { grid-template-columns: 1fr 1fr 1fr 1rem; }
+            details.day summary .verdict { grid-column: 1 / -2; }
+        }
     </style>
 </head>
 <body>
@@ -65,7 +134,7 @@
             <div class="logo-icon"><i class="fa-solid fa-bullseye"></i></div>
             <div>
                 <h1 class="logo-title">RichBot Forecast Accuracy</h1>
-                <p class="logo-sub">RichBot forecasts checked against actual weather at Exeter and Yeovilton</p>
+                <p class="logo-sub">What RichBot said, against what actually happened at Exeter and Yeovilton</p>
             </div>
         </div>
         <a class="back-link" href="../"><i class="fa-solid fa-arrow-left"></i> Back to the forecast</a>
@@ -73,174 +142,384 @@
 </header>
 
 <main>
-    <div class="panel">
+    <div class="topbar">
         <div class="meta" id="meta">Loading accuracy data...</div>
+        <div class="toggle" id="toggle" role="group" aria-label="Time range"></div>
     </div>
 
     <div id="content"></div>
 
     <div class="panel">
-        <h2><i class="fa-solid fa-circle-info" style="color: var(--accent-sky);"></i>How this works</h2>
-        <ul class="method">
-            <li>At about 06:00 and 18:00 UTC each day, a scheduled job saves exactly what the forecast page shows for 08:00-18:00 over the next 7 days.</li>
-            <li>Every 3 hours it collects the actual weather reports (METARs) from Exeter (EGTE) and Yeovilton (EGDY). Dunkeswell has no report of its own, so each forecast hour is checked against both airports.</li>
-            <li>Airport cloud heights are converted to feet above Dunkeswell (833 ft). "Cloudbase" compares RichBot's base with the airport's lowest layer of scattered cloud or more (3+ oktas).</li>
-            <li>"Jumpable" uses the page's rules: wind or gusts over 23 mph, rain, fog, visibility under 3 km, a ceiling under 2,000 ft or overcast cloud = not jumpable.</li>
-            <li>Gusts are only compared when the airport reports a gust (airports only report gusts when they are notable).</li>
-            <li>Bias = forecast minus actual. A positive wind bias means RichBot forecast stronger wind than happened.</li>
-            <li>Each week a review agent reads these results and may make small tuning changes (model weights and bias corrections only). Its reports are listed below.</li>
-        </ul>
+        <details class="how">
+            <summary><i class="fa-solid fa-circle-info"></i>How this is worked out</summary>
+            <ul class="method">
+                <li>At about 06:00 and 18:00 UTC each day, a scheduled job saves exactly what the forecast page shows for 08:00-18:00 over the next 7 days.</li>
+                <li>Every 3 hours it collects the actual weather reports (METARs) from Exeter (EGTE) and Yeovilton (EGDY). Dunkeswell has no report of its own, so each forecast hour is checked against both airports.</li>
+                <li>Airport cloud heights are converted to feet above Dunkeswell (833 ft). "Cloudbase" compares RichBot's base with the airport's lowest layer of scattered cloud or more (3+ oktas).</li>
+                <li>"Jumpable" uses the page's rules: wind or gusts over 23 mph, rain, fog, visibility under 3 km, a base under 2,000 ft or very heavy cloud = not jumpable.</li>
+                <li>The day-by-day list uses the morning forecast for that day (or the closest one before it).</li>
+                <li>Exeter and Yeovilton are lower and more sheltered than Dunkeswell, so the hilltop is usually a bit windier than the airports report.</li>
+                <li>Every morning a review agent reads these results and writes a short report. Once there are 14 days of data it may make small tuning changes (model weights and cloudbase corrections only, at most one a week).</li>
+            </ul>
+        </details>
     </div>
 </main>
 <footer>RichBot • Forecast Accuracy • Data: aviationweather.gov METARs, Open-Meteo</footer>
 
 <script>
-    const DATA_URL = 'https://raw.githubusercontent.com/NoMhawk/RichieTaylor/forecast-data/summary.json';
+    const RAW = 'https://raw.githubusercontent.com/NoMhawk/RichieTaylor/forecast-data/';
     const REPORT_URL = 'https://github.com/NoMhawk/RichieTaylor/blob/forecast-data/reports/';
-    const WINDOWS = { last_7_days: 'Last 7 days', last_30_days: 'Last 30 days', all_time: 'All time' };
-    const LEADS = { same_day: 'Same day (06:00 forecast)', next_day: 'Next day', day_2: '2 days ahead', day_3_plus: '3+ days ahead' };
+    const WINDOWS = { last_7_days: '7 days', last_30_days: '30 days', all_time: 'All time' };
+    const LEADS = { same_day: 'Same day', next_day: 'Next day', day_2: '2 days ahead', day_3_plus: '3+ days ahead' };
     const MODEL_NAMES = { ecmwf_ifs025: 'ECMWF', gfs_seamless: 'GFS', icon_seamless: 'ICON', meteofrance_seamless: 'Météo-France' };
-    let summary = null;
+    const STATIONS = ['EGTE', 'EGDY'];
+    const STATION_NAMES = { EGTE: 'Exeter', EGDY: 'Yeovilton' };
+
+    let summary = null, dayRows = [], pairRows = [];
     let windowKey = 'last_30_days';
 
+    // Wind units follow the forecast page's MPH / KT switch
+    let windUnit = 'mph';
+    try { if (localStorage.getItem('richbotWindUnit') === 'kt') windUnit = 'kt'; } catch (e) { }
+    const wind = mph => (mph === null || mph === undefined || mph === '' || isNaN(mph)) ? null
+        : (windUnit === 'kt' ? Math.round(Number(mph) / 1.150779 * 10) / 10 : Number(mph));
+    const windRound = mph => { const v = wind(mph); return v === null ? null : Math.round(v); };
+    const WU = windUnit === 'kt' ? 'kt' : 'mph';
+
     const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-    const fmt = (v, unit = '') => (v === null || v === undefined) ? '<span class="muted">-</span>' : `${v}${unit}`;
-    const signed = v => (v === null || v === undefined) ? '<span class="muted">-</span>' : (v > 0 ? `+${v}` : `${v}`);
-    const pct = v => fmt(v, '%');
-    const err = (s, unit) => (!s || !s.n) ? '<span class="muted">-</span>' : `${s.mae}${unit} <span class="muted">(${signed(s.bias)})</span>`;
+    const dash = '<span class="muted">-</span>';
+    const has = s => s && s.n;
+    const num = v => (v === null || v === undefined || v === '') ? null : Number(v);
+    const ft = v => Math.round(v).toLocaleString('en-GB');
 
-    function biasWords(s, unit, high, low) {
-        if (!s || !s.n) return 'Not enough data yet';
-        if (Math.abs(s.bias) < (unit === ' ft' ? 100 : 1)) return `On average about right (${s.n} checks)`;
-        return `On average ${Math.abs(s.bias).toLocaleString()}${unit} ${s.bias > 0 ? high : low} (${s.n} checks)`;
+    // green / amber / red grading
+    const grade = (v, goodMax, okMax, higherIsBetter = false) => {
+        if (v === null || v === undefined) return 'none';
+        if (higherIsBetter) return v >= goodMax ? 'good' : (v >= okMax ? 'ok' : 'bad');
+        return v <= goodMax ? 'good' : (v <= okMax ? 'ok' : 'bad');
+    };
+    const gradeJump = v => grade(v, 80, 65, true);
+    const gradeWind = mph => grade(mph, 3, 5);
+    const gradeBase = f => grade(f, 500, 1000);
+    const gradeDayPct = v => grade(v, 15, 30);
+    const pill = (cls, text) => `<span class="pill ${cls}">${text}</span>`;
+
+    function biasWords(s, unitFn, unit, high, low, small) {
+        if (!has(s)) return '';
+        const b = s.median_bias ?? s.bias;
+        if (Math.abs(b) < small) return 'About right on average';
+        return `Usually ${unitFn(Math.abs(b))}${unit} ${b > 0 ? high : low}`;
     }
 
-    function tile(label, value, note) {
-        return `<div class="tile"><div class="label">${label}</div><div class="value">${value}</div><div class="note">${note}</div></div>`;
+    // ---------- CSV ----------
+    function parseCSV(text) {
+        const rows = [];
+        let row = [], field = '', q = false;
+        for (let i = 0; i < text.length; i++) {
+            const c = text[i];
+            if (q) {
+                if (c === '"' && text[i + 1] === '"') { field += '"'; i++; }
+                else if (c === '"') q = false;
+                else field += c;
+            } else if (c === '"') q = true;
+            else if (c === ',') { row.push(field); field = ''; }
+            else if (c === '\n' || c === '\r') {
+                if (c === '\r' && text[i + 1] === '\n') i++;
+                row.push(field); field = '';
+                if (row.length > 1 || row[0] !== '') rows.push(row);
+                row = [];
+            } else field += c;
+        }
+        if (field !== '' || row.length) { row.push(field); rows.push(row); }
+        const head = rows.shift() || [];
+        return rows.map(r => Object.fromEntries(head.map((h, k) => [h, r[k] ?? ''])));
+    }
+    const fetchText = url => fetch(`${url}?t=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => '');
+
+    // ---------- headline ----------
+    function renderSummary(w) {
+        const o = w.overall, d = (w.days && w.days.overall) || {};
+        const lines = [];
+        const j = o.jumpable;
+        lines.push(`Over the last <b>${WINDOWS[windowKey].toLowerCase()}</b>, RichBot got the jump / no-jump call right in <b>${j.accuracy_pct}%</b> of ${j.n} forecast hours.`);
+        if (j.said_no_but_yes > j.said_yes_but_no * 2 && j.said_no_but_yes >= 3) lines.push('When it was wrong, it was mostly <b>too cautious</b> (said no when it was actually jumpable).');
+        else if (j.said_yes_but_no > j.said_no_but_yes * 2 && j.said_yes_but_no >= 3) lines.push('When it was wrong, it was mostly <b>too hopeful</b> (said jumpable when it wasn\'t).');
+        const bits = [];
+        if (has(o.wind_mph)) bits.push(`wind was out by about <b>${wind(o.wind_mph.mae)} ${WU}</b>`);
+        if (has(o.cloudbase_ft)) {
+            const b = o.cloudbase_ft.median_bias ?? o.cloudbase_ft.bias;
+            bits.push(Math.abs(b) < 300 ? 'the cloudbase was <b>about right</b> on a typical hour'
+                : `the cloudbase was usually <b>${ft(Math.abs(b))} ft too ${b > 0 ? 'high' : 'low'}</b>`);
+        }
+        if (bits.length) lines.push(`On average ${bits.join(', and ')}.`);
+        if (summary.data_since) {
+            const days = Math.floor((Date.now() - new Date(summary.data_since)) / 86400000) + 1;
+            if (days < 14) lines.push(`<span class="muted">Still early: ${days} day${days === 1 ? '' : 's'} of data. Treat these numbers as a rough guide until there are a couple of weeks.</span>`);
+        }
+        return `<div class="panel summary">${lines.map(l => `<p>${l}</p>`).join('')}</div>`;
     }
 
-    function rowFor(name, s) {
-        const j = s.jumpable || {};
-        return `<tr><td>${name}</td><td>${fmt(s.hours)}</td><td>${pct(j.accuracy_pct)}</td>
-            <td>${fmt(j.said_yes_but_no)}</td><td>${fmt(j.said_no_but_yes)}</td>
-            <td>${err(s.wind_mph, '')}</td><td>${err(s.gust_mph_when_reported, '')}</td>
-            <td>${err(s.cloudbase_ft, '')}</td><td>${pct((s.rain || {}).accuracy_pct)}</td></tr>`;
+    function tile(cls, label, value, words, note) {
+        return `<div class="tile ${cls}"><div class="label">${label}</div><div class="value">${value}</div>
+            <div class="words">${words}</div><div class="note">${note}</div></div>`;
     }
 
-    const breakdownHead = `<tr><th></th><th>Hours</th><th>Jump calls right</th><th>Said yes, wasn't</th><th>Said no, was</th>
-        <th>Wind error mph (bias)</th><th>Gust error mph (bias)</th><th>Base error ft (bias)</th><th>Rain call right</th></tr>`;
+    function renderTiles(w) {
+        const o = w.overall, d = (w.days && w.days.overall) || {};
+        const j = o.jumpable;
+        const jp = d.jump_pct;
+        const wm = o.wind_mph, cb = o.cloudbase_ft;
+        const jpWords = !has(jp) ? 'Needs finished days' :
+            (Math.abs(jp.bias) < 10 ? 'About right on average' : (jp.bias < 0 ? 'Usually too low (cautious)' : 'Usually too high (hopeful)'));
+        return `<div class="tiles">
+            ${tile(gradeJump(j.accuracy_pct), 'Hourly jump calls right', `${j.accuracy_pct}%`,
+                `${j.n - j.said_yes_but_no - j.said_no_but_yes} of ${j.n} hours`,
+                `Wrong: said yes ${j.said_yes_but_no}×, said no ${j.said_no_but_yes}×`)}
+            ${tile(has(jp) ? gradeDayPct(jp.mae) : 'none', 'Card JUMP % vs reality', has(jp) ? `±${Math.round(jp.mae)}` : dash,
+                jpWords, has(jp) ? `Points out, against the share of hours that were jumpable (${jp.n} day checks)` : '')}
+            ${tile(has(wm) ? gradeWind(wm.mae) : 'none', 'Wind', has(wm) ? `±${wind(wm.mae)} ${WU}` : dash,
+                biasWords(wm, wind, ' ' + WU, 'too strong', 'too light', 1), has(wm) ? `${wm.n} hours checked` : '')}
+            ${tile(has(cb) ? gradeBase(cb.mae) : 'none', 'Cloudbase', has(cb) ? `±${ft(cb.mae)} ft` : dash,
+                biasWords(cb, ft, ' ft', 'too high', 'too low', 300), has(cb) ? `${cb.n} hours with a base to compare` : '')}
+        </div>`;
+    }
+
+    // ---------- day by day ----------
+    function pickIssue(date) {
+        // morning forecast for the day: earliest same-day issue, else the latest issue before the day
+        const issues = [...new Set(pairRows.filter(r => r.valid.startsWith(date)).map(r => r.issued))].sort();
+        if (!issues.length) return null;
+        const same = issues.filter(i => i.slice(0, 10) === date);
+        return same.length ? same[0] : issues[issues.length - 1];
+    }
+
+    function hourTable(date, issued) {
+        const rows = pairRows.filter(r => r.issued === issued && r.valid.startsWith(date));
+        const byHour = {};
+        rows.forEach(r => { (byHour[r.valid.slice(11, 16)] ||= {})[r.station] = r; });
+        const hours = Object.keys(byHour).sort();
+        if (!hours.length) return '<p class="muted small">No hourly data.</p>';
+
+        const baseTxt = (state, v) => state === 'clear' ? 'Clear' : (state === 'check' ? 'Check' : (v === null ? '-' : ft(v)));
+        const obBase = v => v === null ? '<span class="muted">Clear</span>' : ft(v);
+        const call = yes => `<span class="call ${yes ? 'yes' : 'no'}">${yes ? 'JUMP' : 'NO'}</span>`;
+        const markFor = (fc, ob) => fc === ob ? '<i class="fa-solid fa-check match" title="Matched"></i>' : '<i class="fa-solid fa-xmark miss" title="Did not match"></i>';
+
+        const body = hours.map(h => {
+            const s = byHour[h];
+            const any = s.EGTE || s.EGDY;
+            const fcJump = any.fc_jumpable === '1';
+            const stationCells = (fn) => STATIONS.map(st => s[st] ? fn(s[st]) : '<td class="muted">-</td>').join('');
+            return `<tr>
+                <td>${h}</td>
+                <td class="grp fc">${windRound(any.fc_ws)}<span class="muted small"> g${windRound(any.fc_wg)}</span></td>
+                ${stationCells(r => `<td>${windRound(r.ob_ws)}${r.ob_wg ? `<span class="muted small"> g${windRound(r.ob_wg)}</span>` : ''}</td>`)}
+                <td class="grp fc">${baseTxt(any.fc_base_state, num(any.fc_base_ft))}${any.fc_base_est === '1' ? '<span class="muted small"> est</span>' : ''}</td>
+                ${stationCells(r => `<td>${obBase(num(r.ob_base_ft))}</td>`)}
+                <td class="grp fc">${num(any.fc_cloud)}%</td>
+                ${stationCells(r => `<td>${num(r.ob_cloud)}%</td>`)}
+                <td class="grp">${call(fcJump)}</td>
+                ${stationCells(r => `<td>${call(r.ob_jumpable === '1')} ${markFor(fcJump, r.ob_jumpable === '1')}</td>`)}
+            </tr>`;
+        }).join('');
+
+        const grpHead = label => `<th class="grp">RichBot</th><th>Exeter</th><th>Yeovilton</th>`;
+        return `<div class="table-wrapper"><table class="hours">
+            <thead>
+                <tr><th></th><th class="grp" colspan="3">Wind (${WU})</th><th class="grp" colspan="3">Cloudbase (ft above Dunkeswell)</th>
+                    <th class="grp" colspan="3">Cloud %</th><th class="grp" colspan="3">Jump call</th></tr>
+                <tr><th>Time</th>${grpHead()}${grpHead()}${grpHead()}${grpHead()}</tr>
+            </thead><tbody>${body}</tbody></table></div>`;
+    }
+
+    function renderDays() {
+        const dates = [...new Set(dayRows.map(r => r.date))].sort().reverse();
+        const limit = windowKey === 'last_7_days' ? 7 : (windowKey === 'last_30_days' ? 30 : 365);
+        const cutoff = new Date(Date.now() - limit * 86400000).toISOString().slice(0, 10);
+        const shown = dates.filter(d => d >= cutoff);
+        if (!shown.length) return '';
+
+        const items = shown.map((date, idx) => {
+            const issued = pickIssue(date);
+            const rows = dayRows.filter(r => r.date === date && (!issued || r.issued === issued));
+            const use = rows.length ? rows : dayRows.filter(r => r.date === date);
+            const fc = num(use[0].fc_likelihood);
+            const obs = use.map(r => num(r.ob_pct)).filter(v => v !== null);
+            const ob = obs.length ? Math.round(obs.reduce((a, b) => a + b, 0) / obs.length) : null;
+            const diff = ob === null ? null : fc - ob;
+            let verdict = pill('none', 'No data');
+            if (diff !== null) {
+                const cls = gradeDayPct(Math.abs(diff));
+                verdict = Math.abs(diff) <= 15 ? pill(cls, 'Close')
+                    : pill(cls, diff < 0 ? `${Math.abs(diff)} pts too low` : `${diff} pts too high`);
+            }
+            const d = new Date(date + 'T12:00:00');
+            const dayName = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' });
+            const when = issued ? new Date(issued).toLocaleString('en-GB', { weekday: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+            const perStation = use.map(r => `${STATION_NAMES[r.station] || r.station} ${r.ob_pct}%`).join(', ');
+            return `<details class="day"${idx === 0 ? ' open' : ''}>
+                <summary>
+                    <div><div class="day-date">${dayName}</div><div class="day-num">${esc(use[0].revision)}</div></div>
+                    <div><div class="day-num">RichBot said</div><div class="day-val">${fc}%</div></div>
+                    <div><div class="day-num">Actually jumpable</div><div class="day-val">${ob === null ? '-' : ob + '%'}</div></div>
+                    <div class="verdict">${verdict}</div>
+                    <i class="fa-solid fa-chevron-right chev"></i>
+                </summary>
+                <div class="day-body">
+                    <p class="note">Forecast taken ${esc(when)}. Jumpable hours: ${esc(perStation)}.</p>
+                    ${issued ? hourTable(date, issued) : ''}
+                </div>
+            </details>`;
+        }).join('');
+
+        return `<div class="panel">
+            <h2><i class="fa-solid fa-calendar-day"></i>Day by day</h2>
+            <p class="sub">The card's JUMP % against how many daylight hours were actually jumpable. Click a day to see each hour.</p>
+            <div class="days">${items}</div>
+        </div>`;
+    }
+
+    // ---------- breakdown tables ----------
+    function cell(s, fmtFn, gradeFn) {
+        if (!has(s)) return `<td>${dash}</td>`;
+        return `<td>${pill(gradeFn(s.mae), fmtFn(s.mae))}</td>`;
+    }
+    function jumpCell(j) {
+        return (j && j.n) ? `<td>${pill(gradeJump(j.accuracy_pct), j.accuracy_pct + '%')}</td>` : `<td>${dash}</td>`;
+    }
+    const simpleHead = `<tr><th></th><th>Hours</th><th>Jump calls right</th><th>Wind error</th><th>Cloudbase error</th></tr>`;
+    function simpleRow(name, s) {
+        return `<tr><td>${name}</td><td>${s.hours}</td>${jumpCell(s.jumpable)}
+            ${cell(s.wind_mph, v => `±${wind(v)} ${WU}`, gradeWind)}
+            ${cell(s.cloudbase_ft, v => `±${ft(v)} ft`, gradeBase)}</tr>`;
+    }
+
+    function renderTables(w) {
+        const o = w.overall;
+        const leadRows = Object.entries(LEADS).map(([k, n]) => w.by_lead[k] && w.by_lead[k].hours ? simpleRow(n, w.by_lead[k]) : '').join('');
+        const stationRows = Object.entries(w.by_station).map(([k, s]) => s.hours ? simpleRow(`${summary.stations[k]}`, s) : '').join('');
+
+        const models = Object.entries(o.models_wind_mph).filter(([, s]) => s.n)
+            .map(([k, s]) => ({ name: MODEL_NAMES[k] || k, s }));
+        if (has(o.wind_mph)) models.push({ name: 'RichBot average', s: o.wind_mph, blend: true });
+        models.sort((a, b) => a.s.mae - b.s.mae);
+        const modelRows = models.map((m, i) => {
+            const b = m.s.median_bias ?? m.s.bias;
+            const lean = Math.abs(b) < 1 ? 'about right' : `${wind(Math.abs(b))} ${WU} too ${b > 0 ? 'strong' : 'light'}`;
+            return `<tr><td>${i + 1}. ${m.blend ? '<i class="fa-solid fa-star" style="color:var(--accent-sky)"></i> ' : ''}${m.name}</td>
+                <td>${pill(gradeWind(m.s.mae), `±${wind(m.s.mae)} ${WU}`)}</td><td class="muted">${lean}</td><td class="muted">${m.s.n}</td></tr>`;
+        }).join('');
+
+        const revRows = Object.entries(summary.by_revision).reverse().map(([rev, s]) => `<tr><td>${esc(rev)}</td>
+            <td class="muted">${esc(s.first_valid.slice(0, 10))} to ${esc(s.last_valid.slice(0, 10))}</td>
+            <td>${s.hours}</td>${jumpCell(s.jumpable)}
+            ${cell(s.wind_mph, v => `±${wind(v)} ${WU}`, gradeWind)}
+            ${cell(s.cloudbase_ft, v => `±${ft(v)} ft`, gradeBase)}</tr>`).join('');
+
+        return `
+        <div class="panel">
+            <h2><i class="fa-solid fa-clock"></i>How far ahead</h2>
+            <p class="sub">Forecasts normally get less reliable the further ahead they look.</p>
+            <div class="table-wrapper"><table><thead>${simpleHead}</thead><tbody>${leadRows}</tbody></table></div>
+        </div>
+        <div class="panel">
+            <h2><i class="fa-solid fa-tower-broadcast"></i>By airport</h2>
+            <p class="sub">Exeter is lower and nearer the coast; Yeovilton is further east. Dunkeswell is often somewhere between.</p>
+            <div class="table-wrapper"><table><thead>${simpleHead}</thead><tbody>${stationRows}</tbody></table></div>
+        </div>
+        <div class="panel">
+            <h2><i class="fa-solid fa-wind"></i>Wind models, best first</h2>
+            <p class="sub">RichBot averages these four. The review agent uses this ranking to weight the average.</p>
+            <div class="table-wrapper"><table><thead><tr><th>Model</th><th>Typical error</th><th>Leans</th><th>Hours</th></tr></thead>
+            <tbody>${modelRows}</tbody></table></div>
+        </div>
+        <div class="panel">
+            <h2><i class="fa-solid fa-code-branch"></i>By forecast version</h2>
+            <p class="sub">Whether each change to RichBot made it better (all time).</p>
+            <div class="table-wrapper"><table><thead><tr><th>Version</th><th>Period</th><th>Hours</th><th>Jump calls right</th><th>Wind error</th><th>Cloudbase error</th></tr></thead>
+            <tbody>${revRows}</tbody></table></div>
+        </div>`;
+    }
+
+    function renderReports() {
+        const reports = (summary.reports || []).slice().reverse().slice(0, 30);
+        const list = reports.length
+            ? `<div class="reports">${reports.map(r => {
+                const d = new Date(r.replace(/\.md$/, '') + 'T12:00:00');
+                const label = isNaN(d) ? r : d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+                return `<a href="${REPORT_URL}${encodeURIComponent(r)}" target="_blank" rel="noopener">${esc(label)}</a>`;
+            }).join('')}</div>`
+            : '<p class="sub">No reviews yet.</p>';
+        return `<div class="panel">
+            <h2><i class="fa-solid fa-clipboard-check"></i>Daily reviews</h2>
+            <p class="sub">Written every morning by the review agent, including any tuning it changed.</p>
+            ${list}
+        </div>`;
+    }
+
+    // ---------- page ----------
+    function renderToggle() {
+        document.getElementById('toggle').innerHTML = Object.entries(WINDOWS).map(([k, v]) =>
+            `<button type="button" aria-pressed="${k === windowKey}" onclick="windowKey='${k}'; renderToggle(); render();">${v}</button>`).join('');
+    }
 
     function render() {
         const w = summary.windows[windowKey];
-        const o = w.overall;
         const content = document.getElementById('content');
-        if (!o || !o.hours) {
+        if (!w.overall || !w.overall.hours) {
             content.innerHTML = `<div class="panel"><div class="empty"><i class="fa-solid fa-hourglass-half"></i>
-                No results for ${WINDOWS[windowKey].toLowerCase()} yet. Forecasts are checked once the hours they cover have passed,
-                so the first results appear later today, and grow every 3 hours.</div></div>`;
+                No results for the last ${WINDOWS[windowKey].toLowerCase()} yet. Forecasts are checked once the hours they cover have passed.</div></div>`;
             return;
         }
-        const d = (w.days && w.days.overall) || {};
-        const j = o.jumpable;
-
-        const toggle = Object.entries(WINDOWS).map(([k, v]) =>
-            `<button type="button" aria-pressed="${k === windowKey}" onclick="windowKey='${k}'; render();">${v}</button>`).join('');
-
-        const tiles = [
-            tile('Jump / no-jump calls right', pct(j.accuracy_pct),
-                `${j.n} forecast hours checked. Said jumpable but wasn't: ${j.said_yes_but_no}. Said not jumpable but was: ${j.said_no_but_yes}.`),
-            tile('JUMP % error', d.jump_pct && d.jump_pct.n ? `${d.jump_pct.mae} pts` : '<span class="muted">-</span>',
-                d.jump_pct && d.jump_pct.n ? `Average gap between the card's JUMP % and the share of daylight hours that were jumpable (${d.jump_pct.n} day checks, bias ${signed(d.jump_pct.bias)}).` : 'Needs whole days that have finished.'),
-            tile('Wind error', o.wind_mph.n ? `${o.wind_mph.mae} mph` : '<span class="muted">-</span>',
-                biasWords(o.wind_mph, ' mph', 'too strong', 'too light')),
-            tile('Cloudbase error', o.cloudbase_ft.n ? `${o.cloudbase_ft.mae.toLocaleString()} ft` : '<span class="muted">-</span>',
-                biasWords(o.cloudbase_ft, ' ft', 'too high', 'too low'))
-        ].join('');
-
-        const leadRows = Object.entries(LEADS).map(([k, name]) => w.by_lead[k] && w.by_lead[k].hours ? rowFor(name, w.by_lead[k]) : '').join('');
-        const stationRows = Object.entries(w.by_station).map(([k, s]) => s.hours ? rowFor(`${summary.stations[k]} (${k})`, s) : '').join('');
-
-        const models = Object.entries(o.models_wind_mph)
-            .filter(([, s]) => s.n)
-            .map(([k, s]) => ({ name: MODEL_NAMES[k] || k, s, g: o.models_gust_mph_when_reported[k] }));
-        models.push({ name: 'RichBot average (what the page shows)', s: o.wind_mph, g: o.gust_mph_when_reported, blend: true });
-        models.sort((a, b) => a.s.mae - b.s.mae);
-        const modelRows = models.map(m => `<tr><td>${m.blend ? '<i class="fa-solid fa-star" style="color:var(--accent-sky)"></i> ' : ''}${m.name}</td>
-            <td>${m.s.mae}</td><td>${signed(m.s.bias)}</td><td>${err(m.g, '')}</td><td>${m.s.n}</td></tr>`).join('');
-
-        const revRows = Object.entries(summary.by_revision).reverse().map(([rev, s]) => `<tr><td>${esc(rev)}</td>
-            <td>${s.hours}</td><td>${pct(s.jumpable.accuracy_pct)}</td><td>${err(s.wind_mph, '')}</td><td>${err(s.cloudbase_ft, '')}</td>
-            <td class="muted">${esc(s.first_valid.slice(0, 10))} to ${esc(s.last_valid.slice(0, 10))}</td></tr>`).join('');
-
-        const reports = (summary.reports || []).slice().reverse();
-        const reportList = reports.length
-            ? `<ul class="reports">${reports.map(r => `<li><a href="${REPORT_URL}${encodeURIComponent(r)}" target="_blank" rel="noopener">${esc(r.replace(/\.md$/, ''))}</a></li>`).join('')}</ul>`
-            : '<p class="sub">No weekly reviews yet. The first one runs after a week of data.</p>';
-
-        content.innerHTML = `
-        <div style="display:flex; flex-direction:column; gap:1.5rem;">
-            <div class="toggle" role="group" aria-label="Time range">${toggle}</div>
-            <div class="tiles">${tiles}</div>
-
-            <div class="panel">
-                <h2><i class="fa-solid fa-clock" style="color: var(--accent-sky);"></i>By how far ahead the forecast was</h2>
-                <p class="sub">Forecasts usually get worse the further ahead they look. Bias = forecast minus actual.</p>
-                <div class="table-wrapper"><table><thead>${breakdownHead}</thead><tbody>${leadRows}</tbody></table></div>
-            </div>
-
-            <div class="panel">
-                <h2><i class="fa-solid fa-tower-broadcast" style="color: var(--accent-sky);"></i>By airport</h2>
-                <p class="sub">Exeter is lower and nearer the coast; Yeovilton is further east. Dunkeswell's own weather is often somewhere between.</p>
-                <div class="table-wrapper"><table><thead>${breakdownHead}</thead><tbody>${stationRows}</tbody></table></div>
-            </div>
-
-            <div class="panel">
-                <h2><i class="fa-solid fa-wind" style="color: var(--accent-sky);"></i>Wind models, most accurate first</h2>
-                <p class="sub">Each model's wind against the airports. Used by the weekly review to weight the average.</p>
-                <div class="table-wrapper"><table><thead><tr><th>Model</th><th>Wind error mph</th><th>Wind bias</th><th>Gust error mph (bias)</th><th>Checks</th></tr></thead>
-                <tbody>${modelRows}</tbody></table></div>
-            </div>
-
-            <div class="panel">
-                <h2><i class="fa-solid fa-code-branch" style="color: var(--accent-sky);"></i>By forecast version</h2>
-                <p class="sub">Shows whether each change to RichBot made it more accurate (all time).</p>
-                <div class="table-wrapper"><table><thead><tr><th>Version</th><th>Hours</th><th>Jump calls right</th><th>Wind error mph (bias)</th><th>Base error ft (bias)</th><th>Period</th></tr></thead>
-                <tbody>${revRows}</tbody></table></div>
-            </div>
-
-            <div class="panel">
-                <h2><i class="fa-solid fa-clipboard-check" style="color: var(--accent-sky);"></i>Weekly reviews</h2>
-                ${reportList}
-            </div>
+        content.innerHTML = `<div style="display:flex; flex-direction:column; gap:1.25rem;">
+            ${renderSummary(w)}
+            ${renderTiles(w)}
+            ${renderDays()}
+            ${renderTables(w)}
+            ${renderReports()}
         </div>`;
     }
 
     function renderMeta() {
         const t = summary.current_tuning;
-        let tuning = 'neutral';
+        let tuning = 'none';
         if (t) {
             const parts = [];
-            Object.entries(t.modelWeights || {}).forEach(([k, v]) => { if (v !== 1) parts.push(`${MODEL_NAMES[k] || k} weight ${v}`); });
-            if (t.windBiasMph) parts.push(`wind ${signed(t.windBiasMph)} mph`);
-            if (t.gustBiasMph) parts.push(`gusts ${signed(t.gustBiasMph)} mph`);
-            if (t.cloudbaseBiasFt) parts.push(`base ${signed(t.cloudbaseBiasFt)} ft`);
-            if (t.estCloudbaseBiasFt) parts.push(`est. base ${signed(t.estCloudbaseBiasFt)} ft`);
+            Object.entries(t.modelWeights || {}).forEach(([k, v]) => { if (v !== 1) parts.push(`${MODEL_NAMES[k] || k} ×${v}`); });
+            if (t.windBiasMph) parts.push(`wind ${t.windBiasMph > 0 ? '+' : ''}${t.windBiasMph} mph`);
+            if (t.gustBiasMph) parts.push(`gusts ${t.gustBiasMph > 0 ? '+' : ''}${t.gustBiasMph} mph`);
+            if (t.cloudbaseBiasFt) parts.push(`base ${t.cloudbaseBiasFt > 0 ? '+' : ''}${t.cloudbaseBiasFt} ft`);
+            if (t.estCloudbaseBiasFt) parts.push(`est. base ${t.estCloudbaseBiasFt > 0 ? '+' : ''}${t.estCloudbaseBiasFt} ft`);
             if (parts.length) tuning = parts.join(', ');
         }
         const generated = new Date(summary.generated.replace('Z', ':00Z'));
         document.getElementById('meta').innerHTML = `
-            <span>Updated: <b>${generated.toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}</b></span>
-            <span>Checking since: <b>${summary.data_since ? esc(summary.data_since.slice(0, 10)) : 'starting today'}</b></span>
-            <span>Forecast version: <b>${esc(summary.current_revision || '-')}</b></span>
-            <span>Tuning: <b>${esc(tuning)}</b></span>`;
+            <span>Updated <b>${generated.toLocaleString('en-GB', { weekday: 'short', hour: '2-digit', minute: '2-digit' })}</b></span>
+            <span>Checking since <b>${summary.data_since ? new Date(summary.data_since).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : 'today'}</b></span>
+            <span>Forecast <b>${esc(summary.current_revision || '-')}</b></span>
+            <span>Tuning <b>${esc(tuning)}</b></span>`;
     }
 
-    fetch(`${DATA_URL}?t=${Date.now()}`)
-        .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
-        .then(data => { summary = data; renderMeta(); render(); })
-        .catch(() => {
-            document.getElementById('meta').innerHTML = 'Accuracy data isn\'t available yet. The checking job writes its first results within a few hours of starting.';
-        });
+    async function load() {
+        try {
+            const r = await fetch(`${RAW}summary.json?t=${Date.now()}`);
+            if (!r.ok) throw new Error(r.status);
+            summary = await r.json();
+        } catch (e) {
+            document.getElementById('meta').textContent = 'Accuracy data isn\'t available yet. The checking job writes its first results within a few hours of starting.';
+            return;
+        }
+        // this month and last month of hourly pairs, plus the day list
+        const now = new Date();
+        const months = [0, 1].map(k => { const d = new Date(now.getFullYear(), now.getMonth() - k, 1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; });
+        const [daysTxt, ...pairTxts] = await Promise.all([fetchText(`${RAW}days.csv`), ...months.map(m => fetchText(`${RAW}pairs/${m}.csv`))]);
+        dayRows = daysTxt ? parseCSV(daysTxt) : [];
+        pairRows = pairTxts.flatMap(t => t ? parseCSV(t) : []);
+        renderMeta();
+        renderToggle();
+        render();
+    }
+    load();
 </script>
 </body>
 </html>
