@@ -1,10 +1,13 @@
 <!-- ========================================================================= -->
-<!-- REVISION: v5.1                                                            -->
+<!-- REVISION: v5.2                                                            -->
 <!-- SYSTEM: RichBot - Skydive Southwest Flight Line Forecast                  -->
 <!-- TARGET FILE: forecast/index.html                                          -->
 <!-- BACKUPS: previous versions are kept in forecast/revisions/                -->
 <!-- ========================================================================= -->
 <!-- CHANGE LOG                                                                -->
+<!-- v5.2 (2026-11-26)                                                         -->
+<!--   - Renamed the "Above 15k (info)" row to "Cloud 15k+ (%)". Still greyed  -->
+<!--     out and not used for the JUMP %.                                      -->
 <!-- v5.1 (2026-11-26)                                                         -->
 <!--   - Removed the "Cloud <15k" row. The three height bands (0-5k, 5-10k,    -->
 <!--     10-15k ft above the airfield) now use the same coloured boxes as the  -->
@@ -245,7 +248,7 @@
     <!-- [SECTION: CONFIGURATION & SETTINGS BLOCK] -->
     <script>
         const CONFIG = {
-            revision: "v5.1",
+            revision: "v5.2",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -1211,7 +1214,7 @@
             let cLowRow = `<tr><td class="param-label" title="Most cloud at any height from the airfield up to 5,000 ft above it">Cloud 0-5k (%)</td>`;
             let cMidRow = `<tr><td class="param-label" title="Most cloud at any height from 5,000 to 10,000 ft above the airfield">Cloud 5-10k (%)</td>`;
             let cTopRow = `<tr><td class="param-label" title="Most cloud at any height from 10,000 to ${topK},000 ft above the airfield">Cloud 10-${topK}k (%)</td>`;
-            let cHighRow = `<tr><td class="param-label" title="Cloud above ${topK},000 ft (including high cloud). For information only: not used for the JUMP %." style="color:var(--text-muted);">Above ${topK}k (info)</td>`;
+            let cHighRow = `<tr><td class="param-label" title="Cloud above ${topK},000 ft (including high cloud). For information only: not used for the JUMP %." style="color:var(--text-muted);">Cloud ${topK}k+ (%)</td>`;
 
             let visRow = `<tr><td class="param-label">Vis (km)</td>`;
             let baseRow = `<tr><td class="param-label" title="Met Office UK 2 km cloud base, about 2.5 days ahead. Beyond that, 'est.' = estimate from cloud cover by height.">Base (ft AGL)</td>`;
