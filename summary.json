@@ -27,7 +27,7 @@
    }
   }
  },
- "current_revision": "v5.0",
+ "current_revision": "v5.2",
  "current_tuning": {
   "cloudbaseBiasFt": 0,
   "estCloudbaseBiasFt": 0,
@@ -41,7 +41,7 @@
   "windBiasMph": 0
  },
  "data_since": "2026-11-25T11:00",
- "generated": "2026-11-26T01:20Z",
+ "generated": "2026-11-26T08:31Z",
  "reports": [
   "2026-11-25.md"
  ],

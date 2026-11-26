@@ -56,6 +56,384 @@
    "vis": 9.7,
    "wg": null,
    "ws": 10
+  },
+  "2026-11-26T01:20Z": {
+   "base": 836,
+   "ceiling": 836,
+   "cloud": 100,
+   "dir": 40,
+   "fog": false,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "lowest": 836,
+   "rain": false,
+   "raw": "METAR EGDY 260120Z AUTO 04009KT 9999 OVC016/// 05/03 Q1016",
+   "station": "EGDY",
+   "time": "2026-11-26T01:20Z",
+   "vis": 9.7,
+   "wg": null,
+   "ws": 10
+  },
+  "2026-11-26T02:00Z": {
+   "base": 836,
+   "ceiling": 836,
+   "cloud": 100,
+   "dir": 20,
+   "fog": false,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "lowest": 836,
+   "rain": false,
+   "raw": "METAR EGDY 260150Z AUTO 02006KT 6000 BR OVC016/// 04/03 Q1017",
+   "station": "EGDY",
+   "time": "2026-11-26T02:00Z",
+   "vis": 6.0,
+   "wg": null,
+   "ws": 7
+  },
+  "2026-11-26T02:20Z": {
+   "base": 436,
+   "ceiling": 436,
+   "cloud": 100,
+   "dir": 30,
+   "fog": false,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "lowest": 436,
+   "rain": false,
+   "raw": "METAR EGDY 260220Z AUTO 03007KT 8000 BR OVC012/// 05/03 Q1017",
+   "station": "EGDY",
+   "time": "2026-11-26T02:20Z",
+   "vis": 8.0,
+   "wg": null,
+   "ws": 8
+  },
+  "2026-11-26T03:00Z": {
+   "base": 336,
+   "ceiling": 336,
+   "cloud": 100,
+   "dir": 10,
+   "fog": false,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "lowest": 336,
+   "rain": false,
+   "raw": "METAR EGDY 260250Z AUTO 01004KT 8000 BR OVC011/// 05/03 Q1017",
+   "station": "EGDY",
+   "time": "2026-11-26T03:00Z",
+   "vis": 8.0,
+   "wg": null,
+   "ws": 5
+  },
+  "2026-11-26T03:20Z": {
+   "base": 336,
+   "ceiling": 336,
+   "cloud": 100,
+   "dir": 50,
+   "fog": false,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "lowest": 336,
+   "rain": false,
+   "raw": "METAR EGDY 260320Z AUTO 05004KT 7000 BR OVC011/// 05/03 Q1016",
+   "station": "EGDY",
+   "time": "2026-11-26T03:20Z",
+   "vis": 7.0,
+   "wg": null,
+   "ws": 5
+  },
+  "2026-11-26T04:00Z": {
+   "base": 336,
+   "ceiling": 336,
+   "cloud": 100,
+   "dir": 10,
+   "fog": false,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "lowest": 336,
+   "rain": false,
+   "raw": "METAR EGDY 260350Z AUTO 01004KT 7000 BR OVC011/// 05/03 Q1017",
+   "station": "EGDY",
+   "time": "2026-11-26T04:00Z",
+   "vis": 7.0,
+   "wg": null,
+   "ws": 5
+  },
+  "2026-11-26T04:20Z": {
+   "base": 336,
+   "ceiling": 336,
+   "cloud": 100,
+   "dir": 10,
+   "fog": false,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "lowest": 336,
+   "rain": false,
+   "raw": "METAR EGDY 260420Z AUTO 01004KT 7000 BR OVC011/// 05/03 Q1017",
+   "station": "EGDY",
+   "time": "2026-11-26T04:20Z",
+   "vis": 7.0,
+   "wg": null,
+   "ws": 5
+  },
+  "2026-11-26T05:00Z": {
+   "base": 436,
+   "ceiling": 436,
+   "cloud": 75,
+   "dir": 20,
+   "fog": false,
+   "issues": [
+    "lowbase"
+   ],
+   "lowest": 436,
+   "rain": false,
+   "raw": "METAR EGDY 260450Z 02004KT 7000 BR BKN012 05/03 Q1017 RMK GRN",
+   "station": "EGDY",
+   "time": "2026-11-26T05:00Z",
+   "vis": 7.0,
+   "wg": null,
+   "ws": 5
+  },
+  "2026-11-26T05:20Z": {
+   "base": 236,
+   "ceiling": 236,
+   "cloud": 100,
+   "dir": 10,
+   "fog": false,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "lowest": 236,
+   "rain": false,
+   "raw": "METAR EGDY 260520Z AUTO 01004KT 6000 BR OVC010/// 05/03 Q1017",
+   "station": "EGDY",
+   "time": "2026-11-26T05:20Z",
+   "vis": 6.0,
+   "wg": null,
+   "ws": 5
+  },
+  "2026-11-26T06:00Z": {
+   "base": 236,
+   "ceiling": 236,
+   "cloud": 100,
+   "dir": 20,
+   "fog": false,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "lowest": 236,
+   "rain": false,
+   "raw": "METAR EGDY 260550Z 02004KT 6000 BR OVC010 05/04 Q1017 RMK GRN",
+   "station": "EGDY",
+   "time": "2026-11-26T06:00Z",
+   "vis": 6.0,
+   "wg": null,
+   "ws": 5
+  },
+  "2026-11-26T06:20Z": {
+   "base": 236,
+   "ceiling": 236,
+   "cloud": 100,
+   "dir": 40,
+   "fog": false,
+   "issues": [
+    "rain",
+    "lowbase",
+    "cloud"
+   ],
+   "lowest": 236,
+   "rain": true,
+   "raw": "METAR EGDY 260620Z AUTO 04004KT 4400 -DZ OVC010/// 05/04 Q1017",
+   "station": "EGDY",
+   "time": "2026-11-26T06:20Z",
+   "vis": 4.4,
+   "wg": null,
+   "ws": 5
+  },
+  "2026-11-26T07:00Z": {
+   "base": 236,
+   "ceiling": 236,
+   "cloud": 75,
+   "dir": 50,
+   "fog": false,
+   "issues": [
+    "rain",
+    "lowbase"
+   ],
+   "lowest": 236,
+   "rain": true,
+   "raw": "METAR EGDY 260650Z 05005KT 5000 BR -DZ BKN010 05/04 Q1017 NOSIG RMK GRN GRN",
+   "station": "EGDY",
+   "time": "2026-11-26T07:00Z",
+   "vis": 5.0,
+   "wg": null,
+   "ws": 6
+  },
+  "2026-11-26T07:20Z": {
+   "base": 236,
+   "ceiling": 236,
+   "cloud": 100,
+   "dir": 60,
+   "fog": true,
+   "issues": [
+    "fog",
+    "lowbase",
+    "cloud"
+   ],
+   "lowest": 236,
+   "rain": false,
+   "raw": "METAR EGDY 260720Z 06007KT 4500 BR OVC010 05/04 Q1017 NOSIG RMK GRN GRN",
+   "station": "EGDY",
+   "time": "2026-11-26T07:20Z",
+   "vis": 4.5,
+   "wg": null,
+   "ws": 8
+  },
+  "2026-11-26T08:00Z": {
+   "base": 236,
+   "ceiling": 236,
+   "cloud": 100,
+   "dir": 40,
+   "fog": false,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "lowest": 236,
+   "rain": false,
+   "raw": "METAR EGDY 260750Z 04005KT 5000 BR OVC010 05/04 Q1017 NOSIG RMK GRN GRN",
+   "station": "EGDY",
+   "time": "2026-11-26T08:00Z",
+   "vis": 5.0,
+   "wg": null,
+   "ws": 6
+  },
+  "2026-11-26T08:20Z": {
+   "base": 236,
+   "ceiling": 236,
+   "cloud": 100,
+   "dir": 10,
+   "fog": false,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "lowest": 236,
+   "rain": false,
+   "raw": "METAR EGDY 260820Z 01003KT 6000 BR OVC010 05/04 Q1018 BECMG 9999 BKN015 RMK GRN BECMG WHT",
+   "station": "EGDY",
+   "time": "2026-11-26T08:20Z",
+   "vis": 6.0,
+   "wg": null,
+   "ws": 3
+  }
+ },
+ "EGTE": {
+  "2026-11-26T06:20Z": {
+   "base": 265,
+   "ceiling": 265,
+   "cloud": 75,
+   "dir": null,
+   "fog": false,
+   "issues": [
+    "lowbase"
+   ],
+   "lowest": 265,
+   "rain": false,
+   "raw": "METAR EGTE 260620Z VRB02KT 9999 BKN010 05/03 Q1017",
+   "station": "EGTE",
+   "time": "2026-11-26T06:20Z",
+   "vis": 9.7,
+   "wg": null,
+   "ws": 2
+  },
+  "2026-11-26T07:00Z": {
+   "base": 265,
+   "ceiling": 265,
+   "cloud": 75,
+   "dir": 30,
+   "fog": false,
+   "issues": [
+    "lowbase"
+   ],
+   "lowest": 265,
+   "rain": false,
+   "raw": "METAR EGTE 260650Z 03003KT 360V060 8000 BKN010 05/03 Q1017",
+   "station": "EGTE",
+   "time": "2026-11-26T07:00Z",
+   "vis": 8.0,
+   "wg": null,
+   "ws": 3
+  },
+  "2026-11-26T07:20Z": {
+   "base": 265,
+   "ceiling": 265,
+   "cloud": 75,
+   "dir": 10,
+   "fog": false,
+   "issues": [
+    "lowbase"
+   ],
+   "lowest": 265,
+   "rain": false,
+   "raw": "METAR EGTE 260720Z 01003KT 340V050 8000 BKN010 05/04 Q1017",
+   "station": "EGTE",
+   "time": "2026-11-26T07:20Z",
+   "vis": 8.0,
+   "wg": null,
+   "ws": 3
+  },
+  "2026-11-26T08:00Z": {
+   "base": 265,
+   "ceiling": 265,
+   "cloud": 75,
+   "dir": 340,
+   "fog": false,
+   "issues": [
+    "lowbase"
+   ],
+   "lowest": 265,
+   "rain": false,
+   "raw": "METAR EGTE 260750Z 34002KT 6000 BKN010 05/04 Q1018",
+   "station": "EGTE",
+   "time": "2026-11-26T08:00Z",
+   "vis": 6.0,
+   "wg": null,
+   "ws": 2
+  },
+  "2026-11-26T08:20Z": {
+   "base": 265,
+   "ceiling": 265,
+   "cloud": 75,
+   "dir": 360,
+   "fog": false,
+   "issues": [
+    "lowbase"
+   ],
+   "lowest": 265,
+   "rain": false,
+   "raw": "METAR EGTE 260820Z 36004KT 6000 BKN010 05/04 Q1018",
+   "station": "EGTE",
+   "time": "2026-11-26T08:20Z",
+   "vis": 6.0,
+   "wg": null,
+   "ws": 5
   }
  }
 }
