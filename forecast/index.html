@@ -1,10 +1,23 @@
 <!-- ========================================================================= -->
-<!-- REVISION: v4.9                                                            -->
+<!-- REVISION: v5.0                                                            -->
 <!-- SYSTEM: RichBot - Skydive Southwest Flight Line Forecast                  -->
 <!-- TARGET FILE: forecast/index.html                                          -->
 <!-- BACKUPS: previous versions are kept in forecast/revisions/                -->
 <!-- ========================================================================= -->
 <!-- CHANGE LOG                                                                -->
+<!-- v5.0 (2026-11-26)                                                         -->
+<!--   - Cloud % now only counts cloud that matters for jumping: below 15,000  -->
+<!--     ft above the airfield (~16k above sea level, CONFIG.cloudTopFt).      -->
+<!--     High cloud no longer makes the Cloud row show 100% on a jumpable day. -->
+<!--   - Low / Mid / High rows replaced by height bands above the airfield:    -->
+<!--     0-5k, 5-10k, 10-15k (from the model's cloud at each pressure level)   -->
+<!--     plus a greyed-out "Above 15k" row for information only.               -->
+<!--   - "Cloud below 15k" = the larger of Open-Meteo's Low layer and the      -->
+<!--     three bands. The JUMP %, heavy-cloud rule and outlook text use it     -->
+<!--     (before: Low or Mid layer, and Mid reached ~26,000 ft).               -->
+<!--   - Added 750, 650 and 550 hPa levels (~8k, 12k, 16k ft), which also      -->
+<!--     makes the estimated cloudbase (beyond Met Office range) finer.        -->
+<!--   - Snapshot for the accuracy checker now includes cloud and bands.       -->
 <!-- v4.9 (2026-11-25)                                                         -->
 <!--   - Added an MPH / KT switch in the header. Changes every wind and gust   -->
 <!--     figure (cards, hourly table, model rows, outlook text, AFF label and  -->
@@ -220,7 +233,7 @@
     <!-- [SECTION: CONFIGURATION & SETTINGS BLOCK] -->
     <script>
         const CONFIG = {
-            revision: "v4.9",
+            revision: "v5.0",
             systemName: "RichBot",
             locationName: "Skydive Southwest, Dunkeswell Airfield",
             latitude: 50.880,
@@ -230,7 +243,8 @@
             refreshIntervalMinutes: 5,
             affWindLimitMph: 17,            // AFF student limit: 15 knots. Wind OR gusts above this = not AFF suitable
             cloudbaseCoverThreshold: 50,    // % cloud cover at a level that counts as the cloudbase (estimate)
-            minCloudForBase: 25,            // ignore a Met Office base if Low and Mid cloud are both below this %
+            minCloudForBase: 25,
+            cloudTopFt: 15000,              // cloud % only counts cloud below this height above the airfield (~16k ft above sea level)            // ignore a Met Office base if Low and Mid cloud are both below this %
 
             // TUNING - the only settings the weekly accuracy agent may change (see forecast/accuracy/).
             // Neutral values: weights 1, biases 0. Ops limits above (23 mph, AFF) are NOT tuning.
@@ -396,7 +410,7 @@
         let selectedDayIndex = 0;
 
         // Pressure levels used to find the real cloudbase (1000 hPa ~ sea level ... 500 hPa ~ 18,000 ft)
-        const PRESSURE_LEVELS = [1000, 975, 950, 925, 900, 850, 800, 700, 600, 500];
+        const PRESSURE_LEVELS = [1000, 975, 950, 925, 900, 850, 800, 750, 700, 650, 600, 550, 500];
         const PRESSURE_LEVEL_VARS = PRESSURE_LEVELS.flatMap(p => [`cloud_cover_${p}hPa`, `geopotential_height_${p}hPa`]).join(',');
 
         // [SUB-SECTION: UNIT CONVERSION UTILITIES]
@@ -569,6 +583,28 @@
         }
 
         // [SUB-SECTION: METEOROLOGICAL & CLOUDBASE CALCULATIONS]
+        // Cloud cover by height above the airfield: the most cloud at any pressure level in each band.
+        // Returns { b0_5, b5_10, b10_top, above } in %, or null where the model gives no level data.
+        function getCloudBands(i) {
+            const hourly = globalWeatherData.hourly;
+            const bands = { b0_5: null, b5_10: null, b10_top: null, above: null };
+            const put = (key, cover) => { bands[key] = Math.max(bands[key] ?? 0, cover); };
+            for (const p of PRESSURE_LEVELS) {
+                const gh = hourly[`geopotential_height_${p}hPa`];
+                const cc = hourly[`cloud_cover_${p}hPa`];
+                const height = gh ? gh[i] : null;
+                const cover = cc ? cc[i] : null;
+                if (height === null || height === undefined || cover === null || cover === undefined) continue;
+                const agl = (height - CONFIG.elevation) * 3.28084;
+                if (agl < 0) continue;   // level is below the airfield
+                if (agl < 5000) put('b0_5', cover);
+                else if (agl < 10000) put('b5_10', cover);
+                else if (agl <= CONFIG.cloudTopFt) put('b10_top', cover);
+                else put('above', cover);
+            }
+            return bands;
+        }
+
         // Cloudbase in ft above the airfield, read from the model's cloud cover at each pressure level.
         // The base is the height where cover first reaches CONFIG.cloudbaseCoverThreshold,
         // interpolated between the level below and the level above.
@@ -710,8 +746,17 @@
 
             const cloudbase = getCloudbase(i, low, mid);
 
+            // Cloud that matters for jumping: below CONFIG.cloudTopFt above the airfield.
+            const bands = getCloudBands(i);
+            const haveBands = bands.b0_5 !== null || bands.b5_10 !== null || bands.b10_top !== null;
+            const cloud = Math.round(haveBands
+                ? Math.max(low, bands.b0_5 ?? 0, bands.b5_10 ?? 0, bands.b10_top ?? 0)
+                : Math.max(low, mid));
+            const cloudAbove = Math.round(Math.max(high, bands.above ?? 0));
+
             return {
                 temp, dew, hum, code, rain, vis, low, mid, high, total, ws, wg,
+                cloud, bands, cloudAbove,
                 dir: blendedWind.dir[i],
                 base: cloudbase.base,
                 baseEstimated: cloudbase.estimated,
@@ -729,7 +774,7 @@
         // Returns the problems for the hour and a 0-100 score.
         function assessHour(d) {
             const issues = [];
-            const cloud = Math.max(d.low, d.mid);   // cloud up to ~26,000 ft (Low or Mid layer)
+            const cloud = d.cloud;   // cloud below CONFIG.cloudTopFt above the airfield
             if (d.ws > 23 || d.wg > 23) issues.push('wind');
             if (d.rain >= 50) issues.push('rain');
             if (d.isFog) issues.push('fog');
@@ -769,7 +814,7 @@
 
                 const { issues } = assessHour(d);
 
-                hours.push({ hour: hourNum, issues, ws: d.ws, wg: d.wg, dir: d.dir, cloudCover: d.total, affOk: d.affOk });
+                hours.push({ hour: hourNum, issues, ws: d.ws, wg: d.wg, dir: d.dir, cloudCover: d.cloud, affOk: d.affOk });
             }
             if (hours.length === 0) return 'No forecast available for this day.';
 
@@ -1139,11 +1184,13 @@
 
             // Atmospheric & Cloud Rows
             let rainRow = `<tr><td class="param-label">Rain (%)</td>`;
-            let cloudRow = `<tr><td class="param-label">Cloud (%)</td>`;
+            const topK = Math.round(CONFIG.cloudTopFt / 1000);
+            let cloudRow = `<tr><td class="param-label" title="Cloud below ${topK},000 ft above the airfield (about ${topK + 1},000 ft above sea level). Higher cloud is ignored.">Cloud &lt;${topK}k (%)</td>`;
             // Open-Meteo's own cloud layers (heights are approximate, above sea level)
-            let cLowRow = `<tr><td class="param-label" title="Low cloud and fog, up to about 3 km (above sea level)">☁ Low (to 10k)</td>`;
-            let cMidRow = `<tr><td class="param-label" title="Mid-level cloud, about 3 to 8 km (above sea level)">☁ Mid (10-26k)</td>`;
-            let cHighRow = `<tr><td class="param-label" title="High cloud, above about 8 km (above sea level)">☁ High (26k+)</td>`;
+            let cLowRow = `<tr><td class="param-label" title="Most cloud at any height from the airfield up to 5,000 ft above it">☁ 0-5k ft</td>`;
+            let cMidRow = `<tr><td class="param-label" title="Most cloud at any height from 5,000 to 10,000 ft above the airfield">☁ 5-10k ft</td>`;
+            let cTopRow = `<tr><td class="param-label" title="Most cloud at any height from 10,000 to ${topK},000 ft above the airfield">☁ 10-${topK}k ft</td>`;
+            let cHighRow = `<tr><td class="param-label" title="Cloud above ${topK},000 ft (including high cloud). For information only: not used for the JUMP %." style="color:var(--text-muted);">☁ Above ${topK}k</td>`;
 
             let visRow = `<tr><td class="param-label">Vis (km)</td>`;
             let baseRow = `<tr><td class="param-label" title="Met Office UK 2 km cloud base, about 2.5 days ahead. Beyond that, 'est.' = estimate from cloud cover by height.">Base (ft AGL)</td>`;
@@ -1175,7 +1222,7 @@
                 const vis = parseFloat(d.vis.toFixed(1));
                 const code = d.code;
                 const fogStatus = d.fogStatus;
-                const cloud = Math.round(d.total);
+                const cloud = d.cloud;
 
                 const hFog = fogStatus === 'FOG' || fogStatus === 'MIST' || vis < 3;
                 const wInfo = getWeatherIcon(hFog ? 45 : code, rain);
@@ -1229,9 +1276,13 @@
                 rainRow += `<td class="${colClass}">${getTrafficBadge('rain', rain, '%')}</td>`;
                 cloudRow += `<td class="${colClass}">${getTrafficBadge('cloud', cloud, '%')}</td>`;
                 
-                cLowRow += `<td class="${colClass} ${getCloudColorClass(d.low)}" style="font-size: 0.7rem;">${Math.round(d.low)}%</td>`;
-                cMidRow += `<td class="${colClass} ${getCloudColorClass(d.mid)}" style="font-size: 0.7rem;">${Math.round(d.mid)}%</td>`;
-                cHighRow += `<td class="${colClass} ${getCloudColorClass(d.high)}" style="font-size: 0.7rem;">${Math.round(d.high)}%</td>`;
+                const bandCell = v => v === null
+                    ? `<td class="${colClass}" style="font-size: 0.7rem; color: var(--text-muted);">--</td>`
+                    : `<td class="${colClass} ${getCloudColorClass(v)}" style="font-size: 0.7rem;">${Math.round(v)}%</td>`;
+                cLowRow += bandCell(d.bands.b0_5);
+                cMidRow += bandCell(d.bands.b5_10);
+                cTopRow += bandCell(d.bands.b10_top);
+                cHighRow += `<td class="${colClass}" style="font-size: 0.7rem; color: var(--text-muted);">${d.cloudAbove}%</td>`;
 
                 visRow += `<td class="${colClass}">${getTrafficBadge('vis', vis)}</td>`;
                 if (d.base === undefined) {
@@ -1260,6 +1311,7 @@
             cloudRow += `</tr>`;
             cLowRow += `</tr>`;
             cMidRow += `</tr>`;
+            cTopRow += `</tr>`;
             cHighRow += `</tr>`;
             visRow += `</tr>`;
             baseRow += `</tr>`;
@@ -1282,6 +1334,7 @@
                     ${cloudRow}
                     ${cLowRow}
                     ${cMidRow}
+                    ${cTopRow}
                     ${cHighRow}
                     ${visRow}
                     ${baseRow}
@@ -1330,6 +1383,7 @@
                     ws: d.ws, wg: d.wg, dir: Math.round(d.dir),
                     rain: d.rain, vis: Math.round(d.vis * 10) / 10,
                     low: d.low, mid: d.mid, high: d.high, total: d.total,
+                    cloud: d.cloud, cloudAbove: d.cloudAbove, bands: d.bands,
                     baseFt: typeof d.base === 'number' ? d.base : null,
                     baseState: typeof d.base === 'number' ? 'ft' : (d.base === null ? 'clear' : (d.base === 'check' ? 'check' : 'nodata')),
                     baseEstimated: d.baseEstimated,

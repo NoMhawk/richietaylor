@@ -302,7 +302,7 @@ def build_pairs(data_dir, now):
                     "fc_dir": h["dir"], "ob_dir": ob["dir"],
                     "fc_base_state": h["baseState"], "fc_base_ft": h["baseFt"], "fc_base_est": int(bool(h["baseEstimated"])),
                     "ob_base_ft": ob.get("base"), "ob_ceiling_ft": ob["ceiling"], "ob_lowest_ft": ob["lowest"],
-                    "fc_cloud": max(h["low"], h["mid"]), "ob_cloud": ob["cloud"],
+                    "fc_cloud": h.get("cloud", max(h["low"], h["mid"])), "ob_cloud": ob["cloud"],
                     "fc_rain_prob": h["rain"], "ob_rain": int(ob["rain"]),
                     "fc_vis": h["vis"], "ob_vis": ob["vis"], "fc_fog": int(bool(h["fog"])), "ob_fog": int(ob["fog"]),
                     "fc_score": h["score"], "fc_issues": "/".join(h["issues"]), "ob_issues": "/".join(ob["issues"]),
