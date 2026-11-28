@@ -1,0 +1,60 @@
+{
+ "EGDY": {
+  "2026-11-28T00:00Z": {
+   "base": 736,
+   "ceiling": 736,
+   "cloud": 75,
+   "dir": 130,
+   "fog": false,
+   "issues": [
+    "lowbase"
+   ],
+   "lowest": 136,
+   "rain": false,
+   "raw": "METAR EGDY 272350Z AUTO 13004KT 9999 // FEW009/// BKN015/// 09/09 Q1017",
+   "station": "EGDY",
+   "time": "2026-11-28T00:00Z",
+   "vis": 9.7,
+   "wg": null,
+   "ws": 5
+  },
+  "2026-11-28T00:20Z": {
+   "base": 736,
+   "ceiling": 736,
+   "cloud": 100,
+   "dir": 180,
+   "fog": false,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "lowest": 736,
+   "rain": false,
+   "raw": "METAR EGDY 280020Z AUTO 18003KT 9999 // OVC015/// 10/09 Q1017",
+   "station": "EGDY",
+   "time": "2026-11-28T00:20Z",
+   "vis": 9.7,
+   "wg": null,
+   "ws": 3
+  },
+  "2026-11-28T01:00Z": {
+   "base": 636,
+   "ceiling": 636,
+   "cloud": 100,
+   "dir": 170,
+   "fog": false,
+   "issues": [
+    "lowbase",
+    "cloud"
+   ],
+   "lowest": 636,
+   "rain": false,
+   "raw": "METAR EGDY 280050Z AUTO 17004KT 9999 OVC014/// 10/10 Q1017",
+   "station": "EGDY",
+   "time": "2026-11-28T01:00Z",
+   "vis": 9.7,
+   "wg": null,
+   "ws": 5
+  }
+ }
+}

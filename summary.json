@@ -3,77 +3,77 @@
  "by_revision": {
   "v4.8": {
    "cloudbase_ft": {
-    "bias": -160,
-    "mae": 1532,
-    "median_bias": 464,
-    "n": 56
+    "bias": -195,
+    "mae": 1488,
+    "median_bias": 335,
+    "n": 60
    },
    "first_valid": "2026-11-25T11:00",
-   "hours": 56,
+   "hours": 60,
    "jumpable": {
-    "accuracy_pct": 75,
-    "both_no": 42,
+    "accuracy_pct": 73,
+    "both_no": 44,
     "both_yes": 0,
-    "n": 56,
-    "said_no_but_yes": 12,
+    "n": 60,
+    "said_no_but_yes": 14,
     "said_yes_but_no": 2
    },
-   "last_valid": "2026-11-27T16:00",
+   "last_valid": "2026-11-27T18:00",
    "wind_mph": {
-    "bias": 0.6,
-    "mae": 2.2,
+    "bias": 0.9,
+    "mae": 2.4,
     "median_bias": 1.0,
-    "n": 56
+    "n": 60
    }
   },
   "v5.0": {
    "cloudbase_ft": {
-    "bias": 669,
-    "mae": 978,
-    "median_bias": 482,
-    "n": 36
+    "bias": 543,
+    "mae": 968,
+    "median_bias": 400,
+    "n": 40
    },
    "first_valid": "2026-11-26T08:00",
-   "hours": 40,
+   "hours": 44,
    "jumpable": {
-    "accuracy_pct": 80,
-    "both_no": 29,
+    "accuracy_pct": 77,
+    "both_no": 31,
     "both_yes": 3,
-    "n": 40,
-    "said_no_but_yes": 3,
+    "n": 44,
+    "said_no_but_yes": 5,
     "said_yes_but_no": 5
    },
-   "last_valid": "2026-11-27T16:00",
+   "last_valid": "2026-11-27T18:00",
    "wind_mph": {
-    "bias": 0.5,
-    "mae": 2.5,
+    "bias": 0.4,
+    "mae": 2.8,
     "median_bias": 0.5,
-    "n": 40
+    "n": 44
    }
   },
   "v5.2": {
    "cloudbase_ft": {
-    "bias": -1,
-    "mae": 700,
+    "bias": -31,
+    "mae": 723,
     "median_bias": 64,
-    "n": 56
+    "n": 64
    },
    "first_valid": "2026-11-26T09:00",
-   "hours": 56,
+   "hours": 64,
    "jumpable": {
-    "accuracy_pct": 84,
-    "both_no": 44,
+    "accuracy_pct": 80,
+    "both_no": 48,
     "both_yes": 3,
-    "n": 56,
-    "said_no_but_yes": 4,
+    "n": 64,
+    "said_no_but_yes": 8,
     "said_yes_but_no": 5
    },
-   "last_valid": "2026-11-27T16:00",
+   "last_valid": "2026-11-27T18:00",
    "wind_mph": {
-    "bias": 0.3,
-    "mae": 2.7,
+    "bias": 0.0,
+    "mae": 3.0,
     "median_bias": 0.0,
-    "n": 56
+    "n": 64
    }
   }
  },
@@ -91,7 +91,7 @@
   "windBiasMph": 0
  },
  "data_since": "2026-11-25T11:00",
- "generated": "2026-11-27T16:46Z",
+ "generated": "2026-11-28T01:29Z",
  "reports": [
   "2026-11-25.md",
   "2026-11-27.md"
@@ -112,36 +112,36 @@
    "by_lead": {
     "day_2": {
      "cloud_pct": {
-      "bias": 18,
-      "mae": 19,
+      "bias": 20,
+      "mae": 22,
       "median_bias": 20,
-      "n": 20
+      "n": 28
      },
      "cloudbase_ft": {
-      "bias": -199,
-      "mae": 522,
+      "bias": -325,
+      "mae": 622,
       "median_bias": -136,
-      "n": 20
+      "n": 28
      },
      "gust_mph_when_reported": {
       "n": 0
      },
-     "hours": 20,
+     "hours": 28,
      "jumpable": {
-      "accuracy_pct": 90,
-      "both_no": 18,
+      "accuracy_pct": 79,
+      "both_no": 22,
       "both_yes": 0,
-      "n": 20,
-      "said_no_but_yes": 2,
+      "n": 28,
+      "said_no_but_yes": 6,
       "said_yes_but_no": 0
      },
      "low_base_under_2000": {
-      "accuracy_pct": 75,
+      "accuracy_pct": 68,
       "both_no": 0,
-      "both_yes": 15,
-      "n": 20,
+      "both_yes": 19,
+      "n": 28,
       "said_no_but_yes": 0,
-      "said_yes_but_no": 5
+      "said_yes_but_no": 9
      },
      "models_gust_mph_when_reported": {
       "ecmwf_ifs025": {
@@ -159,44 +159,44 @@
      },
      "models_wind_mph": {
       "ecmwf_ifs025": {
-       "bias": 1.7,
-       "mae": 2.9,
-       "median_bias": 1.5,
-       "n": 20
+       "bias": 0.9,
+       "mae": 3.7,
+       "median_bias": 1.0,
+       "n": 28
       },
       "gfs_seamless": {
-       "bias": 1.9,
-       "mae": 2.8,
+       "bias": 2.3,
+       "mae": 3.4,
        "median_bias": 2.0,
-       "n": 20
+       "n": 28
       },
       "icon_seamless": {
-       "bias": 1.5,
-       "mae": 2.6,
+       "bias": 2.8,
+       "mae": 3.6,
        "median_bias": 1.0,
-       "n": 20
+       "n": 28
       },
       "meteofrance_seamless": {
-       "bias": 5.3,
-       "mae": 5.7,
+       "bias": 4.3,
+       "mae": 6.1,
        "median_bias": 5.0,
-       "n": 20
+       "n": 28
       }
      },
      "rain": {
-      "accuracy_pct": 55,
+      "accuracy_pct": 46,
       "both_no": 0,
-      "both_yes": 11,
-      "n": 20,
+      "both_yes": 13,
+      "n": 28,
       "said_no_but_yes": 0,
-      "said_yes_but_no": 9
+      "said_yes_but_no": 15
      },
-     "wind_dir_deg_mae": 38,
+     "wind_dir_deg_mae": 46,
      "wind_mph": {
-      "bias": 2.7,
-      "mae": 3.1,
+      "bias": 2.6,
+      "mae": 3.7,
       "median_bias": 2.0,
-      "n": 20
+      "n": 28
      }
     },
     "day_3_plus": {
@@ -255,35 +255,35 @@
     "next_day": {
      "cloud_pct": {
       "bias": 16,
-      "mae": 19,
+      "mae": 20,
       "median_bias": 25,
-      "n": 76
+      "n": 84
      },
      "cloudbase_ft": {
-      "bias": 356,
-      "mae": 859,
+      "bias": 297,
+      "mae": 861,
       "median_bias": 264,
-      "n": 74
+      "n": 82
      },
      "gust_mph_when_reported": {
       "n": 0
      },
-     "hours": 76,
+     "hours": 84,
      "jumpable": {
-      "accuracy_pct": 88,
-      "both_no": 64,
+      "accuracy_pct": 85,
+      "both_no": 68,
       "both_yes": 3,
-      "n": 76,
-      "said_no_but_yes": 8,
+      "n": 84,
+      "said_no_but_yes": 12,
       "said_yes_but_no": 1
      },
      "low_base_under_2000": {
-      "accuracy_pct": 74,
-      "both_no": 9,
-      "both_yes": 47,
-      "n": 76,
-      "said_no_but_yes": 9,
-      "said_yes_but_no": 11
+      "accuracy_pct": 71,
+      "both_no": 11,
+      "both_yes": 49,
+      "n": 84,
+      "said_no_but_yes": 11,
+      "said_yes_but_no": 13
      },
      "models_gust_mph_when_reported": {
       "ecmwf_ifs025": {
@@ -301,44 +301,44 @@
      },
      "models_wind_mph": {
       "ecmwf_ifs025": {
-       "bias": 0.1,
-       "mae": 3.1,
-       "median_bias": 1.0,
-       "n": 76
+       "bias": -0.5,
+       "mae": 3.4,
+       "median_bias": 0.0,
+       "n": 84
       },
       "gfs_seamless": {
        "bias": 0.5,
-       "mae": 2.5,
+       "mae": 2.8,
        "median_bias": 1.0,
-       "n": 76
+       "n": 84
       },
       "icon_seamless": {
-       "bias": 0.7,
-       "mae": 2.8,
+       "bias": 1.0,
+       "mae": 3.0,
        "median_bias": 0.5,
-       "n": 76
+       "n": 84
       },
       "meteofrance_seamless": {
-       "bias": -0.2,
-       "mae": 3.4,
+       "bias": -0.5,
+       "mae": 3.6,
        "median_bias": 0.0,
-       "n": 76
+       "n": 84
       }
      },
      "rain": {
-      "accuracy_pct": 75,
+      "accuracy_pct": 70,
       "both_no": 28,
-      "both_yes": 29,
-      "n": 76,
+      "both_yes": 31,
+      "n": 84,
       "said_no_but_yes": 0,
-      "said_yes_but_no": 19
+      "said_yes_but_no": 25
      },
-     "wind_dir_deg_mae": 28,
+     "wind_dir_deg_mae": 32,
      "wind_mph": {
-      "bias": 0.2,
-      "mae": 2.7,
+      "bias": 0.1,
+      "mae": 2.9,
       "median_bias": 0.0,
-      "n": 76
+      "n": 84
      }
     },
     "same_day": {
@@ -434,35 +434,35 @@
    "by_station": {
     "EGDY": {
      "cloud_pct": {
-      "bias": 6,
-      "mae": 17,
-      "median_bias": 8,
-      "n": 76
+      "bias": 5,
+      "mae": 16,
+      "median_bias": 0,
+      "n": 84
      },
      "cloudbase_ft": {
-      "bias": -354,
-      "mae": 1159,
-      "median_bias": 82,
-      "n": 74
+      "bias": -278,
+      "mae": 1089,
+      "median_bias": 164,
+      "n": 82
      },
      "gust_mph_when_reported": {
       "n": 0
      },
-     "hours": 76,
+     "hours": 84,
      "jumpable": {
-      "accuracy_pct": 78,
-      "both_no": 55,
+      "accuracy_pct": 80,
+      "both_no": 63,
       "both_yes": 4,
-      "n": 76,
+      "n": 84,
       "said_no_but_yes": 12,
       "said_yes_but_no": 5
      },
      "low_base_under_2000": {
-      "accuracy_pct": 59,
+      "accuracy_pct": 61,
       "both_no": 11,
-      "both_yes": 34,
-      "n": 76,
-      "said_no_but_yes": 6,
+      "both_yes": 40,
+      "n": 84,
+      "said_no_but_yes": 8,
       "said_yes_but_no": 25
      },
      "models_gust_mph_when_reported": {
@@ -481,78 +481,78 @@
      },
      "models_wind_mph": {
       "ecmwf_ifs025": {
-       "bias": -0.3,
-       "mae": 2.8,
-       "median_bias": 0.0,
-       "n": 76
+       "bias": -1.1,
+       "mae": 3.3,
+       "median_bias": -1.0,
+       "n": 84
       },
       "gfs_seamless": {
-       "bias": 0.0,
-       "mae": 2.1,
+       "bias": -0.3,
+       "mae": 2.3,
        "median_bias": -1.0,
-       "n": 76
+       "n": 84
       },
       "icon_seamless": {
        "bias": 0.1,
-       "mae": 2.1,
+       "mae": 2.0,
        "median_bias": -0.5,
-       "n": 76
+       "n": 84
       },
       "meteofrance_seamless": {
-       "bias": -0.1,
-       "mae": 3.5,
+       "bias": -0.7,
+       "mae": 3.9,
        "median_bias": 0.0,
-       "n": 76
+       "n": 84
       }
      },
      "rain": {
-      "accuracy_pct": 68,
+      "accuracy_pct": 67,
       "both_no": 40,
-      "both_yes": 12,
-      "n": 76,
+      "both_yes": 16,
+      "n": 84,
       "said_no_but_yes": 0,
-      "said_yes_but_no": 24
+      "said_yes_but_no": 28
      },
-     "wind_dir_deg_mae": 27,
+     "wind_dir_deg_mae": 32,
      "wind_mph": {
-      "bias": -0.1,
-      "mae": 2.4,
+      "bias": -0.5,
+      "mae": 2.6,
       "median_bias": -1.0,
-      "n": 76
+      "n": 84
      }
     },
     "EGTE": {
      "cloud_pct": {
-      "bias": 13,
-      "mae": 22,
-      "median_bias": 22,
-      "n": 76
+      "bias": 17,
+      "mae": 25,
+      "median_bias": 25,
+      "n": 84
      },
      "cloudbase_ft": {
-      "bias": 559,
-      "mae": 1005,
-      "median_bias": 500,
-      "n": 74
+      "bias": 376,
+      "mae": 1036,
+      "median_bias": 335,
+      "n": 82
      },
      "gust_mph_when_reported": {
       "n": 0
      },
-     "hours": 76,
+     "hours": 84,
      "jumpable": {
-      "accuracy_pct": 82,
+      "accuracy_pct": 74,
       "both_no": 60,
       "both_yes": 2,
-      "n": 76,
-      "said_no_but_yes": 7,
+      "n": 84,
+      "said_no_but_yes": 15,
       "said_yes_but_no": 7
      },
      "low_base_under_2000": {
-      "accuracy_pct": 76,
-      "both_no": 4,
+      "accuracy_pct": 71,
+      "both_no": 6,
       "both_yes": 54,
-      "n": 76,
+      "n": 84,
       "said_no_but_yes": 13,
-      "said_yes_but_no": 5
+      "said_yes_but_no": 11
      },
      "models_gust_mph_when_reported": {
       "ecmwf_ifs025": {
@@ -570,44 +570,44 @@
      },
      "models_wind_mph": {
       "ecmwf_ifs025": {
-       "bias": 0.8,
-       "mae": 2.2,
+       "bias": 0.9,
+       "mae": 2.4,
        "median_bias": 1.0,
-       "n": 76
+       "n": 84
       },
       "gfs_seamless": {
-       "bias": 1.1,
-       "mae": 2.5,
-       "median_bias": 1.0,
-       "n": 76
-      },
-      "icon_seamless": {
-       "bias": 1.2,
+       "bias": 1.6,
        "mae": 3.0,
        "median_bias": 1.0,
-       "n": 76
+       "n": 84
+      },
+      "icon_seamless": {
+       "bias": 2.1,
+       "mae": 3.6,
+       "median_bias": 1.5,
+       "n": 84
       },
       "meteofrance_seamless": {
-       "bias": 1.0,
-       "mae": 3.4,
-       "median_bias": 1.0,
-       "n": 76
+       "bias": 1.3,
+       "mae": 3.6,
+       "median_bias": 1.5,
+       "n": 84
       }
      },
      "rain": {
-      "accuracy_pct": 95,
+      "accuracy_pct": 86,
       "both_no": 40,
       "both_yes": 32,
-      "n": 76,
+      "n": 84,
       "said_no_but_yes": 0,
-      "said_yes_but_no": 4
+      "said_yes_but_no": 12
      },
-     "wind_dir_deg_mae": 30,
+     "wind_dir_deg_mae": 33,
      "wind_mph": {
-      "bias": 1.0,
-      "mae": 2.5,
+      "bias": 1.4,
+      "mae": 2.8,
       "median_bias": 1.0,
-      "n": 76
+      "n": 84
      }
     }
    },
@@ -631,22 +631,6 @@
     "lead_1_days": {
      "day_verdict_50pct": {
       "accuracy_pct": 100,
-      "both_no": 2,
-      "both_yes": 0,
-      "n": 2,
-      "said_no_but_yes": 0,
-      "said_yes_but_no": 0
-     },
-     "jump_pct": {
-      "bias": -11.0,
-      "mae": 11.0,
-      "median_bias": -11.0,
-      "n": 2
-     }
-    },
-    "overall": {
-     "day_verdict_50pct": {
-      "accuracy_pct": 100,
       "both_no": 8,
       "both_yes": 0,
       "n": 8,
@@ -654,45 +638,77 @@
       "said_yes_but_no": 0
      },
      "jump_pct": {
-      "bias": -4.1,
-      "mae": 17.4,
-      "median_bias": -4.0,
+      "bias": -6.9,
+      "mae": 6.9,
+      "median_bias": -5.5,
       "n": 8
+     }
+    },
+    "lead_2_days": {
+     "day_verdict_50pct": {
+      "accuracy_pct": 100,
+      "both_no": 2,
+      "both_yes": 0,
+      "n": 2,
+      "said_no_but_yes": 0,
+      "said_yes_but_no": 0
+     },
+     "jump_pct": {
+      "bias": -5.5,
+      "mae": 5.5,
+      "median_bias": -5.5,
+      "n": 2
+     }
+    },
+    "overall": {
+     "day_verdict_50pct": {
+      "accuracy_pct": 100,
+      "both_no": 16,
+      "both_yes": 0,
+      "n": 16,
+      "said_no_but_yes": 0,
+      "said_yes_but_no": 0
+     },
+     "jump_pct": {
+      "bias": -4.8,
+      "mae": 11.4,
+      "median_bias": -4.0,
+      "n": 16
      }
     }
    },
    "overall": {
     "cloud_pct": {
-     "bias": 10,
+     "bias": 11,
      "mae": 20,
      "median_bias": 19,
-     "n": 152
+     "n": 168
     },
     "cloudbase_ft": {
-     "bias": 102,
-     "mae": 1082,
-     "median_bias": 300,
-     "n": 148
+     "bias": 49,
+     "mae": 1062,
+     "median_bias": 282,
+     "n": 164
     },
     "gust_mph_when_reported": {
      "n": 0
     },
-    "hours": 152,
+    "hours": 168,
     "jumpable": {
-     "accuracy_pct": 80,
-     "both_no": 115,
+     "accuracy_pct": 77,
+     "both_no": 123,
      "both_yes": 6,
-     "n": 152,
-     "said_no_but_yes": 19,
+     "n": 168,
+     "said_no_but_yes": 27,
      "said_yes_but_no": 12
     },
     "low_base_under_2000": {
-     "accuracy_pct": 68,
-     "both_no": 15,
-     "both_yes": 88,
-     "n": 152,
-     "said_no_but_yes": 19,
-     "said_yes_but_no": 30
+     "accuracy_pct": 66,
+     "both_no": 17,
+     "both_yes": 94,
+     "n": 168,
+     "said_no_but_yes": 21,
+     "said_yes_but_no": 36
     },
     "models_gust_mph_when_reported": {
      "ecmwf_ifs025": {
@@ -710,44 +726,44 @@
     },
     "models_wind_mph": {
      "ecmwf_ifs025": {
-      "bias": 0.2,
-      "mae": 2.5,
+      "bias": -0.1,
+      "mae": 2.9,
       "median_bias": 0.0,
-      "n": 152
+      "n": 168
      },
      "gfs_seamless": {
-      "bias": 0.6,
-      "mae": 2.3,
+      "bias": 0.7,
+      "mae": 2.6,
       "median_bias": 1.0,
-      "n": 152
+      "n": 168
      },
      "icon_seamless": {
-      "bias": 0.7,
-      "mae": 2.5,
+      "bias": 1.1,
+      "mae": 2.8,
       "median_bias": 1.0,
-      "n": 152
+      "n": 168
      },
      "meteofrance_seamless": {
-      "bias": 0.5,
-      "mae": 3.5,
+      "bias": 0.3,
+      "mae": 3.7,
       "median_bias": 0.0,
-      "n": 152
+      "n": 168
      }
     },
     "rain": {
-     "accuracy_pct": 82,
+     "accuracy_pct": 76,
      "both_no": 80,
-     "both_yes": 44,
-     "n": 152,
+     "both_yes": 48,
+     "n": 168,
      "said_no_but_yes": 0,
-     "said_yes_but_no": 28
+     "said_yes_but_no": 40
     },
-    "wind_dir_deg_mae": 28,
+    "wind_dir_deg_mae": 32,
     "wind_mph": {
      "bias": 0.5,
-     "mae": 2.5,
+     "mae": 2.7,
      "median_bias": 0.0,
-     "n": 152
+     "n": 168
     }
    }
   },
@@ -755,36 +771,36 @@
    "by_lead": {
     "day_2": {
      "cloud_pct": {
-      "bias": 18,
-      "mae": 19,
+      "bias": 20,
+      "mae": 22,
       "median_bias": 20,
-      "n": 20
+      "n": 28
      },
      "cloudbase_ft": {
-      "bias": -199,
-      "mae": 522,
+      "bias": -325,
+      "mae": 622,
       "median_bias": -136,
-      "n": 20
+      "n": 28
      },
      "gust_mph_when_reported": {
       "n": 0
      },
-     "hours": 20,
+     "hours": 28,
      "jumpable": {
-      "accuracy_pct": 90,
-      "both_no": 18,
+      "accuracy_pct": 79,
+      "both_no": 22,
       "both_yes": 0,
-      "n": 20,
-      "said_no_but_yes": 2,
+      "n": 28,
+      "said_no_but_yes": 6,
       "said_yes_but_no": 0
      },
      "low_base_under_2000": {
-      "accuracy_pct": 75,
+      "accuracy_pct": 68,
       "both_no": 0,
-      "both_yes": 15,
-      "n": 20,
+      "both_yes": 19,
+      "n": 28,
       "said_no_but_yes": 0,
-      "said_yes_but_no": 5
+      "said_yes_but_no": 9
      },
      "models_gust_mph_when_reported": {
       "ecmwf_ifs025": {
@@ -802,44 +818,44 @@
      },
      "models_wind_mph": {
       "ecmwf_ifs025": {
-       "bias": 1.7,
-       "mae": 2.9,
-       "median_bias": 1.5,
-       "n": 20
+       "bias": 0.9,
+       "mae": 3.7,
+       "median_bias": 1.0,
+       "n": 28
       },
       "gfs_seamless": {
-       "bias": 1.9,
-       "mae": 2.8,
+       "bias": 2.3,
+       "mae": 3.4,
        "median_bias": 2.0,
-       "n": 20
+       "n": 28
       },
       "icon_seamless": {
-       "bias": 1.5,
-       "mae": 2.6,
+       "bias": 2.8,
+       "mae": 3.6,
        "median_bias": 1.0,
-       "n": 20
+       "n": 28
       },
       "meteofrance_seamless": {
-       "bias": 5.3,
-       "mae": 5.7,
+       "bias": 4.3,
+       "mae": 6.1,
        "median_bias": 5.0,
-       "n": 20
+       "n": 28
       }
      },
      "rain": {
-      "accuracy_pct": 55,
+      "accuracy_pct": 46,
       "both_no": 0,
-      "both_yes": 11,
-      "n": 20,
+      "both_yes": 13,
+      "n": 28,
       "said_no_but_yes": 0,
-      "said_yes_but_no": 9
+      "said_yes_but_no": 15
      },
-     "wind_dir_deg_mae": 38,
+     "wind_dir_deg_mae": 46,
      "wind_mph": {
-      "bias": 2.7,
-      "mae": 3.1,
+      "bias": 2.6,
+      "mae": 3.7,
       "median_bias": 2.0,
-      "n": 20
+      "n": 28
      }
     },
     "day_3_plus": {
@@ -898,35 +914,35 @@
     "next_day": {
      "cloud_pct": {
       "bias": 16,
-      "mae": 19,
+      "mae": 20,
       "median_bias": 25,
-      "n": 76
+      "n": 84
      },
      "cloudbase_ft": {
-      "bias": 356,
-      "mae": 859,
+      "bias": 297,
+      "mae": 861,
       "median_bias": 264,
-      "n": 74
+      "n": 82
      },
      "gust_mph_when_reported": {
       "n": 0
      },
-     "hours": 76,
+     "hours": 84,
      "jumpable": {
-      "accuracy_pct": 88,
-      "both_no": 64,
+      "accuracy_pct": 85,
+      "both_no": 68,
       "both_yes": 3,
-      "n": 76,
-      "said_no_but_yes": 8,
+      "n": 84,
+      "said_no_but_yes": 12,
       "said_yes_but_no": 1
      },
      "low_base_under_2000": {
-      "accuracy_pct": 74,
-      "both_no": 9,
-      "both_yes": 47,
-      "n": 76,
-      "said_no_but_yes": 9,
-      "said_yes_but_no": 11
+      "accuracy_pct": 71,
+      "both_no": 11,
+      "both_yes": 49,
+      "n": 84,
+      "said_no_but_yes": 11,
+      "said_yes_but_no": 13
      },
      "models_gust_mph_when_reported": {
       "ecmwf_ifs025": {
@@ -944,44 +960,44 @@
      },
      "models_wind_mph": {
       "ecmwf_ifs025": {
-       "bias": 0.1,
-       "mae": 3.1,
-       "median_bias": 1.0,
-       "n": 76
+       "bias": -0.5,
+       "mae": 3.4,
+       "median_bias": 0.0,
+       "n": 84
       },
       "gfs_seamless": {
        "bias": 0.5,
-       "mae": 2.5,
+       "mae": 2.8,
        "median_bias": 1.0,
-       "n": 76
+       "n": 84
       },
       "icon_seamless": {
-       "bias": 0.7,
-       "mae": 2.8,
+       "bias": 1.0,
+       "mae": 3.0,
        "median_bias": 0.5,
-       "n": 76
+       "n": 84
       },
       "meteofrance_seamless": {
-       "bias": -0.2,
-       "mae": 3.4,
+       "bias": -0.5,
+       "mae": 3.6,
        "median_bias": 0.0,
-       "n": 76
+       "n": 84
       }
      },
      "rain": {
-      "accuracy_pct": 75,
+      "accuracy_pct": 70,
       "both_no": 28,
-      "both_yes": 29,
-      "n": 76,
+      "both_yes": 31,
+      "n": 84,
       "said_no_but_yes": 0,
-      "said_yes_but_no": 19
+      "said_yes_but_no": 25
      },
-     "wind_dir_deg_mae": 28,
+     "wind_dir_deg_mae": 32,
      "wind_mph": {
-      "bias": 0.2,
-      "mae": 2.7,
+      "bias": 0.1,
+      "mae": 2.9,
       "median_bias": 0.0,
-      "n": 76
+      "n": 84
      }
     },
     "same_day": {
@@ -1077,35 +1093,35 @@
    "by_station": {
     "EGDY": {
      "cloud_pct": {
-      "bias": 6,
-      "mae": 17,
-      "median_bias": 8,
-      "n": 76
+      "bias": 5,
+      "mae": 16,
+      "median_bias": 0,
+      "n": 84
      },
      "cloudbase_ft": {
-      "bias": -354,
-      "mae": 1159,
-      "median_bias": 82,
-      "n": 74
+      "bias": -278,
+      "mae": 1089,
+      "median_bias": 164,
+      "n": 82
      },
      "gust_mph_when_reported": {
       "n": 0
      },
-     "hours": 76,
+     "hours": 84,
      "jumpable": {
-      "accuracy_pct": 78,
-      "both_no": 55,
+      "accuracy_pct": 80,
+      "both_no": 63,
       "both_yes": 4,
-      "n": 76,
+      "n": 84,
       "said_no_but_yes": 12,
       "said_yes_but_no": 5
      },
      "low_base_under_2000": {
-      "accuracy_pct": 59,
+      "accuracy_pct": 61,
       "both_no": 11,
-      "both_yes": 34,
-      "n": 76,
-      "said_no_but_yes": 6,
+      "both_yes": 40,
+      "n": 84,
+      "said_no_but_yes": 8,
       "said_yes_but_no": 25
      },
      "models_gust_mph_when_reported": {
@@ -1124,78 +1140,78 @@
      },
      "models_wind_mph": {
       "ecmwf_ifs025": {
-       "bias": -0.3,
-       "mae": 2.8,
-       "median_bias": 0.0,
-       "n": 76
+       "bias": -1.1,
+       "mae": 3.3,
+       "median_bias": -1.0,
+       "n": 84
       },
       "gfs_seamless": {
-       "bias": 0.0,
-       "mae": 2.1,
+       "bias": -0.3,
+       "mae": 2.3,
        "median_bias": -1.0,
-       "n": 76
+       "n": 84
       },
       "icon_seamless": {
        "bias": 0.1,
-       "mae": 2.1,
+       "mae": 2.0,
        "median_bias": -0.5,
-       "n": 76
+       "n": 84
       },
       "meteofrance_seamless": {
-       "bias": -0.1,
-       "mae": 3.5,
+       "bias": -0.7,
+       "mae": 3.9,
        "median_bias": 0.0,
-       "n": 76
+       "n": 84
       }
      },
      "rain": {
-      "accuracy_pct": 68,
+      "accuracy_pct": 67,
       "both_no": 40,
-      "both_yes": 12,
-      "n": 76,
+      "both_yes": 16,
+      "n": 84,
       "said_no_but_yes": 0,
-      "said_yes_but_no": 24
+      "said_yes_but_no": 28
      },
-     "wind_dir_deg_mae": 27,
+     "wind_dir_deg_mae": 32,
      "wind_mph": {
-      "bias": -0.1,
-      "mae": 2.4,
+      "bias": -0.5,
+      "mae": 2.6,
       "median_bias": -1.0,
-      "n": 76
+      "n": 84
      }
     },
     "EGTE": {
      "cloud_pct": {
-      "bias": 13,
-      "mae": 22,
-      "median_bias": 22,
-      "n": 76
+      "bias": 17,
+      "mae": 25,
+      "median_bias": 25,
+      "n": 84
      },
      "cloudbase_ft": {
-      "bias": 559,
-      "mae": 1005,
-      "median_bias": 500,
-      "n": 74
+      "bias": 376,
+      "mae": 1036,
+      "median_bias": 335,
+      "n": 82
      },
      "gust_mph_when_reported": {
       "n": 0
      },
-     "hours": 76,
+     "hours": 84,
      "jumpable": {
-      "accuracy_pct": 82,
+      "accuracy_pct": 74,
       "both_no": 60,
       "both_yes": 2,
-      "n": 76,
-      "said_no_but_yes": 7,
+      "n": 84,
+      "said_no_but_yes": 15,
       "said_yes_but_no": 7
      },
      "low_base_under_2000": {
-      "accuracy_pct": 76,
-      "both_no": 4,
+      "accuracy_pct": 71,
+      "both_no": 6,
       "both_yes": 54,
-      "n": 76,
+      "n": 84,
       "said_no_but_yes": 13,
-      "said_yes_but_no": 5
+      "said_yes_but_no": 11
      },
      "models_gust_mph_when_reported": {
       "ecmwf_ifs025": {
@@ -1213,44 +1229,44 @@
      },
      "models_wind_mph": {
       "ecmwf_ifs025": {
-       "bias": 0.8,
-       "mae": 2.2,
+       "bias": 0.9,
+       "mae": 2.4,
        "median_bias": 1.0,
-       "n": 76
+       "n": 84
       },
       "gfs_seamless": {
-       "bias": 1.1,
-       "mae": 2.5,
-       "median_bias": 1.0,
-       "n": 76
-      },
-      "icon_seamless": {
-       "bias": 1.2,
+       "bias": 1.6,
        "mae": 3.0,
        "median_bias": 1.0,
-       "n": 76
+       "n": 84
+      },
+      "icon_seamless": {
+       "bias": 2.1,
+       "mae": 3.6,
+       "median_bias": 1.5,
+       "n": 84
       },
       "meteofrance_seamless": {
-       "bias": 1.0,
-       "mae": 3.4,
-       "median_bias": 1.0,
-       "n": 76
+       "bias": 1.3,
+       "mae": 3.6,
+       "median_bias": 1.5,
+       "n": 84
       }
      },
      "rain": {
-      "accuracy_pct": 95,
+      "accuracy_pct": 86,
       "both_no": 40,
       "both_yes": 32,
-      "n": 76,
+      "n": 84,
       "said_no_but_yes": 0,
-      "said_yes_but_no": 4
+      "said_yes_but_no": 12
      },
-     "wind_dir_deg_mae": 30,
+     "wind_dir_deg_mae": 33,
      "wind_mph": {
-      "bias": 1.0,
-      "mae": 2.5,
+      "bias": 1.4,
+      "mae": 2.8,
       "median_bias": 1.0,
-      "n": 76
+      "n": 84
      }
     }
    },
@@ -1274,22 +1290,6 @@
     "lead_1_days": {
      "day_verdict_50pct": {
       "accuracy_pct": 100,
-      "both_no": 2,
-      "both_yes": 0,
-      "n": 2,
-      "said_no_but_yes": 0,
-      "said_yes_but_no": 0
-     },
-     "jump_pct": {
-      "bias": -11.0,
-      "mae": 11.0,
-      "median_bias": -11.0,
-      "n": 2
-     }
-    },
-    "overall": {
-     "day_verdict_50pct": {
-      "accuracy_pct": 100,
       "both_no": 8,
       "both_yes": 0,
       "n": 8,
@@ -1297,45 +1297,77 @@
       "said_yes_but_no": 0
      },
      "jump_pct": {
-      "bias": -4.1,
-      "mae": 17.4,
-      "median_bias": -4.0,
+      "bias": -6.9,
+      "mae": 6.9,
+      "median_bias": -5.5,
       "n": 8
+     }
+    },
+    "lead_2_days": {
+     "day_verdict_50pct": {
+      "accuracy_pct": 100,
+      "both_no": 2,
+      "both_yes": 0,
+      "n": 2,
+      "said_no_but_yes": 0,
+      "said_yes_but_no": 0
+     },
+     "jump_pct": {
+      "bias": -5.5,
+      "mae": 5.5,
+      "median_bias": -5.5,
+      "n": 2
+     }
+    },
+    "overall": {
+     "day_verdict_50pct": {
+      "accuracy_pct": 100,
+      "both_no": 16,
+      "both_yes": 0,
+      "n": 16,
+      "said_no_but_yes": 0,
+      "said_yes_but_no": 0
+     },
+     "jump_pct": {
+      "bias": -4.8,
+      "mae": 11.4,
+      "median_bias": -4.0,
+      "n": 16
      }
     }
    },
    "overall": {
     "cloud_pct": {
-     "bias": 10,
+     "bias": 11,
      "mae": 20,
      "median_bias": 19,
-     "n": 152
+     "n": 168
     },
     "cloudbase_ft": {
-     "bias": 102,
-     "mae": 1082,
-     "median_bias": 300,
-     "n": 148
+     "bias": 49,
+     "mae": 1062,
+     "median_bias": 282,
+     "n": 164
     },
     "gust_mph_when_reported": {
      "n": 0
     },
-    "hours": 152,
+    "hours": 168,
     "jumpable": {
-     "accuracy_pct": 80,
-     "both_no": 115,
+     "accuracy_pct": 77,
+     "both_no": 123,
      "both_yes": 6,
-     "n": 152,
-     "said_no_but_yes": 19,
+     "n": 168,
+     "said_no_but_yes": 27,
      "said_yes_but_no": 12
     },
     "low_base_under_2000": {
-     "accuracy_pct": 68,
-     "both_no": 15,
-     "both_yes": 88,
-     "n": 152,
-     "said_no_but_yes": 19,
-     "said_yes_but_no": 30
+     "accuracy_pct": 66,
+     "both_no": 17,
+     "both_yes": 94,
+     "n": 168,
+     "said_no_but_yes": 21,
+     "said_yes_but_no": 36
     },
     "models_gust_mph_when_reported": {
      "ecmwf_ifs025": {
@@ -1353,44 +1385,44 @@
     },
     "models_wind_mph": {
      "ecmwf_ifs025": {
-      "bias": 0.2,
-      "mae": 2.5,
+      "bias": -0.1,
+      "mae": 2.9,
       "median_bias": 0.0,
-      "n": 152
+      "n": 168
      },
      "gfs_seamless": {
-      "bias": 0.6,
-      "mae": 2.3,
+      "bias": 0.7,
+      "mae": 2.6,
       "median_bias": 1.0,
-      "n": 152
+      "n": 168
      },
      "icon_seamless": {
-      "bias": 0.7,
-      "mae": 2.5,
+      "bias": 1.1,
+      "mae": 2.8,
       "median_bias": 1.0,
-      "n": 152
+      "n": 168
      },
      "meteofrance_seamless": {
-      "bias": 0.5,
-      "mae": 3.5,
+      "bias": 0.3,
+      "mae": 3.7,
       "median_bias": 0.0,
-      "n": 152
+      "n": 168
      }
     },
     "rain": {
-     "accuracy_pct": 82,
+     "accuracy_pct": 76,
      "both_no": 80,
-     "both_yes": 44,
-     "n": 152,
+     "both_yes": 48,
+     "n": 168,
      "said_no_but_yes": 0,
-     "said_yes_but_no": 28
+     "said_yes_but_no": 40
     },
-    "wind_dir_deg_mae": 28,
+    "wind_dir_deg_mae": 32,
     "wind_mph": {
      "bias": 0.5,
-     "mae": 2.5,
+     "mae": 2.7,
      "median_bias": 0.0,
-     "n": 152
+     "n": 168
     }
    }
   },
@@ -1398,36 +1430,36 @@
    "by_lead": {
     "day_2": {
      "cloud_pct": {
-      "bias": 18,
-      "mae": 19,
+      "bias": 20,
+      "mae": 22,
       "median_bias": 20,
-      "n": 20
+      "n": 28
      },
      "cloudbase_ft": {
-      "bias": -199,
-      "mae": 522,
+      "bias": -325,
+      "mae": 622,
       "median_bias": -136,
-      "n": 20
+      "n": 28
      },
      "gust_mph_when_reported": {
       "n": 0
      },
-     "hours": 20,
+     "hours": 28,
      "jumpable": {
-      "accuracy_pct": 90,
-      "both_no": 18,
+      "accuracy_pct": 79,
+      "both_no": 22,
       "both_yes": 0,
-      "n": 20,
-      "said_no_but_yes": 2,
+      "n": 28,
+      "said_no_but_yes": 6,
       "said_yes_but_no": 0
      },
      "low_base_under_2000": {
-      "accuracy_pct": 75,
+      "accuracy_pct": 68,
       "both_no": 0,
-      "both_yes": 15,
-      "n": 20,
+      "both_yes": 19,
+      "n": 28,
       "said_no_but_yes": 0,
-      "said_yes_but_no": 5
+      "said_yes_but_no": 9
      },
      "models_gust_mph_when_reported": {
       "ecmwf_ifs025": {
@@ -1445,44 +1477,44 @@
      },
      "models_wind_mph": {
       "ecmwf_ifs025": {
-       "bias": 1.7,
-       "mae": 2.9,
-       "median_bias": 1.5,
-       "n": 20
+       "bias": 0.9,
+       "mae": 3.7,
+       "median_bias": 1.0,
+       "n": 28
       },
       "gfs_seamless": {
-       "bias": 1.9,
-       "mae": 2.8,
+       "bias": 2.3,
+       "mae": 3.4,
        "median_bias": 2.0,
-       "n": 20
+       "n": 28
       },
       "icon_seamless": {
-       "bias": 1.5,
-       "mae": 2.6,
+       "bias": 2.8,
+       "mae": 3.6,
        "median_bias": 1.0,
-       "n": 20
+       "n": 28
       },
       "meteofrance_seamless": {
-       "bias": 5.3,
-       "mae": 5.7,
+       "bias": 4.3,
+       "mae": 6.1,
        "median_bias": 5.0,
-       "n": 20
+       "n": 28
       }
      },
      "rain": {
-      "accuracy_pct": 55,
+      "accuracy_pct": 46,
       "both_no": 0,
-      "both_yes": 11,
-      "n": 20,
+      "both_yes": 13,
+      "n": 28,
       "said_no_but_yes": 0,
-      "said_yes_but_no": 9
+      "said_yes_but_no": 15
      },
-     "wind_dir_deg_mae": 38,
+     "wind_dir_deg_mae": 46,
      "wind_mph": {
-      "bias": 2.7,
-      "mae": 3.1,
+      "bias": 2.6,
+      "mae": 3.7,
       "median_bias": 2.0,
-      "n": 20
+      "n": 28
      }
     },
     "day_3_plus": {
@@ -1541,35 +1573,35 @@
     "next_day": {
      "cloud_pct": {
       "bias": 16,
-      "mae": 19,
+      "mae": 20,
       "median_bias": 25,
-      "n": 76
+      "n": 84
      },
      "cloudbase_ft": {
-      "bias": 356,
-      "mae": 859,
+      "bias": 297,
+      "mae": 861,
       "median_bias": 264,
-      "n": 74
+      "n": 82
      },
      "gust_mph_when_reported": {
       "n": 0
      },
-     "hours": 76,
+     "hours": 84,
      "jumpable": {
-      "accuracy_pct": 88,
-      "both_no": 64,
+      "accuracy_pct": 85,
+      "both_no": 68,
       "both_yes": 3,
-      "n": 76,
-      "said_no_but_yes": 8,
+      "n": 84,
+      "said_no_but_yes": 12,
       "said_yes_but_no": 1
      },
      "low_base_under_2000": {
-      "accuracy_pct": 74,
-      "both_no": 9,
-      "both_yes": 47,
-      "n": 76,
-      "said_no_but_yes": 9,
-      "said_yes_but_no": 11
+      "accuracy_pct": 71,
+      "both_no": 11,
+      "both_yes": 49,
+      "n": 84,
+      "said_no_but_yes": 11,
+      "said_yes_but_no": 13
      },
      "models_gust_mph_when_reported": {
       "ecmwf_ifs025": {
@@ -1587,44 +1619,44 @@
      },
      "models_wind_mph": {
       "ecmwf_ifs025": {
-       "bias": 0.1,
-       "mae": 3.1,
-       "median_bias": 1.0,
-       "n": 76
+       "bias": -0.5,
+       "mae": 3.4,
+       "median_bias": 0.0,
+       "n": 84
       },
       "gfs_seamless": {
        "bias": 0.5,
-       "mae": 2.5,
+       "mae": 2.8,
        "median_bias": 1.0,
-       "n": 76
+       "n": 84
       },
       "icon_seamless": {
-       "bias": 0.7,
-       "mae": 2.8,
+       "bias": 1.0,
+       "mae": 3.0,
        "median_bias": 0.5,
-       "n": 76
+       "n": 84
       },
       "meteofrance_seamless": {
-       "bias": -0.2,
-       "mae": 3.4,
+       "bias": -0.5,
+       "mae": 3.6,
        "median_bias": 0.0,
-       "n": 76
+       "n": 84
       }
      },
      "rain": {
-      "accuracy_pct": 75,
+      "accuracy_pct": 70,
       "both_no": 28,
-      "both_yes": 29,
-      "n": 76,
+      "both_yes": 31,
+      "n": 84,
       "said_no_but_yes": 0,
-      "said_yes_but_no": 19
+      "said_yes_but_no": 25
      },
-     "wind_dir_deg_mae": 28,
+     "wind_dir_deg_mae": 32,
      "wind_mph": {
-      "bias": 0.2,
-      "mae": 2.7,
+      "bias": 0.1,
+      "mae": 2.9,
       "median_bias": 0.0,
-      "n": 76
+      "n": 84
      }
     },
     "same_day": {
@@ -1720,35 +1752,35 @@
    "by_station": {
     "EGDY": {
      "cloud_pct": {
-      "bias": 6,
-      "mae": 17,
-      "median_bias": 8,
-      "n": 76
+      "bias": 5,
+      "mae": 16,
+      "median_bias": 0,
+      "n": 84
      },
      "cloudbase_ft": {
-      "bias": -354,
-      "mae": 1159,
-      "median_bias": 82,
-      "n": 74
+      "bias": -278,
+      "mae": 1089,
+      "median_bias": 164,
+      "n": 82
      },
      "gust_mph_when_reported": {
       "n": 0
      },
-     "hours": 76,
+     "hours": 84,
      "jumpable": {
-      "accuracy_pct": 78,
-      "both_no": 55,
+      "accuracy_pct": 80,
+      "both_no": 63,
       "both_yes": 4,
-      "n": 76,
+      "n": 84,
       "said_no_but_yes": 12,
       "said_yes_but_no": 5
      },
      "low_base_under_2000": {
-      "accuracy_pct": 59,
+      "accuracy_pct": 61,
       "both_no": 11,
-      "both_yes": 34,
-      "n": 76,
-      "said_no_but_yes": 6,
+      "both_yes": 40,
+      "n": 84,
+      "said_no_but_yes": 8,
       "said_yes_but_no": 25
      },
      "models_gust_mph_when_reported": {
@@ -1767,78 +1799,78 @@
      },
      "models_wind_mph": {
       "ecmwf_ifs025": {
-       "bias": -0.3,
-       "mae": 2.8,
-       "median_bias": 0.0,
-       "n": 76
+       "bias": -1.1,
+       "mae": 3.3,
+       "median_bias": -1.0,
+       "n": 84
       },
       "gfs_seamless": {
-       "bias": 0.0,
-       "mae": 2.1,
+       "bias": -0.3,
+       "mae": 2.3,
        "median_bias": -1.0,
-       "n": 76
+       "n": 84
       },
       "icon_seamless": {
        "bias": 0.1,
-       "mae": 2.1,
+       "mae": 2.0,
        "median_bias": -0.5,
-       "n": 76
+       "n": 84
       },
       "meteofrance_seamless": {
-       "bias": -0.1,
-       "mae": 3.5,
+       "bias": -0.7,
+       "mae": 3.9,
        "median_bias": 0.0,
-       "n": 76
+       "n": 84
       }
      },
      "rain": {
-      "accuracy_pct": 68,
+      "accuracy_pct": 67,
       "both_no": 40,
-      "both_yes": 12,
-      "n": 76,
+      "both_yes": 16,
+      "n": 84,
       "said_no_but_yes": 0,
-      "said_yes_but_no": 24
+      "said_yes_but_no": 28
      },
-     "wind_dir_deg_mae": 27,
+     "wind_dir_deg_mae": 32,
      "wind_mph": {
-      "bias": -0.1,
-      "mae": 2.4,
+      "bias": -0.5,
+      "mae": 2.6,
       "median_bias": -1.0,
-      "n": 76
+      "n": 84
      }
     },
     "EGTE": {
      "cloud_pct": {
-      "bias": 13,
-      "mae": 22,
-      "median_bias": 22,
-      "n": 76
+      "bias": 17,
+      "mae": 25,
+      "median_bias": 25,
+      "n": 84
      },
      "cloudbase_ft": {
-      "bias": 559,
-      "mae": 1005,
-      "median_bias": 500,
-      "n": 74
+      "bias": 376,
+      "mae": 1036,
+      "median_bias": 335,
+      "n": 82
      },
      "gust_mph_when_reported": {
       "n": 0
      },
-     "hours": 76,
+     "hours": 84,
      "jumpable": {
-      "accuracy_pct": 82,
+      "accuracy_pct": 74,
       "both_no": 60,
       "both_yes": 2,
-      "n": 76,
-      "said_no_but_yes": 7,
+      "n": 84,
+      "said_no_but_yes": 15,
       "said_yes_but_no": 7
      },
      "low_base_under_2000": {
-      "accuracy_pct": 76,
-      "both_no": 4,
+      "accuracy_pct": 71,
+      "both_no": 6,
       "both_yes": 54,
-      "n": 76,
+      "n": 84,
       "said_no_but_yes": 13,
-      "said_yes_but_no": 5
+      "said_yes_but_no": 11
      },
      "models_gust_mph_when_reported": {
       "ecmwf_ifs025": {
@@ -1856,44 +1888,44 @@
      },
      "models_wind_mph": {
       "ecmwf_ifs025": {
-       "bias": 0.8,
-       "mae": 2.2,
+       "bias": 0.9,
+       "mae": 2.4,
        "median_bias": 1.0,
-       "n": 76
+       "n": 84
       },
       "gfs_seamless": {
-       "bias": 1.1,
-       "mae": 2.5,
-       "median_bias": 1.0,
-       "n": 76
-      },
-      "icon_seamless": {
-       "bias": 1.2,
+       "bias": 1.6,
        "mae": 3.0,
        "median_bias": 1.0,
-       "n": 76
+       "n": 84
+      },
+      "icon_seamless": {
+       "bias": 2.1,
+       "mae": 3.6,
+       "median_bias": 1.5,
+       "n": 84
       },
       "meteofrance_seamless": {
-       "bias": 1.0,
-       "mae": 3.4,
-       "median_bias": 1.0,
-       "n": 76
+       "bias": 1.3,
+       "mae": 3.6,
+       "median_bias": 1.5,
+       "n": 84
       }
      },
      "rain": {
-      "accuracy_pct": 95,
+      "accuracy_pct": 86,
       "both_no": 40,
       "both_yes": 32,
-      "n": 76,
+      "n": 84,
       "said_no_but_yes": 0,
-      "said_yes_but_no": 4
+      "said_yes_but_no": 12
      },
-     "wind_dir_deg_mae": 30,
+     "wind_dir_deg_mae": 33,
      "wind_mph": {
-      "bias": 1.0,
-      "mae": 2.5,
+      "bias": 1.4,
+      "mae": 2.8,
       "median_bias": 1.0,
-      "n": 76
+      "n": 84
      }
     }
    },
@@ -1917,22 +1949,6 @@
     "lead_1_days": {
      "day_verdict_50pct": {
       "accuracy_pct": 100,
-      "both_no": 2,
-      "both_yes": 0,
-      "n": 2,
-      "said_no_but_yes": 0,
-      "said_yes_but_no": 0
-     },
-     "jump_pct": {
-      "bias": -11.0,
-      "mae": 11.0,
-      "median_bias": -11.0,
-      "n": 2
-     }
-    },
-    "overall": {
-     "day_verdict_50pct": {
-      "accuracy_pct": 100,
       "both_no": 8,
       "both_yes": 0,
       "n": 8,
@@ -1940,45 +1956,77 @@
       "said_yes_but_no": 0
      },
      "jump_pct": {
-      "bias": -4.1,
-      "mae": 17.4,
-      "median_bias": -4.0,
+      "bias": -6.9,
+      "mae": 6.9,
+      "median_bias": -5.5,
       "n": 8
+     }
+    },
+    "lead_2_days": {
+     "day_verdict_50pct": {
+      "accuracy_pct": 100,
+      "both_no": 2,
+      "both_yes": 0,
+      "n": 2,
+      "said_no_but_yes": 0,
+      "said_yes_but_no": 0
+     },
+     "jump_pct": {
+      "bias": -5.5,
+      "mae": 5.5,
+      "median_bias": -5.5,
+      "n": 2
+     }
+    },
+    "overall": {
+     "day_verdict_50pct": {
+      "accuracy_pct": 100,
+      "both_no": 16,
+      "both_yes": 0,
+      "n": 16,
+      "said_no_but_yes": 0,
+      "said_yes_but_no": 0
+     },
+     "jump_pct": {
+      "bias": -4.8,
+      "mae": 11.4,
+      "median_bias": -4.0,
+      "n": 16
      }
     }
    },
    "overall": {
     "cloud_pct": {
-     "bias": 10,
+     "bias": 11,
      "mae": 20,
      "median_bias": 19,
-     "n": 152
+     "n": 168
     },
     "cloudbase_ft": {
-     "bias": 102,
-     "mae": 1082,
-     "median_bias": 300,
-     "n": 148
+     "bias": 49,
+     "mae": 1062,
+     "median_bias": 282,
+     "n": 164
     },
     "gust_mph_when_reported": {
      "n": 0
     },
-    "hours": 152,
+    "hours": 168,
     "jumpable": {
-     "accuracy_pct": 80,
-     "both_no": 115,
+     "accuracy_pct": 77,
+     "both_no": 123,
      "both_yes": 6,
-     "n": 152,
-     "said_no_but_yes": 19,
+     "n": 168,
+     "said_no_but_yes": 27,
      "said_yes_but_no": 12
     },
     "low_base_under_2000": {
-     "accuracy_pct": 68,
-     "both_no": 15,
-     "both_yes": 88,
-     "n": 152,
-     "said_no_but_yes": 19,
-     "said_yes_but_no": 30
+     "accuracy_pct": 66,
+     "both_no": 17,
+     "both_yes": 94,
+     "n": 168,
+     "said_no_but_yes": 21,
+     "said_yes_but_no": 36
     },
     "models_gust_mph_when_reported": {
      "ecmwf_ifs025": {
@@ -1996,44 +2044,44 @@
     },
     "models_wind_mph": {
      "ecmwf_ifs025": {
-      "bias": 0.2,
-      "mae": 2.5,
+      "bias": -0.1,
+      "mae": 2.9,
       "median_bias": 0.0,
-      "n": 152
+      "n": 168
      },
      "gfs_seamless": {
-      "bias": 0.6,
-      "mae": 2.3,
+      "bias": 0.7,
+      "mae": 2.6,
       "median_bias": 1.0,
-      "n": 152
+      "n": 168
      },
      "icon_seamless": {
-      "bias": 0.7,
-      "mae": 2.5,
+      "bias": 1.1,
+      "mae": 2.8,
       "median_bias": 1.0,
-      "n": 152
+      "n": 168
      },
      "meteofrance_seamless": {
-      "bias": 0.5,
-      "mae": 3.5,
+      "bias": 0.3,
+      "mae": 3.7,
       "median_bias": 0.0,
-      "n": 152
+      "n": 168
      }
     },
     "rain": {
-     "accuracy_pct": 82,
+     "accuracy_pct": 76,
      "both_no": 80,
-     "both_yes": 44,
-     "n": 152,
+     "both_yes": 48,
+     "n": 168,
      "said_no_but_yes": 0,
-     "said_yes_but_no": 28
+     "said_yes_but_no": 40
     },
-    "wind_dir_deg_mae": 28,
+    "wind_dir_deg_mae": 32,
     "wind_mph": {
      "bias": 0.5,
-     "mae": 2.5,
+     "mae": 2.7,
      "median_bias": 0.0,
-     "n": 152
+     "n": 168
     }
    }
   }
